@@ -66,7 +66,7 @@
 
 | 项目 | 地址及已核对基线 | 主要借鉴 | 不直接搬运 |
 |---|---|---|---|
-| **pi-web** | https://github.com/agegr/pi-web ；本机 package `@agegr/pi-web@0.9.3`，Git `95a58744532c7fccaa933aa7757a1419ace67ed2`，依赖 Pi SDK `0.87.1` | 会话创建、API/SSE、历史读取、图片消息、扩展 UI 响应与资源加载 | 不复制整个服务端，不长期维护改名 fork，不假设 HTTP API 是永不变的公开 SDK |
+| **pi-web** | https://github.com/agegr/pi-web ；备份分支 `pi-web-backup` 当前指向远端 `main` 的 Git `96966e5f887e9b127c4ae651a8ccdd8493dc18f5`；文档原记录的 `95a58744532c7fccaa933aa7757a1419ace67ed2` 已不在当前远端可达历史中；本机 package `@agegr/pi-web@0.9.3`，依赖 Pi SDK `0.87.1` | 会话创建、API/SSE、历史读取、图片消息、扩展 UI 响应与资源加载 | 不复制整个服务端，不长期维护改名 fork，不假设 HTTP API 是永不变的公开 SDK |
 | **DeepSeek Orb** | https://github.com/mini-yifan/deepseek-harness-orb ；Git `72f1d738458a223696685a909e806b683eff5885`；根 README 称基于 dsh 0.1.7，实验包声明 `0.1.7-rc.1` | 浮球交互、观察窗口裁剪、坐标投影、动作后回图、overlay 排除、平台权限经验 | 不搬 Cordis 装配、dsh 附件引用格式、后台自动审批，不把实验 backend 视为生产稳定库 |
 
 两个仓库根 LICENSE 都是 MIT。pi-web 为 `Copyright (c) 2026 agegr`，DeepSeek 仓库为 `Copyright (c) 2026 DeepSeek`。借用实质性代码时保留版权及许可文本，逐文件记录来源提交／修改；检查原生依赖、二进制和素材各自许可。MIT 不授予第三方商标背书，不把 pi-Orb 描述为上游官方产品。DeepSeek Orb 的 `THIRD_PARTY_NOTICES.md` 是审阅入口，不代替新依赖的许可证检查。
