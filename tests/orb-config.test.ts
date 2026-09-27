@@ -3,8 +3,10 @@ import {
   createDefaultOrbConfig,
   isOrbWorkspace,
   normalizeDirPath,
+  ORB_CONFIG_ENV,
   ORB_CONFIG_VERSION,
   parseOrbConfig,
+  resolveOrbConfigPath,
   serializeOrbConfig,
   type OrbConfig,
 } from "@shared/orb-config";
@@ -99,5 +101,64 @@ describe("parseOrbConfig", () => {
       window: { ...valid.window, x: 10, y: 20 },
     };
     expect(parseOrbConfig(JSON.parse(serializeOrbConfig(configured)))).toEqual(configured);
+  });
+});
+
+describe("resolveOrbConfigPath", () => {
+  // The Electron shell writes this file and the Pi extension reads it. If the two
+  // sides resolved it differently, Orb mode would silently never activate. These
+  // tests pin one shared resolution.
+
+  it("honours the explicit override for both sides", () => {
+    expect(
+      resolveOrbConfigPath({ [ORB_CONFIG_ENV]: "D:\\custom\\orb.json" }, {
+        userDataDir: "C:\\ignored",
+      }),
+    ).toBe("D:\\custom\\orb.json");
+    expect(resolveOrbConfigPath({ [ORB_CONFIG_ENV]: "D:\\custom\\orb.json" })).toBe(
+      "D:\\custom\\orb.json",
+    );
+  });
+
+  it("ignores a blank override instead of producing an unusable path", () => {
+    expect(
+      resolveOrbConfigPath(
+        { [ORB_CONFIG_ENV]: "   " },
+        { userDataDir: "C:\\data", platform: "win32" },
+      ),
+    ).toBe("C:\\data\\orb-config.json");
+  });
+
+  it("uses the Electron userData directory when the shell supplies it", () => {
+    expect(resolveOrbConfigPath({}, { userDataDir: "C:\\Users\\u\\AppData\\Roaming\\pi-orb", platform: "win32" })).toBe(
+      "C:\\Users\\u\\AppData\\Roaming\\pi-orb\\orb-config.json",
+    );
+  });
+
+  it("derives the same Windows location without Electron, so the extension agrees", () => {
+    expect(
+      resolveOrbConfigPath(
+        { APPDATA: "C:\\Users\\u\\AppData\\Roaming" },
+        { platform: "win32" },
+      ),
+    ).toBe("C:\\Users\\u\\AppData\\Roaming\\pi-orb\\orb-config.json");
+  });
+
+  it("falls back to USERPROFILE when APPDATA is absent", () => {
+    expect(
+      resolveOrbConfigPath(
+        { USERPROFILE: "C:\\Users\\u" },
+        { platform: "win32" },
+      ),
+    ).toBe("C:\\Users\\u\\AppData\\Roaming\\pi-orb\\orb-config.json");
+  });
+
+  it("derives the documented non-Windows location", () => {
+    expect(
+      resolveOrbConfigPath({ XDG_CONFIG_HOME: "/home/u/.config" }, { platform: "linux" }),
+    ).toBe("/home/u/.config/pi-orb/orb-config.json");
+    expect(resolveOrbConfigPath({}, { platform: "linux", homeDir: "/home/u" })).toBe(
+      "/home/u/.config/pi-orb/orb-config.json",
+    );
   });
 });

@@ -7,19 +7,14 @@
  */
 
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { app } from "electron";
+import { dirname } from "node:path";
 import {
   createDefaultOrbConfig,
-  ORB_CONFIG_FILENAME,
   parseOrbConfig,
+  resolveOrbConfigPath,
   serializeOrbConfig,
   type OrbConfig,
 } from "@shared/orb-config";
-
-export function resolveConfigPath(userDataDir: string): string {
-  return join(userDataDir, ORB_CONFIG_FILENAME);
-}
 
 export interface ConfigLoadResult {
   readonly config: OrbConfig;
@@ -90,6 +85,6 @@ export function saveOrbConfig(path: string, config: OrbConfig): void {
   renameSync(tempPath, path);
 }
 
-export function defaultConfigPath(): string {
-  return resolveConfigPath(app.getPath("userData"));
+export function defaultConfigPath(userDataDir: string): string {
+  return resolveOrbConfigPath(process.env, { userDataDir });
 }

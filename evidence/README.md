@@ -12,6 +12,7 @@
 | `p0-04/` | 桌面驱动只读探针：窗口/DPI、截图/解码、后台语义、取消与清理 | 只读项完成；**Cua 运行时验证未通过（未安装）** |
 | `p0-05/` | 最小接入方案决策记录 | 已完成 |
 | `p1-00-foundation/` | P1 基建：工程骨架、质量门禁、启动冒烟、忽略规则与版本维护 | **通过**（门禁 4/4，启动 9/9） |
+| `p1-01/` | P1-01 工作区与独立会话：精确 cwd 匹配、切换不串会话、用户级 skill 事实 | **通过**（集成 19/19，应用 22/22） |
 
 ## 复现方式
 
@@ -42,6 +43,9 @@ P0-02/P0-03 会自动：核验 pi-web HEAD 是否为 `95a58744532c7fccaa933aa775
 node evidence/p1-00-foundation/verify-foundation.mjs
 # P1-00 真实 Electron 启动冒烟（隔离 userData 与配置；不截图、无桌面输入）
 node evidence/p1-00-foundation/run-boot-smoke.mjs
+# P1-01 工作区与独立会话（需先有 P0-02 的固定 HEAD 快照）
+node evidence/p1-01/run-p1-01.mjs
+node evidence/p1-01/run-p1-01-app.mjs
 ```
 
 ## 隔离边界（所有 P0 阶段一致）

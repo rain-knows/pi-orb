@@ -25,7 +25,7 @@ import {
   type NativeImage,
 } from "electron";
 import { join } from "node:path";
-import { loadOrbConfig, resolveConfigPath, saveOrbConfig } from "./config-store";
+import { loadOrbConfig, defaultConfigPath, saveOrbConfig } from "./config-store";
 import { validateWorkspace, createWorkspace } from "./workspace";
 import { RunGenerations } from "./generations";
 import { ShortcutRegistry } from "./shortcut";
@@ -104,10 +104,16 @@ function createWindow(): BrowserWindow {
 
 function currentStatus(): WorkspaceStatus {
   const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
+  const usable = Boolean(validation?.ok);
   return {
-    configured: Boolean(validation?.ok),
-    workspace: validation?.ok ? validation.resolved : config.orbWorkspace,
-    problem: validation?.ok ? null : (validation?.message ?? lastWorkspaceProblem),
+    configured: usable,
+    workspace: usable ? validation?.resolved ?? null : config.orbWorkspace,
+    // A rejection of a new selection must be reported even when the previously
+    // committed workspace is still perfectly usable; otherwise picking a bad
+    // directory looks like nothing happened at all.
+    problem: usable
+      ? lastWorkspaceProblem
+      : (validation?.message ?? lastWorkspaceProblem),
     shortcut: config.shortcut,
     shortcutRegistered: shortcuts.current?.registered ?? false,
     piWeb: { ...piWebState },
@@ -232,6 +238,8 @@ function registerIpc(): void {
     IPC.setWorkspace,
     async (_event, candidate: unknown, createConfirmed: unknown) => {
       if (typeof candidate !== "string" || candidate.trim().length === 0) {
+        // Cancelling is not a failure, but any earlier rejection is stale now.
+        lastWorkspaceProblem = null;
         return currentStatus();
       }
       let validation = validateWorkspace(candidate);
@@ -244,6 +252,7 @@ function registerIpc(): void {
         validation = created.validation ?? validation;
       }
       if (!validation.ok || !validation.resolved) {
+        // Keep the existing workspace; report why the new one was refused.
         lastWorkspaceProblem = validation.message;
         return currentStatus();
       }
@@ -341,7 +350,7 @@ function quit(): void {
 }
 
 void app.whenReady().then(async () => {
-  configPath = resolveConfigPath(app.getPath("userData"));
+  configPath = defaultConfigPath(app.getPath("userData"));
   const loaded = loadOrbConfig(configPath);
   config = loaded.config;
   if (loaded.error) {

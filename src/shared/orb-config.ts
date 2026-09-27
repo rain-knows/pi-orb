@@ -17,6 +17,15 @@
 /** File name of the Orb-owned configuration inside the Orb userData directory. */
 export const ORB_CONFIG_FILENAME = "orb-config.json";
 
+/**
+ * Environment variable overriding the configuration location.
+ *
+ * Both sides must honour it: the Electron shell writes the file, the Pi extension
+ * reads it. If only one side honoured it they would use different files and Orb
+ * mode would never activate, so the resolution lives in exactly one place below.
+ */
+export const ORB_CONFIG_ENV = "PI_ORB_CONFIG";
+
 /** Schema version of the configuration file. Bumped only on a breaking change. */
 export const ORB_CONFIG_VERSION = 1;
 
@@ -217,4 +226,69 @@ function readOptionalFiniteNumber(value: unknown): number | null | typeof INVALI
 
 export function serializeOrbConfig(config: OrbConfig): string {
   return `${JSON.stringify(config, null, 2)}\n`;
+}
+
+/**
+ * Resolve the Orb configuration path deterministically for both processes.
+ *
+ * Resolution order:
+ *  1. the `PI_ORB_CONFIG` override, when set to a non-blank value;
+ *  2. `<userDataDir>/orb-config.json`.
+ *
+ * `userDataDir` is supplied by the Electron main process (`app.getPath("userData")`).
+ * The Pi extension cannot call Electron APIs, so it falls back to the same
+ * directory Electron uses by default: `<APPDATA>/pi-orb` on Windows, and
+ * `~/.config/pi-orb` elsewhere. Pass `platform` and `homeDir` in tests.
+ *
+ * Keeping this in the shared module is deliberate: two independent resolutions
+ * would silently diverge on a platform or profile change.
+ */
+export function resolveOrbConfigPath(
+  env: Record<string, string | undefined> = process.env,
+  options: {
+    readonly userDataDir?: string | undefined;
+    readonly platform?: NodeJS.Platform;
+    readonly homeDir?: string;
+  } = {},
+): string {
+  const override = env[ORB_CONFIG_ENV];
+  if (override && override.trim().length > 0) return override;
+
+  const platform = options.platform ?? process.platform;
+  const userDataDir = options.userDataDir ?? defaultUserDataDir(env, platform, options.homeDir);
+  return joinPath(userDataDir, ORB_CONFIG_FILENAME, platform);
+}
+
+/**
+ * Mirrors Electron's default `userData` location for an app named `pi-orb`:
+ * `%APPDATA%\pi-orb` on Windows, `$XDG_CONFIG_HOME/pi-orb` or `~/.config/pi-orb`
+ * elsewhere.
+ */
+function defaultUserDataDir(
+  env: Record<string, string | undefined>,
+  platform: NodeJS.Platform,
+  homeDir: string | undefined,
+): string {
+  if (platform === "win32") {
+    const appData =
+      nonBlank(env.APPDATA) ?? joinPath(nonBlank(env.USERPROFILE) ?? homeDir ?? "", "AppData\\Roaming", platform);
+    return joinPath(appData, "pi-orb", platform);
+  }
+  const configHome = nonBlank(env.XDG_CONFIG_HOME) ?? joinPath(homeDir ?? "/root", ".config", platform);
+  return joinPath(configHome, "pi-orb", platform);
+}
+
+function nonBlank(value: string | undefined): string | null {
+  return typeof value === "string" && value.trim().length > 0 ? value : null;
+}
+
+/**
+ * A tiny path join so this shared module keeps no Node import and stays safe to
+ * load in the renderer bundle.
+ */
+function joinPath(base: string, relative: string, platform: NodeJS.Platform): string {
+  const separator = platform === "win32" ? "\\" : "/";
+  const normalizedBase = base.endsWith("/") || base.endsWith("\\") ? base.slice(0, -1) : base;
+  const normalizedRelative = relative.replace(/^[/\\]+/, "");
+  return `${normalizedBase}${separator}${normalizedRelative}`;
 }

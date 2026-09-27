@@ -15,28 +15,15 @@
  */
 
 import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
   isOrbWorkspace,
-  ORB_CONFIG_FILENAME,
   parseOrbConfig,
+  resolveOrbConfigPath,
   type OrbConfig,
 } from "../../src/shared/orb-config.js";
 
-export const ORB_CONFIG_ENV = "PI_ORB_CONFIG";
 export const ORB_MODE_SECTION = "orb_mode";
-
-export function resolveOrbConfigPath(env: NodeJS.ProcessEnv = process.env): string {
-  const override = env[ORB_CONFIG_ENV];
-  if (override && override.trim().length > 0) return override;
-  const appData =
-    env.APPDATA && env.APPDATA.trim().length > 0
-      ? env.APPDATA
-      : join(homedir(), "AppData", "Roaming");
-  return join(appData, "pi-orb", ORB_CONFIG_FILENAME);
-}
 
 /**
  * Read the Orb configuration. Returns `null` when the file is absent, unreadable
