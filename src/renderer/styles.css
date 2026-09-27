@@ -1,0 +1,148 @@
+:root {
+  color-scheme: dark light;
+  --orb-bg: #14161a;
+  --orb-fg: #e7e9ee;
+  --orb-muted: #9aa2b1;
+  --orb-accent: #4c8bf5;
+  --orb-surface: #1d2027;
+  --orb-error: #f2757a;
+  font-family: system-ui, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+}
+
+.orb {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0.6rem;
+  gap: 0.5rem;
+  background: var(--orb-bg);
+  color: var(--orb-fg);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.orb__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  -webkit-app-region: drag;
+}
+
+.orb__title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.orb__button {
+  -webkit-app-region: no-drag;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #333844;
+  border-radius: 6px;
+  background: var(--orb-surface);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.orb__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.orb__button--primary {
+  background: var(--orb-accent);
+  border-color: var(--orb-accent);
+  color: #06101f;
+  font-weight: 600;
+}
+
+.orb__setup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--orb-muted);
+}
+
+.orb__problem {
+  color: var(--orb-error);
+  margin: 0;
+}
+
+.orb__workspace {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--orb-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orb__messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.orb__message {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  background: var(--orb-surface);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9rem;
+}
+
+.orb__message--user {
+  background: #23303f;
+}
+
+.orb__message--error {
+  background: #3a1f22;
+  color: var(--orb-error);
+}
+
+.orb__composer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.orb__composer textarea {
+  resize: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #333844;
+  background: var(--orb-surface);
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.orb__actions {
+  display: flex;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.orb__notice {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--orb-muted);
+}
+
+.orb__notice--error {
+  color: var(--orb-error);
+}

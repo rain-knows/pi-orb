@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# pi-Orb repository ignore rules
+#
+# Intent: keep product source, documents and auditable text evidence under
+# version control; keep every generated artifact, local run directory, binary
+# blob and credential out of it.
+# ---------------------------------------------------------------------------
+
+# Dependencies and build output
+node_modules/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local scratch space used by development and probes
+.tmp/
+.tmp-*/
+*.log
+
+# Local pi-Orb run directories (probes write outside the repository, but a
+# local override may place them here)
+.pi-orb-runs/
+runs/
+
+# ---------------------------------------------------------------------------
+# Pi agent state.
+#
+# The project-level .pi directory is intentionally NOT ignored as a whole: a
+# project-level .pi/settings.json, .pi/extensions or .pi/prompts may need to be
+# reviewed and versioned. Only the per-run goal state of the local agent is
+# excluded.
+# ---------------------------------------------------------------------------
+.pi/goals/
+.pi/.goals-pool-snapshot.json
+.pi/.goals-*.json
+.pi/*-settings.local.json
+.pi/tmp/
+
+# ---------------------------------------------------------------------------
+# Credentials and personal data. Never commit these.
+# ---------------------------------------------------------------------------
+auth.json
+**/auth.json
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Native binaries and package archives of the desktop driver.
+# The locked versions are recorded as hashes in
+# evidence/p0-04/cua-artifact-manifest.json; the blobs themselves are not
+# redistributed from this repository.
+*.tgz
+*.dll
+*.node
+*.exe
+
+# Screenshots and captured pixels. pi-Orb never writes pixels to disk by
+# default; an explicit user export must not end up in the repository.
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.bmp
+
+# Electron/OS noise
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,11 @@
+{
+  "name": "pi-orb-pi-package",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi resources shipped with pi-Orb: the Orb mode extension.",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "pi": {
+    "extensions": ["./extensions/orb.ts"]
+  }
+}

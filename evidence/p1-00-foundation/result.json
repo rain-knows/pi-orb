@@ -1,0 +1,132 @@
+{
+  "capturedAt": "2026-09-27T16:30:30.254Z",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "packageVersion": "0.1.0",
+  "pinned": {
+    "@earendil-works/pi-coding-agent": "0.87.1",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "electron": "44.4.5",
+    "electron-vite": "5.0.0",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.1",
+    "vite": "7.3.6",
+    "vitest": "5.0.2"
+  },
+  "runtimePinned": {
+    "@trycua/cua-driver": "0.30.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "checks": [
+    {
+      "name": "typecheck",
+      "command": "npx tsc --noEmit",
+      "ok": true,
+      "durationMs": 5412,
+      "outputTail": ""
+    },
+    {
+      "name": "lint",
+      "command": "npx eslint .",
+      "ok": true,
+      "durationMs": 4249,
+      "outputTail": ""
+    },
+    {
+      "name": "unit tests",
+      "command": "npx vitest run",
+      "ok": true,
+      "durationMs": 2629,
+      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/generations.test.ts (7 tests) 4ms\n ✓ tests/shortcut.test.ts (8 tests) 4ms\n ✓ tests/orb-config.test.ts (14 tests) 5ms\n ✓ tests/workspace.test.ts (11 tests) 48ms\n\n Test Files  4 passed (4)\n      Tests  40 passed (40)\n   Start at  00:30:25\n   Duration  324ms (transform 54%, import 24%, tests 16%, worker 6%)"
+    },
+    {
+      "name": "production build",
+      "command": "npx electron-vite build",
+      "ok": true,
+      "durationMs": 3217,
+      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 9 modules transformed.\nrendering chunks...\nout/main/index.js  35.06 kB\n✓ built in 139ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  2.00 kB\n✓ built in 17ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 29 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-bV4Wn8Rh.css    2.36 kB\n../../out/renderer/assets/index-DKNT-tgO.js   648.79 kB\n✓ built in 537ms"
+    }
+  ],
+  "buildArtifacts": {
+    "expected": [
+      {
+        "path": "out/main/index.js",
+        "exists": true
+      },
+      {
+        "path": "out/preload/index.js",
+        "exists": true
+      },
+      {
+        "path": "out/renderer/index.html",
+        "exists": true
+      }
+    ],
+    "preloadIsCommonJs": true,
+    "mainReferencesExistingPreload": true
+  },
+  "repositoryHygiene": {
+    "statusEntries": [
+      "pi-fff-lsp-necessity.md",
+      "pi-orb-development-goals.md",
+      ".gitignore",
+      ".pi/",
+      "CHANGELOG.md",
+      "README.md",
+      "doc/",
+      "electron.vite.config.ts",
+      "eslint.config.js",
+      "evidence/",
+      "package-lock.json",
+      "package.json",
+      "pi-package/",
+      "src/",
+      "tests/",
+      "tsconfig.json",
+      "vitest.config.ts"
+    ],
+    "ignoreCoverage": [
+      {
+        "entry": "node_modules/",
+        "ignored": true
+      },
+      {
+        "entry": "out/",
+        "ignored": true
+      }
+    ],
+    "leakingEntries": [],
+    "piSettingsPresent": true,
+    "piGoalStateIgnored": true,
+    "ignoredPaths": [
+      ".pi/.goals-pool-snapshot.json",
+      ".pi/goals/",
+      "node_modules/",
+      "out/"
+    ]
+  },
+  "nonDestructive": {
+    "verifiedAt": "2026-09-27T16:30:30.243Z",
+    "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
+    "headUnchanged": true,
+    "checkedFiles": [
+      "app/endfield.css",
+      "components/AppShell.tsx",
+      "components/ChatInput.tsx",
+      "components/MessageView.tsx",
+      "components/SessionSidebar.tsx",
+      "docs/local-endfield-verification.md"
+    ],
+    "checkedCount": 6,
+    "failures": [],
+    "passed": true
+  },
+  "binaryEvidence": [],
+  "passed": true
+}

@@ -1,0 +1,1268 @@
+{
+  "capturedAt": "2026-09-27T12:44:34.535Z",
+  "isolation": {
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent",
+    "sessionDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions",
+    "cwd": [
+      "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\normal",
+      "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\orb",
+      "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\orb\\child",
+      "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\orb-sibling"
+    ],
+    "inheritedSecretEnv": false,
+    "screenshots": false,
+    "desktopInput": false,
+    "sourceSnapshot": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src",
+    "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "piWebHead": "95a58744532c7fccaa933aa7757a1419ace67ed2",
+    "piWebWorkingTreeChanges": [
+      "M app/endfield.css",
+      " M components/AppShell.tsx",
+      " M components/ChatInput.tsx",
+      " M components/MessageView.tsx",
+      " M components/SessionSidebar.tsx",
+      " M docs/local-endfield-verification.md"
+    ],
+    "sourceHead": "95a58744532c7fccaa933aa7757a1419ace67ed2",
+    "reusedSnapshot": true
+  },
+  "build": {
+    "productionBuild": "fixed-HEAD snapshot (git archive + npm ci) built with `next build --webpack` at --max-old-space-size=12288",
+    "runMode": "snapshot `next start` on 127.0.0.1:31287",
+    "devServerUnusable": "`next dev` crashes on this host: Turbopack rejects the linked node_modules, webpack mis-resolves across drives, and the temp-dir dev watcher hits a libuv fs-event assertion",
+    "piWebNodeModulesUnusable": "pi-web node_modules is missing @next/env; the snapshot uses its own npm ci install",
+    "piWebNodeModulesPath": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web\\node_modules"
+  },
+  "phases": {
+    "baselineNoExtension": {
+      "normal": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          }
+        ],
+        "commands": [
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e5-f138-7055-ab02-bf929f0ed9b5",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-normal--\\2026-09-27T12-45-15-449Z_01a0e2e5-f138-7055-ab02-bf929f0ed9b5.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "",
+          "extensionStatuses": []
+        }
+      },
+      "orb": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          }
+        ],
+        "commands": [
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e5-f2f5-7055-ab02-bf9515fab5f3",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-15-893Z_01a0e2e5-f2f5-7055-ab02-bf9515fab5f3.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "",
+          "extensionStatuses": []
+        }
+      }
+    },
+    "extensionInstalled": {
+      "normal": {
+        "sessionId": "01a0e2e6-1924-7386-817c-ad9e4a7710be",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            }
+          ],
+          "commands": [
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-1924-7386-817c-ad9e4a7710be",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-normal--\\2026-09-27T12-45-25-668Z_01a0e2e6-1924-7386-817c-ad9e4a7710be.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "",
+            "extensionStatuses": []
+          }
+        }
+      },
+      "orb": {
+        "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            },
+            {
+              "name": "orb_probe",
+              "active": true
+            }
+          ],
+          "commands": [
+            "orb-probe",
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "",
+            "extensionStatuses": []
+          }
+        }
+      },
+      "orbSecond": {
+        "sessionId": "01a0e2e6-1cbf-7386-817c-ada3d12ea45e",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            },
+            {
+              "name": "orb_probe",
+              "active": true
+            }
+          ],
+          "commands": [
+            "orb-probe",
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-1cbf-7386-817c-ada3d12ea45e",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-591Z_01a0e2e6-1cbf-7386-817c-ada3d12ea45e.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "",
+            "extensionStatuses": []
+          }
+        }
+      },
+      "child": {
+        "sessionId": "01a0e2e6-1e44-7386-817c-ada48049b6f8",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            }
+          ],
+          "commands": [
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-1e44-7386-817c-ada48049b6f8",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb-child--\\2026-09-27T12-45-26-980Z_01a0e2e6-1e44-7386-817c-ada48049b6f8.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "",
+            "extensionStatuses": []
+          }
+        }
+      },
+      "sibling": {
+        "sessionId": "01a0e2e6-1fb6-7386-817c-ada77b82a4e8",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            }
+          ],
+          "commands": [
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-1fb6-7386-817c-ada77b82a4e8",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb-sibling--\\2026-09-27T12-45-27-350Z_01a0e2e6-1fb6-7386-817c-ada77b82a4e8.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "",
+            "extensionStatuses": []
+          }
+        }
+      }
+    },
+    "promptCapture": {
+      "normal": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          }
+        ],
+        "commands": [
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e6-1924-7386-817c-ad9e4a7710be",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-normal--\\2026-09-27T12-45-25-668Z_01a0e2e6-1924-7386-817c-ad9e4a7710be.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/normal\n</cwd>",
+          "extensionStatuses": []
+        }
+      },
+      "orb": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          },
+          {
+            "name": "orb_probe",
+            "active": true
+          }
+        ],
+        "commands": [
+          "orb-probe",
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>",
+          "extensionStatuses": []
+        }
+      },
+      "normalRequests": [
+        {
+          "stream": true,
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/normal\n</cwd>"
+            },
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "p0 normal prompt"
+                }
+              ]
+            }
+          ],
+          "tools": [
+            "read"
+          ]
+        }
+      ],
+      "orbRequests": [
+        {
+          "stream": true,
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>"
+            },
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "p0 orb prompt"
+                }
+              ]
+            }
+          ],
+          "tools": [
+            "read",
+            "orb_probe"
+          ]
+        }
+      ],
+      "allRequests": [
+        {
+          "stream": true,
+          "tools": [
+            "read"
+          ]
+        },
+        {
+          "stream": true,
+          "tools": [
+            "read",
+            "orb_probe"
+          ]
+        }
+      ]
+    },
+    "chatOnlyRestoreReload": {
+      "chatOnly": {
+        "tools": [],
+        "commands": [],
+        "state": {
+          "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "",
+          "extensionStatuses": []
+        }
+      },
+      "restored": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          },
+          {
+            "name": "orb_probe",
+            "active": true
+          }
+        ],
+        "commands": [
+          "orb-probe",
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>",
+          "extensionStatuses": []
+        }
+      },
+      "reloaded": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          },
+          {
+            "name": "orb_probe",
+            "active": true
+          }
+        ],
+        "commands": [
+          "orb-probe",
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>",
+          "extensionStatuses": []
+        }
+      }
+    },
+    "fork": {
+      "sourceSessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+      "entryId": "b190dc0c",
+      "result": {
+        "cancelled": false,
+        "newSessionId": "01a0e2e6-28f3-7386-817c-ada9491ab538"
+      },
+      "snapshot": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          },
+          {
+            "name": "orb_probe",
+            "active": true
+          }
+        ],
+        "commands": [
+          "orb-probe",
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e6-28f3-7386-817c-ada9491ab538",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-29-715Z_01a0e2e6-28f3-7386-817c-ada9491ab538.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>",
+          "extensionStatuses": []
+        }
+      }
+    },
+    "resumeAfterRestart": {
+      "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+      "snapshot": {
+        "tools": [
+          {
+            "name": "read",
+            "active": true
+          },
+          {
+            "name": "bash",
+            "active": false
+          },
+          {
+            "name": "powershell",
+            "active": false
+          },
+          {
+            "name": "edit",
+            "active": false
+          },
+          {
+            "name": "write",
+            "active": false
+          },
+          {
+            "name": "grep",
+            "active": false
+          },
+          {
+            "name": "find",
+            "active": false
+          },
+          {
+            "name": "ls",
+            "active": false
+          },
+          {
+            "name": "orb_probe",
+            "active": true
+          }
+        ],
+        "commands": [
+          "orb-probe",
+          "skill:archify",
+          "skill:banner-design",
+          "skill:brand",
+          "skill:chinese-one-page-resume",
+          "skill:design",
+          "skill:design-system",
+          "skill:find-skills",
+          "skill:grill-me",
+          "skill:kwai",
+          "skill:slides",
+          "skill:ui-styling",
+          "skill:ui-ux-pro-max",
+          "skill:vercel-react-best-practices",
+          "skill:visual-graph",
+          "skill:web-design-guidelines"
+        ],
+        "state": {
+          "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+          "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+          "model": {
+            "id": "p0-model",
+            "provider": "p0-local"
+          },
+          "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>",
+          "extensionStatuses": []
+        }
+      }
+    },
+    "extensionRemoved": {
+      "resumedOrb": {
+        "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            }
+          ],
+          "commands": [
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-1b2b-7386-817c-ada1e76b2ea7",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-26-187Z_01a0e2e6-1b2b-7386-817c-ada1e76b2ea7.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>",
+            "extensionStatuses": []
+          }
+        }
+      },
+      "newOrb": {
+        "sessionId": "01a0e2e6-7924-718f-b80f-89617e80db6e",
+        "snapshot": {
+          "tools": [
+            {
+              "name": "read",
+              "active": true
+            },
+            {
+              "name": "bash",
+              "active": false
+            },
+            {
+              "name": "powershell",
+              "active": false
+            },
+            {
+              "name": "edit",
+              "active": false
+            },
+            {
+              "name": "write",
+              "active": false
+            },
+            {
+              "name": "grep",
+              "active": false
+            },
+            {
+              "name": "find",
+              "active": false
+            },
+            {
+              "name": "ls",
+              "active": false
+            }
+          ],
+          "commands": [
+            "skill:archify",
+            "skill:banner-design",
+            "skill:brand",
+            "skill:chinese-one-page-resume",
+            "skill:design",
+            "skill:design-system",
+            "skill:find-skills",
+            "skill:grill-me",
+            "skill:kwai",
+            "skill:slides",
+            "skill:ui-styling",
+            "skill:ui-ux-pro-max",
+            "skill:vercel-react-best-practices",
+            "skill:visual-graph",
+            "skill:web-design-guidelines"
+          ],
+          "state": {
+            "sessionId": "01a0e2e6-7924-718f-b80f-89617e80db6e",
+            "sessionFile": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-02-42016\\agent\\sessions\\--C--Users-JUSTLI~1-AppData-Local-Temp-pi-orb-p0-02-42016-orb--\\2026-09-27T12-45-50-245Z_01a0e2e6-7924-718f-b80f-89617e80db6e.jsonl",
+            "model": {
+              "id": "p0-model",
+              "provider": "p0-local"
+            },
+            "systemPrompt": "",
+            "extensionStatuses": []
+          }
+        }
+      }
+    }
+  },
+  "assertions": [
+    {
+      "name": "baseline normal has no orb tool",
+      "passed": true
+    },
+    {
+      "name": "baseline normal has no orb command",
+      "passed": true
+    },
+    {
+      "name": "installed normal has no orb tool",
+      "passed": true
+    },
+    {
+      "name": "installed normal has no orb command",
+      "passed": true
+    },
+    {
+      "name": "installed exact Orb cwd has orb tool",
+      "passed": true
+    },
+    {
+      "name": "installed exact Orb cwd has orb command",
+      "passed": true
+    },
+    {
+      "name": "Orb child cwd does not match",
+      "passed": true
+    },
+    {
+      "name": "prefix-similar sibling cwd does not match",
+      "passed": true
+    },
+    {
+      "name": "two sessions on the same Orb cwd both receive tool",
+      "passed": true
+    },
+    {
+      "name": "chat-only removes extension tool and command",
+      "passed": true
+    },
+    {
+      "name": "restoring tools restores extension tool",
+      "passed": true
+    },
+    {
+      "name": "reload preserves conditional extension",
+      "passed": true
+    },
+    {
+      "name": "resume preserves conditional extension",
+      "passed": true
+    },
+    {
+      "name": "removing extension restores ordinary behavior",
+      "passed": true
+    },
+    {
+      "name": "model request captured Orb tool schema",
+      "passed": true
+    },
+    {
+      "name": "model request captured structured Orb prompt",
+      "passed": true
+    },
+    {
+      "name": "normal cwd model request exists",
+      "passed": true
+    },
+    {
+      "name": "normal cwd model request has no Orb tool",
+      "passed": true
+    },
+    {
+      "name": "normal cwd model request has no Orb prompt section",
+      "passed": true
+    },
+    {
+      "name": "normal cwd system prompt has no Orb section",
+      "passed": true
+    },
+    {
+      "name": "Orb cwd session prompt exposes Orb section",
+      "passed": true
+    }
+  ],
+  "capturedModelRequests": [
+    {
+      "stream": true,
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/normal\n</cwd>"
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "p0 normal prompt"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        "read"
+      ]
+    },
+    {
+      "stream": true,
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are an expert coding assistant operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and writing new files.\n\n<tools>\n- read: Read file contents\n- orb_probe: P0 Orb read-only probe\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.\n</tools>\n\n<rules>\n- Use read to examine files instead of cat or sed.\n- Use only for the P0 read-only integration probe.\n- P0 Orb probe guideline: never perform desktop input.\n- Be concise in your responses\n- Show file paths clearly when working with files\n</rules>\n\n<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, extensions, themes, skills, or TUI):\n- Main documentation: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\README.md\n- Additional docs: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\docs\n- Examples: C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src\\node_modules\\@earendil-works\\pi-coding-agent\\examples (extensions, custom tools, SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md)\n- When working on pi topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files completely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>\n\n<skills>\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>archify</name>\n    <description>Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\archify\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>banner-design</name>\n    <description>Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\banner-design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>brand</name>\n    <description>Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\brand\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>chinese-one-page-resume</name>\n    <description>Create a job-targeted Chinese one-page A4 resume from user-provided personal information, photo/avatar, original resume, project or internship experience, skills, and a target job description. Use when you must rewrite resume content for a Chinese role and deliver final HTML, one-page PDF, and PNG preview files with browser height measurement, PDF page-count validation, icon rendering checks, and visual QA.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\chinese-one-page-resume\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design</name>\n    <description>Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>design-system</name>\n    <description>Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\design-system\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\find-skills\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>kwai</name>\n    <description>Use when a user asks to install, start, or troubleshoot AI 应用经验上传助手; scan supported local Agent sessions; create an Assessment Scope; or submit assessment data.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\kwai\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>slides</name>\n    <description>Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\slides\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-styling</name>\n    <description>Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-styling\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ui-ux-pro-max</name>\n    <description>UI/UX design intelligence with searchable database</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\ui-ux-pro-max\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>vercel-react-best-practices</name>\n    <description>React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\vercel-react-best-practices\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>visual-graph</name>\n    <description>Create editable, document-ready diagrams and infographics as self-contained SVG files and browser-rendered PNG previews. Use when you need to reproduce or design architecture diagrams, flowcharts, process maps, timelines, system graphs, comparison graphics, technical figures, icons, or other non-photographic visuals, especially when the output must be controllable, locally renderable, and fixed to SVG plus PNG.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\visual-graph\\SKILL.md</location>\n  </skill>\n  <skill>\n    <name>web-design-guidelines</name>\n    <description>Review UI code for Web Interface Guidelines compliance. Use when asked to &quot;review my UI&quot;, &quot;check accessibility&quot;, &quot;audit design&quot;, &quot;review UX&quot;, or &quot;check my site against best practices&quot;.</description>\n    <location>C:\\Users\\JUSTLIKEZYP\\.agents\\skills\\web-design-guidelines\\SKILL.md</location>\n  </skill>\n</available_skills>\n</skills>\n\n<cwd>\nC:/Users/JUSTLI~1/AppData/Local/Temp/pi-orb-p0-02-42016/orb\n</cwd>\n\n<orb_p0_probe>\nThis is a read-only integration test; desktop input is forbidden.\n</orb_p0_probe>"
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "p0 orb prompt"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        "read",
+        "orb_probe"
+      ]
+    }
+  ],
+  "passed": true
+}

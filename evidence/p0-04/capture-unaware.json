@@ -1,0 +1,155 @@
+﻿{
+    "awarenessMode":  "unaware",
+    "awarenessApplied":  false,
+    "threadAwarenessValue":  0,
+    "virtualScreen":  {
+                          "height":  1067,
+                          "width":  1707
+                      },
+    "desktopDpi":  144,
+    "fullScreenCapture":  {
+                              "width":  1707,
+                              "height":  1067,
+                              "bitbltSucceeded":  true,
+                              "pngEncodeMs":  34,
+                              "pixelsPersisted":  0,
+                              "captureMs":  34,
+                              "pngFormat":  "png",
+                              "pngByteSize":  346642,
+                              "pngSha256Prefix":  "a22c587b3626e5f7"
+                          },
+    "decodeVerification":  {
+                               "decodedWidth":  1707,
+                               "decodeMs":  13,
+                               "decodedFormat":  "[ImageFormat: b96b3caf-0728-11d3-9d7b-0000f81ef32e]",
+                               "decoded":  true,
+                               "dimensionsMatch":  true,
+                               "capturedWidth":  1707,
+                               "decodedHeight":  1067,
+                               "capturedHeight":  1067
+                           },
+    "windowCapture":  {
+                          "targetDpi":  144,
+                          "targetWasForeground":  true,
+                          "targetProcess":  "chrome",
+                          "printWindowFlagUsed":  2,
+                          "printWindowNote":  "flags tried in order 2 (PW_RENDERFULLCONTENT) then 0; a composited window may refuse both, which means window-targeted capture needs a compositor-aware fallback",
+                          "broughtToForeground":  false,
+                          "printWindowSucceeded":  true,
+                          "capturedSize":  {
+                                               "height":  1081,
+                                               "width":  1721
+                                           },
+                          "captureMs":  24,
+                          "titleLength":  31,
+                          "rectFromGetWindowRect":  {
+                                                        "left":  -7,
+                                                        "width":  1721,
+                                                        "top":  -7,
+                                                        "height":  1081
+                                                    }
+                      },
+    "backgroundCapture":  {
+                              "candidateCount":  4,
+                              "elapsedMs":  104,
+                              "conclusion":  "anyCapturedWhileBackground=true means at least one real window was captured without being raised; false means no tested window could be captured in the background, so the driver may have to front a window (a visible, disruptive behavior the product must disclose)",
+                              "foregroundUnchanged":  true,
+                              "anyCapturedWhileBackground":  true,
+                              "candidates":  [
+                                                 {
+                                                     "size":  {
+                                                                  "height":  1067,
+                                                                  "width":  1707
+                                                              },
+                                                     "flagUsed":  0,
+                                                     "titleLength":  24,
+                                                     "process":  "TabTip",
+                                                     "className":  "hashed",
+                                                     "dpi":  144,
+                                                     "wasForeground":  false,
+                                                     "capturedWhileBackground":  false
+                                                 },
+                                                 {
+                                                     "size":  {
+                                                                  "height":  787,
+                                                                  "width":  1076
+                                                              },
+                                                     "flagUsed":  2,
+                                                     "titleLength":  2,
+                                                     "process":  "Weixin",
+                                                     "className":  "hashed",
+                                                     "dpi":  144,
+                                                     "wasForeground":  false,
+                                                     "capturedWhileBackground":  true
+                                                 },
+                                                 {
+                                                     "size":  {
+                                                                  "height":  1081,
+                                                                  "width":  1721
+                                                              },
+                                                     "flagUsed":  2,
+                                                     "titleLength":  4,
+                                                     "process":  "Notion",
+                                                     "className":  "hashed",
+                                                     "dpi":  144,
+                                                     "wasForeground":  false,
+                                                     "capturedWhileBackground":  true
+                                                 },
+                                                 {
+                                                     "size":  {
+                                                                  "height":  1067,
+                                                                  "width":  1707
+                                                              },
+                                                     "flagUsed":  2,
+                                                     "titleLength":  2,
+                                                     "process":  "SystemSettings",
+                                                     "className":  "hashed",
+                                                     "dpi":  144,
+                                                     "wasForeground":  false,
+                                                     "capturedWhileBackground":  true
+                                                 }
+                                             ]
+                          },
+    "cancellation":  {
+                         "growthAcrossRepeats":  0,
+                         "note":  "read-only cancel path; no input was pressed, so no key/mouse release applies here (that stays a P1-05 requirement)",
+                         "repeatElapsedMs":  75,
+                         "repeatCycles":  8,
+                         "gdiCountsEveryFiveIterations":  [
+                                                              4,
+                                                              4,
+                                                              4
+                                                          ],
+                         "elapsedMs":  124,
+                         "iterationsBeforeAbort":  15,
+                         "readOnlyCancelled":  true,
+                         "gdiCountsPerRepeatCycle":  [
+                                                         4,
+                                                         4,
+                                                         4,
+                                                         4,
+                                                         4,
+                                                         4,
+                                                         4,
+                                                         4
+                                                     ]
+                     },
+    "cleanup":  {
+                    "gdiObjectsBefore":  0,
+                    "gdiStages":  {
+                                      "baseline":  0,
+                                      "afterFullScreenCaptureAndEncode":  4,
+                                      "afterWindowCapture":  4,
+                                      "afterRepeatCycles":  4,
+                                      "afterCancelLoop":  4,
+                                      "beforeGc":  3,
+                                      "afterGc":  3
+                                  },
+                    "gdiObjectsAfter":  3,
+                    "note":  "per-stage GDI accounting distinguishes a probe-internal handle from a real leak; a nonzero delta after GC on a one-shot process is process-exit-scoped, not a long-running leak",
+                    "delta":  3
+                },
+    "screenshotsTaken":  1,
+    "pixelsWrittenToDisk":  0,
+    "inputSent":  0
+}

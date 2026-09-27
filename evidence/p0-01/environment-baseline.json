@@ -1,0 +1,55 @@
+{
+  "capturedAt": "2026-09-27T11:21:28.9644024Z",
+  "repository": "D:/workself/pi-orb",
+  "piWeb": {
+    "path": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "packageVersion": "0.9.3",
+    "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
+    "workingTreeStatus": [
+      " M app/endfield.css",
+      " M components/AppShell.tsx",
+      " M components/ChatInput.tsx",
+      " M components/MessageView.tsx",
+      " M components/SessionSidebar.tsx",
+      " M docs/local-endfield-verification.md"
+    ],
+    "scope": "read-only observation; no pi-web files modified by P0 baseline"
+  },
+  "runtime": {
+    "os": "Microsoft Windows 11 家庭版 中文版",
+    "osVersion": "10.0.26200",
+    "build": "26200",
+    "architecture": "64 位",
+    "node": "v24.19.0",
+    "npm": "11.17.0",
+    "sdkPackage": "@earendil-works/pi-coding-agent",
+    "sdkVersion": "0.87.1",
+    "piWebEngine": ">=22.19.0"
+  },
+  "supportMatrix": {
+    "firstPlatform": "Windows x64",
+    "electron": "not selected / not verified",
+    "driver": "not selected / not verified",
+    "piWeb": "0.9.3",
+    "piSdk": "0.87.1"
+  },
+  "writes": {
+    "piOrbRepo": "evidence/** and future pi-Orb source only",
+    "piWeb": "none",
+    "userPiConfig": "none",
+    "screenshots": "none",
+    "credentials": "none",
+    "desktopInput": "none"
+  },
+  "invariants": [
+    "N1",
+    "N2",
+    "N3",
+    "N4",
+    "N5",
+    "N6",
+    "N7",
+    "N8"
+  ],
+  "status": "P0-01 baseline captured; runtime behavior tests remain pending"
+}

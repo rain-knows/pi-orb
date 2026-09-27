@@ -1,0 +1,446 @@
+{
+  "capturedAt": "2026-09-27T14:38:08.217Z",
+  "isolation": {
+    "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "agentDir": "D:\\pi-orb-p0-runs\\p0-03-55372\\agent",
+    "sessionDir": "D:\\pi-orb-p0-runs\\p0-03-55372\\agent\\sessions",
+    "cwd": "D:\\pi-orb-p0-runs\\p0-03-55372\\orb",
+    "baseUrl": "http://127.0.0.1:31289",
+    "port": 31289,
+    "modelPort": 31290,
+    "pipeName": "pi-orb-p0-03-55372",
+    "runBaseOutsideUserProfile": true,
+    "credentialSource": "isolated test password in child env only; user's real auth.json and ~/.pi/agent are not passed",
+    "screenshots": false,
+    "desktopInput": false,
+    "realModel": false,
+    "sourceSnapshot": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src",
+    "sourceHead": "95a58744532c7fccaa933aa7757a1419ace67ed2",
+    "piWebWorkingTreeChanges": [
+      "M app/endfield.css",
+      " M components/AppShell.tsx",
+      " M components/ChatInput.tsx",
+      " M components/MessageView.tsx",
+      " M components/SessionSidebar.tsx",
+      " M docs/local-endfield-verification.md"
+    ],
+    "reusedSnapshot": true,
+    "userProfileSkillLeakInSession": false,
+    "homeDir": "D:\\pi-orb-p0-runs\\p0-03-55372\\home"
+  },
+  "authentication": {
+    "denials": {
+      "unauthenticatedApi": 401,
+      "crossSiteGet": 403,
+      "foreignHostHeader": 403,
+      "foreignHostEvidence": "HTTP/1.1 403 Forbidden"
+    },
+    "cookieFlow": {
+      "loginStatus": 200,
+      "cookieIssued": true,
+      "authenticatedRequestStatus": 200
+    },
+    "wrongPassword": {
+      "status": 401,
+      "note": "requested last because Basic failures share one global backoff; it does not touch pi-web's own configuration"
+    }
+  },
+  "shellClient": {
+    "base": "http://127.0.0.1:31289",
+    "steps": [
+      {
+        "step": "web-auth-probe",
+        "status": 200,
+        "body": {
+          "enabled": true,
+          "authenticated": false
+        }
+      },
+      {
+        "step": "create-session",
+        "status": 200,
+        "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457"
+      },
+      {
+        "step": "get-state",
+        "status": 200,
+        "running": true
+      },
+      {
+        "step": "prompt",
+        "status": 200
+      },
+      {
+        "step": "sse",
+        "status": "closed-by-client",
+        "sse": {
+          "connected": true,
+          "assistantTextSeen": false,
+          "eventTypes": [
+            "connected",
+            "agent_start",
+            "message_start",
+            "message_end"
+          ],
+          "textSample": ":data: {\"type\":\"connected\",\"sessionId\":\"01a0e34d-744d-778b-83be-4f24932bf457\",\"isStreaming\":false}data: {\"type\":\"agent_start\"}data: {\"type\":\"message_start\",\"message\":{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"p0-03 shell prompt\"}],\"timestamp\":1790519899558}}data: {\"type\":\"message_end\",\"message\":{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"p0-03 shell prompt\"}],\"timestamp\":1790519899558}}"
+        }
+      },
+      {
+        "step": "sse-reconnect",
+        "status": "closed-by-client",
+        "reconnect": {
+          "connected": true
+        }
+      },
+      {
+        "step": "abort",
+        "status": 200,
+        "data": null
+      }
+    ],
+    "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+    "sse": {
+      "connected": true,
+      "assistantTextSeen": false,
+      "eventTypes": [
+        "connected",
+        "agent_start",
+        "message_start",
+        "message_end"
+      ],
+      "textSample": ":data: {\"type\":\"connected\",\"sessionId\":\"01a0e34d-744d-778b-83be-4f24932bf457\",\"isStreaming\":false}data: {\"type\":\"agent_start\"}data: {\"type\":\"message_start\",\"message\":{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"p0-03 shell prompt\"}],\"timestamp\":1790519899558}}data: {\"type\":\"message_end\",\"message\":{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"p0-03 shell prompt\"}],\"timestamp\":1790519899558}}"
+    },
+    "reconnect": {
+      "connected": true
+    },
+    "ok": true
+  },
+  "generation": {
+    "sessionIdFromSessionsApi": "01a0e34d-744d-778b-83be-4f24932bf457",
+    "sessionIdStableAcrossReload": true,
+    "twoBrowsingClientsSeeSameSession": true,
+    "revisionBefore": "A59zHbPaXrFXs0oOC30d9I",
+    "revisionAfter": "A59zHbPaXrFXs0oOC30d9I",
+    "note": "snapshotRevision is an opaque cache-freshness token (lib/session-revision.ts), NOT a permission or run-generation check; per-task authorization is enforced by the bridge/executor layer and verified in section E"
+  },
+  "bridge": {
+    "transport": "Windows named pipe (no TCP listener, unreachable from a browser page)",
+    "taskAuthorizedBeforeGrant": {
+      "reason": "no-task-authorization",
+      "executed": false
+    },
+    "grantAccepted": true,
+    "denialMatrix": [
+      {
+        "name": "valid token + current generation + task authorization",
+        "reason": "authorized",
+        "executed": true,
+        "expected": true
+      },
+      {
+        "name": "missing token",
+        "reason": "bad-token",
+        "executed": false,
+        "expected": false
+      },
+      {
+        "name": "wrong token",
+        "reason": "bad-token",
+        "executed": false,
+        "expected": false
+      },
+      {
+        "name": "unknown session",
+        "reason": "unknown-session",
+        "executed": false,
+        "expected": false
+      },
+      {
+        "name": "browser-originated request",
+        "reason": "browser-originated-request",
+        "executed": false,
+        "expected": false
+      }
+    ],
+    "generationBefore": 0,
+    "generationAfter": 1,
+    "staleGeneration": {
+      "reason": "stale-generation",
+      "executed": false
+    },
+    "freshGenerationWithoutAuthorization": {
+      "reason": "no-task-authorization",
+      "executed": false
+    },
+    "freshGenerationWithAuthorization": {
+      "reason": "authorized",
+      "executed": true
+    },
+    "afterRevoke": {
+      "reason": "no-task-authorization",
+      "executed": false
+    },
+    "executedCount": 2,
+    "refusedCount": 7,
+    "requestLog": [
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 0,
+          "action": "no-auth"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "no-task-authorization",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 0,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": true,
+          "reason": "authorized",
+          "executed": true,
+          "marker": "D:\\pi-orb-p0-runs\\p0-03-55372\\bridge-markers\\01a0e34d-744d-778b-83be-4f24932bf457-g0-observe.marker"
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 0,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "bad-token",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a-wrong",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 0,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "bad-token",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "no-such-session",
+          "generation": 0,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "unknown-session",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 0,
+          "action": "observe",
+          "headers": {
+            "origin": "http://evil.example",
+            "sec-fetch-site": "cross-site"
+          }
+        },
+        "result": {
+          "allowed": false,
+          "reason": "browser-originated-request",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 0,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "stale-generation",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 1,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "no-task-authorization",
+          "executed": false
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 1,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": true,
+          "reason": "authorized",
+          "executed": true,
+          "marker": "D:\\pi-orb-p0-runs\\p0-03-55372\\bridge-markers\\01a0e34d-744d-778b-83be-4f24932bf457-g1-observe.marker"
+        }
+      },
+      {
+        "event": "bridge_request",
+        "request": {
+          "token": "p0-03-bridge-token-9f2a",
+          "sessionId": "01a0e34d-744d-778b-83be-4f24932bf457",
+          "generation": 1,
+          "action": "observe"
+        },
+        "result": {
+          "allowed": false,
+          "reason": "no-task-authorization",
+          "executed": false
+        }
+      }
+    ],
+    "markersWritten": 2
+  },
+  "ownership": {},
+  "assertions": [
+    {
+      "name": "unauthenticated API request refused",
+      "passed": true
+    },
+    {
+      "name": "cross-site request refused",
+      "passed": true
+    },
+    {
+      "name": "foreign Host header refused",
+      "passed": true
+    },
+    {
+      "name": "cookie login issues a session cookie",
+      "passed": true
+    },
+    {
+      "name": "cookie session authenticates a later request",
+      "passed": true
+    },
+    {
+      "name": "no user-profile skill leak in session",
+      "passed": true
+    },
+    {
+      "name": "separate client process created a session",
+      "passed": true
+    },
+    {
+      "name": "client triggered a real provider call",
+      "passed": true
+    },
+    {
+      "name": "SSE delivered a connected event",
+      "passed": true
+    },
+    {
+      "name": "client streamed a run to completion",
+      "passed": true
+    },
+    {
+      "name": "client reconnected without disturbing the session",
+      "passed": true
+    },
+    {
+      "name": "client stopped the run via abort",
+      "passed": true
+    },
+    {
+      "name": "shell exit did not kill the running service",
+      "passed": true
+    },
+    {
+      "name": "session still reachable after shell exit",
+      "passed": true
+    },
+    {
+      "name": "session id is stable across reload",
+      "passed": true
+    },
+    {
+      "name": "two browsing clients see one session",
+      "passed": true
+    },
+    {
+      "name": "bridge refuses a task without authorization",
+      "passed": true
+    },
+    {
+      "name": "bridge refuses a missing token",
+      "passed": true
+    },
+    {
+      "name": "bridge refuses a wrong token",
+      "passed": true
+    },
+    {
+      "name": "bridge refuses an unknown session",
+      "passed": true
+    },
+    {
+      "name": "bridge refuses a browser-originated request",
+      "passed": true
+    },
+    {
+      "name": "bridge refuses a stale run generation",
+      "passed": true
+    },
+    {
+      "name": "generation bump clears task authorization",
+      "passed": true
+    },
+    {
+      "name": "bridge executes a fully authorized request",
+      "passed": true
+    },
+    {
+      "name": "revoking authorization stops execution",
+      "passed": true
+    },
+    {
+      "name": "only authorized requests wrote markers",
+      "passed": true
+    },
+    {
+      "name": "wrong password refused",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,166 @@
+{
+  "capturedAt": "2026-09-27T14:47:04.576Z",
+  "isolation": {
+    "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "agentDir": "D:\\pi-orb-p0-runs\\p0-03-electron-15548\\agent",
+    "sessionDir": "D:\\pi-orb-p0-runs\\p0-03-electron-15548\\agent\\sessions",
+    "cwd": "D:\\pi-orb-p0-runs\\p0-03-electron-15548\\orb",
+    "appDir": "D:\\pi-orb-p0-runs\\p0-03-electron-15548\\electron-app",
+    "baseUrl": "http://127.0.0.1:31291",
+    "port": 31291,
+    "modelPort": 31292,
+    "electronExe": "D:\\pi-orb-p0-runs\\electron-probe\\node_modules\\electron\\dist\\electron.exe",
+    "electronVersion": "v44.4.5",
+    "runBaseOutsideUserProfile": true,
+    "windowShown": false,
+    "screenshots": false,
+    "desktopInput": false,
+    "realModel": false,
+    "probeNote": "Electron is launched with async spawn; a synchronous spawn would block this process's event loop and starve the local fake provider server that runs in the same process. Electron gets the REAL user profile (redirected HOME makes it exit silently); only the pi-web server gets the isolated HOME."
+  },
+  "electron": {
+    "origin": "file://",
+    "hasNode": false,
+    "hasProcess": false,
+    "rendererPlain": {
+      "ok": true,
+      "status": 403,
+      "body": "{\"error\":\"Untrusted API request\"}"
+    },
+    "rendererWithFetchMetadata": {
+      "ok": true,
+      "status": 403,
+      "body": "{\"error\":\"Untrusted API request\"}"
+    },
+    "rendererCreateSession": {
+      "ok": true,
+      "status": 403,
+      "body": "{\"error\":\"Untrusted API request\"}"
+    },
+    "rendererSessionId": null,
+    "rendererEventSource": {
+      "connected": false,
+      "error": "EventSource error (no credentials or blocked)"
+    },
+    "mainProcessFetch": {
+      "status": 200,
+      "body": {
+        "sessionListVersion": 2,
+        "runningSessionIds": [],
+        "completionNotificationSuppressedSessionIds": []
+      }
+    },
+    "mainProcessCreateSession": {
+      "status": 200,
+      "sessionId": "01a0e355-9ca9-74e6-a3a2-13cb26641e98"
+    },
+    "mainProcessPrompt": 200,
+    "mainProcessRunCompleted": true,
+    "mainProcessObserved": {
+      "hasAssistantText": true,
+      "hasAborted": false
+    },
+    "mainProcessStream": {
+      "eventTypes": [
+        "connected",
+        "agent_start",
+        "message_start",
+        "message_end",
+        "message_update",
+        "agent_end",
+        "agent_settled",
+        "prompt_done"
+      ],
+      "textTail": "ent\":\"p0-ok\"}}data: {\"type\":\"message_end\",\"message\":{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"p0-ok\"}],\"api\":\"openai-completions\",\"provider\":\"p0-local\",\"model\":\"p0-model\",\"usage\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0,\"totalTokens\":0,\"cost\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0,\"total\":0}},\"stopReason\":\"stop\",\"timestamp\":1790520435239,\"responseId\":\"p0\",\"rawStopReason\":\"stop\"}}data: {\"type\":\"agent_end\"}data: {\"type\":\"agent_settled\"}data: {\"type\":\"prompt_done\"}"
+    },
+    "mainProcessAbort": 200,
+    "mainProcessSessionReadable": true,
+    "sessionPayloadInspected": true,
+    "hostResourceLeakInSession": false,
+    "rendererLogs": [
+      "RENDERER_LOG %cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security"
+    ],
+    "modelRequestCount": 1,
+    "serviceAliveAfterElectronExit": true
+  },
+  "assertions": [
+    {
+      "name": "preflight reached the provider without Electron",
+      "passed": true
+    },
+    {
+      "name": "real electron main process ran the probe",
+      "passed": true
+    },
+    {
+      "name": "renderer is sandboxed without Node",
+      "passed": true
+    },
+    {
+      "name": "renderer origin is opaque (not the pi-web origin)",
+      "passed": true
+    },
+    {
+      "name": "renderer direct cross-origin request outcome recorded",
+      "passed": true
+    },
+    {
+      "name": "main-process path authenticates successfully",
+      "passed": true
+    },
+    {
+      "name": "main-process path creates an independent session",
+      "passed": true
+    },
+    {
+      "name": "main-process path sends a message",
+      "passed": true
+    },
+    {
+      "name": "electron main process completed a real run",
+      "passed": true
+    },
+    {
+      "name": "electron client drove a real provider call",
+      "passed": true
+    },
+    {
+      "name": "main-process path stops the run",
+      "passed": true
+    },
+    {
+      "name": "main-process path reads the session back",
+      "passed": true
+    },
+    {
+      "name": "electron exit did not kill the service",
+      "passed": true
+    },
+    {
+      "name": "no window was shown to the user",
+      "passed": true
+    },
+    {
+      "name": "session payload inspected for host-resource leak",
+      "passed": true
+    },
+    {
+      "name": "no host-resource leak in the real session payload",
+      "passed": true
+    }
+  ],
+  "preflight": {
+    "createStatus": 200,
+    "sessionId": "01a0e355-936b-74e6-a3a2-13c9ec4c1253",
+    "promptStatus": 200,
+    "sawAssistantText": true,
+    "providerRequestsTotal": 1
+  },
+  "rendererDirectCrossOriginBlocked": true,
+  "designConsequence": {
+    "finding": "A sandboxed renderer whose origin is not the pi-web origin cannot call the pi-web API at all: host/origin validation answers 403 'Untrusted API request', and EventSource cannot present credentials.",
+    "consequence": "The Electron shell MUST proxy every API/SSE call through the main process over contextBridge. A renderer that tries to talk to pi-web directly will not work, and must not be given the credentials to try (which is also the desired security posture).",
+    "verifiedAgainst": "lib/request-security.ts isApiRequestAllowed (host + origin/fetch-metadata) and lib/agent-event-stream.ts"
+  },
+  "passed": true
+}
