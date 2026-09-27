@@ -71,6 +71,8 @@
 
 两个仓库根 LICENSE 都是 MIT。pi-web 为 `Copyright (c) 2026 agegr`，DeepSeek 仓库为 `Copyright (c) 2026 DeepSeek`。借用实质性代码时保留版权及许可文本，逐文件记录来源提交／修改；检查原生依赖、二进制和素材各自许可。MIT 不授予第三方商标背书，不把 pi-Orb 描述为上游官方产品。DeepSeek Orb 的 `THIRD_PARTY_NOTICES.md` 是审阅入口，不代替新依赖的许可证检查。
 
+本仓库的 `pi-web-backup` 与 `deepseek-harness-orb-backup` 是本地参考源码快照，不是远端跟踪分支。上文旧 `pi-web` 提交及其证据链接属于历史调研基线；后续开发须以 `pi-web-backup` 当前实际提交重新核验。
+
 本机 pi-web 检查时存在六个已有改动文件：`app/endfield.css`、`components/AppShell.tsx`、`components/ChatInput.tsx`、`components/MessageView.tsx`、`components/SessionSidebar.tsx`、`docs/local-endfield-verification.md`。本次只读；固定菜单等关键事实另用 Git HEAD 对照，不能把工作树当成干净上游发行版。
 
 ### 3.2 pi-web 接入事实
