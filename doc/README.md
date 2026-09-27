@@ -18,6 +18,8 @@
 |---|---|
 | [`../README.md`](../README.md) | 项目说明、仓库结构、开发命令与依赖 |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | 版本历史与版本号策略 |
+| [`../THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) | 第三方组件许可、MPL 归属核实与源码获取路径 |
+| [`../LICENSE`](../LICENSE) | 项目自身 MIT 许可 |
 | [`../evidence/README.md`](../evidence/README.md) | 可复现的验证证据索引 |
 
 ## 阅读顺序

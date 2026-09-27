@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T18:07:13.786Z",
+  "capturedAt": "2026-09-27T19:34:24.174Z",
   "probe": "P1-05 read-only Cua runtime probe",
   "safety": {
     "desktopInputSent": false,
@@ -47,7 +47,7 @@
     "created": true,
     "shutdown": {
       "ok": true,
-      "elapsedMs": 0
+      "elapsedMs": 1
     }
   },
   "tools": {
@@ -211,8 +211,8 @@
   },
   "observation": {
     "windows": {
-      "count": 8,
-      "elapsedMs": 165,
+      "count": 7,
+      "elapsedMs": 158,
       "hasZIndex": true,
       "hasBounds": true,
       "sample": [
@@ -231,7 +231,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "7"
+            "__bigint": "6"
           },
           "layer": 0,
           "minimized": false,
@@ -254,7 +254,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "6"
+            "__bigint": "5"
           },
           "layer": 0,
           "minimized": false,
@@ -277,7 +277,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "5"
+            "__bigint": "4"
           },
           "layer": 0,
           "minimized": false,
@@ -300,7 +300,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "4"
+            "__bigint": "3"
           },
           "layer": 0,
           "minimized": false,
@@ -323,7 +323,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "3"
+            "__bigint": "2"
           },
           "layer": 0,
           "minimized": false,
@@ -332,7 +332,7 @@
           "spaceIds": "undefined"
         }
       ],
-      "bigintIds": 8
+      "bigintIds": 7
     },
     "ownWin32Probe": {
       "ok": true,
@@ -381,7 +381,7 @@
       "conclusion": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
     },
     "desktopState": {
-      "elapsedMs": 248,
+      "elapsedMs": 62,
       "imageFields": [
         {
           "key": "mimeType",
@@ -451,13 +451,13 @@
     }
   },
   "timingsMs": {
-    "moduleImport": 53,
-    "driverCreate": 63,
-    "listToolsJson": 48,
-    "listWindows": 165,
-    "getDesktopState": 248,
-    "startSession": 1,
-    "shutdown": 0
+    "moduleImport": 60,
+    "driverCreate": 77,
+    "listToolsJson": 47,
+    "listWindows": 158,
+    "getDesktopState": 62,
+    "startSession": 0,
+    "shutdown": 1
   },
   "checks": [
     {
@@ -493,7 +493,7 @@
     {
       "name": "a driver instance can be created in-process",
       "ok": true,
-      "detail": "create() took 63 ms"
+      "detail": "create() took 77 ms"
     },
     {
       "name": "the driver reports a runtime tool inventory",
@@ -503,7 +503,7 @@
     {
       "name": "window discovery works at runtime",
       "ok": true,
-      "detail": "8 windows in 165 ms"
+      "detail": "7 windows in 158 ms"
     },
     {
       "name": "window records carry bounds",
@@ -513,7 +513,7 @@
     {
       "name": "window ids are bigint as documented, not numbers",
       "ok": true,
-      "detail": "bigint ids: 8/8"
+      "detail": "bigint ids: 7/7"
     },
     {
       "name": "window records expose a front order (zIndex) for window identity binding",
@@ -538,12 +538,12 @@
     {
       "name": "desktop state can be observed at runtime",
       "ok": true,
-      "detail": "{\"elapsedMs\":248,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
+      "detail": "{\"elapsedMs\":62,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
     },
     {
       "name": "a named session can be started",
       "ok": true,
-      "detail": "took 1 ms"
+      "detail": "took 0 ms"
     },
     {
       "name": "session state can be read",
@@ -558,7 +558,7 @@
     {
       "name": "the driver shuts down cleanly",
       "ok": true,
-      "detail": "0 ms"
+      "detail": "1 ms"
     }
   ],
   "passed": true

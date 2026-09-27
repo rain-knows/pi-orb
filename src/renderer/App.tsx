@@ -105,6 +105,16 @@ export function App() {
   }, [bridge]);
 
   /**
+   * Hide the orb from its own window.
+   *
+   * The same routine the shortcut and the tray use, so desktop operations are revoked on every
+   * route. The chat session is untouched.
+   */
+  const collapse = useCallback(async () => {
+    setDesktopTask(await bridge.collapseOrb());
+  }, [bridge]);
+
+  /**
    * Ask the shell which windows exist, so the user can pick one explicitly.
    *
    * The orb refuses to guess a target, so this list is how a target is chosen when the recorded
@@ -246,18 +256,30 @@ export function App() {
     <div className="orb">
       <header className="orb__header">
         <span className="orb__title">pi-Orb</span>
-        <button
-          type="button"
-          className="orb__button"
-          onClick={() => void refreshStatus()}
-          title="Re-check the pi-web connection and workspace"
-        >
-          {status?.configured
-            ? status.piWeb.reachable
-              ? "Connected"
-              : "pi-web offline"
-            : "No workspace"}
-        </button>
+        <span className="orb__header-actions">
+          <button
+            type="button"
+            className="orb__button"
+            onClick={() => void refreshStatus()}
+            title="Re-check the pi-web connection and workspace"
+          >
+            {status?.configured
+              ? status.piWeb.reachable
+                ? "Connected"
+                : "pi-web offline"
+              : "No workspace"}
+          </button>
+          {status?.configured && (
+            <button
+              type="button"
+              className="orb__button"
+              onClick={() => void collapse()}
+              title="Hide the orb. Desktop operations are revoked; the conversation continues."
+            >
+              Collapse
+            </button>
+          )}
+        </span>
       </header>
 
       {!status?.configured && (

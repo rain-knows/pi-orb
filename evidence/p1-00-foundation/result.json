@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T18:45:45.333Z",
+  "capturedAt": "2026-09-27T19:33:07.118Z",
   "platform": "win32",
   "node": "v24.19.0",
   "packageVersion": "0.1.0",
@@ -28,29 +28,29 @@
       "name": "typecheck",
       "command": "npx tsc --noEmit",
       "ok": true,
-      "durationMs": 8229,
+      "durationMs": 8300,
       "outputTail": ""
     },
     {
       "name": "lint",
       "command": "npx eslint .",
       "ok": true,
-      "durationMs": 4727,
+      "durationMs": 4926,
       "outputTail": ""
     },
     {
       "name": "unit tests",
       "command": "npx vitest run",
       "ok": true,
-      "durationMs": 3936,
-      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/screenshot.test.ts (22 tests) 52ms\n ✓ tests/orb-config.test.ts (20 tests) 10ms\n ✓ tests/orb-tools.test.ts (24 tests) 10ms\n ✓ tests/accelerator.test.ts (12 tests) 9ms\n ✓ tests/orb-session.test.ts (15 tests) 16ms\n ✓ tests/window-toggle.test.ts (13 tests) 9ms\n ✓ tests/shortcut.test.ts (10 tests) 11ms\n ✓ tests/pending-capture.test.ts (11 tests) 9ms\n ✓ tests/desktop-task.test.ts (18 tests) 9ms\n ✓ tests/desktop-broker.test.ts (25 tests) 20ms\n ✓ tests/generations.test.ts (7 tests) 6ms\n ✓ tests/workspace.test.ts (11 tests) 99ms\n ✓ tests/desktop-capture.test.ts (6 tests) 4ms\n ✓ tests/screenshot-flow.test.ts (20 tests) 69ms\n ✓ tests/bridge-server.test.ts (20 tests) 1092ms\n\n Test Files  15 passed (15)\n      Tests  234 passed (234)\n   Start at  02:45:39\n   Duration  1.68s (transform 40%, tests 38%, import 17%, worker 5%)"
+      "durationMs": 4053,
+      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/orb-tools.test.ts (24 tests) 11ms\n ✓ tests/orb-config.test.ts (20 tests) 8ms\n ✓ tests/orb-session.test.ts (15 tests) 14ms\n ✓ tests/desktop-task.test.ts (18 tests) 9ms\n ✓ tests/pending-capture.test.ts (11 tests) 6ms\n ✓ tests/desktop-broker.test.ts (25 tests) 19ms\n ✓ tests/window-toggle.test.ts (13 tests) 7ms\n ✓ tests/shortcut.test.ts (10 tests) 10ms\n ✓ tests/window-lifecycle.test.ts (9 tests) 8ms\n ✓ tests/accelerator.test.ts (12 tests) 8ms\n ✓ tests/screenshot.test.ts (22 tests) 68ms\n ✓ tests/generations.test.ts (7 tests) 5ms\n ✓ tests/screenshot-flow.test.ts (20 tests) 60ms\n ✓ tests/workspace.test.ts (11 tests) 93ms\n ✓ tests/desktop-capture.test.ts (6 tests) 2ms\n ✓ tests/bridge-server.test.ts (20 tests) 1077ms\n\n Test Files  16 passed (16)\n      Tests  243 passed (243)\n   Start at  03:33:00\n   Duration  1.69s (transform 43%, tests 36%, import 16%, worker 6%)"
     },
     {
       "name": "production build",
       "command": "npx electron-vite build",
       "ok": true,
-      "durationMs": 3249,
-      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 22 modules transformed.\nrendering chunks...\nout/main/index.js  98.73 kB\n✓ built in 233ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  3.93 kB\n✓ built in 16ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-CYaPyKnO.css    3.90 kB\n../../out/renderer/assets/index-Bk0Kr0n0.js   659.71 kB\n✓ built in 518ms"
+      "durationMs": 3291,
+      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 23 modules transformed.\nrendering chunks...\nout/main/index.js  101.10 kB\n✓ built in 240ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  4.34 kB\n✓ built in 16ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-CvdsVjsS.css    3.99 kB\n../../out/renderer/assets/index-DUxv4V33.js   660.33 kB\n✓ built in 511ms"
     }
   ],
   "buildArtifacts": {
@@ -74,29 +74,23 @@
   "repositoryHygiene": {
     "statusEntries": [
       "CHANGELOG.md",
+      "README.md",
+      "doc/README.md",
       "doc/support-matrix.md",
       "evidence/README.md",
-      "package-lock.json",
-      "package.json",
-      "pi-package/extensions/orb.ts",
+      "evidence/p1-00-foundation/boot-smoke.json",
+      "evidence/p1-00-foundation/result.json",
       "src/main/index.ts",
       "src/preload/index.ts",
       "src/renderer/App.tsx",
       "src/renderer/bridge.ts",
       "src/renderer/styles.css",
       "src/shared/ipc.ts",
-      "evidence/p1-06/",
-      "pi-package/extensions/bridge-client.ts",
-      "src/main/bridge-server.ts",
-      "src/main/cua-adapter.ts",
-      "src/main/desktop-broker.ts",
-      "src/main/desktop-task.ts",
-      "src/shared/bridge-protocol.ts",
-      "src/shared/orb-tools.ts",
-      "tests/bridge-server.test.ts",
-      "tests/desktop-broker.test.ts",
-      "tests/desktop-task.test.ts",
-      "tests/orb-tools.test.ts"
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "evidence/p1-07/",
+      "src/main/window-lifecycle.ts",
+      "tests/window-lifecycle.test.ts"
     ],
     "ignoreCoverage": [
       {
@@ -120,7 +114,7 @@
     ]
   },
   "nonDestructive": {
-    "verifiedAt": "2026-09-27T18:45:45.320Z",
+    "verifiedAt": "2026-09-27T19:33:07.106Z",
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
     "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
     "headUnchanged": true,

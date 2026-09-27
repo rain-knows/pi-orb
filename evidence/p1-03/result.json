@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-09-27T17:20:13.534Z",
-  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790529613534",
+  "capturedAt": "2026-09-27T19:33:39.219Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790537619219",
   "shortcutUnderTest": "Control+Alt+F9",
   "isolation": {
     "note": "each app instance gets its own userData directory and Orb config; no pi-web service is started and none is needed",
@@ -126,6 +126,19 @@
       "baseUrl": "http://127.0.0.1:31992",
       "reachable": false,
       "problem": "No pi-web service answered at http://127.0.0.1:31992. Start it yourself; Orb will not start, restart or stop it."
+    },
+    "desktopTask": {
+      "authorized": false,
+      "taskId": null,
+      "scope": null,
+      "actionsUsed": 0,
+      "actionLimit": 12,
+      "expiresAt": null,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true,
+      "target": null
     }
   }
 }

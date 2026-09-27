@@ -14,13 +14,25 @@ existing pi-web / Pi session engine, model configuration and credentials.
 
 ## Status
 
-**P1 in progress.** P0 (proof that pi-Orb can attach to pi-web non-destructively) is
-complete and recorded under [`evidence/`](./evidence/README.md). P1 is the minimum
-usable product: `P1-01` … `P1-07`, i.e. M1 (floating window + chat), M2 (screen
-context), M3 (computer use) and the release gate.
+**P1 feature-complete; not a complete v0.1 release.** All seven P1 tasks (`P1-01` … `P1-07`) are
+implemented and each has a reproducible record under [`evidence/`](./evidence/README.md).
 
-Capabilities that have not passed their acceptance step are labelled **unverified**
-and stay disabled. No mock passes for native input, cancellation or key release.
+v0.1 is defined as M1 + M2 + M3 + P1-07:
+
+| Milestone | State |
+|---|---|
+| M1 — floating window, dedicated workspace, chat | **Complete** (P1-01, P1-02, P1-03) |
+| M2 — explicitly authorized screenshot context | **Authorization and refusal paths complete**; the positive capture path is unverified on this machine (P1-04) |
+| M3 — one-action-one-observation computer use | **Click loop complete**; foreground delivery, typing and scrolling are unverified on this machine (P1-05, P1-06) |
+| P1-07 — safety, regression and release gate | **Complete** |
+
+So the current build is **not** a complete v0.1, and M3 must not be described as done. The unverified
+capabilities are listed one by one in [`doc/support-matrix.md`](./doc/support-matrix.md) with manual
+verification steps; the release gate checks that those unverified records still exist, so a release
+cannot turn green by deleting them.
+
+Unverified means disabled or reported as unavailable, never silently faked. No mock stands in for a
+native input, cancellation or key-release check.
 
 ## Repository layout
 
@@ -34,6 +46,19 @@ and stay disabled. No mock passes for native input, cancellation or key release.
 | `tests/` | Unit tests for pure logic and the workspace rules |
 | `evidence/` | Reproducible verification records, per P0/P1 stage |
 | `doc/` | Goals, technology choices, support matrix and supporting research |
+
+## Verification
+
+Every claim in this repository is backed by a script that can be re-run. Start with
+the release gate, which runs the project's quality gates and checks the release
+hygiene, the license inventory and the evidence records:
+
+```powershell
+node evidence/p1-07/run-release-gate.mjs
+```
+
+The per-stage commands, including the native acceptance runs, are listed in
+[`evidence/README.md`](./evidence/README.md).
 
 ## Development
 
@@ -85,8 +110,10 @@ prompts — it cannot promise the prompt content is byte-identical.
 
 ## Licensing
 
-pi-Orb is MIT licensed. The bundled desktop driver
-(`@trycua/cua-driver@0.30.1`, Windows platform package) is `MIT AND MPL-2.0`; its
-NOTICE and source-availability obligations are recorded in
-[`evidence/p0-04/cua-artifact-manifest.json`](./evidence/p0-04/cua-artifact-manifest.json).
-Third-party notices are collected before release (`P1-07`).
+pi-Orb is MIT licensed (see [`LICENSE`](./LICENSE)).
+
+Third-party obligations are recorded in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md),
+including the MPL-2.0 components and how to obtain their corresponding source. The bundled desktop
+driver is `@trycua/cua-driver@0.30.1` with the Windows platform package licensed
+`MIT AND MPL-2.0`; whether the 26.8 MB `cua_driver_sdk.dll` carries an MPL obligation was resolved
+by inspecting the shipped artifact and is documented there.

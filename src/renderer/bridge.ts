@@ -25,6 +25,7 @@ export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
+  collapseOrb(): Promise<DesktopTaskStatus>;
   authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
   revokeDesktopTask(): Promise<DesktopTaskStatus>;
   getDesktopTaskStatus(): Promise<DesktopTaskStatus>;

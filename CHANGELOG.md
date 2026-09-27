@@ -12,6 +12,16 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ### Added
 
+- P1-07 release gate (`evidence/p1-07/run-release-gate.mjs`, 26 checks): quality gates, the
+  non-destructive baseline, release hygiene, the license inventory, version agreement and the
+  presence of the unverified-capability records. Its key checks were falsified three times
+  (an injected credential, an injected AGPL dependency, a wrong version) and fail as expected.
+- Third-party license inventory and `THIRD_PARTY_NOTICES.md`, including how to obtain the source
+  for the MPL-2.0 components.
+- `LICENSE`: the repository declared MIT without shipping the license text.
+- A window lifecycle rule (`src/main/window-lifecycle.ts`) with one collapse routine, plus a
+  Collapse control in the window itself.
+- Lifecycle regression record `evidence/p1-07/lifecycle-regression.json` (9/9).
 - P1-01 workspace and independent session: Orb cannot be enabled without a selected
   workspace; cancelling writes nothing; relative, missing and non-directory paths are
   refused; a Windows junction and a differently-cased spelling resolve to one identity;
@@ -101,6 +111,10 @@ verified is recorded as *unverified* and is not claimed as compatible.
 Both defects below produced no error anywhere and were found only by running the real
 application:
 
+- Hiding the orb through the window's close button or the tray menu kept desktop authority
+  alive, so a hidden orb could still move the user's mouse and keyboard. All hide routes now go
+  through one lifecycle routine that revokes the task authorization and drops any unconfirmed
+  screenshot, and a unit test asserts no hide can happen without both.
 - The Electron main process ignored `PI_ORB_CONFIG` while the Pi extension honoured
   it, so the two sides read different files: the configuration was written and shown
   as configured, but Orb mode never activated. Path resolution is now a single shared

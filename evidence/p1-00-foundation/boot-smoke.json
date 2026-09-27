@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-09-27T16:30:30.349Z",
-  "runRoot": "D:\\pi-orb-p1-runs\\boot-smoke-1790526630349",
+  "capturedAt": "2026-09-27T19:33:07.206Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\boot-smoke-1790537587206",
   "checks": [
     {
       "name": "electron shell stays alive",
@@ -25,7 +25,7 @@
     {
       "name": "IPC round trip returns status",
       "ok": true,
-      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31987\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31987. Start it yourself; Orb will not start, restart or stop it.\"}}"
+      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31987\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31987. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "unconfigured workspace disables Orb",
@@ -49,6 +49,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31988/devtools/browser/137e0dfb-3748-42a4-a4fe-18656384fbe0"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-17056",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31988/devtools/browser/206c53da-10f6-4b76-852c-38d73476ff9d"
 }

@@ -1,0 +1,90 @@
+{
+  "capturedAt": "2026-09-27T19:37:02.279Z",
+  "checks": [
+    {
+      "name": "the shell lists its desktop targets",
+      "ok": true,
+      "detail": "{\"windowId\":\"2099640\",\"pid\":30328,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"6\",\"isRecorded\":false}"
+    },
+    {
+      "name": "a session exists so authority can be granted",
+      "ok": true,
+      "detail": "01a0e45f-2d0c-70bf-8437-1610d7e2dccd"
+    },
+    {
+      "name": "approving a desktop task grants authority",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"lifecycle test\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790538138247,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":tru"
+    },
+    {
+      "name": "an explicit stop clears the authorization",
+      "ok": true,
+      "detail": "{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\""
+    },
+    {
+      "name": "the stop leaves no target or bridge inconsistency behind",
+      "ok": true,
+      "detail": "{\"before\":true,\"after\":true}"
+    },
+    {
+      "name": "stopping desktop operations does not end the chat session",
+      "ok": true,
+      "detail": "before=01a0e45f-2d0c-70bf-8437-1610d7e2dccd after=01a0e45f-2d0c-70bf-8437-1610d7e2dccd"
+    },
+    {
+      "name": "the run generation is unchanged by a desktop stop",
+      "ok": true,
+      "detail": "before=1 after=1"
+    },
+    {
+      "name": "collapsing the orb revokes desktop authority",
+      "ok": true,
+      "detail": "{\"beforeAuthorized\":true,\"bridgeAuthorizedBefore\":true,\"bridgeTargetBefore\":\"P1-05 input target\",\"collapseResponse\":\"{\\\"authorized\\\":false,\\\"taskId\\\":null,\\\"scope\\\":null,\\\"actionsUsed\\\":0,\\\"actionLimit\\\":12,\\\"expiresAt\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"brid…"
+    },
+    {
+      "name": "the shell survived the lifecycle sequence",
+      "ok": true,
+      "detail": "exitCode=null"
+    }
+  ],
+  "passed": true,
+  "environment": {
+    "generation": 1,
+    "ensureResult": "01a0e45f-2d0c-70bf-8437-1610d7e2dccd",
+    "piWebReachable": true
+  },
+  "approval": {
+    "authorized": true,
+    "taskId": "task-1",
+    "scope": "lifecycle test",
+    "actionsUsed": 0,
+    "actionLimit": 12,
+    "expiresAt": 1790538138247,
+    "stopped": false,
+    "stoppedReason": null,
+    "lastObservationId": null,
+    "bridgeReady": true,
+    "target": {
+      "windowId": "2099640",
+      "pid": 30328,
+      "appName": "electron.exe",
+      "title": "P1-05 input target",
+      "bounds": {
+        "x": 189,
+        "y": 135,
+        "width": 735,
+        "height": 684
+      },
+      "zIndex": "6",
+      "isRecorded": false
+    }
+  },
+  "collapse": {
+    "beforeAuthorized": true,
+    "bridgeAuthorizedBefore": true,
+    "bridgeTargetBefore": "P1-05 input target",
+    "collapseResponse": "{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"2099640\",\"pid\":30328,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135",
+    "bridgeAuthorizedAfter": false,
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"2099640\",\"pid\":30328,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"boun"
+  }
+}

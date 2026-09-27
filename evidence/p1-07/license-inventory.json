@@ -1,0 +1,111 @@
+{
+  "capturedAt": "2026-09-27T19:37:02.160Z",
+  "method": "walked package.json dependencies (and optionalDependencies, which carry the native driver) transitively; devDependencies are excluded because they are not redistributed",
+  "productionDependencyCount": 20,
+  "installedCount": 8,
+  "packages": [
+    {
+      "name": "@trycua/cua-driver",
+      "version": "0.30.1",
+      "license": "MIT",
+      "homepage": null,
+      "repository": "git+https://github.com/trycua/cua.git",
+      "licenseFile": null
+    },
+    {
+      "name": "@trycua/cua-driver-win32-x64-msvc",
+      "version": "0.30.1",
+      "license": "MIT AND MPL-2.0",
+      "homepage": null,
+      "repository": "git+https://github.com/trycua/cua.git",
+      "licenseFile": null
+    },
+    {
+      "name": "@ubjs/core",
+      "version": "0.31.0-3",
+      "license": "MPL-2.0",
+      "homepage": "https://github.com/jhugman/uniffi-bindgen-react-native",
+      "repository": "git+https://github.com/jhugman/uniffi-bindgen-react-native.git",
+      "licenseFile": null
+    },
+    {
+      "name": "@ubjs/node",
+      "version": "0.31.0-3",
+      "license": "MPL-2.0",
+      "homepage": "https://github.com/jhugman/uniffi-bindgen-react-native/tree/main/runtimes/napi",
+      "repository": "git+https://github.com/jhugman/uniffi-bindgen-react-native.git",
+      "licenseFile": null
+    },
+    {
+      "name": "@ubjs/node-win32-x64-msvc",
+      "version": "0.31.0-3",
+      "license": "MPL-2.0",
+      "homepage": "https://github.com/jhugman/uniffi-bindgen-react-native/tree/main/runtimes/napi",
+      "repository": "git+https://github.com/jhugman/uniffi-bindgen-react-native.git",
+      "licenseFile": null
+    },
+    {
+      "name": "react",
+      "version": "19.3.0",
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "repository": "https://github.com/react/react.git",
+      "licenseFile": "LICENSE"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.3.0",
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "repository": "https://github.com/react/react.git",
+      "licenseFile": "LICENSE"
+    },
+    {
+      "name": "scheduler",
+      "version": "0.28.0",
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "repository": "https://github.com/react/react.git",
+      "licenseFile": "LICENSE"
+    }
+  ],
+  "notInstalledOnThisPlatform": [
+    "@trycua/cua-driver-darwin-arm64",
+    "@trycua/cua-driver-darwin-x64",
+    "@trycua/cua-driver-linux-arm64-gnu",
+    "@trycua/cua-driver-linux-x64-gnu",
+    "@trycua/cua-driver-win32-arm64-msvc",
+    "@ubjs/node-darwin-arm64",
+    "@ubjs/node-darwin-x64",
+    "@ubjs/node-linux-arm64-gnu",
+    "@ubjs/node-linux-arm64-musl",
+    "@ubjs/node-linux-x64-gnu",
+    "@ubjs/node-linux-x64-musl",
+    "@ubjs/node-win32-arm64-msvc"
+  ],
+  "notInstalledNote": "these are declared optional platform packages for other operating systems and architectures; none of them is present on disk, so none ships in a Windows x64 release",
+  "forbiddenLicenseHits": [],
+  "packagesWithNoLicenseField": [],
+  "packagesWithNoLicenseFile": [
+    {
+      "name": "@trycua/cua-driver",
+      "license": "MIT"
+    },
+    {
+      "name": "@trycua/cua-driver-win32-x64-msvc",
+      "license": "MIT AND MPL-2.0"
+    },
+    {
+      "name": "@ubjs/core",
+      "license": "MPL-2.0"
+    },
+    {
+      "name": "@ubjs/node",
+      "license": "MPL-2.0"
+    },
+    {
+      "name": "@ubjs/node-win32-x64-msvc",
+      "license": "MPL-2.0"
+    }
+  ]
+}

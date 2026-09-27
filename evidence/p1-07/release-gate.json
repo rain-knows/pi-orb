@@ -1,0 +1,143 @@
+{
+  "capturedAt": "2026-09-27T19:37:21.945Z",
+  "projectVersion": "0.1.0",
+  "checks": [
+    {
+      "name": "typecheck passes",
+      "ok": true,
+      "detail": "8373 ms"
+    },
+    {
+      "name": "lint passes",
+      "ok": true,
+      "detail": "4693 ms"
+    },
+    {
+      "name": "unit tests pass",
+      "ok": true,
+      "detail": "4003 ms"
+    },
+    {
+      "name": "production build succeeds",
+      "ok": true,
+      "detail": "3345 ms"
+    },
+    {
+      "name": "pi-web HEAD and its six pre-existing user changes are untouched",
+      "ok": true,
+      "detail": "headUnchanged=true files=6 failures=[]"
+    },
+    {
+      "name": "no credential or key material is present in the shipped tree",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no screenshot, native binary or archive is committed",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the credential files that must never be committed are absent",
+      "ok": true,
+      "detail": "auth.json and .env must not exist in the repository"
+    },
+    {
+      "name": "the release ignore rules exclude dependencies and build output",
+      "ok": true,
+      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".tmp/\",\"node_modules/\",\"out/\"]}"
+    },
+    {
+      "name": "no build output or dependency directory is staged for release",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the license inventory records every installed production dependency",
+      "ok": true,
+      "detail": "8 installed components"
+    },
+    {
+      "name": "no AGPL, GPL-3 or SSPL component is present",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "every installed production dependency declares a license",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the MPL-2.0 components are named with their source location",
+      "ok": true,
+      "detail": "THIRD_PARTY_NOTICES.md must name the MPL components and how to obtain their source"
+    },
+    {
+      "name": "the project ships its own license text",
+      "ok": true,
+      "detail": "package.json declares MIT, so a LICENSE file must exist"
+    },
+    {
+      "name": "the changelog records the current version as unreleased or released",
+      "ok": true,
+      "detail": "version 0.1.0"
+    },
+    {
+      "name": "the support matrix records the project version",
+      "ok": true,
+      "detail": "looked for 0.1.0"
+    },
+    {
+      "name": "the support matrix records the locked desktop driver version",
+      "ok": true,
+      "detail": "the driver version must appear in the supported-version record"
+    },
+    {
+      "name": "the support matrix distinguishes verified from unverified combinations",
+      "ok": true,
+      "detail": "a matrix that lists only verified rows would hide the gaps"
+    },
+    {
+      "name": "the desktop driver is pinned to the locked version in package.json",
+      "ok": true,
+      "detail": "0.30.1"
+    },
+    {
+      "name": "Electron is pinned to the version the native checks used",
+      "ok": true,
+      "detail": "44.4.5"
+    },
+    {
+      "name": "the Pi SDK is pinned to the version the pi-web baseline uses",
+      "ok": true,
+      "detail": "0.87.1"
+    },
+    {
+      "name": "every native acceptance record exists",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the native acceptance records keep their unverified items",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the .gitignore excludes local agent goal state while keeping project .pi configuration versionable",
+      "ok": true,
+      "detail": "ignoring all of .pi would make future project configuration unversionable"
+    },
+    {
+      "name": "the README states the status truthfully",
+      "ok": true,
+      "detail": "a release README must not present unverified capability as working"
+    }
+  ],
+  "passed": true,
+  "summary": {
+    "passed": 26,
+    "failed": 0,
+    "version": "0.1.0",
+    "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files"
+  }
+}

@@ -33,6 +33,7 @@ export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
+  collapseOrb(): Promise<DesktopTaskStatus>;
   authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
   revokeDesktopTask(): Promise<DesktopTaskStatus>;
   getDesktopTaskStatus(): Promise<DesktopTaskStatus>;
@@ -54,6 +55,7 @@ const bridge: OrbBridge = {
   getStatus: () => ipcRenderer.invoke(IPC.getStatus),
   refreshConnection: () => ipcRenderer.invoke(IPC.refreshConnection),
   setShortcut: (accelerator: string) => ipcRenderer.invoke(IPC.setShortcut, accelerator),
+  collapseOrb: () => ipcRenderer.invoke(IPC.collapseOrb),
   authorizeDesktopTask: (request: AuthorizeDesktopTaskRequest) =>
     ipcRenderer.invoke(IPC.authorizeDesktopTask, request),
   revokeDesktopTask: () => ipcRenderer.invoke(IPC.revokeDesktopTask),

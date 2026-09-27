@@ -14,6 +14,14 @@ export const IPC = {
   refreshConnection: "orb:refresh-connection",
   /** Renderer -> main: change the global wake shortcut. */
   setShortcut: "orb:set-shortcut",
+  /**
+   * Renderer -> main: collapse the orb.
+   *
+   * A floating window needs a way to hide itself that does not depend on a global shortcut or the
+   * tray, and this goes through the same lifecycle routine, so collapsing from the window revokes
+   * desktop operations exactly like the other routes.
+   */
+  collapseOrb: "orb:collapse",
   /** Renderer -> main: read the Orb configuration and workspace status. */
   getStatus: "orb:get-status",
   /** Renderer -> main: validate a candidate workspace directory (read-only). */

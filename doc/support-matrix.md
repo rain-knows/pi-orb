@@ -69,6 +69,11 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **Orb 工具仅限 Orb 模式**：普通会话无 orb 工具、Orb 会话恰好四个 | 已验证（provider 实际收到 schema） | `evidence/p1-06/tool-exposure.json` |
 | **桌面工具闭环**：授权/预算/新鲜度、拒绝零副作用、真实点击落点为目标格心 | 已验证（真实壳+驱动+自报目标） | `evidence/p1-06/loop-verification.json` |
 | 桥准入：无会话/错误令牌/浏览器来源/旧代次均被拒 | 已验证 | `evidence/p1-06/` + `tests/bridge-server.test.ts` |
+| **第三方许可清单**：每个已安装生产依赖均声明许可，无 AGPL/GPL-3/SSPL | 已验证 | `evidence/p1-07/license-inventory.json` |
+| **`cua_driver_sdk.dll` 的 MPL 归属核实**：交付物中无任何证据把 MPL 归于该 DLL（无许可文本、不引用 uniffi runtime、仅导入系统库） | 已核实并记录 | `THIRD_PARTY_NOTICES.md` §3 |
+| `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
+| **生命周期**：折叠/停止撤权、不结束会话、不改代次 | 已验证 | `evidence/p1-07/lifecycle-regression.json`（9/9） |
+| **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性 | 已验证（且三次反向对照可证伪） | `evidence/p1-07/release-gate.json`（26/26） |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -99,6 +104,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 经 orb 工具的文本输入与滚动 | 驱动对 Chromium 内容的这些事件类型不可用（见 `cua-driver-integration.md`） | 未验证；被驱动拒绝时会如实报回，不静默成功 |
 | 失败即停由真实驱动失败触发 | 由单测覆盖（`tests/desktop-broker.test.ts`），整链路未构造真实驱动失败 | 部分验证 |
 | 同一任务锁在多会话并发下的行为 | 单测覆盖；整链路只覆盖单会话 | 未验证 |
+| **完整 v0.1 发布** | M2 正向截图与 M3 前台投递/输入/滚动未验证 | **未完成**；当前交付物不得声明为完整 v0.1 |
 | 驱动内建授权语义（`desktopCaptureAuthorized`、`desktopUnlocked`、`escalate_session`） | 本阶段未使用；状态实测均为 false | **未验证**；产品侧授权仍由 pi-Orb 自己的任务授权与代次绑定负责 |
 | 截图点↔屏幕坐标一致性、预览不夹带 Orb 遮罩、多显示器/遮挡窗口截图 | 均依赖正向截图路径 | **未验证**；属 P1-04 人工确认及 P1-05 |
 | 窗口位置的**跨启动**恢复 | 防抖保存已实现，但未做“移动→退出→重启→恢复”实测 | 未验证；不得宣称已支持 |

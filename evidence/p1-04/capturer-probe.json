@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-09-27T17:27:33.977Z",
+  "capturedAt": "2026-09-27T19:35:00.452Z",
   "electronVersion": null,
-  "sourceCount": 3,
-  "windowSourceCount": 2,
+  "sourceCount": 5,
+  "windowSourceCount": 4,
   "screenSourceCount": 1,
   "displayCount": 1,
   "displays": [
@@ -26,17 +26,31 @@
   ],
   "idFormatExamples": [
     {
+      "id": "window:918562:0",
+      "name": "Windows 默认锁屏界面"
+    },
+    {
       "id": "window:1181646:0",
       "name": "Backstop Window"
+    },
+    {
+      "id": "window:723120:0",
+      "name": "*p1-05-keyboard-target.txt - Notepad"
     },
     {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome"
     }
   ],
-  "nativeWindowCount": 5,
-  "idsContainingNativeHandle": 1,
+  "nativeWindowCount": 6,
+  "idsContainingNativeHandle": 2,
   "idHandleMatches": [
+    {
+      "id": "window:723120:0",
+      "name": "*p1-05-keyboard-target.txt - Notepad",
+      "middle": "723120",
+      "middleIsLiveHandle": true
+    },
     {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome",
@@ -49,6 +63,16 @@
   "error": null,
   "rawSourceSample": [
     {
+      "id": "window:918562:0",
+      "name": "Windows 默认锁屏界面",
+      "displayId": "",
+      "hasThumbnail": false,
+      "thumbnailSize": {
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
       "id": "window:1181646:0",
       "name": "Backstop Window",
       "displayId": "",
@@ -59,8 +83,8 @@
       }
     },
     {
-      "id": "window:329270:0",
-      "name": "pi-orb - Pi Web - Google Chrome",
+      "id": "window:723120:0",
+      "name": "*p1-05-keyboard-target.txt - Notepad",
       "displayId": "",
       "hasThumbnail": false,
       "thumbnailSize": {
@@ -69,8 +93,8 @@
       }
     },
     {
-      "id": "screen:0:0",
-      "name": "整个屏幕",
+      "id": "window:329270:0",
+      "name": "pi-orb - Pi Web - Google Chrome",
       "displayId": "",
       "hasThumbnail": false,
       "thumbnailSize": {

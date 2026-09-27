@@ -30,6 +30,7 @@ import { validateWorkspace, createWorkspace } from "./workspace";
 import { RunGenerations } from "./generations";
 import { ShortcutRegistry } from "./shortcut";
 import { WakeController } from "./window-toggle";
+import { OrbWindowLifecycle } from "./window-lifecycle";
 import { OrbSessionController } from "./orb-session";
 import { PiWebClient, PiWebError } from "./pi-web-client";
 import { Win32TargetWindowReader } from "./target-window";
@@ -92,19 +93,28 @@ let window: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let session: OrbSessionController;
 let wake: WakeController | null = null;
+let lifecycle: OrbWindowLifecycle | null = null;
 let lastWorkspaceProblem: string | null = null;
 let lastShortcutProblem: string | null = null;
 let lastDesktopProblem: string | null = null;
 let isQuitting = false;
+const piWebBaseUrl = process.env.PI_ORB_PI_WEB_URL ?? "http://127.0.0.1:30141";
+const piWebPassword = process.env.PI_ORB_PI_WEB_PASSWORD ?? process.env.PI_WEB_PASSWORD;
+
+/**
+ * pi-web connection state.
+ *
+ * `baseUrl` is known from the moment the process starts, so it is set here rather than left empty
+ * until the first probe. Leaving it empty made the first render report an empty URL with no problem,
+ * which hid the real state: the window is created before the (slower) desktop startup completes, so
+ * a client can read the snapshot before any probe has run.
+ */
 let piWebState: PiWebStatus = {
-  // Filled in once the main process knows the configured base URL.
-  baseUrl: "",
+  baseUrl: piWebBaseUrl,
   reachable: false,
   problem: null,
 };
 
-const piWebBaseUrl = process.env.PI_ORB_PI_WEB_URL ?? "http://127.0.0.1:30141";
-const piWebPassword = process.env.PI_ORB_PI_WEB_PASSWORD ?? process.env.PI_WEB_PASSWORD;
 const client = new PiWebClient({
   baseUrl: piWebBaseUrl,
   ...(piWebPassword ? { password: piWebPassword } : {}),
@@ -147,9 +157,14 @@ function createWindow(): BrowserWindow {
   win.once("ready-to-show", () => win.show());
   win.on("close", (event) => {
     // Collapsing is not quitting: hide the window and keep the session alive.
+    //
+    // Closing goes through the same collapse routine as the wake shortcut and the tray, so the
+    // "hiding the orb revokes desktop operations" rule cannot be bypassed by using the window
+    // button instead of the shortcut. Two independent hide paths was a real defect: closing the
+    // window kept the desktop authority alive.
     if (!isQuitting) {
       event.preventDefault();
-      win.hide();
+      lifecycle?.collapse();
     }
   });
 
@@ -362,6 +377,23 @@ function toggleWindow(source: "shortcut" | "tray"): void {
 }
 
 function attachWakeController(win: BrowserWindow): void {
+  // Every collapse route — the wake shortcut, the window's close button and the tray menu — goes
+  // through this one lifecycle object. Two independent hide paths was a real defect: closing the
+  // window (or using the tray menu) kept the desktop authority alive.
+  lifecycle = new OrbWindowLifecycle(
+    {
+      hide: () => {
+        if (!win.isDestroyed()) win.hide();
+      },
+      isDestroyed: () => win.isDestroyed(),
+    },
+    {
+      revokeDesktopTask: () => desktopBroker?.revoke(),
+      discardPendingCapture: () => screenshotFlow?.discard(),
+    },
+    (message) => console.log(message),
+  );
+
   wake = new WakeController({
     getState: () => ({
       destroyed: win.isDestroyed(),
@@ -376,10 +408,25 @@ function attachWakeController(win: BrowserWindow): void {
       win.focus();
     },
     collapse: () => {
-      if (win.isDestroyed()) return;
-      win.hide();
+      lifecycle?.collapse();
     },
   });
+}
+
+/**
+ * Torn down every outstanding desktop capability, in one place.
+ *
+ * There is exactly one revocation path so a new caller cannot invent a partial one. It revokes the
+ * task authorization and drops any unconfirmed screenshot, and it is idempotent.
+ */
+function revokeDesktopOperations(reason: string): void {
+  const hadAuthority = desktopBroker?.status().authorized === true;
+  const hadCapture = screenshotFlow?.pending !== null && screenshotFlow?.pending !== undefined;
+  desktopBroker?.revoke();
+  screenshotFlow?.discard();
+  if (hadAuthority || hadCapture) {
+    console.log(`[pi-orb] desktop operations revoked: ${reason}`);
+  }
 }
 
 function createTray(): void {
@@ -388,7 +435,9 @@ function createTray(): void {
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: "Show orb", click: () => window?.show() },
-      { label: "Hide orb", click: () => window?.hide() },
+      // Goes through the same collapse routine as the shortcut and the window button, so the tray
+      // cannot hide the orb while leaving desktop authority alive.
+      { label: "Hide orb", click: () => lifecycle?.collapse() },
       { type: "separator" },
       { label: "Quit", click: () => quit() },
     ]),
@@ -417,6 +466,13 @@ function registerIpc(): void {
   ipcMain.handle(IPC.refreshConnection, async () => {
     await refreshPiWebState();
     return currentStatus();
+  });
+
+  ipcMain.handle(IPC.collapseOrb, () => {
+    // The window's own collapse control. It goes through the lifecycle object, so hiding from the
+    // window revokes desktop operations just like the shortcut and the tray.
+    lifecycle?.collapse();
+    return desktopTaskStatus();
   });
 
   ipcMain.handle(IPC.setShortcut, (_event, candidate: unknown) => {
@@ -501,8 +557,7 @@ function registerIpc(): void {
       // previous workspace must not continue under the new one. An unconfirmed
       // screenshot and any desktop authorization belong to the previous run and must not
       // survive it either.
-      screenshotFlow.discard();
-      desktopBroker?.revoke();
+      revokeDesktopOperations("the workspace changed");
       const generation = generations.begin();
       session.beginGeneration(generation);
       try {
@@ -588,7 +643,6 @@ function registerIpc(): void {
     screenshotFlow.discard();
     return true;
   });
-
   ipcMain.handle(IPC.getDesktopTaskStatus, () => desktopTaskStatus());
 
   ipcMain.handle(IPC.listDesktopWindows, async (): Promise<ListDesktopWindowsResult> => {
@@ -661,7 +715,9 @@ function registerIpc(): void {
   });
 
   ipcMain.handle(IPC.revokeDesktopTask, () => {
-    desktopBroker?.revoke();
+    // The user's explicit emergency stop: one call drops the task authority and any
+    // unconfirmed screenshot, so nothing is left able to touch the desktop.
+    revokeDesktopOperations("the user stopped desktop operations");
     lastDesktopProblem = null;
     return desktopTaskStatus();
   });
@@ -785,10 +841,8 @@ function debounce(action: () => void, delayMs: number): () => void {
 function quit(): void {
   isQuitting = true;
   shortcuts.releaseAll();
-  // Drop any unconfirmed capture and revoke desktop authority: shutdown must not leave an
-  // image waiting to be sent, nor a task grant that a later run could inherit.
-  screenshotFlow.discard();
-  desktopBroker?.revoke();
+  // Shutdown must not leave an image waiting to be sent, nor a task grant a later run could inherit.
+  revokeDesktopOperations("the shell is quitting");
   void bridge?.close();
   void cuaAdapter?.shutdown();
   removeHandshake(app.getPath("userData"));
@@ -828,16 +882,19 @@ void app.whenReady().then(async () => {
   attachWakeController(window);
   registerShortcut();
 
-  // Started before the connection probe so the extension can reach the shell as soon as a
-  // session exists, and so a driver problem is reported rather than crashing startup.
+  // The connection probe runs first: the window is already created, so its first snapshot must
+  // carry a real answer rather than "unknown". Desktop startup is slower (it loads a native driver
+  // and shells out for the recorded target) and is not needed for the first render.
+  await refreshPiWebState();
+
+  // Started so the extension can reach the shell as soon as a session exists, and so a driver
+  // problem is reported rather than crashing startup.
   await startDesktop();
   await startBridge();
 
   // Record the window the user was looking at, before the orb can take focus. The same identity
   // then gates every desktop observation and action.
   await recordDesktopTarget();
-
-  await refreshPiWebState();
 });
 
 /**
@@ -896,8 +953,7 @@ app.on("window-all-closed", () => {
 app.on("before-quit", () => {
   isQuitting = true;
   shortcuts.releaseAll();
-  screenshotFlow?.discard();
-  desktopBroker?.revoke();
+  revokeDesktopOperations("the shell is quitting");
   void bridge?.close();
   void cuaAdapter?.shutdown();
   removeHandshake(app.getPath("userData"));

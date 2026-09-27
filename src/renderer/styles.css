@@ -42,6 +42,12 @@ body {
   letter-spacing: 0.02em;
 }
 
+.orb__header-actions {
+  display: flex;
+  gap: 0.35rem;
+  -webkit-app-region: no-drag;
+}
+
 .orb__button {
   -webkit-app-region: no-drag;
   padding: 0.3rem 0.7rem;
