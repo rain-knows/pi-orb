@@ -27,8 +27,7 @@ verified is recorded as *unverified* and is not claimed as compatible.
   demonstrated statement of the `~/.agents/skills` limitation.
 - Repository foundation: `package.json` with a locked dependency set, TypeScript
   `strict`, ESLint, Vitest, and an `electron-vite` build producing main, preload and
-  renderer bundles.
-- `.gitignore` covering dependencies, build output, scratch directories, local agent
+  renderer bundles.- `.gitignore` covering dependencies, build output, scratch directories, local agent
   goal state, credentials, native binaries and screenshots.
 - Electron main process: orb window, tray, configurable global wake shortcut with
   registration diagnostics, and single-instance exit cleanup.
@@ -49,6 +48,14 @@ verified is recorded as *unverified* and is not claimed as compatible.
 - Pi package `pi-package/` with the Orb mode extension: conditional registration on an
   exact `cwd` match, and no registration at all otherwise.
 - `doc/support-matrix.md` recording verified and unverified version combinations.
+- P1-02 minimum Electron orb window end to end: text input, streamed assistant
+  output, visible errors, an explicit stop whose output stops growing and whose task
+  lock is released, window bounds persistence, and a tray entry. The chat flow runs
+  against a real pi-web while the normal pi-web UI can browse the same session.
+- Status snapshot now carries the run generation, the task-lock state and the bound
+  session id, so a client never depends on a pushed event it may have missed.
+- `tests/fixtures/pi-web-events.ts` records the real pi-web SSE event shapes, so the
+  stream parser is checked against the observed wire format rather than a guess.
 
 ### Fixed
 
@@ -62,6 +69,17 @@ application:
 - A rejected directory selection left the previously committed workspace usable but
   reported no reason at all, so choosing a bad directory looked like nothing happened.
   The reason for the last operation is now part of the status snapshot.
+- The initial run generation was emitted before the renderer subscribed, so every
+  prompt was refused as stale. Generation, task-lock state and session id are now
+  read from the pull-based status snapshot.
+- The single-task lock was released when the HTTP prompt call returned rather than
+  when the turn ended, so `busy` was always false and a second GUI task could start
+  while one was running. The lock now spans the turn.
+- The SSE parser guessed at the event shape (`message_delta` with `delta.text`), so
+  streamed text never reached the UI and nothing reported an error. It now reads the
+  observed `message_update.assistantMessageEvent.text_delta` contract.
+- A reply that arrived without any delta events rendered as empty, because the
+  accumulator's empty-string initial value defeated a `??` fallback.
 
 ### Security
 

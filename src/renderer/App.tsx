@@ -10,20 +10,20 @@ interface ChatMessage {
 export function App() {
   const bridge = useMemo(() => getBridge(), []);
   const [status, setStatus] = useState<WorkspaceStatus | null>(null);
-  const [generation, setGeneration] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const streaming = useRef("");
 
+  // The generation is read from the status snapshot, never from a pushed event:
+  // the initial generation is decided before this subscriber exists.
+  const generation = status?.generation ?? 0;
+
   useEffect(() => {
     void bridge.getStatus().then(setStatus);
     return bridge.onSessionEvent((event: OrbSessionEvent) => {
       switch (event.type) {
-        case "generation":
-          setGeneration(event.generation);
-          return;
         case "assistant-delta":
           streaming.current += event.text;
           setMessages((current) => withStreaming(current, streaming.current));
@@ -34,6 +34,7 @@ export function App() {
           return;
         case "error":
           setNotice(event.message);
+          setBusy(false);
           return;
         case "idle":
           setBusy(false);
@@ -65,7 +66,7 @@ export function App() {
 
   const send = useCallback(async () => {
     const text = draft.trim();
-    if (text.length === 0 || busy) return;
+    if (text.length === 0 || busy || generation === 0) return;
     setNotice(null);
     setDraft("");
     streaming.current = "";
@@ -124,7 +125,6 @@ export function App() {
           >
             Choose workspace…
           </button>
-          {status?.problem && <p className="orb__problem">{status.problem}</p>}
         </section>
       )}
 
@@ -174,6 +174,7 @@ export function App() {
         </>
       )}
 
+      {status?.problem && <p className="orb__notice orb__notice--error">{status.problem}</p>}
       {notice && <p className="orb__notice">{notice}</p>}
       {status && !status.piWeb.reachable && status.piWeb.problem && (
         <p className="orb__notice orb__notice--error">{status.piWeb.problem}</p>

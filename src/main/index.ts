@@ -59,6 +59,14 @@ const client = new PiWebClient({
 });
 
 function emit(event: OrbSessionEvent): void {
+  if (event.type === "idle" || event.type === "error") {
+    // The turn is over. The single-task lock must not outlive it, or the orb would
+    // refuse every later message for the rest of the run.
+    //
+    // Released against the controller's own generation, not `generations.current`:
+    // a turn that ends after a workspace switch must not free the new run's lock.
+    generations.release(session.generation);
+  }
   if (window && !window.isDestroyed()) {
     window.webContents.send(IPC.sessionEvent, event);
   }
@@ -93,6 +101,21 @@ function createWindow(): BrowserWindow {
     }
   });
 
+  // Remember where the user put the orb. Writes are debounced so dragging does not
+  // rewrite the configuration on every pixel.
+  const saveBounds = debounce(() => {
+    if (win.isDestroyed()) return;
+    const bounds = win.getBounds();
+    config = { ...config, window: { ...config.window, ...bounds } };
+    try {
+      saveOrbConfig(configPath, config);
+    } catch (error) {
+      console.warn(`[pi-orb] could not save window bounds: ${describeError(error)}`);
+    }
+  }, 500);
+  win.on("moved", saveBounds);
+  win.on("resized", saveBounds);
+
   const rendererUrl = process.env.ELECTRON_RENDERER_URL;
   if (rendererUrl) {
     void win.loadURL(rendererUrl);
@@ -116,6 +139,9 @@ function currentStatus(): WorkspaceStatus {
       : (validation?.message ?? lastWorkspaceProblem),
     shortcut: config.shortcut,
     shortcutRegistered: shortcuts.current?.registered ?? false,
+    generation: generations.current,
+    busy: generations.busy,
+    sessionId: session?.sessionId ?? null,
     piWeb: { ...piWebState },
   };
 }
@@ -299,9 +325,10 @@ function registerIpc(): void {
     try {
       await session.prompt(parsed.text);
     } catch (error) {
-      throw new Error(describeError(error));
-    } finally {
+      // The turn never started, so release the lock here; a turn that does start
+      // keeps it until it ends (see emit()).
       generations.release(parsed.generation);
+      throw new Error(describeError(error));
     }
   });
 
@@ -310,7 +337,13 @@ function registerIpc(): void {
     if (!parsed) throw new Error("Malformed abort request.");
     const check = generations.check(parsed.generation);
     if (!check.ok) throw new Error(describeGenerationFailure(check.reason));
-    await session.abort();
+    try {
+      await session.abort();
+    } finally {
+      // Stopping ends the turn, so the task lock must be released here too; the
+      // stream does not reliably emit an idle event for an aborted turn.
+      generations.release(parsed.generation);
+    }
   });
 }
 
@@ -339,6 +372,18 @@ function describeGenerationFailure(reason: "no-run" | "stale-generation" | "malf
 function describeError(error: unknown): string {
   if (error instanceof PiWebError) return error.message;
   return error instanceof Error ? error.message : String(error);
+}
+
+/** Trailing-edge debounce. Returns a function that can be called repeatedly. */
+function debounce(action: () => void, delayMs: number): () => void {
+  let timer: NodeJS.Timeout | null = null;
+  return () => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      action();
+    }, delayMs);
+  };
 }
 
 function quit(): void {

@@ -1,0 +1,255 @@
+{
+  "capturedAt": "2026-09-27T17:02:05.132Z",
+  "isolation": {
+    "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-02-1790528525077",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-02-1790528525077\\agent",
+    "sessionDir": "D:\\pi-orb-p1-runs\\p1-02-1790528525077\\agent\\sessions",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-02-1790528525077\\home",
+    "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace",
+    "normalCwd": "D:\\pi-orb-p1-runs\\p1-02-1790528525077\\normal-project",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-config.json",
+    "extensionPath": "D:\\workself\\pi-orb\\pi-package\\extensions\\orb.ts",
+    "piWebUrl": "http://127.0.0.1:31293",
+    "piWebPort": 31293,
+    "modelPort": 31294,
+    "debugPort": 31295,
+    "credentialSource": "isolated test password in the child env only",
+    "realUserProfileTouched": false,
+    "screenshots": false,
+    "desktopInput": false,
+    "realModel": false
+  },
+  "checks": [
+    {
+      "name": "electron shell is alive",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "orb window exists",
+      "ok": true,
+      "detail": "pi-Orb"
+    },
+    {
+      "name": "preload bridge is exposed",
+      "ok": true
+    },
+    {
+      "name": "renderer has no Node access",
+      "ok": true,
+      "detail": "{\"require\":\"undefined\",\"process\":\"undefined\",\"module\":\"undefined\",\"Buffer\":\"undefined\"}"
+    },
+    {
+      "name": "the bridge surface is a fixed, small set with no generic IPC passthrough",
+      "ok": true,
+      "detail": "[\"abort\",\"chooseWorkspace\",\"ensureSession\",\"getStatus\",\"onSessionEvent\",\"refreshConnection\",\"sendPrompt\",\"setWorkspace\",\"validateWorkspace\"]"
+    },
+    {
+      "name": "renderer cannot reach pi-web directly (opaque origin)",
+      "ok": true,
+      "detail": "blocked:TypeError"
+    },
+    {
+      "name": "workspace is configured and reported",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-02-1790528525077\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31293\",\"reachable\":true,\"problem\":null}}"
+    },
+    {
+      "name": "pi-web connection is reported reachable",
+      "ok": true,
+      "detail": "{\"baseUrl\":\"http://127.0.0.1:31293\",\"reachable\":true,\"problem\":null}"
+    },
+    {
+      "name": "status exposes a usable run generation",
+      "ok": true,
+      "detail": "generation=1"
+    },
+    {
+      "name": "no stale workspace problem is reported",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "name": "the composer accepted the text",
+      "ok": true,
+      "detail": "submitted"
+    },
+    {
+      "name": "the Orb session ran in Orb mode",
+      "ok": true,
+      "detail": "{\"index\":1,\"tools\":[\"bash\",\"read\"],\"containsOrbModeSection\":true,\"isSlow\":false,\"lastUserText\":\"hello from the orb\",\"startedAt\":1790528539757,\"clientDisconnected\":false}"
+    },
+    {
+      "name": "the user message is shown",
+      "ok": true,
+      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
+    },
+    {
+      "name": "the assistant reply is shown",
+      "ok": true,
+      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
+    },
+    {
+      "name": "the shell reports the session it is using",
+      "ok": true,
+      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
+    },
+    {
+      "name": "the shell reports the session it created",
+      "ok": true,
+      "detail": "01a0e3d1-47f7-7007-9906-fe1f95b1b458"
+    },
+    {
+      "name": "pi-web lists the Orb session",
+      "ok": true,
+      "detail": "status=200 matched=true"
+    },
+    {
+      "name": "the Orb session id was resolved",
+      "ok": true,
+      "detail": "01a0e3d1-47f7-7007-9906-fe1f95b1b458"
+    },
+    {
+      "name": "pi-web can read the Orb session history",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "the browsed history contains the conversation",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a0e3d1-47f7-7007-9906-fe1f95b1b458\",\"filePath\":\"D:\\\\pi-orb-p1-runs\\\\p1-02-1790528525077\\\\agent\\\\sessions\\\\--D--pi-orb-p1-runs-p1-02-1790528525077-orb-workspace--\\\\2026-09-27T17-02-18-616Z_01a0e3d1-47f7-7007-9906-fe1f95b1b458.jsonl\",\"info\":{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-02-1790528525"
+    },
+    {
+      "name": "a second client can browse while the app owns the session",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "browsing produced no extra model call",
+      "ok": true,
+      "detail": "before=1 after=1"
+    },
+    {
+      "name": "streamed partial output is visible mid-turn",
+      "ok": true,
+      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSLOW please stream for a while\nSLOW-STREAM-\nSend\nStop"
+    },
+    {
+      "name": "the shell reports a busy turn",
+      "ok": true,
+      "detail": "busy=true"
+    },
+    {
+      "name": "the shell reports the session id it is bound to",
+      "ok": true,
+      "detail": "sessionId=01a0e3d1-47f7-7007-9906-fe1f95b1b458"
+    },
+    {
+      "name": "the stop control was available during the turn",
+      "ok": true,
+      "detail": "clicked"
+    },
+    {
+      "name": "the turn stopped and the shell is no longer busy",
+      "ok": true
+    },
+    {
+      "name": "streamed output stops growing after the stop",
+      "ok": true,
+      "detail": "atStop=\"\\n\\nhello from the orb\\np1-ok\\nSLOW please stream for a while\\nSLOW-STREAM-\\nSend\\nStop\" afterStop=\"\\n\\nhello from the orb\\np1-ok\\nSLOW please stream for a while\\nSLOW-STREAM-\\nSend\\nStop\""
+    },
+    {
+      "name": "the stopped turn never reached its final token",
+      "ok": true,
+      "detail": "1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSLOW please stream for a while\nSLOW-STREAM-\nSend\nStop"
+    },
+    {
+      "name": "the slow-stream probe flagged exactly one request",
+      "ok": true,
+      "detail": "[{\"index\":1,\"isSlow\":false,\"lastUserText\":\"hello from the orb\"},{\"index\":2,\"isSlow\":true,\"lastUserText\":\"SLOW please stream for a while\"}]"
+    },
+    {
+      "name": "a new message is accepted after a stop (the task lock was released)",
+      "ok": true
+    },
+    {
+      "name": "a normal, non-Orb session can still be created",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "a normal session can still prompt",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "electron is still alive after the whole flow",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "no renderer crash was reported",
+      "ok": true,
+      "detail": "\r\nDevTools listening on ws://127.0.0.1:31295/devtools/browser/e1d40bb5-6320-464a-8993-f71eec8d5c29\r\n"
+    }
+  ],
+  "passed": true,
+  "stopPropagation": {
+    "modelAcceptedRequest": true,
+    "providerStreamDisconnectedByPiWeb": false,
+    "note": "pi-web's abort is cooperative: the agent loop stops at the next checkpoint. A false value here means the in-flight provider request was allowed to finish rather than being torn down, which is pi-web behaviour and not a pi-Orb guarantee."
+  },
+  "modelRequests": [
+    {
+      "index": 1,
+      "tools": [
+        "bash",
+        "read"
+      ],
+      "containsOrbModeSection": true,
+      "isSlow": false,
+      "lastUserText": "hello from the orb",
+      "startedAt": 1790528539757,
+      "clientDisconnected": false
+    },
+    {
+      "index": 2,
+      "tools": [
+        "bash",
+        "read"
+      ],
+      "containsOrbModeSection": true,
+      "isSlow": true,
+      "lastUserText": "SLOW please stream for a while",
+      "startedAt": 1790528539959,
+      "clientDisconnected": false
+    },
+    {
+      "index": 3,
+      "tools": [
+        "bash",
+        "read"
+      ],
+      "containsOrbModeSection": true,
+      "isSlow": false,
+      "lastUserText": "after the stop",
+      "startedAt": 1790528554219,
+      "clientDisconnected": false
+    },
+    {
+      "index": 4,
+      "tools": [
+        "bash",
+        "read"
+      ],
+      "containsOrbModeSection": false,
+      "isSlow": false,
+      "lastUserText": "normal prompt",
+      "startedAt": 1790528554583,
+      "clientDisconnected": false
+    }
+  ],
+  "sessionId": "01a0e3d1-47f7-7007-9906-fe1f95b1b458",
+  "electronStderrTail": "DevTools listening on ws://127.0.0.1:31295/devtools/browser/e1d40bb5-6320-464a-8993-f71eec8d5c29"
+}

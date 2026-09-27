@@ -35,7 +35,6 @@ export class OrbSessionController {
   #closeStream: (() => void) | null = null;
   #running = false;
   #accumulator: AssistantAccumulator | null = null;
-
   constructor(deps: OrbSessionDeps) {
     this.#deps = deps;
   }
@@ -53,6 +52,17 @@ export class OrbSessionController {
   }
 
   /**
+   * The generation this controller is bound to.
+   *
+   * The task lock is released against this generation rather than "whatever is
+   * current", so a turn that ends after a new run started cannot release the new
+   * run's lock.
+   */
+  get generation(): number {
+    return this.#generation;
+  }
+
+  /**
    * Bind the controller to a new run. Drops every stream and session reference
    * from the previous run so no stale work can continue under a new generation.
    */
@@ -64,7 +74,6 @@ export class OrbSessionController {
     this.#running = false;
     this.#accumulator = null;
     this.#generation = generation;
-    this.#deps.emit({ type: "generation", generation });
   }
 
   /**
@@ -113,9 +122,15 @@ export class OrbSessionController {
     try {
       await this.#deps.client.prompt(sessionId, text);
     } catch (error) {
+      // The prompt never started, so no idle event will arrive to clear the state.
       this.#running = false;
       throw error;
     }
+    // Deliberately no success-path cleanup here. The prompt call returning only
+    // means pi-web accepted the message; the turn itself continues until an
+    // `agent_end` (or a stream error) arrives. Releasing the task lock here would
+    // free it while the turn is still running, allowing a second GUI task to be
+    // started concurrently.
   }
 
   async abort(): Promise<void> {
@@ -152,21 +167,9 @@ export class OrbSessionController {
     if (typeof type !== "string") return;
 
     switch (type) {
-      case "message_start": {
-        const message = record.message as { role?: string } | undefined;
-        if (message?.role === "assistant") this.#accumulator = { text: "" };
-        return;
-      }
       case "message_update":
-      case "message_delta": {
-        const delta = readTextDelta(record);
-        if (delta !== null) {
-          if (!this.#accumulator) this.#accumulator = { text: "" };
-          this.#accumulator.text += delta;
-          this.#deps.emit({ type: "assistant-delta", text: delta });
-        }
+        this.#handleMessageUpdate(record);
         return;
-      }
       case "message_end": {
         // The first message_end of a turn belongs to the user message of that
         // turn; only an assistant message ends the reply.
@@ -174,7 +177,12 @@ export class OrbSessionController {
           | { role?: string; content?: unknown }
           | undefined;
         if (message?.role !== "assistant") return;
-        const text = this.#accumulator?.text ?? extractText(message.content);
+        // Prefer streamed deltas, but fall back to the finalized content. The
+        // accumulator starts as an empty string, so a truthiness-agnostic `??`
+        // would keep the empty string and render a reply as nothing when no
+        // delta events arrived.
+        const streamed = this.#accumulator?.text ?? "";
+        const text = streamed.length > 0 ? streamed : extractText(message.content);
         this.#accumulator = null;
         this.#emitAssistantMessage(text);
         return;
@@ -201,21 +209,45 @@ export class OrbSessionController {
     }
   }
 
+  /**
+   * Handle the streaming update envelope.
+   *
+   * The wire format is pi-web's `toClientAgentEvent` projection
+   * (`lib/agent-event-wire.ts`): `{ type: "message_update", assistantMessageEvent }`
+   * with the bulky `partial` field stripped. The nested `assistantMessageEvent` is
+   * Pi's own stream union, so text arrives as
+   * `{ type: "text_delta", contentIndex, delta }` and completion as
+   * `{ type: "done", reason }`.
+   */
+  #handleMessageUpdate(record: Record<string, unknown>): void {
+    const update = record.assistantMessageEvent;
+    if (typeof update !== "object" || update === null) return;
+    const updateRecord = update as Record<string, unknown>;
+    const updateType = updateRecord.type;
+
+    if (updateType === "text_delta") {
+      const delta = updateRecord.delta;
+      if (typeof delta !== "string" || delta.length === 0) return;
+      if (!this.#accumulator) this.#accumulator = { text: "" };
+      this.#accumulator.text += delta;
+      this.#deps.emit({ type: "assistant-delta", text: delta });
+      return;
+    }
+
+    if (updateType === "error") {
+      const message = updateRecord.errorMessage;
+      this.#running = false;
+      this.#deps.emit({
+        type: "error",
+        message: typeof message === "string" ? message : "The model call failed.",
+      });
+    }
+  }
+
   #emitAssistantMessage(text: string): void {
     if (text.length === 0) return;
     this.#deps.emit({ type: "assistant-message", text });
   }
-}
-
-function readTextDelta(record: Record<string, unknown>): string | null {
-  const delta = record.delta;
-  if (typeof delta === "string") return delta;
-  if (typeof delta === "object" && delta !== null) {
-    const text = (delta as { text?: unknown }).text;
-    if (typeof text === "string") return text;
-  }
-  const text = record.text;
-  return typeof text === "string" ? text : null;
 }
 
 function extractText(content: unknown): string {

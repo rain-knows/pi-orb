@@ -2,6 +2,16 @@ import { describe, expect, it, vi } from "vitest";
 import { OrbSessionController } from "../src/main/orb-session";
 import type { PiWebClient } from "../src/main/pi-web-client";
 import type { OrbSessionEvent } from "@shared/ipc";
+import {
+  agentEnd,
+  assistantError,
+  assistantMessageEnd,
+  assistantMessageStart,
+  streamError,
+  systemMessageEnd,
+  textDelta,
+  userMessageEnd,
+} from "./fixtures/pi-web-events";
 
 interface FakeClient {
   createSession: ReturnType<typeof vi.fn>;
@@ -99,12 +109,12 @@ describe("OrbSessionController", () => {
     await controller.prompt("hi");
     const deliver = client.delivered[0]!;
 
-    deliver({ type: "message_start", message: { role: "assistant" } });
-    deliver({ type: "message_end", message: { role: "user", content: "hi" } });
-    deliver({ type: "message_delta", delta: { text: "par" } });
-    deliver({ type: "message_delta", delta: { text: "tial" } });
-    deliver({ type: "message_end", message: { role: "assistant", content: [] } });
-    deliver({ type: "agent_end", stopReason: "stop" });
+    deliver(assistantMessageStart());
+    deliver(userMessageEnd("hi"));
+    deliver(textDelta("par"));
+    deliver(textDelta("tial"));
+    deliver(assistantMessageEnd());
+    deliver(agentEnd());
 
     const deltas = events.filter((event) => event.type === "assistant-delta");
     expect(deltas.map((event) => (event as { text: string }).text)).toEqual(["par", "tial"]);
@@ -116,20 +126,50 @@ describe("OrbSessionController", () => {
     expect(events.at(-1)).toEqual({ type: "idle", stopReason: "stop" });
   });
 
+  it("ignores the system-message projection and unrelated event types", async () => {
+    const { controller, events, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("hi");
+    const deliver = client.delivered[0]!;
+    deliver(systemMessageEnd());
+    deliver({ type: "tool_execution_update", toolName: "read" });
+    deliver({ type: "message_update", assistantMessageEvent: { type: "thinking_delta", delta: "hmm" } });
+    deliver({ type: "message_update", assistantMessageEvent: { type: "text_end", contentIndex: 0 } });
+    deliver({ type: "agent_end" });
+    expect(events.filter((event) => event.type === "assistant-delta")).toHaveLength(0);
+    expect(events.filter((event) => event.type === "assistant-message")).toHaveLength(0);
+  });
+
+  it("reports a failed model call carried inside the update envelope", async () => {
+    const { controller, events, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("hi");
+    client.delivered[0]!(assistantError("model unavailable"));
+    expect(events).toContainEqual({ type: "error", message: "model unavailable" });
+  });
+
   it("does not emit an empty completed message", async () => {
     const { controller, events, client } = setup();
     await controller.ensureSession("C:\\work\\orb");
     await controller.prompt("hi");
-    client.delivered[0]!({ type: "message_end", message: { role: "assistant", content: "" } });
+    client.delivered[0]!(assistantMessageEnd(""));
     expect(events.filter((event) => event.type === "assistant-message")).toHaveLength(0);
   });
 
-  it("surfaces a stream error and leaves the run not busy afterwards", async () => {
+  it("surfaces a stream error", async () => {
     const { controller, events, client } = setup();
     await controller.ensureSession("C:\\work\\orb");
     await controller.prompt("hi");
-    client.delivered[0]!({ type: "error", message: "provider exploded" });
+    client.delivered[0]!(streamError("provider exploded"));
     expect(events).toContainEqual({ type: "error", message: "provider exploded" });
+  });
+
+  it("falls back to the final message content when no deltas arrived", async () => {
+    const { controller, events, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("hi");
+    client.delivered[0]!(assistantMessageEnd([{ type: "text", text: "whole reply" }]));
+    expect(events).toContainEqual({ type: "assistant-message", text: "whole reply" });
   });
 
   it("releases the previous stream when the workspace changes", async () => {

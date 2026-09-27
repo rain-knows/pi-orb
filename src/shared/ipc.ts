@@ -41,11 +41,28 @@ export interface WorkspaceStatus {
   readonly shortcut: string;
   readonly shortcutRegistered: boolean;
   /**
+   * The run generation a client must echo back on a prompt or abort.
+   *
+   * This is part of the status snapshot rather than a pushed event: the initial
+   * generation is decided before the renderer has subscribed, so a pushed message
+   * would be lost and every prompt would be refused as stale.
+   */
+  readonly generation: number;
+  /** True while a turn is running, so a second chat request is refused. */
+  readonly busy: boolean;
+  /**
+   * The pi-web session this shell is bound to, or `null` before one is created.
+   *
+   * Exposed so a client can confirm which session it is acting on, and so two
+   * clients can tell whether they are looking at the same conversation.
+   */
+  readonly sessionId: string | null;
+  /**
    * State of the pi-web service this shell talks to.
    *
-   * This is part of the status snapshot rather than a pushed event on purpose:
-   * a startup notice is produced before the renderer has subscribed, so a pushed
-   * message would be lost and the shell would look healthy when it is not.
+   * Also pull-based, for the same reason: a startup notice is produced before the
+   * renderer has subscribed, so a pushed message would be lost and the shell would
+   * look healthy when it is not.
    */
   readonly piWeb: PiWebStatus;
 }
@@ -66,7 +83,6 @@ export interface WorkspaceCandidateResult {
 export const SESSION_EVENT_CHANNEL_NAME = "orb:session-event";
 
 export type OrbSessionEvent =
-  | { readonly type: "generation"; readonly generation: number }
   | { readonly type: "session"; readonly sessionId: string; readonly generation: number }
   | { readonly type: "assistant-delta"; readonly text: string }
   | { readonly type: "assistant-message"; readonly text: string }
