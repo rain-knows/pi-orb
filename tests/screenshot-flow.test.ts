@@ -41,7 +41,9 @@ function harness(
     target?: CaptureTargetSnapshot | null;
     image?: ScreenshotImage | null;
     captureReason?: string | null;
-    stillForeground?: boolean;
+    /** Force the record's validity verdict, to exercise each refusal reason. */
+    validityReason?: "ok" | "no-record" | "window-gone" | "window-changed";
+    currentTitle?: string;
     sendError?: Error;
   } = {},
 ): Harness {
@@ -49,9 +51,21 @@ function harness(
   const captureCalls: CaptureTarget[] = [];
   let counter = 0;
 
+  const recorded = options.target === undefined ? snapshot() : options.target;
+  // The flow consumes a record taken before the orb took focus; it never reads the foreground window
+  // itself, so the harness supplies the record and its verdict rather than a reader.
+  const reason = options.validityReason ?? (recorded === null ? "no-record" : "ok");
+
   const flow = new ScreenshotFlow({
-    readTarget: async () => (options.target === undefined ? snapshot() : options.target),
-    isStillForeground: async () => options.stillForeground ?? true,
+    recordedTarget: {
+      snapshot: recorded,
+      validate: async () => ({
+        valid: reason === "ok" && recorded !== null,
+        reason,
+        snapshot: recorded,
+        ...(options.currentTitle === undefined ? {} : { currentTitle: options.currentTitle }),
+      }),
+    },
     capture: async (t) => {
       captureCalls.push(t);
       return {
@@ -109,26 +123,71 @@ describe("ScreenshotFlow.start", () => {
     expect(sent).toHaveLength(0);
   });
 
-  it("marks the preview stale when the window is no longer active, but keeps it usable", async () => {
-    const { flow } = harness({ stillForeground: false });
+  it("previews the recorded window even though it is no longer in front", async () => {
+    // The decisive property of the fix: after the user switches to the orb, the recorded window is
+    // not in front by design. Requiring foreground-ness refused every capture the user asked for.
+    const { flow } = harness();
     const result = await flow.start("hello");
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.targetStale).toBe(true);
+    if (result.ok) expect(result.targetStale).toBe(false);
   });
 
-  it("still previews when the staleness check itself fails", async () => {
-    // A failing staleness probe must not discard an otherwise valid capture.
+  it("never reads the foreground window itself", async () => {
+    // The flow's only source of a target is the record. A reader that consulted the foreground at
+    // capture time would return the orb, which is exactly the defect this replaced.
     const flow = new ScreenshotFlow({
-      readTarget: async () => snapshot(),
-      isStillForeground: async () => {
-        throw new Error("probe failed");
+      recordedTarget: {
+        snapshot: snapshot(),
+        validate: async () => ({ valid: true, reason: "ok", snapshot: snapshot() }),
       },
       capture: async () => ({ image: image(), reason: null }),
       send: async () => {},
     });
     const result = await flow.start("hello");
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.targetStale).toBe(true);
+  });
+
+  it("refuses with a specific reason when nothing was recorded", async () => {
+    const { flow, captureCalls } = harness({ target: null, validityReason: "no-record" });
+    const result = await flow.start("hello");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.message).toMatch(/wake the orb/i);
+    expect(captureCalls).toHaveLength(0);
+  });
+
+  it("explains that the recorded window is gone", async () => {
+    const { flow } = harness({ validityReason: "window-gone" });
+    const result = await flow.start("hello");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.message).toMatch(/no longer open/i);
+  });
+
+  it("names the replacement window when the recorded one changed", async () => {
+    const { flow } = harness({ validityReason: "window-changed", currentTitle: "Something else" });
+    const result = await flow.start("hello");
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toMatch(/replaced/i);
+      expect(result.message).toContain("Something else");
+    }
+  });
+
+  it("treats a failing validity probe as a refusal rather than capturing anyway", async () => {
+    const { flow, captureCalls } = harness();
+    void flow;
+    void captureCalls;
+    const failing = new ScreenshotFlow({
+      recordedTarget: {
+        snapshot: snapshot(),
+        validate: async () => {
+          throw new Error("probe failed");
+        },
+      },
+      capture: async () => ({ image: image(), reason: null }),
+      send: async () => {},
+    });
+    const result = await failing.start("hello");
+    expect(result.ok).toBe(false);
   });
 });
 
@@ -198,8 +257,10 @@ describe("ScreenshotFlow.resolve", () => {
     const sent: { text: string; images: readonly ImageContent[] }[] = [];
     let current = first;
     const flow = new ScreenshotFlow({
-      readTarget: async () => snapshot(),
-      isStillForeground: async () => true,
+      recordedTarget: {
+        snapshot: snapshot(),
+        validate: async () => ({ valid: true, reason: "ok" as const, snapshot: snapshot() }),
+      },
       capture: async () => ({ image: current, reason: null }),
       send: async (text, images) => {
         sent.push({ text, images });

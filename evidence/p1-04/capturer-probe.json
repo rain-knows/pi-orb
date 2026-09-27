@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-09-27T19:35:00.452Z",
+  "capturedAt": "2026-09-27T20:01:57.628Z",
   "electronVersion": null,
-  "sourceCount": 5,
-  "windowSourceCount": 4,
+  "sourceCount": 4,
+  "windowSourceCount": 3,
   "screenSourceCount": 1,
   "displayCount": 1,
   "displays": [
@@ -25,10 +25,6 @@
     }
   ],
   "idFormatExamples": [
-    {
-      "id": "window:918562:0",
-      "name": "Windows 默认锁屏界面"
-    },
     {
       "id": "window:1181646:0",
       "name": "Backstop Window"
@@ -63,16 +59,6 @@
   "error": null,
   "rawSourceSample": [
     {
-      "id": "window:918562:0",
-      "name": "Windows 默认锁屏界面",
-      "displayId": "",
-      "hasThumbnail": false,
-      "thumbnailSize": {
-        "width": 0,
-        "height": 0
-      }
-    },
-    {
       "id": "window:1181646:0",
       "name": "Backstop Window",
       "displayId": "",
@@ -101,7 +87,17 @@
         "width": 0,
         "height": 0
       }
+    },
+    {
+      "id": "screen:0:0",
+      "name": "整个屏幕",
+      "displayId": "",
+      "hasThumbnail": false,
+      "thumbnailSize": {
+        "width": 0,
+        "height": 0
+      }
     }
   ],
-  "stderrTail": ""
+  "stderrTail": "[15528:0928/040157.537:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange.\n[15528:0928/040157.537:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange."
 }

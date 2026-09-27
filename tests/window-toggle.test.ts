@@ -57,77 +57,77 @@ describe("decideToggle", () => {
 });
 
 describe("WakeController", () => {
-  it("wakes a hidden window on the first trigger", () => {
+  it("wakes a hidden window on the first trigger", async () => {
     const target = fakeTarget(state({ visible: false }));
     const controller = new WakeController(target);
-    expect(controller.trigger("shortcut")).toBe("wake");
+    expect(await controller.trigger("shortcut")).toBe("wake");
     expect(target.wakeCalls).toBe(1);
   });
 
-  it("collapses an already focused window on the next trigger", () => {
+  it("collapses an already focused window on the next trigger", async () => {
     const target = fakeTarget(state({ visible: false }));
     let now = 0;
     const controller = new WakeController(target, { now: () => now });
-    expect(controller.trigger("shortcut")).toBe("wake");
+    expect(await controller.trigger("shortcut")).toBe("wake");
     now += DEFAULT_TRIGGER_COOLDOWN_MS + 1;
-    expect(controller.trigger("shortcut")).toBe("collapse");
+    expect(await controller.trigger("shortcut")).toBe("collapse");
     expect(target.collapseCalls).toBe(1);
   });
-  it("throttles an auto-repeating press so one long hold cannot flip the window many times", () => {
+  it("throttles an auto-repeating press so one long hold cannot flip the window many times", async () => {
     const target = fakeTarget(state({ visible: false }));
     let now = 0;
     const controller = new WakeController(target, { now: () => now });
 
-    expect(controller.trigger("shortcut")).toBe("wake");
+    expect(await controller.trigger("shortcut")).toBe("wake");
     // Global accelerators auto-repeat while held: many triggers, ~0 ms apart.
     for (let index = 0; index < 20; index += 1) {
       now += 10;
-      expect(controller.trigger("shortcut")).toBe("throttled");
+      expect(await controller.trigger("shortcut")).toBe("throttled");
     }
     expect(target.wakeCalls).toBe(1);
     expect(target.collapseCalls).toBe(0);
 
     // After the cooldown a deliberate second press still collapses.
     now += DEFAULT_TRIGGER_COOLDOWN_MS;
-    expect(controller.trigger("shortcut")).toBe("collapse");
+    expect(await controller.trigger("shortcut")).toBe("collapse");
     expect(target.collapseCalls).toBe(1);
   });
 
-  it("throttles across sources so the shortcut and the tray cannot double-apply", () => {
+  it("throttles across sources so the shortcut and the tray cannot double-apply", async () => {
     const target = fakeTarget(state({ visible: false }));
     const now = 0;
     const controller = new WakeController(target, { now: () => now });
-    expect(controller.trigger("shortcut")).toBe("wake");
-    expect(controller.trigger("tray")).toBe("throttled");
+    expect(await controller.trigger("shortcut")).toBe("wake");
+    expect(await controller.trigger("tray")).toBe("throttled");
     expect(target.wakeCalls).toBe(1);
     expect(target.collapseCalls).toBe(0);
   });
 
-  it("does not count a throttled trigger as applied", () => {
+  it("does not count a throttled trigger as applied", async () => {
     const target = fakeTarget(state({ visible: false }));
     const now = 0;
     const controller = new WakeController(target, { now: () => now });
-    controller.trigger("shortcut");
-    controller.trigger("shortcut");
+    await controller.trigger("shortcut");
+    await controller.trigger("shortcut");
     expect(controller.lastAction).toBe("wake");
   });
 
-  it("keeps working after the cooldown, so waking is never permanently lost", () => {
+  it("keeps working after the cooldown, so waking is never permanently lost", async () => {
     const target = fakeTarget(state({ visible: false }));
     let now = 0;
     const controller = new WakeController(target, { now: () => now });
-    controller.trigger("shortcut");
+    await controller.trigger("shortcut");
     now += DEFAULT_TRIGGER_COOLDOWN_MS + 1;
-    expect(controller.trigger("shortcut")).toBe("collapse");
+    expect(await controller.trigger("shortcut")).toBe("collapse");
     now += DEFAULT_TRIGGER_COOLDOWN_MS + 1;
-    expect(controller.trigger("shortcut")).toBe("wake");
+    expect(await controller.trigger("shortcut")).toBe("wake");
     expect(target.wakeCalls).toBe(2);
   });
 
-  it("ignores a destroyed window", () => {
+  it("ignores a destroyed window", async () => {
     const target = fakeTarget(state({ destroyed: true }));
     const controller = new WakeController(target);
-    expect(controller.trigger("shortcut")).toBe("noop");
+    expect(await controller.trigger("shortcut")).toBe("noop");
     expect(target.wakeCalls).toBe(0);
     expect(target.collapseCalls).toBe(0);
   });

@@ -84,7 +84,11 @@ export class WakeController {
    * cooldown window. Waking never creates a session, starts a screenshot or sends
    * anything: it only changes window visibility.
    */
-  trigger(_source: TriggerSource): ToggleAction | "throttled" {
+  trigger(_source: TriggerSource): Promise<ToggleAction | "throttled"> {
+    return this.#apply();
+  }
+
+  async #apply(): Promise<ToggleAction | "throttled"> {
     const now = this.#now();
     if (now - this.#lastAppliedAt < this.#cooldownMs) return "throttled";
 
@@ -92,8 +96,11 @@ export class WakeController {
     this.#lastAppliedAt = now;
     this.#lastAction = action;
 
-    if (action === "wake") this.#target.wake();
-    else if (action === "collapse") this.#target.collapse();
+    // Awaited, not fired and forgotten: the order of side effects is part of the contract. A
+    // floating window that appears before its target is recorded would record itself, because once
+    // the orb takes focus the window the user was looking at is no longer the foreground window.
+    if (action === "wake") await this.#target.wake();
+    else if (action === "collapse") await this.#target.collapse();
     return action;
   }
 }

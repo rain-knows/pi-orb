@@ -24,10 +24,22 @@ export interface CaptureOutcomeLike {
 }
 
 export interface ScreenshotFlowDeps {
-  /** Record the window the user was looking at, before the orb takes focus. */
-  readonly readTarget: () => Promise<CaptureTargetSnapshot | null>;
-  /** Whether the recorded window is still the active window. */
-  readonly isStillForeground: (handle: string) => Promise<boolean>;
+  /**
+   * The record of the window the user was looking at.
+   *
+   * The flow **consumes** this record; it must not read the foreground window itself. By the time the
+   * user presses the screenshot control, the orb holds focus, so a fresh foreground lookup would
+   * return the orb and refuse every request — which made the positive capture path unreachable.
+   */
+  readonly recordedTarget: {
+    readonly snapshot: CaptureTargetSnapshot | null;
+    validate(): Promise<{
+      readonly valid: boolean;
+      readonly reason: "ok" | "no-record" | "window-gone" | "window-changed";
+      readonly snapshot: CaptureTargetSnapshot | null;
+      readonly currentTitle?: string;
+    }>;
+  };
   /** Capture one already-recorded window. */
   readonly capture: (target: CaptureTargetSnapshot["target"]) => Promise<CaptureOutcomeLike>;
   /** Send the confirmed message and image together. */
@@ -57,21 +69,19 @@ export class ScreenshotFlow {
    * behind waiting to be sent.
    */
   async start(text: string): Promise<ScreenshotCaptureResult> {
-    const target = await this.#deps.readTarget().catch(() => null);
-    if (!target) {
+    const validity = await this.#deps.recordedTarget.validate().catch(() => ({
+      valid: false,
+      reason: "no-record" as const,
+      snapshot: null,
+    }));
+
+    if (!validity.valid || !validity.snapshot) {
       this.#store.discard();
       this.#queuedText = null;
-      return {
-        ok: false,
-        message:
-          "No target window was recorded. The target is recorded before the orb takes focus, so bring the window you want to share to the front first.",
-      };
+      return { ok: false, message: describeTargetRefusal(validity) };
     }
 
-    // Ask the OS whether that window is still active. A stale answer is reported;
-    // it is not used to switch to a different window.
-    const stillForeground = await this.#deps.isStillForeground(target.target.handle).catch(() => false);
-
+    const target = validity.snapshot;
     const outcome = await this.#deps.capture(target.target).catch((error: Error) => ({
       image: null,
       reason: error.message,
@@ -82,7 +92,9 @@ export class ScreenshotFlow {
       userInitiated: true,
       target,
       image: outcome.image,
-      targetStale: !stillForeground,
+      // The recorded window need not be in front — the user deliberately switched to the orb, so the
+      // preview simply states which window it shows rather than calling it stale.
+      targetStale: false,
     });
     if (!started.ok) {
       this.#queuedText = null;
@@ -100,7 +112,9 @@ export class ScreenshotFlow {
       height: image.height,
       bytes: base64Bytes(image.data),
       targetDescription: describeTarget(target.target),
-      targetStale: !stillForeground,
+      // The recorded window is not required to be in front: the user deliberately switched to the orb,
+      // so the preview simply names the window it shows.
+      targetStale: false,
     };
   }
 
@@ -159,4 +173,28 @@ function base64Bytes(data: string): number {
   if (data.length % 4 !== 0) return 0;
   const padding = data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0;
   return (data.length / 4) * 3 - padding;
+}
+
+/**
+ * Explain why the recorded target cannot be used.
+ *
+ * Each reason gets its own sentence because they call for different user actions: nothing recorded
+ * means the user has not yet shown the orb which window to read, whereas a changed window means the
+ * recorded one was replaced and the target has to be chosen again. A single generic message would
+ * leave the user guessing.
+ */
+export function describeTargetRefusal(validity: {
+  readonly reason: "ok" | "no-record" | "window-gone" | "window-changed";
+  readonly currentTitle?: string;
+}): string {
+  switch (validity.reason) {
+    case "no-record":
+      return "No target window has been recorded yet. Bring the window you want to share to the front, then wake the orb with the shortcut so it can record it before it takes focus.";
+    case "window-gone":
+      return "The recorded window is no longer open. Bring the window you want to share to the front, then wake the orb again so it records the new target.";
+    case "window-changed":
+      return `The recorded window was replaced by a different one${validity.currentTitle ? ` (now "${validity.currentTitle}")` : ""}. Wake the orb again to record the target you want.`;
+    default:
+      return "The recorded target cannot be used.";
+  }
 }

@@ -111,6 +111,13 @@ verified is recorded as *unverified* and is not claimed as compatible.
 Both defects below produced no error anywhere and were found only by running the real
 application:
 
+- The screenshot target was re-read from the foreground window at the moment the user pressed the
+  screenshot control. By then the orb holds focus, and the reader excludes this process, so the
+  lookup always failed: the positive capture path could never run once. The target is now recorded
+  once, before the orb is shown, and the capture flow consumes that record and only checks that the
+  window still exists with the same title (a validity check, not a foreground check, because the
+  user has deliberately switched to the orb by then). Collapsing, changing workspace or quitting
+  clears the record so a later capture cannot silently reuse a window the user has left.
 - Hiding the orb through the window's close button or the tray menu kept desktop authority
   alive, so a hidden orb could still move the user's mouse and keyboard. All hide routes now go
   through one lifecycle routine that revokes the task authorization and drops any unconfirmed

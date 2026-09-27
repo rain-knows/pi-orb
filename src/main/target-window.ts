@@ -14,12 +14,19 @@
 
 import { execFile } from "node:child_process";
 import { join } from "node:path";
-import type { CaptureTarget, CaptureTargetSnapshot } from "@shared/screenshot";
+import type { CaptureTarget } from "@shared/screenshot";
 
 export interface TargetWindowReader {
   read(pidToIgnore: number): Promise<CaptureTarget | null>;
-  /** True when the recorded handle is still the active window. */
-  isStillForeground(handle: string): Promise<boolean>;
+  /**
+   * True when the recorded handle still refers to the same window.
+   *
+   * Deliberately not a foreground test: once the user switches to the orb, the recorded window is no
+   * longer in front by design, so foreground-ness cannot decide whether a recorded target is still
+   * usable. This checks that the window still exists and that its title still agrees, which catches a
+   * destroyed handle being recycled to a different window.
+   */
+  isStillValid(handle: string, expectedTitle: string): Promise<{ valid: boolean; currentTitle: string }>;
 }
 
 interface HelperWindowPayload {
@@ -36,6 +43,8 @@ interface HelperPayload {
   readonly reason?: string;
   readonly foreground?: HelperWindowPayload | null;
   readonly stillForeground?: boolean;
+  readonly stillValid?: boolean;
+  readonly currentTitle?: string;
   readonly dpiAwareness?: {
     readonly isPerMonitorV2: boolean;
     readonly setCallSucceeded: boolean;
@@ -73,9 +82,12 @@ export class Win32TargetWindowReader implements TargetWindowReader {
     };
   }
 
-  async isStillForeground(handle: string): Promise<boolean> {
-    const payload = await this.#run(["-IsStillForeground", handle]);
-    return payload.stillForeground === true;
+  async isStillValid(
+    handle: string,
+    expectedTitle: string,
+  ): Promise<{ valid: boolean; currentTitle: string }> {
+    const payload = await this.#run(["-IsStillValid", handle, "-ExpectedTitle", expectedTitle]);
+    return { valid: payload.stillValid === true, currentTitle: payload.currentTitle ?? "" };
   }
 
   /** Exposed so the DPI-awareness declaration can be verified, not assumed. */
@@ -125,14 +137,4 @@ export class Win32TargetWindowReader implements TargetWindowReader {
   #powershell(): string {
     return process.platform === "win32" ? "powershell.exe" : "pwsh";
   }
-}
-
-export interface TargetRecording {
-  readonly snapshot: CaptureTargetSnapshot;
-  /**
-   * True when the recorded window is already gone or is no longer the active
-   * window. The capture is still attempted for the recorded handle, and the preview
-   * says so, so the user can decide instead of being surprised by a stale image.
-   */
-  readonly stale: boolean;
 }

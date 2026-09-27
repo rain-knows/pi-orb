@@ -34,6 +34,7 @@ import { OrbWindowLifecycle } from "./window-lifecycle";
 import { OrbSessionController } from "./orb-session";
 import { PiWebClient, PiWebError } from "./pi-web-client";
 import { Win32TargetWindowReader } from "./target-window";
+import { RecordedTargetStore } from "./recorded-target";
 import { captureTargetWindow } from "./desktop-capture";
 import { ScreenshotFlow } from "./screenshot-flow";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
@@ -52,7 +53,6 @@ import {
   type SetDesktopTargetResult,
   type WorkspaceStatus,
 } from "@shared/ipc";
-import { type CaptureTargetSnapshot } from "@shared/screenshot";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 
 const generations = new RunGenerations();
@@ -80,10 +80,24 @@ let cuaAdapter: CuaDriverAdapter | null = null;
 let bridge: BridgeServer | null = null;
 
 /**
+ * The one record of the window the user was looking at.
+ *
+ * Written before the orb takes focus and shared by the screenshot path and the desktop tool path, so
+ * there is exactly one answer to "which window is the user working with". Re-reading the foreground
+ * window later would return the orb itself, because by then the user is interacting with the orb.
+ */
+const recordedTarget = new RecordedTargetStore({
+  readForeground: () => targetWindowReader.read(process.pid),
+  isStillValid: (handle, title) => targetWindowReader.isStillValid(handle, title),
+  log: (message) => console.log(message),
+});
+
+/**
  * The window desktop actions may target.
  *
- * Recorded before the orb can take focus, and changeable only by an explicit user choice. Stored
- * as the full choice (not just pid/title) so the window can show exactly what is selected.
+ * Chosen from the recorded window or by an explicit user selection, and always carrying the driver's
+ * own window id: the driver's id space and the Win32 handle space are different, so only the driver's
+ * id can be acted on.
  */
 let desktopTarget: DesktopWindowChoice | null = null;
 
@@ -401,8 +415,18 @@ function attachWakeController(win: BrowserWindow): void {
       minimized: win.isMinimized(),
       focused: win.isFocused(),
     }),
-    wake: () => {
+    wake: async () => {
       if (win.isDestroyed()) return;
+      // Record the target BEFORE showing the window. Once the orb takes focus the window the user
+      // was looking at is no longer the foreground window, so a recording taken afterwards would
+      // capture the orb itself. This ordering is the whole reason the wake path is where the record
+      // is written.
+      const outcome = await recordedTarget.record();
+      if (outcome.ok) {
+        // Keep the desktop target consistent with the same record, so the screenshot path and the
+        // desktop tool path cannot disagree about which window the user means.
+        await syncDesktopTargetFromRecord();
+      }
       if (win.isMinimized()) win.restore();
       win.show();
       win.focus();
@@ -424,6 +448,10 @@ function revokeDesktopOperations(reason: string): void {
   const hadCapture = screenshotFlow?.pending !== null && screenshotFlow?.pending !== undefined;
   desktopBroker?.revoke();
   screenshotFlow?.discard();
+  // The record of "the window the user was looking at" also stops being current here: after a
+  // collapse the user is no longer working with that window, so keeping it would let a later capture
+  // silently reuse a window the user has moved on from. A fresh wake records a fresh target.
+  recordedTarget.clear();
   if (hadAuthority || hadCapture) {
     console.log(`[pi-orb] desktop operations revoked: ${reason}`);
   }
@@ -434,7 +462,9 @@ function createTray(): void {
   tray.setToolTip("pi-Orb");
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: "Show orb", click: () => window?.show() },
+      // "Show" is an explicit wake, not a toggle: a menu item labelled Show must never hide a focused
+      // orb. It records the target before showing for the same reason the shortcut does.
+      { label: "Show orb", click: () => void showOrb() },
       // Goes through the same collapse routine as the shortcut and the window button, so the tray
       // cannot hide the orb while leaving desktop authority alive.
       { label: "Hide orb", click: () => lifecycle?.collapse() },
@@ -865,11 +895,10 @@ void app.whenReady().then(async () => {
     emit: (event) => emit(event),
   });
   screenshotFlow = new ScreenshotFlow({
-    readTarget: async (): Promise<CaptureTargetSnapshot | null> => {
-      const target = await targetWindowReader.read(process.pid);
-      return target ? { target, recordedAt: Date.now() } : null;
-    },
-    isStillForeground: (handle) => targetWindowReader.isStillForeground(handle),
+    // The flow consumes the record taken before the orb took focus. It deliberately does not read
+    // the foreground window: at this point the orb holds focus, so a fresh lookup would always
+    // return the orb and the positive capture path could never run.
+    recordedTarget,
     capture: (target) => captureTargetWindow(target),
     send: (text, images) => session.prompt(text, images),
   });
@@ -898,36 +927,58 @@ void app.whenReady().then(async () => {
 });
 
 /**
- * Record the current foreground window as the desktop target.
+ * Show the orb, recording the target window first.
  *
- * Uses the same Win32 reader as the screenshot path, so there is one definition of "the window
- * the user was looking at" and one place that refuses to fall back to something else.
+ * Used by the tray menu, where a label that says "Show" must not toggle. Recording before showing is
+ * the same ordering rule the wake shortcut follows, because once the orb is in front the window the
+ * user was looking at cannot be read any more.
+ */
+async function showOrb(): Promise<void> {
+  if (!window || window.isDestroyed()) return;
+  const outcome = await recordedTarget.record();
+  if (outcome.ok) await syncDesktopTargetFromRecord();
+  if (window.isMinimized()) window.restore();
+  window.show();
+  window.focus();
+}
+
+/**
+ * Align the desktop tool target with the recorded window.
+ *
+ * The driver's window list is the only source of a usable window id, so the recorded window is
+ * matched into it by (process id, title). When the recorded window is not in the list, the previous
+ * target is kept rather than cleared, so a temporary absence does not silently drop a user's choice.
+ */
+async function syncDesktopTargetFromRecord(): Promise<void> {
+  const snapshot = recordedTarget.snapshot;
+  if (!snapshot || !cuaAdapter) return;
+  const windows = await cuaAdapter.listWindows(process.pid);
+  const match = windows.find(
+    (window) => window.pid === snapshot.target.processId && window.title === snapshot.target.title,
+  );
+  if (match) {
+    desktopTarget = toWindowChoice(match);
+  } else {
+    console.log(
+      `[pi-orb] the recorded window (pid ${snapshot.target.processId}) is not in the driver's window list; the previous desktop target is kept`,
+    );
+  }
+}
+
+/**
+ * Record the current foreground window as the target, outside a wake.
+ *
+ * Used at startup so the app has a target even if the user never wakes it with the shortcut, and by
+ * the window picker when the user changes their mind. Every path goes through the same store, so
+ * "the recorded window" has one meaning.
  */
 async function recordDesktopTarget(): Promise<void> {
-  try {
-    const target = await targetWindowReader.read(process.pid);
-    if (!target) {
-      console.log("[pi-orb] no foreground window was available to record as the desktop target");
-      return;
-    }
-    // Match the recorded window against the driver's own list so the stored choice carries the
-    // driver's id: the two id spaces differ, and only the driver's id can be acted on.
-    if (!cuaAdapter) return;
-    const windows = await cuaAdapter.listWindows(process.pid);
-    const match = windows.find(
-      (window) => window.pid === target.processId && window.title === target.title,
-    );
-    if (match) {
-      desktopTarget = toWindowChoice(match);
-      console.log(`[pi-orb] desktop target recorded: pid ${target.processId} "${target.title}"`);
-    } else {
-      console.log(
-        `[pi-orb] the foreground window (pid ${target.processId}) is not in the driver's window list; no target recorded`,
-      );
-    }
-  } catch (error) {
-    console.warn(`[pi-orb] could not record a desktop target: ${describeError(error)}`);
+  const outcome = await recordedTarget.record();
+  if (!outcome.ok) {
+    console.log("[pi-orb] no foreground window was available to record as the desktop target");
+    return;
   }
+  await syncDesktopTargetFromRecord();
 }
 
 /** Convert a driver window record into the shape the window shows the user. */

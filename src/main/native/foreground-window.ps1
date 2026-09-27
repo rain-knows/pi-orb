@@ -11,7 +11,8 @@
 # Read-only: no input is sent, nothing is captured, no pixel is touched.
 
 param(
-  [string]$IsStillForeground = ""
+  [string]$IsStillValid = "",
+  [string]$ExpectedTitle = ""
 )
 
 $ErrorActionPreference = 'Stop'
@@ -106,20 +107,15 @@ try {
   $cursor = New-Object P1OrbTarget.Native+POINT
   [void][P1OrbTarget.Native]::GetCursorPos([ref]$cursor)
 
-  # `IsStillForeground` lets the caller check, without a second process launch,
-  # whether the target it recorded earlier is still the active window.
-  $stillForeground = $null
-  if ($IsStillForeground -ne '') {
-    $candidate = [IntPtr]::Zero
-    try { $candidate = [IntPtr][int64]$IsStillForeground } catch { $candidate = [IntPtr]::Zero }
-    $stillForeground = ($candidate -ne [IntPtr]::Zero) -and ($candidate -eq $foreground)
-  }
-
+  # `IsStillValid` answers "is the window I recorded still the same window?" — that is a different
+  # question from "is it still in front". After the user deliberately switches to the orb, the
+  # recorded window is no longer in front by design, so foreground-ness cannot be used to decide
+  # whether a recorded target is still usable.
   $payload = [ordered]@{
-    ok                = $true
-    foreground        = Describe-Window $foreground
-    cursor            = [ordered]@{ x = $cursor.X; y = $cursor.Y }
-    dpiAwareness      = [ordered]@{
+    ok           = $true
+    foreground   = Describe-Window $foreground
+    cursor       = [ordered]@{ x = $cursor.X; y = $cursor.Y }
+    dpiAwareness = [ordered]@{
       requestedPerMonitorV2 = $true
       setCallSucceeded      = [bool]$awarenessDeclared
       # 0 = unaware, 1 = system aware, 2 = per-monitor aware (v1 or v2).
@@ -130,9 +126,26 @@ try {
       isUnaware             = [bool]$isUnaware
     }
   }
-  if ($stillForeground -ne $null) {
-    $payload['stillForeground'] = $stillForeground
+
+  if ($IsStillValid -ne '') {
+    $valid = $false
+    $currentTitle = ''
+    $candidate = [IntPtr]::Zero
+    try { $candidate = [IntPtr][int64]$IsStillValid } catch { $candidate = [IntPtr]::Zero }
+    if ($candidate -ne [IntPtr]::Zero -and [P1OrbTarget.Native]::IsWindow($candidate)) {
+      $len = [P1OrbTarget.Native]::GetWindowTextLength($candidate)
+      if ($len -gt 0) {
+        $sb = New-Object System.Text.StringBuilder ($len + 1)
+        [void][P1OrbTarget.Native]::GetWindowText($candidate, $sb, $sb.Capacity)
+        $currentTitle = $sb.ToString()
+      }
+      # A handle can be recycled after its window dies, so the title must still agree.
+      $valid = ($ExpectedTitle -eq '') -or ($currentTitle -eq $ExpectedTitle)
+    }
+    $payload['stillValid'] = [bool]$valid
+    $payload['currentTitle'] = $currentTitle
   }
+
   Emit $payload
 } catch {
   Emit ([ordered]@{
