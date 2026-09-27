@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { OrbSessionEvent, WorkspaceStatus } from "@shared/ipc";
+import type {
+  DesktopTaskStatus,
+  DesktopWindowChoice,
+  OrbSessionEvent,
+  WorkspaceStatus,
+} from "@shared/ipc";
 import { formatBytes } from "@shared/screenshot";
 import { getBridge } from "./bridge";
 
@@ -33,6 +38,9 @@ export function App() {
   const [notice, setNotice] = useState<string | null>(null);
   const [shortcutDraft, setShortcutDraft] = useState("");
   const [preview, setPreview] = useState<PreviewState | null>(null);
+  const [taskScope, setTaskScope] = useState("");
+  const [desktopTask, setDesktopTask] = useState<DesktopTaskStatus | null>(null);
+  const [windowChoices, setWindowChoices] = useState<readonly DesktopWindowChoice[] | null>(null);
   const streaming = useRef("");
 
   // The generation is read from the status snapshot, never from a pushed event:
@@ -40,7 +48,10 @@ export function App() {
   const generation = status?.generation ?? 0;
 
   useEffect(() => {
-    void bridge.getStatus().then(setStatus);
+    void bridge.getStatus().then((next) => {
+      setStatus(next);
+      setDesktopTask(next.desktopTask);
+    });
     return bridge.onSessionEvent((event: OrbSessionEvent) => {
       switch (event.type) {
         case "assistant-delta":
@@ -68,8 +79,60 @@ export function App() {
   }, [bridge]);
 
   const refreshStatus = useCallback(async () => {
-    setStatus(await bridge.refreshConnection());
+    const next = await bridge.refreshConnection();
+    setStatus(next);
+    setDesktopTask(next.desktopTask);
   }, [bridge]);
+
+  /**
+   * Grant a desktop task.
+   *
+   * The user has to say what the task is for, and that text is what gets approved and shown
+   * back. A blank scope is refused here rather than defaulted, so there is no way to approve
+   * "whatever the model wants".
+   */
+  const authorizeDesktop = useCallback(async () => {
+    const scope = taskScope.trim();
+    if (scope.length === 0 || generation === 0) return;
+    const next = await bridge.authorizeDesktopTask({ generation, scope });
+    setDesktopTask(next);
+    setNotice(next.authorized ? `Desktop task approved: ${next.scope}` : next.stoppedReason);
+  }, [bridge, generation, taskScope]);
+
+  const revokeDesktop = useCallback(async () => {
+    setDesktopTask(await bridge.revokeDesktopTask());
+    setNotice("Desktop authorization revoked.");
+  }, [bridge]);
+
+  /**
+   * Ask the shell which windows exist, so the user can pick one explicitly.
+   *
+   * The orb refuses to guess a target, so this list is how a target is chosen when the recorded
+   * foreground window is not the one the user wants.
+   */
+  const loadWindows = useCallback(async () => {
+    const result = await bridge.listDesktopWindows();
+    if (!result.ok) {
+      setNotice(result.message);
+      return;
+    }
+    setWindowChoices(result.windows);
+  }, [bridge]);
+
+  const chooseTarget = useCallback(
+    async (windowId: string) => {
+      const result = await bridge.setDesktopTarget(windowId);
+      if (!result.ok) {
+        setNotice(result.message);
+        return;
+      }
+      setNotice(`Desktop target set to "${result.target.title}". Approval is required again.`);
+      setWindowChoices(null);
+      setTaskScope("");
+      setDesktopTask(await bridge.getDesktopTaskStatus());
+    },
+    [bridge],
+  );
 
   const chooseWorkspace = useCallback(async () => {
     const result = await bridge.chooseWorkspace();
@@ -303,6 +366,90 @@ export function App() {
               Discard
             </button>
           </div>
+        </section>
+      )}
+
+      {status?.configured && (
+        <section className="orb__task">
+          <p className="orb__task-state">
+            {desktopTask?.authorized
+              ? `Desktop task approved (${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions used): ${desktopTask.scope}`
+              : "Desktop actions are not authorized. The orb cannot click, type or scroll until you approve a task."}
+          </p>
+          {desktopTask?.stopped && desktopTask.stoppedReason && (
+            <p className="orb__notice orb__notice--error">
+              Task stopped: {desktopTask.stoppedReason} Observe again and approve a new task to
+              continue.
+            </p>
+          )}
+          {desktopTask && !desktopTask.bridgeReady && (
+            <p className="orb__notice orb__notice--error">
+              The desktop bridge is not listening, so the orb cannot reach the desktop even with
+              approval.
+            </p>
+          )}
+          <p className="orb__task-state">
+            {desktopTask?.target
+              ? `Target window: "${desktopTask.target.title}" (${desktopTask.target.appName})`
+              : "No target window is selected, so desktop actions cannot run."}
+          </p>
+          <div className="orb__actions">
+            <button type="button" className="orb__button" onClick={() => void loadWindows()}>
+              Choose target window…
+            </button>
+          </div>
+          {windowChoices && (
+            <ul className="orb__windows">
+              {windowChoices.length === 0 && <li>No windows are available to choose.</li>}
+              {windowChoices.map((choice) => (
+                <li key={choice.windowId}>
+                  <button
+                    type="button"
+                    className="orb__button"
+                    onClick={() => void chooseTarget(choice.windowId)}
+                  >
+                    {choice.title || choice.appName}
+                  </button>
+                  <span className="orb__window-meta">
+                    {choice.appName} · pid {choice.pid}
+                    {choice.isRecorded ? " · recorded" : ""}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <form
+            className="orb__composer"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void authorizeDesktop();
+            }}
+          >
+            <input
+              type="text"
+              value={taskScope}
+              placeholder="What should the orb be allowed to do?"
+              onChange={(event) => setTaskScope(event.target.value)}
+              aria-label="Desktop task scope"
+            />
+            <div className="orb__actions">
+              <button
+                type="submit"
+                className="orb__button orb__button--primary"
+                disabled={taskScope.trim().length === 0 || generation === 0}
+              >
+                Approve desktop task
+              </button>
+              <button
+                type="button"
+                className="orb__button"
+                onClick={() => void revokeDesktop()}
+                disabled={!desktopTask?.authorized}
+              >
+                Revoke
+              </button>
+            </div>
+          </form>
         </section>
       )}
 

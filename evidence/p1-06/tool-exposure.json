@@ -1,0 +1,115 @@
+{
+  "capturedAt": "2026-09-27T18:44:16.110Z",
+  "isolation": {
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-tools-1790534656106",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790534656106\\agent",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790534656106\\home",
+    "normalCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790534656106\\normal-project",
+    "orbCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790534656106\\orb-workspace",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-06-tools-1790534656106\\orb-config.json",
+    "extensionPath": "D:\\workself\\pi-orb\\pi-package\\extensions\\orb.ts",
+    "baseUrl": "http://127.0.0.1:31411"
+  },
+  "requests": [
+    {
+      "index": 1,
+      "tools": [
+        "bash",
+        "read"
+      ],
+      "orbTools": [],
+      "containsOrbModeSection": false,
+      "mentionsOneActionPerObservation": false,
+      "mentionsUntrustedScreenContent": false
+    },
+    {
+      "index": 2,
+      "tools": [
+        "bash",
+        "orb_click",
+        "orb_observe",
+        "orb_scroll",
+        "orb_type",
+        "read"
+      ],
+      "orbTools": [
+        "orb_click",
+        "orb_observe",
+        "orb_scroll",
+        "orb_type"
+      ],
+      "containsOrbModeSection": true,
+      "mentionsOneActionPerObservation": true,
+      "mentionsUntrustedScreenContent": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "a normal session is offered no Orb tool",
+      "ok": true,
+      "detail": "normal tools: [\"bash\",\"read\"]"
+    },
+    {
+      "name": "an Orb session is offered exactly the four Orb tools",
+      "ok": true,
+      "detail": "orb tools: [\"orb_click\",\"orb_observe\",\"orb_scroll\",\"orb_type\"]"
+    },
+    {
+      "name": "a normal session keeps pi-web's own tools and gains nothing from Orb",
+      "ok": true,
+      "detail": "normal tools: [\"bash\",\"read\"]"
+    },
+    {
+      "name": "the Orb prompt section is present only in Orb mode",
+      "ok": true,
+      "detail": "orb=true normal=false"
+    },
+    {
+      "name": "the Orb prompt states the one-action-per-observation rule the executor enforces",
+      "ok": true,
+      "detail": "the model must not be told one thing and judged by another"
+    },
+    {
+      "name": "the Orb prompt states that screen content is untrusted input",
+      "ok": true,
+      "detail": "screens and page text are data, never instructions or authorization"
+    },
+    {
+      "name": "the Orb prompt does not claim a matching directory grants authority",
+      "ok": true,
+      "detail": "covered by the shared prompt text asserted in tests/orb-tools.test.ts"
+    }
+  ],
+  "passed": true,
+  "normal": {
+    "index": 1,
+    "tools": [
+      "bash",
+      "read"
+    ],
+    "orbTools": [],
+    "containsOrbModeSection": false,
+    "mentionsOneActionPerObservation": false,
+    "mentionsUntrustedScreenContent": false
+  },
+  "orb": {
+    "index": 2,
+    "tools": [
+      "bash",
+      "orb_click",
+      "orb_observe",
+      "orb_scroll",
+      "orb_type",
+      "read"
+    ],
+    "orbTools": [
+      "orb_click",
+      "orb_observe",
+      "orb_scroll",
+      "orb_type"
+    ],
+    "containsOrbModeSection": true,
+    "mentionsOneActionPerObservation": true,
+    "mentionsUntrustedScreenContent": true
+  }
+}

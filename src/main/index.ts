@@ -35,7 +35,22 @@ import { PiWebClient, PiWebError } from "./pi-web-client";
 import { Win32TargetWindowReader } from "./target-window";
 import { captureTargetWindow } from "./desktop-capture";
 import { ScreenshotFlow } from "./screenshot-flow";
-import { type ImageContent, type OrbSessionEvent, type PiWebStatus, type ScreenshotCaptureResult, type ScreenshotResolveResult, type WorkspaceStatus, IPC } from "@shared/ipc";
+import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
+import { DesktopBroker } from "./desktop-broker";
+import { CuaDriverAdapter, type CuaSdkLike, type CuaWindowInfo } from "./cua-adapter";
+import {
+  IPC,
+  type DesktopTaskStatus,
+  type DesktopWindowChoice,
+  type ImageContent,
+  type OrbSessionEvent,
+  type PiWebStatus,
+  type ScreenshotCaptureResult,
+  type ScreenshotResolveResult,
+  type ListDesktopWindowsResult,
+  type SetDesktopTargetResult,
+  type WorkspaceStatus,
+} from "@shared/ipc";
 import { type CaptureTargetSnapshot } from "@shared/screenshot";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 
@@ -53,6 +68,24 @@ const targetWindowReader = new Win32TargetWindowReader();
  */
 let screenshotFlow: ScreenshotFlow;
 
+/**
+ * The desktop broker and its driver.
+ *
+ * The driver is created lazily on first use so a machine without a working driver still
+ * starts the orb; the bridge listens from startup so the extension can report its state.
+ */
+let desktopBroker: DesktopBroker | null = null;
+let cuaAdapter: CuaDriverAdapter | null = null;
+let bridge: BridgeServer | null = null;
+
+/**
+ * The window desktop actions may target.
+ *
+ * Recorded before the orb can take focus, and changeable only by an explicit user choice. Stored
+ * as the full choice (not just pid/title) so the window can show exactly what is selected.
+ */
+let desktopTarget: DesktopWindowChoice | null = null;
+
 let configPath = "";
 let config: OrbConfig;
 let window: BrowserWindow | null = null;
@@ -61,6 +94,7 @@ let session: OrbSessionController;
 let wake: WakeController | null = null;
 let lastWorkspaceProblem: string | null = null;
 let lastShortcutProblem: string | null = null;
+let lastDesktopProblem: string | null = null;
 let isQuitting = false;
 let piWebState: PiWebStatus = {
   // Filled in once the main process knows the configured base URL.
@@ -153,8 +187,8 @@ function currentStatus(): WorkspaceStatus {
     // committed workspace is still perfectly usable; otherwise picking a bad
     // directory looks like nothing happened at all.
     problem: usable
-      ? lastWorkspaceProblem
-      : (validation?.message ?? lastWorkspaceProblem),
+      ? (lastWorkspaceProblem ?? lastDesktopProblem)
+      : (validation?.message ?? lastWorkspaceProblem ?? lastDesktopProblem),
     shortcut: config.shortcut,
     shortcutRegistered: shortcuts.current?.registered ?? false,
     shortcutProblem: shortcuts.current?.reason ?? lastShortcutProblem,
@@ -162,7 +196,120 @@ function currentStatus(): WorkspaceStatus {
     busy: generations.busy,
     sessionId: session?.sessionId ?? null,
     piWeb: { ...piWebState },
+    desktopTask: desktopTaskStatus(),
   };
+}
+
+/**
+ * Report desktop task state, defaulting to "not authorized" when no broker exists.
+ *
+ * The default matters: a missing broker must read as "the orb may not touch the desktop",
+ * never as "unknown, so probably fine".
+ */
+function desktopTaskStatus(): DesktopTaskStatus {
+  if (!desktopBroker) {
+    return {
+      authorized: false,
+      taskId: null,
+      scope: null,
+      actionsUsed: 0,
+      actionLimit: 0,
+      expiresAt: null,
+      stopped: false,
+      stoppedReason: null,
+      bridgeReady: bridge !== null,
+      target: desktopTarget,
+    };
+  }
+  return { ...desktopBroker.status(), bridgeReady: bridge !== null, target: desktopTarget };
+}
+
+/**
+ * Start the desktop broker, its driver and the bridge the Pi extension talks to.
+ *
+ * The driver is created here rather than at module load so a driver failure is a reported
+ * state instead of a startup crash. A failure to start the driver leaves the bridge listening
+ * with no capability, which is the safe direction: the extension still reports "unavailable".
+ */
+async function startDesktop(): Promise<void> {
+  try {
+    const sdk = (await import("@trycua/cua-driver")) as unknown as CuaSdkLike;
+    cuaAdapter = new CuaDriverAdapter({
+      sdk,
+      ownProcessId: process.pid,
+      onMappingUsed: (mapping) => console.log(`[pi-orb] desktop coordinate mapping: ${JSON.stringify(mapping)}`),
+      // The adapter refuses to guess a target, so this is the only source of one.
+      resolveRecordedTarget: () =>
+        desktopTarget ? { pid: desktopTarget.pid, title: desktopTarget.title } : undefined,
+    });
+    cuaAdapter.create();
+  } catch (error) {
+    console.warn(`[pi-orb] desktop driver unavailable: ${describeError(error)}`);
+    cuaAdapter = null;
+  }
+
+  if (!cuaAdapter) return;
+
+  desktopBroker = new DesktopBroker({
+    driver: cuaAdapter,
+    isLive: (sessionId, generation) =>
+      generations.current === generation && session?.sessionId === sessionId,
+    log: (entry) => {
+      // Structured, desensitized: action kind and reason only, never typed text or pixels.
+      console.log(`[pi-orb] desktop ${JSON.stringify(entry)}`);
+    },
+  });
+}
+
+/**
+ * Start the bridge and publish its handshake.
+ *
+ * The handshake lands in the Orb userData directory, which is the same place the
+ * configuration lives, so the extension finds it without any environment variable. That
+ * matters because the extension runs inside pi-web's process, whose environment this project
+ * cannot set.
+ */
+async function startBridge(): Promise<void> {
+  const token = createBridgeToken();
+  const handshake = writeHandshake(
+    app.getPath("userData"),
+    token,
+    config.orbWorkspace ?? "",
+    process.pid,
+  );
+  bridge = new BridgeServer({
+    pipePath: handshake.pipePath,
+    token,
+    executor: {
+      observe: async (input) => {
+        const broker = requireBroker();
+        return broker.observe(session?.sessionId ?? "", generations.current, input.windowId);
+      },
+      act: async (action) => {
+        const broker = requireBroker();
+        return broker.act(action, session?.sessionId ?? "", generations.current);
+      },
+      status: () => desktopTaskStatus(),
+      revoke: () => desktopBroker?.revoke(),
+      accepts: (sessionId, generation) =>
+        generations.current === generation && session?.sessionId === sessionId,
+    },
+    log: (entry) => console.log(`[pi-orb] bridge ${JSON.stringify(entry)}`),
+  });
+  try {
+    await bridge.listen();
+    console.log(`[pi-orb] bridge listening on ${handshake.pipePath}`);
+  } catch (error) {
+    console.warn(`[pi-orb] bridge could not listen: ${describeError(error)}`);
+    bridge = null;
+  }
+}
+
+function requireBroker(): DesktopBroker {
+  if (!desktopBroker) {
+    throw new Error("The desktop driver is unavailable, so desktop actions cannot run.");
+  }
+  return desktopBroker;
 }
 
 /**
@@ -352,8 +499,10 @@ function registerIpc(): void {
       saveOrbConfig(configPath, config);
       // A workspace change binds a fresh run: any in-flight work from the
       // previous workspace must not continue under the new one. An unconfirmed
-      // screenshot belongs to the previous run and must not survive it either.
+      // screenshot and any desktop authorization belong to the previous run and must not
+      // survive it either.
       screenshotFlow.discard();
+      desktopBroker?.revoke();
       const generation = generations.begin();
       session.beginGeneration(generation);
       try {
@@ -440,6 +589,83 @@ function registerIpc(): void {
     return true;
   });
 
+  ipcMain.handle(IPC.getDesktopTaskStatus, () => desktopTaskStatus());
+
+  ipcMain.handle(IPC.listDesktopWindows, async (): Promise<ListDesktopWindowsResult> => {
+    if (!cuaAdapter) {
+      return { ok: false, message: "The desktop driver is unavailable, so windows cannot be listed." };
+    }
+    const windows = await cuaAdapter.listWindows(process.pid);
+    return {
+      ok: true,
+      windows: windows.map((window) => toWindowChoice(window)),
+    };
+  });
+
+  /**
+   * Record which window desktop actions may target.
+   *
+   * Only windows the driver actually reports are accepted, so the choice cannot name a window
+   * that does not exist. Changing the target also revokes any current authorization: the previous
+   * approval was for the previous window and must not carry over to a different one.
+   */
+  ipcMain.handle(IPC.setDesktopTarget, async (_event, windowId: unknown): Promise<SetDesktopTargetResult> => {
+    if (typeof windowId !== "string" || windowId.length === 0) {
+      return { ok: false, message: "No window was chosen." };
+    }
+    if (!cuaAdapter) {
+      return { ok: false, message: "The desktop driver is unavailable, so a target cannot be set." };
+    }
+    const windows = await cuaAdapter.listWindows(process.pid);
+    const match = windows.find((window) => String(window.windowId) === windowId);
+    if (!match) {
+      return { ok: false, message: "That window is no longer available." };
+    }
+    if (desktopTarget && desktopTarget.windowId !== windowId) {
+      // Authority is bound to a window, so changing the window cannot keep it.
+      desktopBroker?.revoke();
+    }
+    desktopTarget = toWindowChoice(match);
+    return { ok: true, target: desktopTarget };
+  });
+
+  /**
+   * Grant a desktop task after an explicit user decision in the window.
+   *
+   * This is the only path that creates authority, and it requires the caller to say what the
+   * task is for. The grant is bound to the live session and generation, so it cannot outlive
+   * the run it was approved for.
+   */
+  ipcMain.handle(IPC.authorizeDesktopTask, (_event, request: unknown) => {
+    const parsed = parseAuthorizeRequest(request);
+    if (!parsed) {
+      lastDesktopProblem = "A desktop task needs a scope describing what it is for.";
+      return desktopTaskStatus();
+    }
+    if (!desktopBroker || !session?.sessionId) {
+      lastDesktopProblem =
+        "The desktop driver or the Orb session is not available, so a task cannot be authorized.";
+      return desktopTaskStatus();
+    }
+    if (generations.current !== parsed.generation) {
+      lastDesktopProblem = "This request belongs to an earlier run and was refused.";
+      return desktopTaskStatus();
+    }
+    lastDesktopProblem = null;
+    desktopBroker.authorize({
+      sessionId: session.sessionId,
+      generation: parsed.generation,
+      scope: parsed.scope,
+    });
+    return desktopTaskStatus();
+  });
+
+  ipcMain.handle(IPC.revokeDesktopTask, () => {
+    desktopBroker?.revoke();
+    lastDesktopProblem = null;
+    return desktopTaskStatus();
+  });
+
   ipcMain.handle(IPC.abort, async (_event, request: unknown) => {
     const parsed = parseGenerationRequest(request);
     if (!parsed) throw new Error("Malformed abort request.");
@@ -475,6 +701,22 @@ function parseCaptureRequest(
   const generation = record.generation;
   if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
   return { generation, text: typeof record.text === "string" ? record.text : "" };
+}
+
+/**
+ * Parse a task authorization request.
+ *
+ * A blank scope is refused rather than defaulted: the user's approval has to say what it is
+ * for, and the scope is what the window shows back to them.
+ */
+function parseAuthorizeRequest(value: unknown): { generation: number; scope: string } | null {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as Record<string, unknown>;
+  const generation = record.generation;
+  if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
+  const scope = typeof record.scope === "string" ? record.scope.trim() : "";
+  if (scope.length === 0) return null;
+  return { generation, scope };
 }
 
 function parseResolveRequest(
@@ -543,9 +785,13 @@ function debounce(action: () => void, delayMs: number): () => void {
 function quit(): void {
   isQuitting = true;
   shortcuts.releaseAll();
-  // Drop any unconfirmed capture: shutdown must not leave an image waiting to be
-  // sent by a later run.
+  // Drop any unconfirmed capture and revoke desktop authority: shutdown must not leave an
+  // image waiting to be sent, nor a task grant that a later run could inherit.
   screenshotFlow.discard();
+  desktopBroker?.revoke();
+  void bridge?.close();
+  void cuaAdapter?.shutdown();
+  removeHandshake(app.getPath("userData"));
   session.dispose();
   generations.end();
   app.quit();
@@ -582,8 +828,66 @@ void app.whenReady().then(async () => {
   attachWakeController(window);
   registerShortcut();
 
+  // Started before the connection probe so the extension can reach the shell as soon as a
+  // session exists, and so a driver problem is reported rather than crashing startup.
+  await startDesktop();
+  await startBridge();
+
+  // Record the window the user was looking at, before the orb can take focus. The same identity
+  // then gates every desktop observation and action.
+  await recordDesktopTarget();
+
   await refreshPiWebState();
 });
+
+/**
+ * Record the current foreground window as the desktop target.
+ *
+ * Uses the same Win32 reader as the screenshot path, so there is one definition of "the window
+ * the user was looking at" and one place that refuses to fall back to something else.
+ */
+async function recordDesktopTarget(): Promise<void> {
+  try {
+    const target = await targetWindowReader.read(process.pid);
+    if (!target) {
+      console.log("[pi-orb] no foreground window was available to record as the desktop target");
+      return;
+    }
+    // Match the recorded window against the driver's own list so the stored choice carries the
+    // driver's id: the two id spaces differ, and only the driver's id can be acted on.
+    if (!cuaAdapter) return;
+    const windows = await cuaAdapter.listWindows(process.pid);
+    const match = windows.find(
+      (window) => window.pid === target.processId && window.title === target.title,
+    );
+    if (match) {
+      desktopTarget = toWindowChoice(match);
+      console.log(`[pi-orb] desktop target recorded: pid ${target.processId} "${target.title}"`);
+    } else {
+      console.log(
+        `[pi-orb] the foreground window (pid ${target.processId}) is not in the driver's window list; no target recorded`,
+      );
+    }
+  } catch (error) {
+    console.warn(`[pi-orb] could not record a desktop target: ${describeError(error)}`);
+  }
+}
+
+/** Convert a driver window record into the shape the window shows the user. */
+function toWindowChoice(window: CuaWindowInfo): DesktopWindowChoice {
+  return {
+    windowId: String(window.windowId),
+    pid: window.pid ?? -1,
+    appName: window.appName,
+    title: window.title,
+    bounds: window.bounds,
+    zIndex: window.zIndex === undefined ? null : String(window.zIndex),
+    isRecorded:
+      desktopTarget !== null &&
+      desktopTarget.pid === window.pid &&
+      desktopTarget.title === window.title,
+  };
+}
 
 app.on("window-all-closed", () => {
   // The orb is a tray application; closing the window keeps it running.
@@ -593,5 +897,9 @@ app.on("before-quit", () => {
   isQuitting = true;
   shortcuts.releaseAll();
   screenshotFlow?.discard();
+  desktopBroker?.revoke();
+  void bridge?.close();
+  void cuaAdapter?.shutdown();
+  removeHandshake(app.getPath("userData"));
   session?.dispose();
 });

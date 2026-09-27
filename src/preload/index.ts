@@ -15,12 +15,16 @@ import { contextBridge, ipcRenderer } from "electron";
 import {
   IPC,
   type AbortRequest,
+  type AuthorizeDesktopTaskRequest,
   type CaptureRequest,
+  type DesktopTaskStatus,
+  type ListDesktopWindowsResult,
   type OrbSessionEvent,
   type PromptRequest,
   type ScreenshotCaptureResult,
   type ScreenshotResolveRequest,
   type ScreenshotResolveResult,
+  type SetDesktopTargetResult,
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
 } from "@shared/ipc";
@@ -29,6 +33,11 @@ export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
+  authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
+  revokeDesktopTask(): Promise<DesktopTaskStatus>;
+  getDesktopTaskStatus(): Promise<DesktopTaskStatus>;
+  listDesktopWindows(): Promise<ListDesktopWindowsResult>;
+  setDesktopTarget(windowId: string): Promise<SetDesktopTargetResult>;
   validateWorkspace(candidate: string): Promise<WorkspaceCandidateResult>;
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
@@ -45,6 +54,12 @@ const bridge: OrbBridge = {
   getStatus: () => ipcRenderer.invoke(IPC.getStatus),
   refreshConnection: () => ipcRenderer.invoke(IPC.refreshConnection),
   setShortcut: (accelerator: string) => ipcRenderer.invoke(IPC.setShortcut, accelerator),
+  authorizeDesktopTask: (request: AuthorizeDesktopTaskRequest) =>
+    ipcRenderer.invoke(IPC.authorizeDesktopTask, request),
+  revokeDesktopTask: () => ipcRenderer.invoke(IPC.revokeDesktopTask),
+  getDesktopTaskStatus: () => ipcRenderer.invoke(IPC.getDesktopTaskStatus),
+  listDesktopWindows: () => ipcRenderer.invoke(IPC.listDesktopWindows),
+  setDesktopTarget: (windowId: string) => ipcRenderer.invoke(IPC.setDesktopTarget, windowId),
   validateWorkspace: (candidate: string) =>
     ipcRenderer.invoke(IPC.validateWorkspace, candidate),
   chooseWorkspace: () => ipcRenderer.invoke(IPC.chooseWorkspace),

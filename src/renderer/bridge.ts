@@ -7,12 +7,16 @@
 
 import type {
   AbortRequest,
+  AuthorizeDesktopTaskRequest,
   CaptureRequest,
+  DesktopTaskStatus,
+  ListDesktopWindowsResult,
   OrbSessionEvent,
   PromptRequest,
   ScreenshotCaptureResult,
   ScreenshotResolveRequest,
   ScreenshotResolveResult,
+  SetDesktopTargetResult,
   WorkspaceCandidateResult,
   WorkspaceStatus,
 } from "@shared/ipc";
@@ -21,6 +25,11 @@ export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
+  authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
+  revokeDesktopTask(): Promise<DesktopTaskStatus>;
+  getDesktopTaskStatus(): Promise<DesktopTaskStatus>;
+  listDesktopWindows(): Promise<ListDesktopWindowsResult>;
+  setDesktopTarget(windowId: string): Promise<SetDesktopTargetResult>;
   validateWorkspace(candidate: string): Promise<WorkspaceCandidateResult>;
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;

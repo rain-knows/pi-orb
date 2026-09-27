@@ -85,6 +85,16 @@ verified is recorded as *unverified* and is not claimed as compatible.
 - A disposable, self-reporting input target (`evidence/p1-05/target-app/`) that logs the
   cell that received each press along with its in-cell offset, so a coordinate error is
   visible as the wrong cell instead of a vague "it clicked somewhere".
+- P1-06 Orb mode and the desktop tool loop: four `orb_`-prefixed tools registered only for an
+  exact workspace match, a per-task authorization bound to a session and run generation, an
+  action budget and time limit, one action per observation, and a batch that stops after a
+  failure instead of retrying blindly.
+- A bridge between the Pi extension and the shell over a Windows named pipe, with a per-run
+  token in a `0600` file, a protocol version, a session/generation check, and a refusal for
+  browser-shaped requests.
+- The user chooses which window desktop actions may target, because the orb refuses to guess.
+- The same "record the target before the orb takes focus" rule that governs screenshots now
+  also governs desktop actions.
 
 ### Fixed
 
@@ -120,6 +130,15 @@ application:
   queued message, so a late click from an earlier preview left the user unable to confirm
   the image they were looking at. A mismatched or stale decision is now a no-op that
   leaves the current preview intact, and "refuse" is distinguished from "cancel".
+- The bridge wrapped a policy refusal inside a successful reply, so a caller would read "the
+  request succeeded" while the action had not run, and a refused action could be counted as
+  work done. A refusal is now surfaced as a refusal all the way to the extension.
+- Desktop observation fell back to the front-most window when no target was named. Measurement
+  showed an auxiliary surface (the touch keyboard host) can outrank the intended window, so the
+  click went to the wrong window. The fallback is removed: a target must be identified, and
+  observation is refused otherwise.
+- An observation could be replayed, letting a plan chain actions on one picture. The observation
+  is now consumed by the action that used it, so the next action must re-observe.
 
 ### Security
 

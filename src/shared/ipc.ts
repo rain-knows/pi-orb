@@ -34,6 +34,16 @@ export const IPC = {
   resolveScreenshot: "orb:resolve-screenshot",
   /** Renderer -> main: discard any pending screenshot (idempotent). */
   discardScreenshot: "orb:discard-screenshot",
+  /** Renderer -> main: grant a desktop task authorization after an explicit user decision. */
+  authorizeDesktopTask: "orb:authorize-desktop-task",
+  /** Renderer -> main: revoke the desktop task authorization. */
+  revokeDesktopTask: "orb:revoke-desktop-task",
+  /** Renderer -> main: read the desktop task state (authorization, budget, stop reason). */
+  getDesktopTaskStatus: "orb:get-desktop-task-status",
+  /** Renderer -> main: list the windows the user can choose to work with. */
+  listDesktopWindows: "orb:list-desktop-windows",
+  /** Renderer -> main: record which window desktop actions may target. */
+  setDesktopTarget: "orb:set-desktop-target",
   /** Main -> renderer: streaming session events. */
   sessionEvent: "orb:session-event",
 } as const;
@@ -80,7 +90,67 @@ export interface WorkspaceStatus {
    * look healthy when it is not.
    */
   readonly piWeb: PiWebStatus;
+  /**
+   * Desktop task state.
+   *
+   * Pull-based like the rest of the snapshot: an authorization grant and its remaining budget
+   * are current state, and the user must be able to see exactly what was approved.
+   */
+  readonly desktopTask: DesktopTaskStatus;
 }
+
+/**
+ * What the user can see about desktop authorization.
+ *
+ * Every field is here so the UI can state plainly whether the orb may touch the desktop, for
+ * what, and why it stopped — the model's own claims are never the source of truth.
+ */
+export interface DesktopTaskStatus {
+  readonly authorized: boolean;
+  readonly taskId: string | null;
+  readonly scope: string | null;
+  readonly actionsUsed: number;
+  readonly actionLimit: number;
+  readonly expiresAt: number | null;
+  readonly stopped: boolean;
+  readonly stoppedReason: string | null;
+  /** Whether the shell's bridge is listening, so the extension can reach it at all. */
+  readonly bridgeReady: boolean;
+  /**
+   * The window desktop actions will target, or `null` when none is chosen.
+   *
+   * Surfaced because the orb refuses to guess a target: the user has to see which window it is
+   * about to act on before approving a task.
+   */
+  readonly target: DesktopWindowChoice | null;
+}
+
+export interface AuthorizeDesktopTaskRequest {
+  readonly generation: number;
+  readonly scope: string;
+}
+
+/** A window the user can choose to work with. */
+export interface DesktopWindowChoice {
+  /** Driver window id as a string; the driver reports it as a bigint. */
+  readonly windowId: string;
+  readonly pid: number;
+  readonly appName: string;
+  readonly title: string;
+  readonly bounds: { readonly x: number; readonly y: number; readonly width: number; readonly height: number };
+  /** Higher is closer to the front, or `null` when the driver reports no order. */
+  readonly zIndex: string | null;
+  /** True when this is the window the shell recorded before taking focus. */
+  readonly isRecorded: boolean;
+}
+
+export type ListDesktopWindowsResult =
+  | { readonly ok: true; readonly windows: readonly DesktopWindowChoice[] }
+  | { readonly ok: false; readonly message: string };
+
+export type SetDesktopTargetResult =
+  | { readonly ok: true; readonly target: DesktopWindowChoice }
+  | { readonly ok: false; readonly message: string };
 
 export interface PiWebStatus {
   readonly baseUrl: string;
