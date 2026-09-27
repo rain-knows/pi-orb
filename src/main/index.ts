@@ -29,6 +29,7 @@ import { loadOrbConfig, defaultConfigPath, saveOrbConfig } from "./config-store"
 import { validateWorkspace, createWorkspace } from "./workspace";
 import { RunGenerations } from "./generations";
 import { ShortcutRegistry } from "./shortcut";
+import { WakeController } from "./window-toggle";
 import { OrbSessionController } from "./orb-session";
 import { PiWebClient, PiWebError } from "./pi-web-client";
 import { IPC, type OrbSessionEvent, type PiWebStatus, type WorkspaceStatus } from "@shared/ipc";
@@ -42,7 +43,9 @@ let config: OrbConfig;
 let window: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let session: OrbSessionController;
+let wake: WakeController | null = null;
 let lastWorkspaceProblem: string | null = null;
+let lastShortcutProblem: string | null = null;
 let isQuitting = false;
 let piWebState: PiWebStatus = {
   // Filled in once the main process knows the configured base URL.
@@ -139,6 +142,7 @@ function currentStatus(): WorkspaceStatus {
       : (validation?.message ?? lastWorkspaceProblem),
     shortcut: config.shortcut,
     shortcutRegistered: shortcuts.current?.registered ?? false,
+    shortcutProblem: shortcuts.current?.reason ?? lastShortcutProblem,
     generation: generations.current,
     busy: generations.busy,
     sessionId: session?.sessionId ?? null,
@@ -177,20 +181,43 @@ async function refreshPiWebState(): Promise<void> {
 }
 
 function registerShortcut(): void {
-  const result = shortcuts.apply(config.shortcut, () => toggleWindow());
+  const result = shortcuts.apply(config.shortcut, () => void wake?.trigger("shortcut"));
   if (!result.registered) {
     console.warn(`[pi-orb] wake shortcut not registered: ${result.reason}`);
   }
 }
 
-function toggleWindow(): void {
-  if (!window) return;
-  if (window.isVisible() && window.isFocused()) {
-    window.hide();
-    return;
-  }
-  window.show();
-  window.focus();
+/**
+ * Wake or collapse the window.
+ *
+ * Routed through `WakeController` so the same rules apply to the shortcut and the
+ * tray, and so an auto-repeating held shortcut cannot flip the window repeatedly.
+ * Waking only changes visibility: it never starts a screenshot, an upload or a
+ * session.
+ */
+function toggleWindow(source: "shortcut" | "tray"): void {
+  wake?.trigger(source);
+}
+
+function attachWakeController(win: BrowserWindow): void {
+  wake = new WakeController({
+    getState: () => ({
+      destroyed: win.isDestroyed(),
+      visible: win.isVisible(),
+      minimized: win.isMinimized(),
+      focused: win.isFocused(),
+    }),
+    wake: () => {
+      if (win.isDestroyed()) return;
+      if (win.isMinimized()) win.restore();
+      win.show();
+      win.focus();
+    },
+    collapse: () => {
+      if (win.isDestroyed()) return;
+      win.hide();
+    },
+  });
 }
 
 function createTray(): void {
@@ -204,7 +231,7 @@ function createTray(): void {
       { label: "Quit", click: () => quit() },
     ]),
   );
-  tray.on("click", () => toggleWindow());
+  tray.on("click", () => toggleWindow("tray"));
 }
 
 /** A 16x16 solid icon, drawn in code so no binary asset is committed. */
@@ -227,6 +254,28 @@ function registerIpc(): void {
   // restarting the shell.
   ipcMain.handle(IPC.refreshConnection, async () => {
     await refreshPiWebState();
+    return currentStatus();
+  });
+
+  ipcMain.handle(IPC.setShortcut, (_event, candidate: unknown) => {
+    if (typeof candidate !== "string") {
+      lastShortcutProblem = "No shortcut was provided.";
+      return currentStatus();
+    }
+    const previous = config.shortcut;
+    const result = shortcuts.apply(candidate, () => void wake?.trigger("shortcut"));
+    if (!result.registered) {
+      // Do not persist a shortcut that does not work, and put the previous one back
+      // so the orb stays reachable. The reason still reaches the user through the
+      // status snapshot.
+      lastShortcutProblem = result.reason;
+      shortcuts.apply(previous, () => void wake?.trigger("shortcut"));
+      return currentStatus();
+    }
+    lastShortcutProblem = null;
+    // Persist the canonical form that was actually registered, not the raw input.
+    config = { ...config, shortcut: result.accelerator };
+    saveOrbConfig(configPath, config);
     return currentStatus();
   });
 
@@ -411,9 +460,10 @@ void app.whenReady().then(async () => {
   session.beginGeneration(generation);
 
   registerIpc();
-  registerShortcut();
   createTray();
   window = createWindow();
+  attachWakeController(window);
+  registerShortcut();
 
   await refreshPiWebState();
 });

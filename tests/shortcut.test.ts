@@ -49,13 +49,26 @@ describe("ShortcutRegistry", () => {
   });
 
   it("reports a rejected accelerator rather than throwing", () => {
+    // A shape-valid accelerator that the OS refuses: the message must name the OS
+    // as the source, not "another application owns it".
     const shortcuts = fakeShortcuts(() => {
       throw new Error("Invalid accelerator");
     });
     const registry = new ShortcutRegistry(shortcuts);
-    const result = registry.apply("NotAKey", () => {});
+    const result = registry.apply("Control+Alt+O", () => {});
     expect(result.registered).toBe(false);
     expect(result.reason).toContain("Invalid accelerator");
+  });
+
+  it("rejects a malformed accelerator before asking the OS", () => {
+    const shortcuts = fakeShortcuts();
+    const registry = new ShortcutRegistry(shortcuts);
+    const result = registry.apply("NotAKey", () => {});
+    expect(result.registered).toBe(false);
+    expect(result.reason).toContain("not a recognized key");
+    // Electron returns false both for a malformed accelerator and for a conflict, so
+    // validation must happen first or the user is told the wrong problem.
+    expect(shortcuts.registered).toEqual([]);
   });
 
   it("releases the previous accelerator before registering the new one", () => {
@@ -71,8 +84,7 @@ describe("ShortcutRegistry", () => {
     const shortcuts = fakeShortcuts();
     const registry = new ShortcutRegistry(shortcuts);
     registry.apply("Control+Alt+O", () => {});
-    const second = registry.apply("Control+Alt+O", () => {});
-    expect(second.registered).toBe(true);
+    const second = registry.apply("Control+Alt+O", () => {});    expect(second.registered).toBe(true);
     expect(shortcuts.unregistered).toEqual(["Control+Alt+O"]);
   });
 
@@ -81,6 +93,15 @@ describe("ShortcutRegistry", () => {
     const registry = new ShortcutRegistry(shortcuts);
     const result = registry.apply("  ", () => {});
     expect(result.registered).toBe(false);
+    expect(shortcuts.registered).toEqual([]);
+  });
+
+  it("refuses a modifier-only accelerator so it is never silently a no-op", () => {
+    const shortcuts = fakeShortcuts();
+    const registry = new ShortcutRegistry(shortcuts);
+    const result = registry.apply("Alt+Alt", () => {});
+    expect(result.registered).toBe(false);
+    expect(result.reason).toContain("needs a key");
     expect(shortcuts.registered).toEqual([]);
   });
 

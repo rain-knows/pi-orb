@@ -7,7 +7,15 @@
  * surface (see doc/pi-orb-development-goals.md P1-03: "注册失败可诊断").
  */
 
+import { validateAccelerator } from "../shared/accelerator";
+
 export interface ShortcutRegistration {
+  /**
+   * The accelerator actually handed to the OS, in canonical form.
+   *
+   * Callers should persist this rather than the raw input, so the stored value is
+   * exactly what is registered.
+   */
   readonly accelerator: string;
   readonly registered: boolean;
   /** Populated only when `registered` is false. */
@@ -39,26 +47,32 @@ export class ShortcutRegistry {
    * Order matters: the old accelerator is released before the new one is
    * attempted, so re-registering the same accelerator cannot fail against
    * itself.
+   *
+   * The accelerator is shape-checked first. Electron returns `false` both for a
+   * malformed accelerator and for one another application owns, so without this
+   * check the user would be told the wrong problem.
    */
   apply(accelerator: string, onTrigger: () => void): ShortcutRegistration {
     this.release();
 
-    if (!accelerator || accelerator.trim().length === 0) {
+    const validation = validateAccelerator(accelerator);
+    if (!validation.ok) {
       this.#current = {
         accelerator,
         registered: false,
-        reason: "No accelerator configured.",
+        reason: validation.message,
       };
       return this.#current;
     }
 
     let registered = false;
     let reason: string | null = null;
+    const canonical = validation.normalized ?? accelerator;
     try {
-      registered = this.#shortcuts.register(accelerator, onTrigger);
+      registered = this.#shortcuts.register(canonical, onTrigger);
     } catch (error) {
       registered = false;
-      reason = `The accelerator was rejected: ${(error as Error).message}`;
+      reason = `The shortcut was rejected by the operating system: ${(error as Error).message}`;
     }
 
     if (!registered && reason === null) {
@@ -66,7 +80,7 @@ export class ShortcutRegistry {
         "Another application already owns this shortcut. Choose a different one.";
     }
 
-    this.#current = { accelerator, registered, reason: registered ? null : reason };
+    this.#current = { accelerator: canonical, registered, reason: registered ? null : reason };
     return this.#current;
   }
 

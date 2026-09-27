@@ -56,6 +56,13 @@ verified is recorded as *unverified* and is not claimed as compatible.
   session id, so a client never depends on a pushed event it may have missed.
 - `tests/fixtures/pi-web-events.ts` records the real pi-web SSE event shapes, so the
   stream parser is checked against the observed wire format rather than a guess.
+- P1-03 global wake shortcut: shape validation that separates "malformed" from
+  "already owned", registration diagnostics surfaced in the status snapshot, a
+  configurable shortcut that never persists a value that fails to register, a tray
+  fallback entry, and a wake/collapse state machine with auto-repeat suppression.
+- Verification record `evidence/p1-03/` (20/20) proving real OS registration with a
+  second-process contention probe, conflict diagnosis, release on change, and release
+  on exit — without synthesising any keystroke.
 
 ### Fixed
 
@@ -80,6 +87,13 @@ application:
   observed `message_update.assistantMessageEvent.text_delta` contract.
 - A reply that arrived without any delta events rendered as empty, because the
   accumulator's empty-string initial value defeated a `??` fallback.
+- Accelerator validation accepted a doubled separator while registering the original
+  string, so the OS could refuse a value this project had called valid and report a
+  malformed shortcut as a conflict with another application. Validation now rejects
+  empty parts and returns the exact canonical string that gets registered.
+- A shortcut registration failure was only written to the main-process console, so the
+  user could not see why the orb was unreachable. The reason is now part of the status
+  snapshot and shown in the window.
 
 ### Security
 

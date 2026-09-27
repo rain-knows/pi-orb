@@ -14,6 +14,7 @@ export function App() {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [shortcutDraft, setShortcutDraft] = useState("");
   const streaming = useRef("");
 
   // The generation is read from the status snapshot, never from a pushed event:
@@ -83,6 +84,19 @@ export function App() {
       ]);
     }
   }, [bridge, busy, draft, generation]);
+
+  const saveShortcut = useCallback(async () => {
+    const candidate = shortcutDraft.trim();
+    if (candidate.length === 0) return;
+    const next = await bridge.setShortcut(candidate);
+    setStatus(next);
+    if (next.shortcutRegistered && next.shortcut === candidate) {
+      setShortcutDraft("");
+      setNotice(`Wake shortcut set to ${candidate}.`);
+    } else {
+      setNotice(next.shortcutProblem);
+    }
+  }, [bridge, shortcutDraft]);
 
   const stop = useCallback(async () => {
     try {
@@ -180,9 +194,40 @@ export function App() {
         <p className="orb__notice orb__notice--error">{status.piWeb.problem}</p>
       )}
       {status && !status.shortcutRegistered && (
-        <p className="orb__notice">
-          Wake shortcut “{status.shortcut}” is unavailable. Use the tray icon instead.
+        <p className="orb__notice orb__notice--error">
+          Wake shortcut “{status.shortcut}” is unavailable
+          {status.shortcutProblem ? `: ${status.shortcutProblem}` : "."} Use the tray
+          icon instead.
         </p>
+      )}
+      {status && (
+        <details className="orb__shortcut">
+          <summary>Wake shortcut</summary>
+          <form
+            className="orb__composer"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void saveShortcut();
+            }}
+          >
+            <input
+              type="text"
+              value={shortcutDraft}
+              placeholder={status.shortcut}
+              onChange={(event) => setShortcutDraft(event.target.value)}
+              aria-label="Wake shortcut"
+            />
+            <div className="orb__actions">
+              <button
+                type="submit"
+                className="orb__button"
+                disabled={shortcutDraft.trim().length === 0}
+              >
+                Apply
+              </button>
+            </div>
+          </form>
+        </details>
       )}
     </div>
   );

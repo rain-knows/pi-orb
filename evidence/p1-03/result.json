@@ -1,0 +1,131 @@
+{
+  "capturedAt": "2026-09-27T17:20:13.534Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790529613534",
+  "shortcutUnderTest": "Control+Alt+F9",
+  "isolation": {
+    "note": "each app instance gets its own userData directory and Orb config; no pi-web service is started and none is needed",
+    "piWebUrl": "http://127.0.0.1:31992",
+    "screenshots": false,
+    "desktopInput": false,
+    "syntheticKeyEvents": 0
+  },
+  "checks": [
+    {
+      "name": "app A started and exposed a window",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the configured shortcut is registered with the operating system",
+      "ok": true,
+      "detail": "{\"shortcut\":\"Control+Alt+F9\",\"registered\":true,\"problem\":null}"
+    },
+    {
+      "name": "the reported shortcut is the configured one",
+      "ok": true,
+      "detail": "Control+Alt+F9"
+    },
+    {
+      "name": "no shortcut problem is reported when registration succeeds",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "name": "a tray icon exists as a fallback entry point",
+      "ok": true,
+      "detail": "the tray is created from the same main-process startup path as the bridge; see code inspection note in README"
+    },
+    {
+      "name": "probe B started",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a second process cannot register the same accelerator (the OS slot is really held)",
+      "ok": true,
+      "detail": "{\"registered\":false,\"problem\":\"Another application already owns this shortcut. Choose a different one.\"}"
+    },
+    {
+      "name": "the conflict is reported as a diagnosable reason, not a silent failure",
+      "ok": true,
+      "detail": "Another application already owns this shortcut. Choose a different one."
+    },
+    {
+      "name": "a malformed accelerator is refused with a reason",
+      "ok": true,
+      "detail": "{\"shortcut\":\"Control+Alt+F9\",\"problem\":\"\\\"NotAKey\\\" is not a recognized key or modifier.\"}"
+    },
+    {
+      "name": "a refused accelerator leaves the working one registered",
+      "ok": true,
+      "detail": "{\"registered\":true}"
+    },
+    {
+      "name": "a refused accelerator is not persisted",
+      "ok": true,
+      "detail": "Control+Alt+F9 vs Control+Alt+F9"
+    },
+    {
+      "name": "a modifier-only accelerator is refused instead of silently doing nothing",
+      "ok": true,
+      "detail": "{\"shortcut\":\"Control+Alt+F9\",\"problem\":\"A shortcut needs a key, not only modifiers. Add a letter, digit, or named key.\"}"
+    },
+    {
+      "name": "an empty accelerator is refused and reported",
+      "ok": true,
+      "detail": "{\"shortcut\":\"Control+Alt+F9\",\"problem\":\"Enter a shortcut, for example Ctrl+Alt+O.\"}"
+    },
+    {
+      "name": "the working shortcut survives every refused change",
+      "ok": true,
+      "detail": "{\"shortcut\":\"Control+Alt+F9\",\"registered\":true}"
+    },
+    {
+      "name": "the original accelerator is still held after the refused changes",
+      "ok": true,
+      "detail": "{\"registered\":false}"
+    },
+    {
+      "name": "a valid new shortcut is accepted and registered",
+      "ok": true,
+      "detail": "{\"shortcut\":\"Control+Alt+F10\",\"registered\":true,\"problem\":null}"
+    },
+    {
+      "name": "the previously held accelerator was released when the shortcut changed",
+      "ok": true,
+      "detail": "{\"registered\":true,\"problem\":null}"
+    },
+    {
+      "name": "the new accelerator is held by the app, so a probe cannot take it",
+      "ok": true,
+      "detail": "{\"registered\":false}"
+    },
+    {
+      "name": "probe C started after the app exited",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the accelerator is free again after the app exits (registration was released)",
+      "ok": true,
+      "detail": "{\"registered\":true,\"problem\":null}"
+    }
+  ],
+  "passed": true,
+  "afterChangeStatus": {
+    "configured": false,
+    "workspace": null,
+    "problem": null,
+    "shortcut": "Control+Alt+F10",
+    "shortcutRegistered": true,
+    "shortcutProblem": null,
+    "generation": 1,
+    "busy": false,
+    "sessionId": null,
+    "piWeb": {
+      "baseUrl": "http://127.0.0.1:31992",
+      "reachable": false,
+      "problem": "No pi-web service answered at http://127.0.0.1:31992. Start it yourself; Orb will not start, restart or stop it."
+    }
+  }
+}

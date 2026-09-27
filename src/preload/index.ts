@@ -24,6 +24,7 @@ import {
 export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
+  setShortcut(accelerator: string): Promise<WorkspaceStatus>;
   validateWorkspace(candidate: string): Promise<WorkspaceCandidateResult>;
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
@@ -36,6 +37,7 @@ export interface OrbBridge {
 const bridge: OrbBridge = {
   getStatus: () => ipcRenderer.invoke(IPC.getStatus),
   refreshConnection: () => ipcRenderer.invoke(IPC.refreshConnection),
+  setShortcut: (accelerator: string) => ipcRenderer.invoke(IPC.setShortcut, accelerator),
   validateWorkspace: (candidate: string) =>
     ipcRenderer.invoke(IPC.validateWorkspace, candidate),
   chooseWorkspace: () => ipcRenderer.invoke(IPC.chooseWorkspace),

@@ -12,6 +12,8 @@
 export const IPC = {
   /** Renderer -> main: re-probe the pi-web connection. */
   refreshConnection: "orb:refresh-connection",
+  /** Renderer -> main: change the global wake shortcut. */
+  setShortcut: "orb:set-shortcut",
   /** Renderer -> main: read the Orb configuration and workspace status. */
   getStatus: "orb:get-status",
   /** Renderer -> main: validate a candidate workspace directory (read-only). */
@@ -40,6 +42,13 @@ export interface WorkspaceStatus {
   readonly problem: string | null;
   readonly shortcut: string;
   readonly shortcutRegistered: boolean;
+  /**
+   * Why the configured shortcut is not active, or `null` when it is.
+   *
+   * A shortcut that silently fails to register leaves the orb unreachable, so the
+   * reason is part of the snapshot the user can see.
+   */
+  readonly shortcutProblem: string | null;
   /**
    * The run generation a client must echo back on a prompt or abort.
    *

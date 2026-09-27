@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T17:04:22.965Z",
+  "capturedAt": "2026-09-27T17:23:07.679Z",
   "platform": "win32",
   "node": "v24.19.0",
   "packageVersion": "0.1.0",
@@ -27,29 +27,29 @@
       "name": "typecheck",
       "command": "npx tsc --noEmit",
       "ok": true,
-      "durationMs": 5576,
+      "durationMs": 5748,
       "outputTail": ""
     },
     {
       "name": "lint",
       "command": "npx eslint .",
       "ok": true,
-      "durationMs": 4358,
+      "durationMs": 4480,
       "outputTail": ""
     },
     {
       "name": "unit tests",
       "command": "npx vitest run",
       "ok": true,
-      "durationMs": 2654,
-      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/generations.test.ts (7 tests) 4ms\n ✓ tests/shortcut.test.ts (8 tests) 5ms\n ✓ tests/orb-config.test.ts (20 tests) 6ms\n ✓ tests/orb-session.test.ts (15 tests) 11ms\n ✓ tests/workspace.test.ts (11 tests) 53ms\n\n Test Files  5 passed (5)\n      Tests  61 passed (61)\n   Start at  01:04:18\n   Duration  352ms (transform 54%, import 25%, tests 15%, worker 6%)"
+      "durationMs": 2723,
+      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/accelerator.test.ts (12 tests) 6ms\n ✓ tests/orb-config.test.ts (20 tests) 6ms\n ✓ tests/window-toggle.test.ts (13 tests) 6ms\n ✓ tests/generations.test.ts (7 tests) 6ms\n ✓ tests/shortcut.test.ts (10 tests) 8ms\n ✓ tests/orb-session.test.ts (15 tests) 12ms\n ✓ tests/workspace.test.ts (11 tests) 59ms\n\n Test Files  7 passed (7)\n      Tests  88 passed (88)\n   Start at  01:23:02\n   Duration  411ms (transform 54%, import 27%, tests 13%, worker 6%)"
     },
     {
       "name": "production build",
       "command": "npx electron-vite build",
       "ok": true,
-      "durationMs": 3203,
-      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 9 modules transformed.\nrendering chunks...\nout/main/index.js  38.34 kB\n✓ built in 150ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  2.00 kB\n✓ built in 21ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 29 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-bV4Wn8Rh.css    2.36 kB\n../../out/renderer/assets/index-C3fCBE8C.js   648.75 kB\n✓ built in 543ms"
+      "durationMs": 3280,
+      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 11 modules transformed.\nrendering chunks...\nout/main/index.js  44.10 kB\n✓ built in 155ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  2.19 kB\n✓ built in 17ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 29 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-Do2tn--i.css    2.67 kB\n../../out/renderer/assets/index-BXg05Egv.js   650.59 kB\n✓ built in 541ms"
     }
   ],
   "buildArtifacts": {
@@ -76,12 +76,18 @@
       "doc/support-matrix.md",
       "evidence/README.md",
       "src/main/index.ts",
-      "src/main/orb-session.ts",
+      "src/main/shortcut.ts",
+      "src/preload/index.ts",
       "src/renderer/App.tsx",
+      "src/renderer/bridge.ts",
+      "src/renderer/styles.css",
       "src/shared/ipc.ts",
-      "tests/orb-session.test.ts",
-      "evidence/p1-02/",
-      "tests/fixtures/"
+      "tests/shortcut.test.ts",
+      "evidence/p1-03/",
+      "src/main/window-toggle.ts",
+      "src/shared/accelerator.ts",
+      "tests/accelerator.test.ts",
+      "tests/window-toggle.test.ts"
     ],
     "ignoreCoverage": [
       {
@@ -105,7 +111,7 @@
     ]
   },
   "nonDestructive": {
-    "verifiedAt": "2026-09-27T17:04:22.954Z",
+    "verifiedAt": "2026-09-27T17:23:07.668Z",
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
     "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
     "headUnchanged": true,

@@ -131,6 +131,25 @@ body {
   font-size: 0.9rem;
 }
 
+.orb__shortcut {
+  font-size: 0.78rem;
+  color: var(--orb-muted);
+}
+
+.orb__shortcut summary {
+  cursor: pointer;
+}
+
+.orb__shortcut input {
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #333844;
+  background: var(--orb-surface);
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
 .orb__actions {
   display: flex;
   gap: 0.45rem;

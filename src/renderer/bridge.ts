@@ -16,6 +16,7 @@ import type {
 export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
+  setShortcut(accelerator: string): Promise<WorkspaceStatus>;
   validateWorkspace(candidate: string): Promise<WorkspaceCandidateResult>;
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
