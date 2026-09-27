@@ -1,10 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OrbSessionEvent, WorkspaceStatus } from "@shared/ipc";
+import { formatBytes } from "@shared/screenshot";
 import { getBridge } from "./bridge";
 
 interface ChatMessage {
   readonly role: "user" | "assistant" | "error";
   readonly text: string;
+}
+
+/**
+ * A capture awaiting the user's decision.
+ *
+ * The image lives only here, as a data URL, and only until the decision is made.
+ * It is never included in a status snapshot or a session event.
+ */
+interface PreviewState {
+  readonly observationId: string;
+  readonly dataUrl: string;
+  readonly width: number;
+  readonly height: number;
+  readonly bytes: number;
+  readonly targetDescription: string;
+  readonly targetStale: boolean;
 }
 
 export function App() {
@@ -15,6 +32,7 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [shortcutDraft, setShortcutDraft] = useState("");
+  const [preview, setPreview] = useState<PreviewState | null>(null);
   const streaming = useRef("");
 
   // The generation is read from the status snapshot, never from a pushed event:
@@ -84,6 +102,59 @@ export function App() {
       ]);
     }
   }, [bridge, busy, draft, generation]);
+
+  /**
+   * Capture the previously recorded window and show it for review.
+   *
+   * This sends nothing. The draft text travels with the capture, so confirming
+   * sends the message and the image together and cancelling drops both.
+   */
+  const requestScreenshot = useCallback(async () => {
+    if (busy || generation === 0) return;
+    setNotice(null);
+    const result = await bridge.captureScreenshot({ generation, text: draft.trim() });
+    if (!result.ok) {
+      setPreview(null);
+      setNotice(result.message);
+      return;
+    }
+    setPreview({
+      observationId: result.observationId,
+      dataUrl: `data:${result.mimeType};base64,${result.data}`,
+      width: result.width,
+      height: result.height,
+      bytes: result.bytes,
+      targetDescription: result.targetDescription,
+      targetStale: result.targetStale,
+    });
+  }, [bridge, busy, draft, generation]);
+
+  const resolveScreenshot = useCallback(
+    async (confirmed: boolean) => {
+      const current = preview;
+      setPreview(null);
+      if (!current) return;
+      const result = await bridge.resolveScreenshot({
+        generation,
+        observationId: current.observationId,
+        confirmed,
+      });
+      if (!result.sent) {
+        // A discard is the user's intent, so it is not reported as a failure; a
+        // failed confirmation is.
+        if (confirmed) setNotice(result.message);
+        return;
+      }
+      streaming.current = "";
+      setDraft("");
+      setMessages((messages) => [
+        ...messages,
+        { role: "user", text: `[screenshot] ${current.targetDescription}` },
+      ]);
+      setBusy(true);
+    },
+    [bridge, generation, preview],
+  );
 
   const saveShortcut = useCallback(async () => {
     const candidate = shortcutDraft.trim();
@@ -178,6 +249,14 @@ export function App() {
               <button
                 type="button"
                 className="orb__button"
+                onClick={() => void requestScreenshot()}
+                disabled={busy}
+              >
+                Screenshot
+              </button>
+              <button
+                type="button"
+                className="orb__button"
                 onClick={() => void stop()}
                 disabled={!busy}
               >
@@ -186,6 +265,45 @@ export function App() {
             </div>
           </form>
         </>
+      )}
+
+      {preview && (
+        <section className="orb__preview">
+          <p className="orb__preview-target">{preview.targetDescription}</p>
+          {preview.targetStale && (
+            <p className="orb__notice orb__notice--error">
+              That window is no longer the active window. The preview shows it as it
+              was when recorded.
+            </p>
+          )}
+          <img
+            className="orb__preview-image"
+            src={preview.dataUrl}
+            alt="Screenshot preview"
+            width={preview.width}
+            height={preview.height}
+          />
+          <p className="orb__notice">
+            {preview.width}x{preview.height}, {formatBytes(preview.bytes)}. Nothing has
+            been sent yet.
+          </p>
+          <div className="orb__actions">
+            <button
+              type="button"
+              className="orb__button orb__button--primary"
+              onClick={() => void resolveScreenshot(true)}
+            >
+              Send with message
+            </button>
+            <button
+              type="button"
+              className="orb__button"
+              onClick={() => void resolveScreenshot(false)}
+            >
+              Discard
+            </button>
+          </div>
+        </section>
       )}
 
       {status?.problem && <p className="orb__notice orb__notice--error">{status.problem}</p>}

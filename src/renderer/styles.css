@@ -150,6 +150,32 @@ body {
   font-size: 0.8rem;
 }
 
+.orb__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 1px solid #333844;
+  border-radius: 8px;
+  background: #191c22;
+}
+
+.orb__preview-target {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--orb-muted);
+  overflow-wrap: anywhere;
+}
+
+.orb__preview-image {
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  align-self: center;
+  border-radius: 6px;
+  background: #000;
+}
+
 .orb__actions {
   display: flex;
   gap: 0.45rem;

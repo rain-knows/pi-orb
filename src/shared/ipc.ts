@@ -28,6 +28,12 @@ export const IPC = {
   sendPrompt: "orb:send-prompt",
   /** Renderer -> main: stop the running turn. */
   abort: "orb:abort",
+  /** Renderer -> main: capture the previously recorded target window for preview. */
+  captureScreenshot: "orb:capture-screenshot",
+  /** Renderer -> main: confirm or cancel the previewed screenshot. */
+  resolveScreenshot: "orb:resolve-screenshot",
+  /** Renderer -> main: discard any pending screenshot (idempotent). */
+  discardScreenshot: "orb:discard-screenshot",
   /** Main -> renderer: streaming session events. */
   sessionEvent: "orb:session-event",
 } as const;
@@ -101,7 +107,70 @@ export type OrbSessionEvent =
 export interface PromptRequest {
   readonly generation: number;
   readonly text: string;
+  /**
+   * Screenshot attachments for this message.
+   *
+   * An image reaches here only through the explicit confirm path, and the data is
+   * exactly what the user previewed.
+   */
+  readonly images?: readonly ImageContent[];
 }
+
+/** Pi's image content block; the shape pi-web's `validateAgentImages` accepts. */
+export interface ImageContent {
+  readonly type: "image";
+  readonly data: string;
+  readonly mimeType: string;
+}
+
+/**
+ * Result of a screenshot capture request.
+ *
+ * The image is carried as base64 for display. It is never written to disk, and the
+ * renderer holds it only until the user confirms or cancels.
+ */
+export type ScreenshotCaptureResult =
+  | {
+      readonly ok: true;
+      readonly observationId: string;
+      readonly data: string;
+      readonly mimeType: string;
+      readonly width: number;
+      readonly height: number;
+      readonly bytes: number;
+      /** Target description for the preview; pixel data is never part of it. */
+      readonly targetDescription: string;
+      /** True when the previous target window is no longer the active window. */
+      readonly targetStale: boolean;
+    }
+  | { readonly ok: false; readonly message: string };
+
+/**
+ * Ask for a capture of the recorded target window, for preview only.
+ *
+ * `text` is the message the capture belongs to. It is held in the main process and
+ * sent only if the user confirms that exact image.
+ */
+export interface CaptureRequest {
+  readonly generation: number;
+  readonly text: string;
+}
+
+export interface ScreenshotResolveRequest {
+  readonly generation: number;
+  readonly observationId: string;
+  readonly confirmed: boolean;
+}
+
+/**
+ * Outcome of confirming a screenshot.
+ *
+ * On success the image is already attached to the message that was sent, so the
+ * renderer only needs the prompt text it was queued with.
+ */
+export type ScreenshotResolveResult =
+  | { readonly ok: true; readonly sent: true }
+  | { readonly ok: false; readonly sent: false; readonly message: string };
 
 export interface AbortRequest {
   readonly generation: number;

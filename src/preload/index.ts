@@ -15,8 +15,12 @@ import { contextBridge, ipcRenderer } from "electron";
 import {
   IPC,
   type AbortRequest,
+  type CaptureRequest,
   type OrbSessionEvent,
   type PromptRequest,
+  type ScreenshotCaptureResult,
+  type ScreenshotResolveRequest,
+  type ScreenshotResolveResult,
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
 } from "@shared/ipc";
@@ -31,6 +35,9 @@ export interface OrbBridge {
   ensureSession(): Promise<string>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
+  captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
+  resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
+  discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
 }
 
@@ -46,6 +53,11 @@ const bridge: OrbBridge = {
   ensureSession: () => ipcRenderer.invoke(IPC.ensureSession),
   sendPrompt: (request: PromptRequest) => ipcRenderer.invoke(IPC.sendPrompt, request),
   abort: (request: AbortRequest) => ipcRenderer.invoke(IPC.abort, request),
+  captureScreenshot: (request: CaptureRequest) =>
+    ipcRenderer.invoke(IPC.captureScreenshot, request),
+  resolveScreenshot: (request: ScreenshotResolveRequest) =>
+    ipcRenderer.invoke(IPC.resolveScreenshot, request),
+  discardScreenshot: () => ipcRenderer.invoke(IPC.discardScreenshot),
   onSessionEvent: (listener) => {
     const handler = (_event: unknown, payload: OrbSessionEvent) => listener(payload);
     ipcRenderer.on(IPC.sessionEvent, handler);

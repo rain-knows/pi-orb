@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T17:23:07.679Z",
+  "capturedAt": "2026-09-27T17:47:39.433Z",
   "platform": "win32",
   "node": "v24.19.0",
   "packageVersion": "0.1.0",
@@ -27,29 +27,29 @@
       "name": "typecheck",
       "command": "npx tsc --noEmit",
       "ok": true,
-      "durationMs": 5748,
+      "durationMs": 5948,
       "outputTail": ""
     },
     {
       "name": "lint",
       "command": "npx eslint .",
       "ok": true,
-      "durationMs": 4480,
+      "durationMs": 4537,
       "outputTail": ""
     },
     {
       "name": "unit tests",
       "command": "npx vitest run",
       "ok": true,
-      "durationMs": 2723,
-      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/accelerator.test.ts (12 tests) 6ms\n ✓ tests/orb-config.test.ts (20 tests) 6ms\n ✓ tests/window-toggle.test.ts (13 tests) 6ms\n ✓ tests/generations.test.ts (7 tests) 6ms\n ✓ tests/shortcut.test.ts (10 tests) 8ms\n ✓ tests/orb-session.test.ts (15 tests) 12ms\n ✓ tests/workspace.test.ts (11 tests) 59ms\n\n Test Files  7 passed (7)\n      Tests  88 passed (88)\n   Start at  01:23:02\n   Duration  411ms (transform 54%, import 27%, tests 13%, worker 6%)"
+      "durationMs": 2810,
+      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/orb-config.test.ts (20 tests) 9ms\n ✓ tests/accelerator.test.ts (12 tests) 8ms\n ✓ tests/window-toggle.test.ts (13 tests) 8ms\n ✓ tests/pending-capture.test.ts (11 tests) 7ms\n ✓ tests/shortcut.test.ts (10 tests) 9ms\n ✓ tests/generations.test.ts (7 tests) 6ms\n ✓ tests/orb-session.test.ts (15 tests) 16ms\n ✓ tests/screenshot.test.ts (22 tests) 59ms\n ✓ tests/desktop-capture.test.ts (6 tests) 4ms\n ✓ tests/screenshot-flow.test.ts (20 tests) 55ms\n ✓ tests/workspace.test.ts (11 tests) 79ms\n\n Test Files  11 passed (11)\n      Tests  147 passed (147)\n   Start at  01:47:34\n   Duration  549ms (transform 50%, import 26%, tests 16%, worker 7%)"
     },
     {
       "name": "production build",
       "command": "npx electron-vite build",
       "ok": true,
-      "durationMs": 3280,
-      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 11 modules transformed.\nrendering chunks...\nout/main/index.js  44.10 kB\n✓ built in 155ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  2.19 kB\n✓ built in 17ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 29 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-Do2tn--i.css    2.67 kB\n../../out/renderer/assets/index-BXg05Egv.js   650.59 kB\n✓ built in 541ms"
+      "durationMs": 3225,
+      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 16 modules transformed.\nrendering chunks...\nout/main/index.js  60.96 kB\n✓ built in 188ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  2.83 kB\n✓ built in 18ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-BPxiuh5S.css    3.11 kB\n../../out/renderer/assets/index-CZsp1ccz.js   654.15 kB\n✓ built in 521ms"
     }
   ],
   "buildArtifacts": {
@@ -76,18 +76,24 @@
       "doc/support-matrix.md",
       "evidence/README.md",
       "src/main/index.ts",
-      "src/main/shortcut.ts",
+      "src/main/orb-session.ts",
+      "src/main/pi-web-client.ts",
       "src/preload/index.ts",
       "src/renderer/App.tsx",
       "src/renderer/bridge.ts",
       "src/renderer/styles.css",
       "src/shared/ipc.ts",
-      "tests/shortcut.test.ts",
-      "evidence/p1-03/",
-      "src/main/window-toggle.ts",
-      "src/shared/accelerator.ts",
-      "tests/accelerator.test.ts",
-      "tests/window-toggle.test.ts"
+      "evidence/p1-04/",
+      "src/main/desktop-capture.ts",
+      "src/main/native/",
+      "src/main/pending-capture.ts",
+      "src/main/screenshot-flow.ts",
+      "src/main/target-window.ts",
+      "src/shared/screenshot.ts",
+      "tests/desktop-capture.test.ts",
+      "tests/pending-capture.test.ts",
+      "tests/screenshot-flow.test.ts",
+      "tests/screenshot.test.ts"
     ],
     "ignoreCoverage": [
       {
@@ -111,7 +117,7 @@
     ]
   },
   "nonDestructive": {
-    "verifiedAt": "2026-09-27T17:23:07.668Z",
+    "verifiedAt": "2026-09-27T17:47:39.421Z",
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
     "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
     "headUnchanged": true,

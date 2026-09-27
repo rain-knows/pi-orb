@@ -14,7 +14,7 @@
  *    completion is tracked from assistant-role events only.
  */
 
-import type { PiWebClient } from "./pi-web-client";
+import type { ImageContent, PiWebClient } from "./pi-web-client";
 import type { OrbSessionEvent } from "@shared/ipc";
 
 export interface OrbSessionDeps {
@@ -109,18 +109,20 @@ export class OrbSessionController {
    * Rejects when no session has been created, so a prompt can never be sent
    * against the wrong workspace.
    */
-  async prompt(text: string): Promise<void> {
+  async prompt(text: string, images?: readonly ImageContent[]): Promise<void> {
     const sessionId = this.#sessionId;
     if (!sessionId) {
       throw new Error("No Orb session. Select a workspace first.");
     }
-    if (text.trim().length === 0) return;
+    // An image-only message is legitimate (a screenshot with no text), so the empty
+    // check only applies when there is nothing to send at all.
+    if (text.trim().length === 0 && (!images || images.length === 0)) return;
 
     await this.#subscribe(sessionId);
     this.#running = true;
     this.#accumulator = { text: "" };
     try {
-      await this.#deps.client.prompt(sessionId, text);
+      await this.#deps.client.prompt(sessionId, text, images);
     } catch (error) {
       // The prompt never started, so no idle event will arrive to clear the state.
       this.#running = false;

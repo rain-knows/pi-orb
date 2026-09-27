@@ -63,6 +63,18 @@ verified is recorded as *unverified* and is not claimed as compatible.
 - Verification record `evidence/p1-03/` (20/20) proving real OS registration with a
   second-process contention probe, conflict diagnosis, release on change, and release
   on exit — without synthesising any keystroke.
+- P1-04 explicitly-authorized screenshot context: one pending capture at a time, a
+  preview that shows the exact bytes that will be sent, discard with zero upload, a
+  text-only model that never receives image data, explicit size and pixel limits, and
+  a target recorded before the orb takes focus so the orb cannot capture itself.
+- Windows target-window helper declaring per-monitor-v2 DPI awareness and reporting
+  whether the declaration actually took effect (the `DPI_AWARENESS` enum collapses v1
+  and v2, so the contexts are compared directly).
+- `ScreenshotFlow` as the single seam for the consent rules, driven directly by tests
+  so "previewed bytes == sent bytes" is verified with a byte-for-byte comparison.
+- Verification records `evidence/p1-04/` (21/21) covering the refusal and consent
+  paths end to end against real Electron and a real pi-web, plus a read-only
+  capture-source probe that established `window:<hwnd>:<index>` as an exact identity.
 
 ### Fixed
 
@@ -94,6 +106,10 @@ application:
 - A shortcut registration failure was only written to the main-process console, so the
   user could not see why the orb was unreachable. The reason is now part of the status
   snapshot and shown in the window.
+- A confirmation that did not match the live screenshot preview cleared it along with its
+  queued message, so a late click from an earlier preview left the user unable to confirm
+  the image they were looking at. A mismatched or stale decision is now a no-op that
+  leaves the current preview intact, and "refuse" is distinguished from "cancel".
 
 ### Security
 

@@ -1,0 +1,172 @@
+{
+  "capturedAt": "2026-09-27T17:45:46.985Z",
+  "isolation": {
+    "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-04-1790531146929",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-04-1790531146929\\agent",
+    "sessionDir": "D:\\pi-orb-p1-runs\\p1-04-1790531146929\\agent\\sessions",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-04-1790531146929\\home",
+    "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-04-1790531146929\\orb-workspace",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-04-1790531146929\\orb-config.json",
+    "piWebUrl": "http://127.0.0.1:31301",
+    "note": "isolated agent dir, isolated HOME, local fake provider; no real model, no real credentials",
+    "screenshots": false,
+    "desktopInput": false
+  },
+  "foregroundWindowAvailable": false,
+  "helperMeasurement": {
+    "elapsedMs": 680,
+    "ok": true,
+    "foregroundFound": false,
+    "dpiAwareness": {
+      "requestedPerMonitorV2": true,
+      "setCallSucceeded": true,
+      "awarenessValue": 2,
+      "isPerMonitorV2": true,
+      "isPerMonitorV1": false,
+      "isSystemAware": false,
+      "isUnaware": false
+    },
+    "note": "P0-04 required the desktop helper to declare per-monitor-v2 DPI awareness; the helper reports whether the declaration actually took effect"
+  },
+  "checks": [
+    {
+      "name": "target helper runs and returns JSON",
+      "ok": true,
+      "detail": "{\"ok\":true,\"foreground\":null,\"cursor\":{\"x\":933,\"y\":977},\"dpiAwareness\":{\"requestedPerMonitorV2\":true,\"setCallSucceeded\":true,\"awarenessValue\":2,\"isPerMonitorV2\":true,\"isPerMonitorV1\":false,\"isSystemAware\":false,\"isUnaware\":false}}"
+    },
+    {
+      "name": "target helper declares per-monitor-v2 DPI awareness",
+      "ok": true,
+      "detail": "{\"requestedPerMonitorV2\":true,\"setCallSucceeded\":true,\"awarenessValue\":2,\"isPerMonitorV2\":true,\"isPerMonitorV1\":false,\"isSystemAware\":false,\"isUnaware\":false}"
+    },
+    {
+      "name": "target helper does not report a stale v1 awareness",
+      "ok": true,
+      "detail": "{\"requestedPerMonitorV2\":true,\"setCallSucceeded\":true,\"awarenessValue\":2,\"isPerMonitorV2\":true,\"isPerMonitorV1\":false,\"isSystemAware\":false,\"isUnaware\":false}"
+    },
+    {
+      "name": "environment fact: a genuine foreground window is available for the positive capture path",
+      "ok": true,
+      "detail": "NO — GetForegroundWindow() returned null in this session, so the positive capture path cannot be exercised here and is recorded as unverified"
+    },
+    {
+      "name": "orb is configured and connected for this run",
+      "ok": true,
+      "detail": "{\"baseUrl\":\"http://127.0.0.1:31301\",\"reachable\":true,\"problem\":null}"
+    },
+    {
+      "name": "the screenshot operations are exposed through the bridge",
+      "ok": true,
+      "detail": "[\"abort\",\"captureScreenshot\",\"chooseWorkspace\",\"discardScreenshot\",\"ensureSession\",\"getStatus\",\"onSessionEvent\",\"refreshConnection\",\"resolveScreenshot\",\"sendPrompt\",\"setShortcut\",\"setWorkspace\",\"validateWorkspace\"]"
+    },
+    {
+      "name": "the bridge still exposes no generic IPC or pixel-writing helper",
+      "ok": true,
+      "detail": "[\"abort\",\"captureScreenshot\",\"chooseWorkspace\",\"discardScreenshot\",\"ensureSession\",\"getStatus\",\"onSessionEvent\",\"refreshConnection\",\"resolveScreenshot\",\"sendPrompt\",\"setShortcut\",\"setWorkspace\",\"validateWorkspace\"]"
+    },
+    {
+      "name": "a capture with no recorded target window is refused",
+      "ok": true,
+      "detail": "{\"ok\":false,\"message\":\"No target window was recorded. The target is recorded before the orb takes focus, so bring the window you want to share to the front first.\"}"
+    },
+    {
+      "name": "the refusal explains that the target is recorded before waking",
+      "ok": true,
+      "detail": "No target window was recorded. The target is recorded before the orb takes focus, so bring the window you want to share to the front first."
+    },
+    {
+      "name": "the refusal does not offer or perform a whole-screen capture",
+      "ok": true,
+      "detail": "No target window was recorded. The target is recorded before the orb takes focus, so bring the window you want to share to the front first."
+    },
+    {
+      "name": "a refused capture uploads nothing to the model",
+      "ok": true,
+      "detail": "before=0 after=0"
+    },
+    {
+      "name": "confirming an unknown capture sends nothing",
+      "ok": true,
+      "detail": "{\"ok\":false,\"sent\":false,\"message\":\"There is no screenshot awaiting confirmation.\"}"
+    },
+    {
+      "name": "the unknown confirmation reached no model call",
+      "ok": true,
+      "detail": "before=0 after=0"
+    },
+    {
+      "name": "discarding with nothing pending is harmless",
+      "ok": true,
+      "detail": "true"
+    },
+    {
+      "name": "no message was sent on the refusal path",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-04-1790531146929\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31301\",\"reachable\":true,\"problem\":null}}"
+    },
+    {
+      "name": "a session can be created on demand for the workspace",
+      "ok": true,
+      "detail": "01a0e3f9-57ec-70c5-ae8a-c3e77d60b11a"
+    },
+    {
+      "name": "the orb session exists for the image test",
+      "ok": true,
+      "detail": "01a0e3f9-57ec-70c5-ae8a-c3e77d60b11a"
+    },
+    {
+      "name": "a text-only model never receives image data",
+      "ok": true,
+      "detail": "{\"httpStatus\":200,\"responseError\":null,\"providerReceivedImage\":false,\"syntheticImageBytes\":180,\"newProviderRequests\":1,\"omissionAnnotationPresent\":true,\"observedLastUserText\":\"describe this synthetic image(image omitted: model does not support images)\"}"
+    },
+    {
+      "name": "the dropped image is recorded in the transcript instead of vanishing silently",
+      "ok": true,
+      "detail": "{\"httpStatus\":200,\"responseError\":null,\"providerReceivedImage\":false,\"syntheticImageBytes\":180,\"newProviderRequests\":1,\"omissionAnnotationPresent\":true,\"observedLastUserText\":\"describe this synthetic image(image omitted: model does not support images)\"}"
+    },
+    {
+      "name": "a plain text message still reaches the model",
+      "ok": true,
+      "detail": "{\"index\":2,\"receivedAt\":1790531168688,\"lastUserText\":\"plain text only\",\"imagePartsInLastUserMessage\":0,\"anyImageInTranscript\":false,\"totalImagesInTranscript\":0}"
+    },
+    {
+      "name": "the shell is still alive at the end",
+      "ok": true,
+      "detail": "exitCode=null"
+    }
+  ],
+  "passed": true,
+  "captureAttempt": {
+    "ok": false,
+    "message": "No target window was recorded. The target is recorded before the orb takes focus, so bring the window you want to share to the front first."
+  },
+  "textOnlyModel": {
+    "httpStatus": 200,
+    "responseError": null,
+    "providerReceivedImage": false,
+    "syntheticImageBytes": 180,
+    "newProviderRequests": 1,
+    "omissionAnnotationPresent": true,
+    "observedLastUserText": "describe this synthetic image(image omitted: model does not support images)"
+  },
+  "modelRequests": [
+    {
+      "index": 1,
+      "receivedAt": 1790531165118,
+      "lastUserText": "describe this synthetic image(image omitted: model does not support images)",
+      "imagePartsInLastUserMessage": 0,
+      "anyImageInTranscript": false,
+      "totalImagesInTranscript": 0
+    },
+    {
+      "index": 2,
+      "receivedAt": 1790531168688,
+      "lastUserText": "plain text only",
+      "imagePartsInLastUserMessage": 0,
+      "anyImageInTranscript": false,
+      "totalImagesInTranscript": 0
+    }
+  ],
+  "electronStderrTail": "DevTools listening on ws://127.0.0.1:31303/devtools/browser/6ad54b13-dd9a-4f2a-8639-535d3a59ce73"
+}

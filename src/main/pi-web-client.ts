@@ -16,6 +16,16 @@
 
 const JSON_HEADERS = { "Content-Type": "application/json" } as const;
 
+/**
+ * Pi's image content block, as pi-web's `validateAgentImages` expects it on a
+ * `prompt` command: `{ type: "image", data, mimeType }`.
+ */
+export interface ImageContent {
+  readonly type: "image";
+  readonly data: string;
+  readonly mimeType: string;
+}
+
 export interface PiWebEndpoints {
   readonly baseUrl: string;
   readonly password?: string;
@@ -121,8 +131,12 @@ export class PiWebClient {
     return sessionId;
   }
 
-  async prompt(sessionId: string, text: string): Promise<void> {
-    await this.#sessionCommand(sessionId, { type: "prompt", message: text });
+  async prompt(sessionId: string, text: string, images?: readonly ImageContent[]): Promise<void> {
+    await this.#sessionCommand(sessionId, {
+      type: "prompt",
+      message: text,
+      ...(images && images.length > 0 ? { images } : {}),
+    });
   }
 
   async abort(sessionId: string): Promise<void> {

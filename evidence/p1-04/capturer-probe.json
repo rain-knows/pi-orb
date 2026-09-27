@@ -1,0 +1,83 @@
+{
+  "capturedAt": "2026-09-27T17:27:33.977Z",
+  "electronVersion": null,
+  "sourceCount": 3,
+  "windowSourceCount": 2,
+  "screenSourceCount": 1,
+  "displayCount": 1,
+  "displays": [
+    {
+      "id": 1524534193,
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1707,
+        "height": 1067
+      },
+      "workArea": {
+        "x": 0,
+        "y": 0,
+        "width": 1707,
+        "height": 1067
+      },
+      "scaleFactor": 1.5,
+      "rotation": 0
+    }
+  ],
+  "idFormatExamples": [
+    {
+      "id": "window:1181646:0",
+      "name": "Backstop Window"
+    },
+    {
+      "id": "window:329270:0",
+      "name": "pi-orb - Pi Web - Google Chrome"
+    }
+  ],
+  "nativeWindowCount": 5,
+  "idsContainingNativeHandle": 1,
+  "idHandleMatches": [
+    {
+      "id": "window:329270:0",
+      "name": "pi-orb - Pi Web - Google Chrome",
+      "middle": "329270",
+      "middleIsLiveHandle": true
+    }
+  ],
+  "duplicateTitlesAmongWindowSources": [],
+  "anyThumbnailPresent": false,
+  "error": null,
+  "rawSourceSample": [
+    {
+      "id": "window:1181646:0",
+      "name": "Backstop Window",
+      "displayId": "",
+      "hasThumbnail": false,
+      "thumbnailSize": {
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
+      "id": "window:329270:0",
+      "name": "pi-orb - Pi Web - Google Chrome",
+      "displayId": "",
+      "hasThumbnail": false,
+      "thumbnailSize": {
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
+      "id": "screen:0:0",
+      "name": "整个屏幕",
+      "displayId": "",
+      "hasThumbnail": false,
+      "thumbnailSize": {
+        "width": 0,
+        "height": 0
+      }
+    }
+  ],
+  "stderrTail": ""
+}

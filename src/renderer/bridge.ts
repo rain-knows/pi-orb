@@ -7,8 +7,12 @@
 
 import type {
   AbortRequest,
+  CaptureRequest,
   OrbSessionEvent,
   PromptRequest,
+  ScreenshotCaptureResult,
+  ScreenshotResolveRequest,
+  ScreenshotResolveResult,
   WorkspaceCandidateResult,
   WorkspaceStatus,
 } from "@shared/ipc";
@@ -23,6 +27,9 @@ export interface OrbBridge {
   ensureSession(): Promise<string>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
+  captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
+  resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
+  discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
 }
 

@@ -32,11 +32,26 @@ import { ShortcutRegistry } from "./shortcut";
 import { WakeController } from "./window-toggle";
 import { OrbSessionController } from "./orb-session";
 import { PiWebClient, PiWebError } from "./pi-web-client";
-import { IPC, type OrbSessionEvent, type PiWebStatus, type WorkspaceStatus } from "@shared/ipc";
+import { Win32TargetWindowReader } from "./target-window";
+import { captureTargetWindow } from "./desktop-capture";
+import { ScreenshotFlow } from "./screenshot-flow";
+import { type ImageContent, type OrbSessionEvent, type PiWebStatus, type ScreenshotCaptureResult, type ScreenshotResolveResult, type WorkspaceStatus, IPC } from "@shared/ipc";
+import { type CaptureTargetSnapshot } from "@shared/screenshot";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
+const targetWindowReader = new Win32TargetWindowReader();
+
+/**
+ * The screenshot consent flow.
+ *
+ * It is constructed after `session` exists because it sends through it. The telegram
+ * of rules — record the target before taking focus, never fall back to a full-screen
+ * capture, send only the exact image the user confirmed — lives in ScreenshotFlow,
+ * which is driven directly by tests.
+ */
+let screenshotFlow: ScreenshotFlow;
 
 let configPath = "";
 let config: OrbConfig;
@@ -336,7 +351,9 @@ function registerIpc(): void {
       config = { ...config, orbWorkspace: validation.resolved };
       saveOrbConfig(configPath, config);
       // A workspace change binds a fresh run: any in-flight work from the
-      // previous workspace must not continue under the new one.
+      // previous workspace must not continue under the new one. An unconfirmed
+      // screenshot belongs to the previous run and must not survive it either.
+      screenshotFlow.discard();
       const generation = generations.begin();
       session.beginGeneration(generation);
       try {
@@ -372,13 +389,55 @@ function registerIpc(): void {
       throw new Error("Orb is busy with another task.");
     }
     try {
-      await session.prompt(parsed.text);
+      await session.prompt(parsed.text, parsed.images);
     } catch (error) {
       // The turn never started, so release the lock here; a turn that does start
       // keeps it until it ends (see emit()).
       generations.release(parsed.generation);
       throw new Error(describeError(error));
     }
+  });
+
+  /**
+   * Capture the window recorded before the orb took focus, for preview only.
+   *
+   * Nothing is sent here. The image is held in the main process until the user
+   * confirms that specific capture.
+   */
+  ipcMain.handle(
+    IPC.captureScreenshot,
+    async (_event, request: unknown): Promise<ScreenshotCaptureResult> => {
+      const parsed = parseCaptureRequest(request);
+      if (!parsed) return { ok: false, message: "Malformed capture request." };
+      const check = generations.check(parsed.generation);
+      if (!check.ok) return { ok: false, message: describeGenerationFailure(check.reason) };
+      return screenshotFlow.start(parsed.text);
+    },
+  );
+
+  ipcMain.handle(
+    IPC.resolveScreenshot,
+    async (_event, request: unknown): Promise<ScreenshotResolveResult> => {
+      const parsed = parseResolveRequest(request);
+      if (!parsed) return { ok: false, sent: false, message: "Malformed screenshot decision." };
+      const check = generations.check(parsed.generation);
+      if (!check.ok) {
+        return { ok: false, sent: false, message: describeGenerationFailure(check.reason) };
+      }
+      if (!generations.tryAcquire(parsed.generation)) {
+        return { ok: false, sent: false, message: "Orb is busy with another task." };
+      }
+      // The send is synchronous from here: the flow either sends the confirmed image
+      // or reports why it did not. Either way the task lock is released on failure.
+      const result = await screenshotFlow.resolve(parsed.observationId, parsed.confirmed);
+      if (!result.sent) generations.release(parsed.generation);
+      return result;
+    },
+  );
+
+  ipcMain.handle(IPC.discardScreenshot, () => {
+    screenshotFlow.discard();
+    return true;
   });
 
   ipcMain.handle(IPC.abort, async (_event, request: unknown) => {
@@ -398,13 +457,59 @@ function registerIpc(): void {
 
 function parseGenerationRequest(
   value: unknown,
-): { generation: number; text: string } | null {
+): { generation: number; text: string; images: readonly ImageContent[] | undefined } | null {
   if (typeof value !== "object" || value === null) return null;
   const record = value as Record<string, unknown>;
   const generation = record.generation;
   if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
   const text = typeof record.text === "string" ? record.text : "";
-  return { generation, text };
+  const images = parseImages(record.images);
+  return { generation, text, images };
+}
+
+function parseCaptureRequest(
+  value: unknown,
+): { generation: number; text: string } | null {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as Record<string, unknown>;
+  const generation = record.generation;
+  if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
+  return { generation, text: typeof record.text === "string" ? record.text : "" };
+}
+
+function parseResolveRequest(
+  value: unknown,
+): { generation: number; observationId: string; confirmed: boolean } | null {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as Record<string, unknown>;
+  const generation = record.generation;
+  const observationId = record.observationId;
+  if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
+  if (typeof observationId !== "string" || observationId.length === 0) return null;
+  return { generation, observationId, confirmed: record.confirmed === true };
+}
+
+/**
+ * Accept only well-formed image blocks.
+ *
+ * The renderer is not a trusted boundary: it may be compromised, and a malformed
+ * image would be rejected by pi-web only after the request was made. Rejecting here
+ * keeps the failure local and prevents a path where the shape, rather than the
+ * confirmation, decides what gets sent.
+ */
+function parseImages(value: unknown): readonly ImageContent[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) return undefined;
+  const images: ImageContent[] = [];
+  for (const entry of value) {
+    if (typeof entry !== "object" || entry === null) continue;
+    const record = entry as Record<string, unknown>;
+    if (record.type !== "image") continue;
+    if (typeof record.data !== "string" || typeof record.mimeType !== "string") continue;
+    if (!record.mimeType.startsWith("image/")) continue;
+    images.push({ type: "image", data: record.data, mimeType: record.mimeType });
+  }
+  return images.length > 0 ? images : undefined;
 }
 
 function describeGenerationFailure(reason: "no-run" | "stale-generation" | "malformed"): string {
@@ -438,6 +543,9 @@ function debounce(action: () => void, delayMs: number): () => void {
 function quit(): void {
   isQuitting = true;
   shortcuts.releaseAll();
+  // Drop any unconfirmed capture: shutdown must not leave an image waiting to be
+  // sent by a later run.
+  screenshotFlow.discard();
   session.dispose();
   generations.end();
   app.quit();
@@ -455,6 +563,15 @@ void app.whenReady().then(async () => {
   session = new OrbSessionController({
     client,
     emit: (event) => emit(event),
+  });
+  screenshotFlow = new ScreenshotFlow({
+    readTarget: async (): Promise<CaptureTargetSnapshot | null> => {
+      const target = await targetWindowReader.read(process.pid);
+      return target ? { target, recordedAt: Date.now() } : null;
+    },
+    isStillForeground: (handle) => targetWindowReader.isStillForeground(handle),
+    capture: (target) => captureTargetWindow(target),
+    send: (text, images) => session.prompt(text, images),
   });
   const generation = generations.begin();
   session.beginGeneration(generation);
@@ -475,5 +592,6 @@ app.on("window-all-closed", () => {
 app.on("before-quit", () => {
   isQuitting = true;
   shortcuts.releaseAll();
+  screenshotFlow?.discard();
   session?.dispose();
 });
