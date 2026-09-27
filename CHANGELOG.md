@@ -75,6 +75,16 @@ verified is recorded as *unverified* and is not claimed as compatible.
 - Verification records `evidence/p1-04/` (21/21) covering the refusal and consent
   paths end to end against real Electron and a real pi-web, plus a read-only
   capture-source probe that established `window:<hwnd>:<index>` as an exact identity.
+- P1-05 real-machine acceptance of the locked Cua driver (decision (a)): installed
+  artifacts verified against the recorded tarball and binary hashes, the runtime tool
+  inventory (57 tools) read from a running driver, the real coordinate-space mismatch
+  measured (physical 2560x1600 window bounds vs 1707x1067 DIP screen and DIP actions),
+  background clicks landing on the intended target in four widely separated cells,
+  background typing landing in a native application verified by reading the document
+  back, and balanced key/mouse press and release.
+- A disposable, self-reporting input target (`evidence/p1-05/target-app/`) that logs the
+  cell that received each press along with its in-cell offset, so a coordinate error is
+  visible as the wrong cell instead of a vague "it clicked somewhere".
 
 ### Fixed
 

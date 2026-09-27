@@ -1,0 +1,8 @@
+{
+  "name": "p1-05-input-target",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Disposable, self-reporting input target for P1-05 real-machine verification. Never shipped.",
+  "main": "main.mjs"
+}

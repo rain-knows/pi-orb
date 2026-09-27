@@ -1,0 +1,565 @@
+{
+  "capturedAt": "2026-09-27T18:07:13.786Z",
+  "probe": "P1-05 read-only Cua runtime probe",
+  "safety": {
+    "desktopInputSent": false,
+    "actionMethodsInvoked": [],
+    "pixelsWrittenToDisk": 0,
+    "note": "only observation methods are called; the single desktop-state call uses maxImageDimension 1 and only metadata is recorded"
+  },
+  "installedArtifacts": {
+    "packages": [
+      {
+        "name": "@trycua/cua-driver",
+        "version": "0.30.1",
+        "licenseField": "MIT",
+        "expectedLicense": "MIT",
+        "licenseMatchesManifest": true
+      },
+      {
+        "name": "@trycua/cua-driver-win32-x64-msvc",
+        "version": "0.30.1",
+        "licenseField": "MIT AND MPL-2.0",
+        "expectedLicense": "MIT AND MPL-2.0",
+        "licenseMatchesManifest": true
+      }
+    ],
+    "binaries": [
+      {
+        "file": "cua_driver_sdk.dll",
+        "actualSha256": "6651C3847C3F93D9E668FE1865BC3303C15FC60A9FBB6B0174CF2190025BD1E5",
+        "expectedSha256": "6651C3847C3F93D9E668FE1865BC3303C15FC60A9FBB6B0174CF2190025BD1E5",
+        "matches": true
+      },
+      {
+        "file": "cua_driver_node_runtime.node",
+        "actualSha256": "BFC1AA55A22FF78B6D9EEBAF3071F61C222DCFF2FAEB11E379B1955EED1679F0",
+        "expectedSha256": "BFC1AA55A22FF78B6D9EEBAF3071F61C222DCFF2FAEB11E379B1955EED1679F0",
+        "matches": true
+      }
+    ]
+  },
+  "moduleLoad": {
+    "loaded": true,
+    "exportedSymbols": 168
+  },
+  "driverCreation": {
+    "created": true,
+    "shutdown": {
+      "ok": true,
+      "elapsedMs": 0
+    }
+  },
+  "tools": {
+    "apiSurface": {
+      "methodCount": 39,
+      "observationMethodsPresent": [
+        "listToolsJson",
+        "listWindows",
+        "listApps",
+        "getScreenSize",
+        "getDesktopState",
+        "getWindowState",
+        "getSessionState",
+        "listSessions",
+        "verifyState",
+        "getCursorPosition"
+      ],
+      "actionMethodsPresent": [
+        "click",
+        "typeText",
+        "pressKey",
+        "hotkey",
+        "scroll",
+        "drag",
+        "moveCursor",
+        "invokeMenu"
+      ],
+      "note": "action methods are recorded for completeness and are never called by this probe"
+    },
+    "runtimeInventory": {
+      "count": 57,
+      "names": [
+        "list_apps",
+        "list_windows",
+        "get_window_state",
+        "verify_state",
+        "launch_app",
+        "kill_app",
+        "bring_to_front",
+        "set_window_frame",
+        "invoke_menu",
+        "debug_window_info",
+        "click",
+        "double_click",
+        "right_click",
+        "drag",
+        "type_text",
+        "press_key",
+        "hotkey",
+        "set_value",
+        "scroll",
+        "clipboard_read",
+        "clipboard_write",
+        "get_screen_size",
+        "get_desktop_state",
+        "get_cursor_position",
+        "move_cursor",
+        "set_agent_cursor_enabled",
+        "set_agent_cursor_motion",
+        "get_agent_cursor_state",
+        "set_agent_cursor_theme",
+        "check_permissions",
+        "health_report",
+        "get_config",
+        "set_config",
+        "get_accessibility_tree",
+        "zoom",
+        "page",
+        "get_browser_state",
+        "browser_prepare",
+        "browser_navigate",
+        "browser_click",
+        "browser_type",
+        "browser_dialog",
+        "browser_set_input_files",
+        "browser_download",
+        "browser_pointer",
+        "start_recording",
+        "stop_recording",
+        "get_recording_state",
+        "replay_trajectory",
+        "install_ffmpeg",
+        "start_session",
+        "escalate_session",
+        "get_session",
+        "list_sessions",
+        "get_session_state",
+        "end_session",
+        "parse_visual_regions"
+      ],
+      "sampleSchema": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "capabilities": [
+          "app.list"
+        ],
+        "description": "List Windows apps — both currently running and installed-but-not-running — with per-app state flags:\n\n- running: is a process for this app live? (pid is 0 when false)\n- active: is it the system-frontmost app? (implies running)\n- kind: `\"desktop\"` for `.exe`-backed apps (resolved from Start-Menu shortcuts) or `\"uwp\"` for packaged store apps.\n- launch_path: what `launch_app` would consume.\n* desktop…(1464 chars)",
+        "inputSchema": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "name": "list_apps",
+        "outputSchema": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "properties": {
+                "apps": {
+                  "items": {
+                    "properties": "[depth-limit]",
+                    "required": "[depth-limit]",
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "apps"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": true,
+              "anyOf": [
+                {
+                  "required": [
+                    "refusal"
+                  ]
+                },
+                {
+                  "required": [
+                    "status"
+                  ]
+                },
+                {
+                  "required": [
+                    "code"
+                  ]
+                }
+              ],
+              "type": "object"
+            }
+          ],
+          "type": "object"
+        },
+        "risk": {
+          "class": "r2",
+          "enforcement": "active",
+          "operation_sensitive": true,
+          "version": "1"
+        }
+      },
+      "rawType": "string",
+      "rawLength": 182427
+    }
+  },
+  "observation": {
+    "windows": {
+      "count": 8,
+      "elapsedMs": 165,
+      "hasZIndex": true,
+      "hasBounds": true,
+      "sample": [
+        {
+          "windowId": {
+            "__bigint": "723120"
+          },
+          "pid": 2756,
+          "appName": "Notepad.exe",
+          "title": "*p1-05-keyboard-target.txt - Notepad",
+          "bounds": {
+            "x": 436,
+            "y": 429,
+            "width": 1906,
+            "height": 815
+          },
+          "isOnScreen": true,
+          "zIndex": {
+            "__bigint": "7"
+          },
+          "layer": 0,
+          "minimized": false,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
+        },
+        {
+          "windowId": {
+            "__bigint": "1507986"
+          },
+          "pid": 6444,
+          "appName": "SystemSettings.exe",
+          "title": "设置",
+          "bounds": {
+            "x": 0,
+            "y": 11,
+            "width": 2560,
+            "height": 1600
+          },
+          "isOnScreen": true,
+          "zIndex": {
+            "__bigint": "6"
+          },
+          "layer": 0,
+          "minimized": false,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
+        },
+        {
+          "windowId": {
+            "__bigint": "4916960"
+          },
+          "pid": 18292,
+          "appName": "ApplicationFrameHost.exe",
+          "title": "设置",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1600
+          },
+          "isOnScreen": true,
+          "zIndex": {
+            "__bigint": "5"
+          },
+          "layer": 0,
+          "minimized": false,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
+        },
+        {
+          "windowId": {
+            "__bigint": "329270"
+          },
+          "pid": 25612,
+          "appName": "chrome.exe",
+          "title": "pi-orb - Pi Web - Google Chrome",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1600
+          },
+          "isOnScreen": true,
+          "zIndex": {
+            "__bigint": "4"
+          },
+          "layer": 0,
+          "minimized": false,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
+        },
+        {
+          "windowId": {
+            "__bigint": "525390"
+          },
+          "pid": 11592,
+          "appName": "TextInputHost.exe",
+          "title": "Windows 输入体验",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1600
+          },
+          "isOnScreen": true,
+          "zIndex": {
+            "__bigint": "3"
+          },
+          "layer": 0,
+          "minimized": false,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
+        }
+      ],
+      "bigintIds": 8
+    },
+    "ownWin32Probe": {
+      "ok": true,
+      "foregroundFound": true,
+      "dpiAwareness": {
+        "requestedPerMonitorV2": true,
+        "setCallSucceeded": true,
+        "awarenessValue": 2,
+        "isPerMonitorV2": true,
+        "isPerMonitorV1": false,
+        "isSystemAware": false,
+        "isUnaware": false
+      }
+    },
+    "apps": {
+      "count": 309,
+      "activeApp": null,
+      "runningCount": 6,
+      "note": "AppInfo.active identifies the active application, not the active window"
+    }
+  },
+  "coordinateSpace": {
+    "screenSize": {
+      "text": "✅ Main display: 1707x1067 pixels @ 1x",
+      "structured": {
+        "height": 1067,
+        "scale_factor": 1,
+        "width": 1707
+      },
+      "width": 1707,
+      "height": 1067,
+      "scaleFactor": 1
+    },
+    "analysis": {
+      "physicalResolution": {
+        "width": 2560,
+        "height": 1600
+      },
+      "virtualizedResolution": {
+        "width": 1707,
+        "height": 1067
+      },
+      "screenSizeIsVirtualized": true,
+      "screenSizeIsPhysical": false,
+      "windowBoundsArePhysical": true,
+      "conclusion": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
+    },
+    "desktopState": {
+      "elapsedMs": 248,
+      "imageFields": [
+        {
+          "key": "mimeType",
+          "mimeType": "image/png"
+        }
+      ],
+      "keys": [
+        "text",
+        "images",
+        "structuredJson",
+        "isError",
+        "errorCode",
+        "action",
+        "verification",
+        "degraded",
+        "rawJson"
+      ],
+      "pixelsPersisted": false
+    }
+  },
+  "sessions": {
+    "list": {
+      "sessions": [
+        {
+          "session": "undefined",
+          "implicit": true,
+          "state": 0,
+          "clientKind": 1,
+          "transport": 1,
+          "cursorVisible": false,
+          "recordingActive": false,
+          "idleSeconds": {
+            "__bigint": "0"
+          },
+          "expiresInSeconds": {
+            "__bigint": "299"
+          }
+        }
+      ],
+      "nextCursor": "undefined"
+    },
+    "start": {
+      "state": {
+        "session": "p1-05-probe",
+        "captureScope": 0,
+        "effectiveScope": 0,
+        "desktopCaptureAuthorized": false,
+        "desktopUnlocked": false,
+        "escalationReason": "undefined",
+        "escalationDetail": "undefined"
+      },
+      "active": true,
+      "revived": false
+    },
+    "state": {
+      "session": "p1-05-probe",
+      "captureScope": 0,
+      "effectiveScope": 0,
+      "desktopCaptureAuthorized": false,
+      "desktopUnlocked": false,
+      "escalationReason": "undefined",
+      "escalationDetail": "undefined"
+    },
+    "end": {
+      "session": "p1-05-probe",
+      "active": false
+    }
+  },
+  "timingsMs": {
+    "moduleImport": 53,
+    "driverCreate": 63,
+    "listToolsJson": 48,
+    "listWindows": 165,
+    "getDesktopState": 248,
+    "startSession": 1,
+    "shutdown": 0
+  },
+  "checks": [
+    {
+      "name": "both installed packages are the locked 0.30.1 version",
+      "ok": true,
+      "detail": "[\"@trycua/cua-driver@0.30.1\",\"@trycua/cua-driver-win32-x64-msvc@0.30.1\"]"
+    },
+    {
+      "name": "installed license fields match the recorded manifest",
+      "ok": true,
+      "detail": "[{\"name\":\"@trycua/cua-driver\",\"license\":\"MIT\",\"expected\":\"MIT\"},{\"name\":\"@trycua/cua-driver-win32-x64-msvc\",\"license\":\"MIT AND MPL-2.0\",\"expected\":\"MIT AND MPL-2.0\"}]"
+    },
+    {
+      "name": "the Windows platform package is NOT plain MIT",
+      "ok": true,
+      "detail": "[\"MIT\",\"MIT AND MPL-2.0\"]"
+    },
+    {
+      "name": "installed native binaries match the recorded SHA-256 hashes",
+      "ok": true,
+      "detail": "[{\"file\":\"cua_driver_sdk.dll\",\"matches\":true},{\"file\":\"cua_driver_node_runtime.node\",\"matches\":true}]"
+    },
+    {
+      "name": "the native Cua driver module loads on this machine",
+      "ok": true,
+      "detail": "exported symbols: 168"
+    },
+    {
+      "name": "every MVP observation method is present on the driver",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "a driver instance can be created in-process",
+      "ok": true,
+      "detail": "create() took 63 ms"
+    },
+    {
+      "name": "the driver reports a runtime tool inventory",
+      "ok": true,
+      "detail": "57 tools"
+    },
+    {
+      "name": "window discovery works at runtime",
+      "ok": true,
+      "detail": "8 windows in 165 ms"
+    },
+    {
+      "name": "window records carry bounds",
+      "ok": true,
+      "detail": "true"
+    },
+    {
+      "name": "window ids are bigint as documented, not numbers",
+      "ok": true,
+      "detail": "bigint ids: 8/8"
+    },
+    {
+      "name": "window records expose a front order (zIndex) for window identity binding",
+      "ok": true,
+      "detail": "P1-06 needs this to bind an observation to the intended window"
+    },
+    {
+      "name": "application discovery works at runtime",
+      "ok": true,
+      "detail": "309 apps"
+    },
+    {
+      "name": "the driver reports a screen size at runtime",
+      "ok": true,
+      "detail": "1707x1067 @ 1"
+    },
+    {
+      "name": "the coordinate-space mismatch is recorded as a measured fact",
+      "ok": true,
+      "detail": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
+    },
+    {
+      "name": "desktop state can be observed at runtime",
+      "ok": true,
+      "detail": "{\"elapsedMs\":248,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
+    },
+    {
+      "name": "a named session can be started",
+      "ok": true,
+      "detail": "took 1 ms"
+    },
+    {
+      "name": "session state can be read",
+      "ok": true,
+      "detail": "{\"session\":\"p1-05-probe\",\"captureScope\":0,\"effectiveScope\":0,\"desktopCaptureAuthorized\":false,\"desktopUnlocked\":false,\"escalationReason\":\"undefined\",\"escalationDetail\":\"undefined\"}"
+    },
+    {
+      "name": "a named session can be ended",
+      "ok": true,
+      "detail": "{\"session\":\"p1-05-probe\",\"active\":false}"
+    },
+    {
+      "name": "the driver shuts down cleanly",
+      "ok": true,
+      "detail": "0 ms"
+    }
+  ],
+  "passed": true
+}

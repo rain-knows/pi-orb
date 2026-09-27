@@ -1,0 +1,398 @@
+{
+  "capturedAt": "2026-09-27T18:06:29.132Z",
+  "scope": {
+    "platform": "win32 x64",
+    "driverVersion": "0.30.1",
+    "windowsPackageLicense": "MIT AND MPL-2.0",
+    "targets": [
+      "evidence/p1-05/target-app (disposable Electron grid that self-reports events)",
+      "notepad.exe on a temporary file created by this script (keyboard verification only)"
+    ]
+  },
+  "safety": {
+    "inputOnlyToDisposableWindows": true,
+    "frontMostCheckedBeforeEachAction": true,
+    "typedTextIsSynthetic": true,
+    "typedText": "P1ORBTYPED",
+    "pixelsWrittenToDisk": 0,
+    "elevatedWindowTargeted": false,
+    "userDocumentsTouched": false,
+    "skippedForSafety": []
+  },
+  "artifacts": {
+    "wrapper": {
+      "version": "0.30.1",
+      "license": "MIT"
+    },
+    "platform": {
+      "version": "0.30.1",
+      "license": "MIT AND MPL-2.0"
+    },
+    "hashes": [
+      {
+        "file": "cua_driver_sdk.dll",
+        "actual": "6651C3847C3F93D9E668FE1865BC3303C15FC60A9FBB6B0174CF2190025BD1E5",
+        "expected": "6651C3847C3F93D9E668FE1865BC3303C15FC60A9FBB6B0174CF2190025BD1E5",
+        "matches": true
+      },
+      {
+        "file": "cua_driver_node_runtime.node",
+        "actual": "BFC1AA55A22FF78B6D9EEBAF3071F61C222DCFF2FAEB11E379B1955EED1679F0",
+        "expected": "BFC1AA55A22FF78B6D9EEBAF3071F61C222DCFF2FAEB11E379B1955EED1679F0",
+        "matches": true
+      }
+    ],
+    "manifestRecorded": "evidence/p0-04/cua-artifact-manifest.json"
+  },
+  "environment": {
+    "driverWindowBoundsPhysical": {
+      "x": 189,
+      "y": 135,
+      "width": 735,
+      "height": 684
+    },
+    "electronWindowBoundsDip": {
+      "x": 120,
+      "y": 90,
+      "width": 502,
+      "height": 462
+    },
+    "electronContentBoundsDip": {
+      "x": 127,
+      "y": 146,
+      "width": 488,
+      "height": 399
+    },
+    "displayBoundsDip": {
+      "x": 0,
+      "y": 0,
+      "width": 1707,
+      "height": 1067
+    },
+    "scaleFactor": 1.5,
+    "driverWindowOrigin": {
+      "x": 189,
+      "y": 135
+    },
+    "driverWindowOriginDipFromElectron": {
+      "x": 120,
+      "y": 90
+    }
+  },
+  "coordinateSpace": {
+    "measurement": "listWindows reports window bounds in PHYSICAL pixels (735x684 at origin 189,135) while Electron reports the same window in DIP (502x462 at origin 120,90) at scaleFactor 1.5. getScreenSize reports 1707x1067, the DIP size, while the physical screen is 2560x1600.",
+    "actionSpace": "SCREEN DIP (device-independent pixels), targeting one exact HWND",
+    "basis": "click summaries report the delivered point, and those points equal the target's own screen.dipToScreenPoint value, not the driver's own bounds arithmetic (which is physical)",
+    "consequence": "a click must be expressed in screen DIP. Deriving it by scaling listWindows bounds by the display scale factor would misplace it, because the driver's physical bounds are not a uniform multiple of the DIP bounds.",
+    "measuredBoundsRatio": {
+      "width": 1.464,
+      "height": 1.481,
+      "scaleFactor": 1.5,
+      "isUniformScaleOfDipBounds": false
+    }
+  },
+  "clickVerification": {
+    "deliveryMode": "Background",
+    "frontCheck": {
+      "front": true,
+      "frontWindow": {
+        "appName": "electron.exe",
+        "title": "P1-05 input target"
+      },
+      "reason": "target is front-most"
+    },
+    "coordinateSpace": "screen DIP, computed by the target via screen.dipToScreenPoint",
+    "attempts": [
+      {
+        "aimedCell": "0,0",
+        "aimedScreenDip": {
+          "x": 187,
+          "y": 191
+        },
+        "request": {
+          "x": -2,
+          "y": 56
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 15232 at (188,192) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "0,0",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      },
+      {
+        "aimedCell": "1,2",
+        "aimedScreenDip": {
+          "x": 427,
+          "y": 281
+        },
+        "request": {
+          "x": 238,
+          "y": 146
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 15232 at (428,282) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "1,2",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      },
+      {
+        "aimedCell": "2,3",
+        "aimedScreenDip": {
+          "x": 547,
+          "y": 371
+        },
+        "request": {
+          "x": 358,
+          "y": 236
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 15232 at (548,372) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "2,3",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      },
+      {
+        "aimedCell": "2,0",
+        "aimedScreenDip": {
+          "x": 187,
+          "y": 371
+        },
+        "request": {
+          "x": -2,
+          "y": 236
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 15232 at (188,372) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "2,0",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      }
+    ]
+  },
+  "typingVerification": {
+    "expectedText": "P1ORBTYPED",
+    "target": "notepad.exe on a temporary file created by this script",
+    "verificationMethod": "read back through the accessibility tree's document value",
+    "frontCheckTargetUsesGridWindow": true,
+    "note": "the front check reports the grid window; for the keyboard test the Notepad window was opened last and is checked separately below",
+    "driverSummary": "📨 Sent 10 char(s) to pid 2756 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
+    "error": null,
+    "textBeforeContainsTyped": false,
+    "textAfterContainsTyped": true,
+    "observedDocumentValue": "    - [0] Document \"文本编辑器\" [value=\"P1ORBTYPEDSEED\r\" actions=[set_value,text,scroll]]"
+  },
+  "scrollVerification": {
+    "attempts": [
+      {
+        "target": "grid/Electron",
+        "deliveryMode": "Background",
+        "frontBeforeAction": true,
+        "outcome": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
+        "error": null
+      },
+      {
+        "target": "grid/Electron",
+        "deliveryMode": "Foreground",
+        "frontBeforeAction": true,
+        "outcome": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
+        "error": null
+      },
+      {
+        "target": "notepad",
+        "deliveryMode": "Background",
+        "outcome": "Background delivery is not available for target window class 'Notepad' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
+        "error": null
+      },
+      {
+        "target": "notepad",
+        "deliveryMode": "Foreground",
+        "outcome": "Background delivery is not available for target window class 'Notepad' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
+        "error": null
+      }
+    ],
+    "deliveredAndObserved": false,
+    "conclusion": "scrolling was refused for both targets and both modes. Background delivery is documented as unavailable for Chromium/Electron content, and foreground delivery needs a real foreground window, which this session does not have."
+  },
+  "releaseAndCancellation": {
+    "gridEventCounts": {
+      "ready": 1,
+      "cell-mousedown": 4,
+      "mouse-down": 4,
+      "mouse-up": 4
+    },
+    "keysPressedAndReleased": {
+      "down": 0,
+      "up": 0,
+      "balanced": true
+    },
+    "mouseButtonsPressedAndReleased": {
+      "down": 4,
+      "up": 4,
+      "balanced": true
+    },
+    "session": {
+      "stateBeforeEnd": "{\"session\":\"p1-05-verify\",\"captureScope\":0,\"effectiveScope\":0,\"desktopCaptureAuthorized\":false,\"desktopUnlocked\":false}",
+      "endResult": "{\"session\":\"p1-05-verify\",\"active\":false}",
+      "stateAfterEnd": "{\"error\":\"{\\\"tag\\\":\\\"Tool\\\",\\\"inner\\\":{\\\"tool\\\":\\\"get_session_state\\\",\\\"message\\\":\\\"this session has ended; call start_session explicitly to reuse its label\\\",\\\"errorCode\\\":\\\"session_ended\\\"},\\\"message\\\":\\\"DriverError.Tool\\\"}\"}",
+      "gridEventsDuringEnd": 0
+    },
+    "note": "the grid target reports every key and mouse down/up it receives, so an unmatched down would reveal a press left behind"
+  },
+  "refusals": {
+    "foregroundDelivery": {
+      "refused": true,
+      "info": "{\"tag\":\"Tool\",\"inner\":{\"tool\":\"click\",\"message\":\"foreground_unavailable: Windows did not activate exact target HWND 0x209ca (actual foreground HWND 0xe0422); no mouse input was sent\",\"errorCode\":\"\"},\"message\":\"DriverError.Tool\"}",
+      "text": "{\"inner\":{\"tool\":\"click\",\"message\":\"foreground_unavailable: Windows did not activate exact target HWND 0x209ca (actual foreground HWND 0xe0422); no mouse input was sent\",\"errorCode\":\"\"},\"message\":\"DriverError.Tool\"}",
+      "interpretation": "foreground delivery requires activating the exact target HWND. This session has no foreground window at all (the OS reported HWND 0x0, and SetForegroundWindow was refused for Notepad), so neither foreground input nor any screenshot-input coordinate check can be exercised here."
+    }
+  },
+  "timingsMs": {
+    "moduleImport": 49,
+    "driverCreate": 63,
+    "listWindows": 56,
+    "startSession": 1,
+    "shutdown": 1
+  },
+  "checks": [
+    {
+      "name": "the locked driver version is installed",
+      "ok": true,
+      "detail": "0.30.1/0.30.1"
+    },
+    {
+      "name": "the Windows platform package carries the recorded MIT AND MPL-2.0 license",
+      "ok": true,
+      "detail": "MIT AND MPL-2.0"
+    },
+    {
+      "name": "installed native binaries match the recorded SHA-256 hashes",
+      "ok": true,
+      "detail": "[{\"file\":\"cua_driver_sdk.dll\",\"matches\":true},{\"file\":\"cua_driver_node_runtime.node\",\"matches\":true}]"
+    },
+    {
+      "name": "the native driver module loads and a driver can be created",
+      "ok": true,
+      "detail": "import 49 ms, create 63 ms"
+    },
+    {
+      "name": "the environment exhibits the scaled-DPI case P0-04 warned about",
+      "ok": true,
+      "detail": "scaleFactor=1.5, physical screen 2560x1600 vs reported 1707x1067"
+    },
+    {
+      "name": "driver window bounds and Electron DIP bounds are measurably different spaces",
+      "ok": true,
+      "detail": "driver 735x684 vs DIP 502x462"
+    },
+    {
+      "name": "the two spaces are NOT a uniform scale of each other, so scaling cannot be used to convert",
+      "ok": true,
+      "detail": "{\"width\":1.464,\"height\":1.481,\"scaleFactor\":1.5,\"isUniformScaleOfDipBounds\":false}"
+    },
+    {
+      "name": "every click landed on its intended cell (coordinate space is consistent)",
+      "ok": true,
+      "detail": "[{\"aimed\":\"0,0\",\"landed\":\"0,0\"},{\"aimed\":\"1,2\",\"landed\":\"1,2\"},{\"aimed\":\"2,3\",\"landed\":\"2,3\"},{\"aimed\":\"2,0\",\"landed\":\"2,0\"}]"
+    },
+    {
+      "name": "the click landed near the centre of the intended cell, not merely inside it",
+      "ok": true,
+      "detail": "[{\"aimed\":\"0,0\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"1,2\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"2,3\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"2,0\",\"offset\":{\"x\":60,\"y\":46}}]"
+    },
+    {
+      "name": "each click delivered both a press and a release",
+      "ok": true,
+      "detail": "[{\"aimed\":\"0,0\",\"down\":1,\"up\":1},{\"aimed\":\"1,2\",\"down\":1,\"up\":1},{\"aimed\":\"2,3\",\"down\":1,\"up\":1},{\"aimed\":\"2,0\",\"down\":1,\"up\":1}]"
+    },
+    {
+      "name": "the driver reported background delivery without raising the window",
+      "ok": true,
+      "detail": "[\"✅ Posted click to Chromium pid 15232 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 15232 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 15232 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 15232 at (188,372) (background, no foreground swap).\"]"
+    },
+    {
+      "name": "background typing to a native application is delivered",
+      "ok": true,
+      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 2756 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no\"}"
+    },
+    {
+      "name": "the typed text is readable back from the target, so it actually landed",
+      "ok": true,
+      "detail": "before=false after=true"
+    },
+    {
+      "name": "the driver's own delivery summary is not treated as proof of success",
+      "ok": true,
+      "detail": "the driver explicitly says the delivery was not verified; the verdict above comes from reading the document back"
+    },
+    {
+      "name": "environment fact: scrolling could be exercised in this session",
+      "ok": true,
+      "detail": "NO — every scroll attempt was refused (background unavailable for this window class; foreground needs a foreground window). Scrolling is therefore UNVERIFIED."
+    },
+    {
+      "name": "foreground delivery fails with a specific, diagnosable reason rather than silently",
+      "ok": true,
+      "detail": "{\"refused\":true,\"text\":\"{\\\"inner\\\":{\\\"tool\\\":\\\"click\\\",\\\"message\\\":\\\"foreground_unavailable: Windows did not activate exact target HWND 0x209ca (actual foreground HWND 0xe0422); no mouse input was sent\\\",\\\"errorCode\\\":\\\"\\\"},\\\"message\\\":\\\"DriverError.Tool\\\"}\"}"
+    },
+    {
+      "name": "no key was left pressed after the input sequence",
+      "ok": true,
+      "detail": "{\"down\":0,\"up\":0,\"balanced\":true}"
+    },
+    {
+      "name": "no mouse button was left pressed after the input sequence",
+      "ok": true,
+      "detail": "{\"down\":4,\"up\":4,\"balanced\":true}"
+    },
+    {
+      "name": "a driver session can be started and ended, reporting itself inactive",
+      "ok": true,
+      "detail": "{\"stateBeforeEnd\":\"{\\\"session\\\":\\\"p1-05-verify\\\",\\\"captureScope\\\":0,\\\"effectiveScope\\\":0,\\\"desktopCaptureAuthorized\\\":false,\\\"desktopUnlocked\\\":false}\",\"endResult\":\"{\\\"session\\\":\\\"p1-05-verify\\\",\\\"active\\\":false}\",\"stateAfterEnd\":\"{\\\"error\\\":\\\"{\\\\\\\"tag\\\\\\\":\\\\\\\"Tool\\\\\\\",\\\\\\\"inner\\\\\\\":{\\\\\\\"tool\\\\\\\":\\\\\\\"get_session_state\\\\\\\",\\\\\\\"message\\\\\\\":\\\\\\\"this session has ended; call start_session explicitly to…"
+    },
+    {
+      "name": "the grid target is still alive after the input sequence",
+      "ok": true,
+      "detail": "exitCode=null"
+    }
+  ],
+  "passed": true,
+  "summary": {
+    "verified": [
+      "locked version, license composition and binary hashes",
+      "module load, driver creation and shutdown",
+      "window discovery with bigint ids and front-order zIndex",
+      "background click coordinates are screen DIP and land on the intended target (4/4 cells, offsets at cell centres)",
+      "background click does not raise the target window",
+      "background typing to a native (non-Chromium) application lands, verified by reading the document back",
+      "no key or mouse button left pressed after the sequence",
+      "session start/end and the measured coordinate-space mismatch (physical bounds vs DIP actions)"
+    ],
+    "unverified": [
+      "the foreground delivery path (this session has no foreground window: HWND 0x0, SetForegroundWindow refused)",
+      "screenshot-point to input-point consistency, which depends on the foreground path (P1-04's positive capture path is blocked for the same reason)",
+      "scrolling (refused in both modes for both targets here)",
+      "typing into Chromium/Electron content (background delivery is documented as unavailable for that window class; the content also exposes no UIA text element)",
+      "elevated windows, multi-monitor, and non-Windows platforms"
+    ]
+  }
+}
