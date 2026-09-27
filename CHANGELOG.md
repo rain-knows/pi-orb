@@ -114,6 +114,16 @@ verified is recorded as *unverified* and is not claimed as compatible.
 Both defects below produced no error anywhere and were found only by running the real
 application:
 
+- The Pi extension sent run generation `0` while the shell's live generation starts at `1`, and the
+  value could only have come from an environment variable nothing sets (the extension runs inside
+  pi-web's process, whose environment this project cannot set). The bridge therefore refused every
+  desktop request as `stale-generation`, so the P1-06 tools could never work outside the probes. The
+  shell now publishes the generation in the same handshake file the extension already reads, and
+  rewrites it whenever the generation changes.
+- Reaching the bridge with an unknown session was reported as `stale-generation`, which told the user
+  their run was stale when the real problem was that the session was not this shell's. The two cases
+  are now distinct reasons with distinct messages; this was found by a check asserting that a request
+  using the handshake generation gets *past* the generation check.
 - Losing the pi-web connection did not revoke desktop authority, so after pi-web died a grant
   survived that belonged to a session nobody could see any more, and reconnecting could resume it.
   A lost or unusable connection now revokes desktop operations and the unconfirmed screenshot, and

@@ -291,6 +291,37 @@ async function startDesktop(): Promise<void> {
 }
 
 /**
+ * The bridge token for this run.
+ *
+ * Kept so the handshake can be rewritten with a new generation without rotating the token: the token
+ * authenticates the run, the generation bounds the authority, and only the latter changes mid-run.
+ */
+let bridgeToken: string | null = null;
+
+/**
+ * Publish the bridge handshake with the current run generation.
+ *
+ * The extension reads this file to learn the pipe, the token and the generation. It has to be
+ * rewritten whenever the generation changes, otherwise the extension would keep sending the previous
+ * generation and every desktop request would be refused as stale — the tools would silently never
+ * work.
+ */
+function publishHandshake(): void {
+  if (!bridgeToken) return;
+  try {
+    writeHandshake(
+      app.getPath("userData"),
+      bridgeToken,
+      config.orbWorkspace ?? "",
+      process.pid,
+      generations.current,
+    );
+  } catch (error) {
+    console.warn(`[pi-orb] could not publish the bridge handshake: ${describeError(error)}`);
+  }
+}
+
+/**
  * Start the bridge and publish its handshake.
  *
  * The handshake lands in the Orb userData directory, which is the same place the
@@ -300,11 +331,14 @@ async function startDesktop(): Promise<void> {
  */
 async function startBridge(): Promise<void> {
   const token = createBridgeToken();
+  bridgeToken = token;
+  publishHandshake();
   const handshake = writeHandshake(
     app.getPath("userData"),
     token,
     config.orbWorkspace ?? "",
     process.pid,
+    generations.current,
   );
   bridge = new BridgeServer({
     pipePath: handshake.pipePath,
@@ -320,8 +354,22 @@ async function startBridge(): Promise<void> {
       },
       status: () => desktopTaskStatus(),
       revoke: () => desktopBroker?.revoke(),
-      accepts: (sessionId, generation) =>
-        generations.current === generation && session?.sessionId === sessionId,
+      /**
+       * Admit only the live run's session and generation, and say which of the two failed.
+       *
+       * The Orb session is created lazily, so before it exists there is no session the shell can
+       * accept. Reporting that as `stale-generation` would tell the user their run is stale when the
+       * real situation is that no Orb session has been started yet.
+       */
+      accepts: (sessionId, generation) => {
+        if (!session?.sessionId || session.sessionId !== sessionId) {
+          return { ok: false, reason: "unknown-session" as const };
+        }
+        if (generations.current !== generation) {
+          return { ok: false, reason: "stale-generation" as const };
+        }
+        return { ok: true };
+      },
     },
     log: (entry) => console.log(`[pi-orb] bridge ${JSON.stringify(entry)}`),
   });
@@ -612,6 +660,8 @@ function registerIpc(): void {
       revokeDesktopOperations("the workspace changed");
       const generation = generations.begin();
       session.beginGeneration(generation);
+      // The extension must learn the new generation, or its next request would be refused as stale.
+      publishHandshake();
       try {
         await session.ensureSession(validation.resolved);
       } catch (error) {

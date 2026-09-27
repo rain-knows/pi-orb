@@ -425,11 +425,36 @@ try {
 
   check("the bridge handshake is written with a token and a pipe path", Boolean(handshake.token) && Boolean(handshake.pipePath), safe(report.bridge.handshake));
   check("the handshake records the configured workspace", handshake.workspace === WORKSPACE, String(handshake.workspace));
+  // The extension cannot derive the generation (it runs in pi-web's process), so the handshake must
+  // carry it. Without this the extension sent 0 while the shell's live generation was 1, and every
+  // desktop request was refused as stale — the tools could never work.
+  check(
+    "the handshake carries the shell's run generation",
+    handshake.generation === 1,
+    `generation=${String(handshake.generation)}`,
+  );
 
-  // The pipe must actually answer, so "listening" is a fact rather than an assumption.
+  // The decisive check: a request made with the generation the extension actually reads must be
+  // accepted, not refused as stale. This is what an end-to-end generation mismatch would break.
   const hello = await bridgeCall({ type: "hello" });
   report.bridge.hello = safe(hello);
   check("the bridge pipe answers a hello handshake", hello.ok === true, safe(hello).slice(0, 200));
+
+  const handshakeOnly = JSON.parse(readFileSync(tokenFile, "utf8"));
+  const nonStaleProbe = await bridgeCall({
+    type: "status",
+    sessionId: "probe-before-session",
+    generation: handshakeOnly.generation,
+  });
+  report.bridge.generationProbe = safe(nonStaleProbe);
+  // No session exists yet, so the request is refused — but for the right reason. Reaching the
+  // session check proves the handshake's generation was accepted; if it had been stale the reason
+  // would be `stale-generation`, which is the failure that made every desktop tool unusable.
+  check(
+    "a request using the handshake generation gets past the generation check",
+    nonStaleProbe.reason === "unknown-session",
+    safe(nonStaleProbe).slice(0, 200),
+  );
 
   // -------------------------------------------------------------------------
   // 3. Connect over the pipe the way the extension does.

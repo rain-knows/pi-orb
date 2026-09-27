@@ -78,9 +78,10 @@ export class BridgeClient {
   /**
  * Read the token written by the shell for this run.
  *
- * Returns `null` when the file is absent, unreadable, mismatched in version, or missing the
- * token or pipe path. Every one of those cases means "no desktop capability", which is the
- * safe direction.
+ * Returns `null` when the file is absent, unreadable, mismatched in version, or missing the token,
+ * pipe path or run generation. Every one of those cases means "no desktop capability", which is the
+ * safe direction: a request with a guessed generation is refused by the shell anyway, so failing here
+ * just reports it earlier and more clearly.
  */
 readToken(): BridgeTokenFile | null {
   if (!existsSync(this.#options.tokenFile)) return null;
@@ -90,12 +91,16 @@ readToken(): BridgeTokenFile | null {
     if (typeof parsed.token !== "string" || parsed.token.length === 0) return null;
     if (typeof parsed.workspace !== "string") return null;
     if (typeof parsed.pipePath !== "string" || parsed.pipePath.length === 0) return null;
+    // The generation is required, not defaulted. Defaulting it (to 0, say) would produce a request the
+    // shell refuses as stale, which looks like a policy decision rather than a missing handshake.
+    if (typeof parsed.generation !== "number" || !Number.isInteger(parsed.generation)) return null;
     return {
       version: parsed.version,
       token: parsed.token,
       pid: typeof parsed.pid === "number" ? parsed.pid : -1,
       workspace: parsed.workspace,
       pipePath: parsed.pipePath,
+      generation: parsed.generation,
       createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : "",
     };
   } catch {

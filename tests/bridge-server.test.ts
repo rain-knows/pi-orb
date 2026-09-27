@@ -115,6 +115,31 @@ describe("bridge admission rules", () => {
     expect(executor.calls).toEqual([]);
   });
 
+  it("reports an unknown session as such instead of calling it a stale generation", async () => {
+    // The two conditions call for different user actions, so reporting both as `stale-generation`
+    // would tell the user their run is stale when the real problem is that the session is not this
+    // shell's.
+    unique += 1;
+    const token = createBridgeToken();
+    const pipePath = "\\\\.\\pipe\\pi-orb-test-" + process.pid + "-" + unique;
+    const executor = {
+      calls: [] as string[],
+      observe: async () => ({}),
+      act: async () => ({}),
+      status: () => ({}),
+      revoke: () => {},
+      accepts: () => ({ ok: false, reason: "unknown-session" as const }),
+    };
+    const server = new BridgeServer({ pipePath, token, executor });
+    await server.listen();
+    servers.push(server);
+
+    const response = await send(pipePath, { type: "status", token, sessionId: "someone-else", generation: 1 });
+    expect(response.parsed).toMatchObject({ ok: false, reason: "unknown-session" });
+    expect(String(response.parsed.message)).toMatch(/does not belong to this Orb run/i);
+    expect(executor.calls).toEqual([]);
+  });
+
   it("refuses a protocol version mismatch instead of guessing", async () => {
     const { pipePath, token, executor } = await start();
     const response = await send(pipePath, {

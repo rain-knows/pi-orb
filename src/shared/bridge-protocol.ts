@@ -51,6 +51,14 @@ export interface BridgeTokenFile {
    * this project cannot set, so a file at a well-known path is the only reliable channel.
    */
   readonly pipePath: string;
+  /**
+   * The shell's current run generation.
+   *
+   * Carried here because the extension cannot otherwise know it: the extension runs inside pi-web's
+   * process, so this project cannot pass it in an environment variable, and a value of 0 would be
+   * refused as stale forever. The shell rewrites this file whenever the generation changes.
+   */
+  readonly generation: number;
   readonly createdAt: string;
 }
 
@@ -89,6 +97,7 @@ export type BridgeRefusal =
   | "bad-token"
   | "browser-originated-request"
   | "stale-generation"
+  | "unknown-session"
   | "no-task-authorization"
   | "not-configured";
 

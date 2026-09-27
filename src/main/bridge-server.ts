@@ -33,8 +33,18 @@ export interface BridgeExecutor {
   status(): unknown;
   /** Revoke the current task authorization. */
   revoke(): void;
-  /** Confirm that a session/generation pair is the live run. */
-  accepts(sessionId: string, generation: number): boolean;
+  /**
+   * Confirm that a session/generation pair is the live run.
+   *
+   * Returns a falsey value when it is not, or an explicit reason when the caller can tell the two cases
+   * apart. "The session does not belong to this shell" and "the generation is old" call for different
+   * user actions, so reporting both as `stale-generation` is misleading: it tells the user their run is
+   * stale when the real problem is that the session is not this shell's.
+   */
+  accepts(
+    sessionId: string,
+    generation: number,
+  ): boolean | { readonly ok: boolean; readonly reason?: "stale-generation" | "unknown-session" };
 }
 
 export interface BridgeServerOptions {
@@ -147,9 +157,17 @@ export class BridgeServer {
       case "act":
       case "status":
       case "revoke": {
-        if (!this.#options.executor.accepts(sessionId, generation)) {
-          this.#log({ event: "refused", type, reason: "stale-generation", sessionId, generation });
-          return refuse("stale-generation", "This request belongs to an earlier run and was refused.");
+        const admission = this.#options.executor.accepts(sessionId, generation);
+        const admitted = typeof admission === "boolean" ? admission : admission.ok;
+        if (!admitted) {
+          const reason =
+            typeof admission === "boolean" ? "stale-generation" : (admission.reason ?? "stale-generation");
+          const message =
+            reason === "unknown-session"
+              ? "That session does not belong to this Orb run. Start the Orb session first."
+              : "This request belongs to an earlier run and was refused.";
+          this.#log({ event: "refused", type, reason, sessionId, generation });
+          return refuse(reason, message);
         }
         try {
           if (type === "observe") {
@@ -242,16 +260,21 @@ export interface BridgeHandshakeFiles {
  * The token goes into a file under the Orb data directory rather than into an environment
  * variable, because the extension runs inside pi-web's process, whose environment this project
  * cannot set. Environment variables are also visible in process listings on this platform.
- * The file is rewritten on every start so a token from a previous run cannot be replayed.
  *
- * The pipe name is carried in the file too: it embeds the shell's process id, so the
- * extension cannot derive it.
+ * The pipe name and the run generation are carried here too. The extension cannot derive either: the
+ * pipe name embeds the shell's process id, and the generation is the shell's own counter. Without the
+ * generation the extension could only guess, and a wrong guess is refused as stale — so the desktop
+ * tools would never run.
+ *
+ * The file is rewritten on every start and whenever the generation changes, so a token or a
+ * generation from a previous run cannot be replayed.
  */
 export function writeHandshake(
   dataDir: string,
   token: string,
   workspace: string,
   processId: number,
+  generation: number,
 ): BridgeHandshakeFiles {
   mkdirSync(dataDir, { recursive: true });
   const pipePath = createPipePath(processId);
@@ -265,6 +288,7 @@ export function writeHandshake(
         pid: processId,
         workspace,
         pipePath,
+        generation,
         createdAt: new Date().toISOString(),
       },
       null,
