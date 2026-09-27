@@ -10,6 +10,7 @@
 | [`tech-stack.md`](./tech-stack.md) | 技术栈建议、选型依据、版本边界、P0 验证门槛和明确非目标 | 技术选型建议，待验证 |
 | [`support-matrix.md`](./support-matrix.md) | 唯一的版本兼容性声明来源：已验证 / 未验证 / 已知环境事实 | 随每个发布版本维护 |
 | [`cua-driver-integration.md`](./cua-driver-integration.md) | Cua 驱动接入事实：坐标空间、投递模式约束、会话与授权、许可义务 | P1-05 运行时实测结论 |
+| [`../evidence/p1-07/CONTRACT-MATRIX.md`](../evidence/p1-07/CONTRACT-MATRIX.md) | P1 合同对照：N1–N8 不变量与 §7.1 发布必测项的证据映射（含未验证项） | 随每个发布版本维护 |
 | [`pi-fff-lsp-necessity.md`](./pi-fff-lsp-necessity.md) | FFF 与 LSP 对当前 Pi 工作流的需要程度评估 | 可选开发工具评估，不属于运行时依赖 |
 
 ## 相关文件

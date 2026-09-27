@@ -273,6 +273,7 @@ const requiredEvidence = [
   { path: "evidence/p1-06/tool-exposure.json", what: "Orb tool exposure" },
   { path: "evidence/p1-07/lifecycle-regression.json", what: "collapse, stop and generation lifecycle" },
   { path: "evidence/p1-07/license-inventory.json", what: "third-party license inventory" },
+  { path: "evidence/p1-07/CONTRACT-MATRIX.md", what: "N1-N8 and §7.1 contract cross-check" },
 ];
 const missingEvidence = requiredEvidence.filter((entry) => !existsSync(join(repo, entry.path))).map((entry) => entry.path);
 check(
@@ -313,6 +314,37 @@ check(
   /P1/.test(readme) && /unverified/i.test(readme),
   "a release README must not present unverified capability as working",
 );
+
+// The contract cross-check has to exist and has to keep its unverified rows, so a release cannot
+// drop the N1-N8 comparison or the §7.1 coverage table to look complete.
+const contractMatrixPath = join(repo, "evidence/p1-07/CONTRACT-MATRIX.md");
+if (existsSync(contractMatrixPath)) {
+  const matrix = readFileSync(contractMatrixPath, "utf8");
+  const invariantRows = ["N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8"].filter((name) =>
+    new RegExp(`\\*\\*${name}\\*\\*`).test(matrix),
+  );
+  check(
+    "the contract matrix covers every non-destructive invariant N1-N8",
+    invariantRows.length === 8,
+    JSON.stringify(invariantRows),
+  );
+  check(
+    "the contract matrix keeps its partially-verified and unverified rows visible",
+    /\*\*部分\*\*/.test(matrix) && /未验证/.test(matrix),
+    "a matrix listing only passes would hide the gaps",
+  );
+  check(
+    "the contract matrix covers the §7.1 test classes",
+    ["普通 Web 非破坏性", "cwd 与模式", "生命周期", "工具选择", "图像", "原生输入", "快捷键", "进程与认证", "打包／卸载"].every(
+      (name) => matrix.includes(name),
+    ),
+    "every §7.1 test class must be accounted for",
+  );
+} else {
+  check("the contract matrix covers every non-destructive invariant N1-N8", false, "CONTRACT-MATRIX.md is missing");
+  check("the contract matrix keeps its partially-verified and unverified rows visible", false, "CONTRACT-MATRIX.md is missing");
+  check("the contract matrix covers the §7.1 test classes", false, "CONTRACT-MATRIX.md is missing");
+}
 
 // ---------------------------------------------------------------------------
 // 9. Uninstall safety: the product's write surface must be confined to its own data directory and

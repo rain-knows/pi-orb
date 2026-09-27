@@ -1,0 +1,64 @@
+# P1 合同对照：非破坏性不变量（N1–N8）与发布必测项（§7.1）
+
+> 用途：P1-07 要求「N1–N8 对照有证据」且「§7.1 中当前已交付能力对应的必测项通过」。本文件是这两项的唯一对照表。
+>
+> 证据路径均相对仓库根。**状态只写实际做到的**：未验证的能力在表里就是未验证，不因实现已存在而记为通过。
+
+## 1. 非破坏性不变量 N1–N8（P1 范围）
+
+P0 已就同一组不变量给出结论（见 [`../p0-01/README.md`](../p0-01/README.md)）。下表是 **P1 交付后**的重新对照：左侧是合同要求，右侧是 P1 阶段新增的可复现证据。
+
+| 不变量 | 合同要求 | P1 证据 | 状态 |
+|---|---|---|---|
+| **N1** 普通非 Orb cwd 会话的工具、系统提示、模型默认值、资源加载与命令行为不被 Orb 主动改变 | 安装前后对比**有效工具/提示**，不只看按钮 | `../p1-06/tool-exposure.json`：普通 cwd 的 provider 实际收到 `tools=["bash","read"]` 且无 orb 工具；`../p1-01/result.json`：普通目录请求无 `orb_mode` section，且与安装扩展前的基线一致 | **通过**（本 P1 测试面） |
+| **N2** 不静默改写全局 defaultTools、模型默认值、凭据、用户主题、现有插件配置 | 配置 diff | Orb 只写自己的数据目录（`src/main/config-store.ts`、`bridge-server.ts`）；`evidence/p1-07/release-gate.json` 的写入面审计证明写入仅限三个模块且不指向 pi-web/node_modules；所有测试使用隔离 `PI_CODING_AGENT_DIR` / `HOME` | **通过**（本 P1 测试面） |
+| **N3** 普通会话不会因 Orb 扩展静态注册工具而意外新增模型可见 GUI 能力 | 检模型看到的 schema | `../p1-06/tool-exposure.json`：普通会话 `orbTools=[]`；Orb 会话恰好 `orb_click/orb_observe/orb_scroll/orb_type`；`before_agent_start` 只在精确匹配时写 section | **通过** |
+| **N4** 悬浮窗/网页共用后端；连接别人的已有 pi-web 不得擅自重启、升级或关闭它 | 连接/退出/崩溃/重复启动流程与进程归属 | `../p0-03/result.json`：壳退出后服务存活、会话仍可访问；P1 壳启动只探测与认证，无任何启动/停止服务的代码路径（`src/main/pi-web-client.ts` 仅有 probe/authenticate/会话命令） | **通过** |
+| **N5** 不让两个运行时同时写同一会话文件；控制任务只由一个入口持有 | 双客户端与重连测试 | `../p0-03/result.json`：双客户端同 sessionId、reload 后 sessionId 稳定、旧代次被拒；P1 新增运行代次与单任务锁（`src/main/generations.ts`，`tests/generations.test.ts`） | **通过**（本 P1 测试面） |
+| **N6** 安装/关闭/卸载不删除用户工作区文件或历史；不把用户已有源码改动纳入本项目 | 写入清单与源码 diff | `../p0-01/verify-baseline.mjs` 每次门禁重跑：pi-web HEAD 与 6 个既有改动文件哈希不变；写入面审计（见 N2） | **通过** |
+| **N7** 扩展与壳退出可清理资源；断连、重载、换会话、恢复后不继承桌面操作授权 | 权限失效、按键释放、锁释放、监听器注销 | `../p1-07/lifecycle-regression.json`（10/10）：折叠撤权、显式停止撤权、**杀掉 pi-web 后刷新即撤权**、撤权不结束会话/不改代次；`tests/window-lifecycle.test.ts` 断言"每次隐藏必伴随 revoke+discard" | **通过**（授权与锁）；**按键/鼠标释放见 §2「原生输入」** |
+| **N8** 明确版本与小型适配模块，不维护旧废弃路径、静默 fallback 或多版本兼容层 | 支持版本表、依赖锁、升级门禁 | `doc/support-matrix.md`、`package.json` 精确锁定（驱动 `0.30.1`、Electron `44.4.5`、Pi SDK `0.87.1`）；门禁校验三者一致；本阶段实际移除了被废弃的路径（`isStillForeground`、`TargetRecording`、helper 的 `-IsStillForeground`、适配器的"最前窗口"回退） | **通过** |
+
+**退出条件自查**：P1 未以「插件代码没改上游」代替非破坏性论证——每个不变量都有指向具体证据文件的引用；未修改 pi-web 源码、其 `node_modules` 或用户 6 个已有改动文件。
+
+### 1.1 一个必须随产品一起声明的例外
+
+Pi 无条件加载**用户级** `$HOME/.agents/skills`，`HOME` 在运行时解析，**与 cwd、agentDir 无关**。因此该目录存在时其内容会进入**每一个**会话（含普通非 Orb 会话）的 prompt。
+
+- 证据：`../p1-01/result.json` 的 `promptLeakDeclaration`（隔离 HOME 下放入夹具后，普通 cwd 与 Orb cwd 的 provider 请求体**都**命中该标记，且安装扩展前后次数不变）。
+- 产品含义：Orb 能承诺「**不主动改变**它」，**不能**承诺 prompt 内容逐字节零差异。此例外已在 `README.md` 与 `doc/support-matrix.md` 中声明。
+
+## 2. 发布必测项（§7.1）与 P1 证据
+
+合同的 §7.1 明确：**只对当次发布启用的能力**取适用范围；未启用的 P2 能力不阻塞 v0.1，但共享的生命周期与普通 Web 非破坏性回归不得跳过；仅聊天/看图的预览版本必须标注未启用输入。
+
+| 测试类 | P1 证据 | 状态 |
+|---|---|---|
+| **普通 Web 非破坏性** | `../p1-06/tool-exposure.json`、`../p1-01/result.json`、`../p0-01/verify-baseline.mjs` | 通过。未覆盖 `read-only/default/full/configured` 等**预设切换**的逐项对比（P0-02 覆盖了 `set_tools` 置空与恢复）；**部分** |
+| **cwd 与模式** | `../p1-01/result.json`（精确匹配、子目录、前缀相似同级目录、大小写、junction）；`tests/workspace.test.ts`、`tests/orb-config.test.ts` | 通过。**未**验证"两个 cwd 同时运行"与网络路径实际访问 |
+| **生命周期** | `../p1-07/lifecycle-regression.json`；`../p0-03/result.json`（reload/resume/双客户端） | 通过。**未**覆盖 fork/换目录后的授权继承（换工作区已由 `src/main/index.ts` 撤权并留日志） |
+| **工具选择** | `../p1-06/tool-exposure.json`（模型实际收到的 schema）；`../p0-02/result.json`（W1 自动追加、reload、chat-only）；`tests/desktop-broker.test.ts`（终止同批后续动作） | 通过（模型看到的 schema 为准，非 UI 标签）。**未**由真实模型触发工具调用 |
+| **图像** | `../p1-04/result.json`（text-only 拒绝且标注省略、超限拒绝、取消零上传、授权前零上传） | **部分**：正向截图→预览→确认发送**未验证**（本机无真实前台窗口）；多屏/遮挡/Orb 遮罩排除未验证 |
+| **原生输入** | `../p1-05/input-verification.json`（后台点击 4/4 命中格心、后台输入经读回证实、无未配对 down）；`tests/*`（策略层） | **部分**：普通/高权限窗口对比、焦点被抢、**按下后取消的释放**、helper 崩溃、超时均**未验证**；本机无前台窗口。mock **未**被用来代替此项 |
+| **快捷键** | `../p1-03/result.json`（真实 OS 注册、第二进程竞争探针、冲突诊断、改键与退出释放） | 通过（OS 级）。**未**验证按键人工体验、AltGr/非 US 布局、锁屏恢复；双 Alt 属 P2，未启用 |
+| **进程与认证** | `../p0-03/result.json`（401/403/伪造 Host、壳退出不杀服务、旧代次拒绝）；`tests/bridge-server.test.ts`（令牌、浏览器来源、代次、策略拒绝上抛） | 通过。**未**验证 LAN 请求与真实 Electron 跨 origin cookie/SameSite 细节 |
+| **打包／卸载** | `THIRD_PARTY_NOTICES.md`、`../p1-07/license-inventory.json`、门禁的写入面审计（N6） | **部分**：许可与写入面已审计；**未**构建真实安装包，**未**做安装/卸载实测 |
+
+图例：**通过** = 对应能力在本机可复现验证；**部分** = 部分用例已验证、其余明确未验证；未列出的 P2 能力（双 Alt、选区、额外平台）本版本未启用，不阻塞。
+
+## 3. 本版本的能力声明（不得超范围宣称）
+
+| 能力 | 可否声明 |
+|---|---|
+| 专用 cwd 的独立会话与聊天 | **可用** |
+| 全局快捷键唤醒/收起、托盘备用入口 | **可用**（按键人工体验待人工确认） |
+| 普通 Web 非破坏性、不双写会话、退出不杀服务 | **可用** |
+| 授权截图（预览、删除、确认发送） | **授权与拒绝路径可用**；正向截图路径未验证 → **仅可声明"未启用输入/截图"，不得声明截图可用** |
+| 桌面点击闭环（一动作一观察、授权、预算、失败即停） | **本机验证通过后台点击**；前台投递、输入、滚动未验证 |
+| 完整 v0.1（M1+M2+M3+P1-07） | **不可声明**：M2 正向截图与 M3 前台投递/输入/滚动未验证 |
+
+## 4. 维护约定
+
+- 新增能力时同步更新本表，并附可复现证据路径；不得只改结论。
+- `evidence/p1-07/run-release-gate.mjs` 会检查各阶段证据文件存在、且 `../p1-05/README.md`、`../p1-06/README.md` 仍保留「明确未验证」小节，防止发布时通过删记录来"变绿"。
+- 已发布版本的组合以 `doc/support-matrix.md` 为准；本文件只作合同对照，不另行声明兼容性。
