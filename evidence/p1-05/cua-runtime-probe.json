@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:03:39.759Z",
+  "capturedAt": "2026-09-27T20:18:58.981Z",
   "probe": "P1-05 read-only Cua runtime probe",
   "safety": {
     "desktopInputSent": false,
@@ -47,7 +47,7 @@
     "created": true,
     "shutdown": {
       "ok": true,
-      "elapsedMs": 0
+      "elapsedMs": 1
     }
   },
   "tools": {
@@ -212,7 +212,7 @@
   "observation": {
     "windows": {
       "count": 7,
-      "elapsedMs": 150,
+      "elapsedMs": 158,
       "hasZIndex": true,
       "hasBounds": true,
       "sample": [
@@ -381,7 +381,7 @@
       "conclusion": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
     },
     "desktopState": {
-      "elapsedMs": 109,
+      "elapsedMs": 87,
       "imageFields": [
         {
           "key": "mimeType",
@@ -454,10 +454,10 @@
     "moduleImport": 50,
     "driverCreate": 60,
     "listToolsJson": 45,
-    "listWindows": 150,
-    "getDesktopState": 109,
+    "listWindows": 158,
+    "getDesktopState": 87,
     "startSession": 0,
-    "shutdown": 0
+    "shutdown": 1
   },
   "checks": [
     {
@@ -503,7 +503,7 @@
     {
       "name": "window discovery works at runtime",
       "ok": true,
-      "detail": "7 windows in 150 ms"
+      "detail": "7 windows in 158 ms"
     },
     {
       "name": "window records carry bounds",
@@ -538,7 +538,7 @@
     {
       "name": "desktop state can be observed at runtime",
       "ok": true,
-      "detail": "{\"elapsedMs\":109,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
+      "detail": "{\"elapsedMs\":87,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
     },
     {
       "name": "a named session can be started",
@@ -558,7 +558,7 @@
     {
       "name": "the driver shuts down cleanly",
       "ok": true,
-      "detail": "0 ms"
+      "detail": "1 ms"
     }
   ],
   "passed": true

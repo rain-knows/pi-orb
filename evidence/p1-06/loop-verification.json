@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:04:12.733Z",
+  "capturedAt": "2026-09-27T20:19:32.142Z",
   "scope": {
     "chain": "target app <- locked Cua driver <- cua-adapter <- desktop-broker <- bridge-server <- handshake file",
     "approvalPath": "real UI path over CDP (window.orb.authorizeDesktopTask)"
@@ -232,25 +232,25 @@
       ]
     },
     "session": {
-      "sessionId": "01a0e478-114a-7504-950f-806c617fa114",
+      "sessionId": "01a0e486-185a-70e6-8ecb-01e481435617",
       "generation": 1,
-      "ensureResult": "01a0e478-114a-7504-950f-806c617fa114"
+      "ensureResult": "01a0e486-185a-70e6-8ecb-01e481435617"
     }
   },
   "bridge": {
     "shellExitCode": null,
-    "handshakePath": "D:\\pi-orb-p1-runs\\p1-06-1790539452730\\shell-data\\bridge-token.json",
+    "handshakePath": "D:\\pi-orb-p1-runs\\p1-06-1790540372139\\shell-data\\bridge-token.json",
     "candidatePaths": [
-      "D:\\pi-orb-p1-runs\\p1-06-1790539452730\\shell-data\\bridge-token.json",
-      "D:\\pi-orb-p1-runs\\p1-06-1790539452730\\shell-data\\pi-orb\\bridge-token.json"
+      "D:\\pi-orb-p1-runs\\p1-06-1790540372139\\shell-data\\bridge-token.json",
+      "D:\\pi-orb-p1-runs\\p1-06-1790540372139\\shell-data\\pi-orb\\bridge-token.json"
     ],
-    "shellStdoutTail": "[pi-orb] no foreground window was available to record as the desktop target\n[pi-orb] desktop coordinate mapping: {\"driverBoundsPhysical\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"actionOrigin\":{\"x\":189,\"y\":135},\"actionSpace\":\"screen-dip\",\"relation\":\"request = screenDip - driverPhysicalOrigin\",\"coordinateMappingConfidence\":\"empirically-fitted\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:29.758Z\",\"event\":\"observe\",\"sessionId\":\"01a0e478-114a-7504-950f-806c617fa114\",\"observationId\":\"obs-muk8yx19-1\",\"windowId\":\"3539720\",\"elementCount\":0}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:29.812Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.077Z\",\"event\":\"authorize\",\"sessionId\":\"01a0e478-114a-7504-950f-806c617fa114\",\"generation\":1,\"scope\":\"click the highlighted cell in the test window\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.079Z\",\"event\":\"revoke\"}\n[pi-orb] desktop operations revoked: the user stopped desktop operations\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.080Z\",\"event\":\"authorize\",\"sessionId\":\"01a0e478-114a-7504-950f-806c617fa114\",\"generation\":1,\"scope\":\"click the highlighted cell\"}\n[pi-orb] desktop coordinate mapping: {\"driverBoundsPhysical\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"actionOrigin\":{\"x\":189,\"y\":135},\"actionSpace\":\"screen-dip\",\"relation\":\"request = screenDip - driverPhysicalOrigin\",\"coordinateMappingConfidence\":\"empirically-fitted\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.275Z\",\"event\":\"observe\",\"sessionId\":\"01a0e478-114a-7504-950f-806c617fa114\",\"observationId\":\"obs-muk8yy7f-2\",\"windowId\":\"3539720\",\"elementCount\":0}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.344Z\",\"event\":\"act-refused\",\"reason\":\"stale-observation\",\"kind\":\"click\"}\n[pi-orb] desktop coordinate mapping: {\"driverBoundsPhysical\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"actionOrigin\":{\"x\":189,\"y\":135},\"actionSpace\":\"screen-dip\",\"relation\":\"request = screenDip - driverPhysicalOrigin\",\"coordinateMappingConfidence\":\"empirically-fitted\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.596Z\",\"event\":\"observe\",\"sessionId\":\"01a0e478-114a-7504-950f-806c617fa114\",\"observationId\":\"obs-muk8yygc-3\",\"windowId\":\"3539720\",\"elementCount\":0}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:31.748Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muk8yygc-3\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:33.316Z\",\"event\":\"act-refused\",\"reason\":\"observation-unknown\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:33.383Z\",\"event\":\"revoke\"}\n[pi-orb] desktop operations revoked: the user stopped desktop operations\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:33.385Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:04:33.452Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] bridge {\"at\":\"2026-09-27T20:04:33.508Z\",\"event\":\"refused\",\"type\":\"observe\",\"reason\":\"browser-originated-request\"}",
+    "shellStdoutTail": "[pi-orb] no foreground window was available to record as the desktop target\n[pi-orb] desktop coordinate mapping: {\"driverBoundsPhysical\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"actionOrigin\":{\"x\":189,\"y\":135},\"actionSpace\":\"screen-dip\",\"relation\":\"request = screenDip - driverPhysicalOrigin\",\"coordinateMappingConfidence\":\"empirically-fitted\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:49.105Z\",\"event\":\"observe\",\"sessionId\":\"01a0e486-185a-70e6-8ecb-01e481435617\",\"observationId\":\"obs-muk9imep-1\",\"windowId\":\"1771988\",\"elementCount\":0}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:49.165Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:50.431Z\",\"event\":\"authorize\",\"sessionId\":\"01a0e486-185a-70e6-8ecb-01e481435617\",\"generation\":1,\"scope\":\"click the highlighted cell in the test window\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:50.432Z\",\"event\":\"revoke\"}\n[pi-orb] desktop operations revoked: the user stopped desktop operations\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:50.434Z\",\"event\":\"authorize\",\"sessionId\":\"01a0e486-185a-70e6-8ecb-01e481435617\",\"generation\":1,\"scope\":\"click the highlighted cell\"}\n[pi-orb] desktop coordinate mapping: {\"driverBoundsPhysical\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"actionOrigin\":{\"x\":189,\"y\":135},\"actionSpace\":\"screen-dip\",\"relation\":\"request = screenDip - driverPhysicalOrigin\",\"coordinateMappingConfidence\":\"empirically-fitted\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:50.633Z\",\"event\":\"observe\",\"sessionId\":\"01a0e486-185a-70e6-8ecb-01e481435617\",\"observationId\":\"obs-muk9inl5-2\",\"windowId\":\"1771988\",\"elementCount\":0}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:50.696Z\",\"event\":\"act-refused\",\"reason\":\"stale-observation\",\"kind\":\"click\"}\n[pi-orb] desktop coordinate mapping: {\"driverBoundsPhysical\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"actionOrigin\":{\"x\":189,\"y\":135},\"actionSpace\":\"screen-dip\",\"relation\":\"request = screenDip - driverPhysicalOrigin\",\"coordinateMappingConfidence\":\"empirically-fitted\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:50.947Z\",\"event\":\"observe\",\"sessionId\":\"01a0e486-185a-70e6-8ecb-01e481435617\",\"observationId\":\"obs-muk9intv-3\",\"windowId\":\"1771988\",\"elementCount\":0}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:51.100Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muk9intv-3\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:52.681Z\",\"event\":\"act-refused\",\"reason\":\"observation-unknown\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:52.747Z\",\"event\":\"revoke\"}\n[pi-orb] desktop operations revoked: the user stopped desktop operations\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:52.748Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-27T20:19:52.805Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] bridge {\"at\":\"2026-09-27T20:19:52.861Z\",\"event\":\"refused\",\"type\":\"observe\",\"reason\":\"browser-originated-request\"}",
     "handshake": {
       "version": 1,
       "hasToken": true,
-      "pipePath": "\\\\.\\pipe\\pi-orb-32228",
-      "pid": 32228,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-1790539452730\\orb-workspace"
+      "pipePath": "\\\\.\\pipe\\pi-orb-17808",
+      "pid": 17808,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-1790540372139\\orb-workspace"
     },
     "hello": "{\"ok\":true,\"result\":{\"version\":1}}",
     "statusBeforeSession": "{\"ok\":false,\"reason\":\"stale-generation\",\"message\":\"This request belongs to an earlier run and was refused.\"}",
@@ -263,8 +263,8 @@
       "message": null
     },
     "gridWindowChoice": {
-      "windowId": "3539720",
-      "pid": 5984,
+      "windowId": "1771988",
+      "pid": 30004,
       "appName": "electron.exe",
       "title": "P1-05 input target",
       "bounds": {
@@ -279,8 +279,8 @@
     "setTarget": {
       "ok": true,
       "target": {
-        "windowId": "3539720",
-        "pid": 5984,
+        "windowId": "1771988",
+        "pid": 30004,
         "appName": "electron.exe",
         "title": "P1-05 input target",
         "bounds": {
@@ -295,7 +295,7 @@
     },
     "observeBeforeApproval": {
       "ok": true,
-      "observationId": "obs-muk8yx19-1",
+      "observationId": "obs-muk9imep-1",
       "reasoning": "observing is read-only, so it is allowed before approval; it must be, or the model could not decide what to ask for"
     },
     "unapprovedAct": {
@@ -309,14 +309,14 @@
       "scope": "click the highlighted cell in the test window",
       "actionsUsed": 0,
       "actionLimit": 12,
-      "expiresAt": 1790539771077,
+      "expiresAt": 1790540690431,
       "stopped": false,
       "stoppedReason": null,
-      "lastObservationId": "obs-muk8yx19-1",
+      "lastObservationId": "obs-muk9imep-1",
       "bridgeReady": true,
       "target": {
-        "windowId": "3539720",
-        "pid": 5984,
+        "windowId": "1771988",
+        "pid": 30004,
         "appName": "electron.exe",
         "title": "P1-05 input target",
         "bounds": {
@@ -341,8 +341,8 @@
       "lastObservationId": null,
       "bridgeReady": true,
       "target": {
-        "windowId": "3539720",
-        "pid": 5984,
+        "windowId": "1771988",
+        "pid": 30004,
         "appName": "electron.exe",
         "title": "P1-05 input target",
         "bounds": {
@@ -364,14 +364,14 @@
       "scope": "click the highlighted cell",
       "actionsUsed": 1,
       "actionLimit": 12,
-      "expiresAt": 1790539771080,
+      "expiresAt": 1790540690434,
       "stopped": false,
       "stoppedReason": null,
-      "lastObservationId": "obs-muk8yygc-3",
+      "lastObservationId": "obs-muk9intv-3",
       "bridgeReady": true,
       "target": {
-        "windowId": "3539720",
-        "pid": 5984,
+        "windowId": "1771988",
+        "pid": 30004,
         "appName": "electron.exe",
         "title": "P1-05 input target",
         "bounds": {
@@ -388,12 +388,12 @@
   "clickLoop": {
     "observation": {
       "ok": true,
-      "observationId": "obs-muk8yygc-3",
+      "observationId": "obs-muk9intv-3",
       "elementCount": 0,
       "elementsUnavailable": true,
       "window": {
-        "id": "3539720",
-        "pid": 5984,
+        "id": "1771988",
+        "pid": 30004,
         "title": "P1-05 input target",
         "appName": "electron.exe",
         "bounds": {
@@ -413,7 +413,7 @@
       "x": 641,
       "y": 422
     },
-    "response": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muk8yygc-3\",\"actionsUsed\":1,\"next\":\"Observe the window again before the next action.\"}}",
+    "response": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muk9intv-3\",\"actionsUsed\":1,\"next\":\"Observe the window again before the next action.\"}}",
     "landedCell": "1,2",
     "landedOffsetInCell": {
       "x": 60,
@@ -436,8 +436,8 @@
       "lastObservationId": null,
       "bridgeReady": true,
       "target": {
-        "windowId": "3539720",
-        "pid": 5984,
+        "windowId": "1771988",
+        "pid": 30004,
         "appName": "electron.exe",
         "title": "P1-05 input target",
         "bounds": {
@@ -466,12 +466,12 @@
     {
       "name": "the bridge handshake is written with a token and a pipe path",
       "ok": true,
-      "detail": "{\"version\":1,\"hasToken\":true,\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-32228\",\"pid\":32228,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-1790539452730\\\\orb-workspace\"}"
+      "detail": "{\"version\":1,\"hasToken\":true,\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-17808\",\"pid\":17808,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-1790540372139\\\\orb-workspace\"}"
     },
     {
       "name": "the handshake records the configured workspace",
       "ok": true,
-      "detail": "D:\\pi-orb-p1-runs\\p1-06-1790539452730\\orb-workspace"
+      "detail": "D:\\pi-orb-p1-runs\\p1-06-1790540372139\\orb-workspace"
     },
     {
       "name": "the bridge pipe answers a hello handshake",
@@ -486,7 +486,7 @@
     {
       "name": "a session exists for the workspace",
       "ok": true,
-      "detail": "01a0e478-114a-7504-950f-806c617fa114"
+      "detail": "01a0e486-185a-70e6-8ecb-01e481435617"
     },
     {
       "name": "the shell can list desktop windows",
@@ -496,22 +496,22 @@
     {
       "name": "the target window is offered by the picker, identified by process id",
       "ok": true,
-      "detail": "grid pid=5984 candidates=[{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":5400,\"title\":\"Windows 默认锁屏界面\"},{\"pid\":13732,\"title\":\"Backstop Window\"},{\"pid\":2476,\"title\":\"新通知\"},{\"pid\":15400,\"title\":\"搜索\"},{\"pid\":15388,\"title\":\"开始\"},{\"pid\":2476,\"title\":\"Windows Shell Experience 主机\"},{\"pi…"
+      "detail": "grid pid=30004 candidates=[{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":11592,\"title\":\"Windows 输入体验\"},{\"pid\":5400,\"title\":\"Windows 默认锁屏界面\"},{\"pid\":13732,\"title\":\"Backstop Window\"},{\"pid\":2476,\"title\":\"新通知\"},{\"pid\":15400,\"title\":\"搜索\"},{\"pid\":15388,\"title\":\"开始\"},{\"pid\":2476,\"title\":\"Windows Shell Experience 主机\"},{\"pi…"
     },
     {
       "name": "the target window can be selected",
       "ok": true,
-      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"3539720\",\"pid\":5984,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"6\",\"isRecorded\":false}}"
+      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"1771988\",\"pid\":30004,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"6\",\"isRecorded\":false}}"
     },
     {
       "name": "the selected target is reported back to the user",
       "ok": true,
-      "detail": "{\"windowId\":\"3539720\",\"pid\":5984,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"6\",\"isRecorded\":false}"
+      "detail": "{\"windowId\":\"1771988\",\"pid\":30004,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"6\",\"isRecorded\":false}"
     },
     {
       "name": "an observation is allowed before a task is approved (read-only)",
       "ok": true,
-      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"observationId\":\"obs-muk8yx19-1\",\"at\":1790539469757,\"window\":{\"id\":\"3539720\",\"pid\":5984,\"title\":\"P1-05 input target\",\"appName\":\"electron.exe\",\"bounds\":{\"x\":189,\"y\":135,\""
+      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"observationId\":\"obs-muk9imep-1\",\"at\":1790540389105,\"window\":{\"id\":\"1771988\",\"pid\":30004,\"title\":\"P1-05 input target\",\"appName\":\"electron.exe\",\"bounds\":{\"x\":189,\"y\":135,"
     },
     {
       "name": "an action without an approved task is refused",
@@ -531,7 +531,7 @@
     {
       "name": "the desktop task can be approved through the UI path",
       "ok": true,
-      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"click the highlighted cell in the test window\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790539771077,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":\"obs-muk8yx19-1\",\"bridgeReady\":true,\"targ"
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"click the highlighted cell in the test window\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790540690431,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":\"obs-muk9imep-1\",\"bridgeReady\":true,\"targ"
     },
     {
       "name": "the approval records what it is for",
@@ -556,12 +556,12 @@
     {
       "name": "the observation reports the target window through the product path",
       "ok": true,
-      "detail": "{\"ok\":true,\"observationId\":\"obs-muk8yygc-3\",\"elementCount\":0,\"elementsUnavailable\":true,\"window\":{\"id\":\"3539720\",\"pid\":5984,\"title\":\"P1-05 input target\",\"appName\":\"electron.exe\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684}},\"coordinateSpace\":{\"action\":\"screen-dip\",\"windowSize\":\"735x684 physic"
+      "detail": "{\"ok\":true,\"observationId\":\"obs-muk9intv-3\",\"elementCount\":0,\"elementsUnavailable\":true,\"window\":{\"id\":\"1771988\",\"pid\":30004,\"title\":\"P1-05 input target\",\"appName\":\"electron.exe\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684}},\"coordinateSpace\":{\"action\":\"screen-dip\",\"windowSize\":\"735x684 physi"
     },
     {
       "name": "the authorized action was executed by the broker",
       "ok": true,
-      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muk8yygc-3\",\"actionsUsed\":1,\"next\":\"Observe the window again before the next action.\"}}"
+      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muk9intv-3\",\"actionsUsed\":1,\"next\":\"Observe the window again before the next action.\"}}"
     },
     {
       "name": "the click reached the window through the whole chain",
@@ -581,7 +581,7 @@
     {
       "name": "the action result tells the model to observe again",
       "ok": true,
-      "detail": "{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muk8yygc-3\",\"actionsUsed\":1,\"next\":\"Observe the window again before the next action.\"}"
+      "detail": "{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muk9intv-3\",\"actionsUsed\":1,\"next\":\"Observe the window again before the next action.\"}"
     },
     {
       "name": "replaying the same observation is refused (one action per observation)",
@@ -591,7 +591,7 @@
     {
       "name": "the task state reports the actions used",
       "ok": true,
-      "detail": "{\"authorized\":true,\"taskId\":\"task-2\",\"scope\":\"click the highlighted cell\",\"actionsUsed\":1,\"actionLimit\":12,\"expiresAt\":1790539771080,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":\"obs-muk8y"
+      "detail": "{\"authorized\":true,\"taskId\":\"task-2\",\"scope\":\"click the highlighted cell\",\"actionsUsed\":1,\"actionLimit\":12,\"expiresAt\":1790540690434,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":\"obs-muk9i"
     },
     {
       "name": "the task state reports an action limit",
@@ -653,5 +653,5 @@
       "the orb refusing a second GUI task while one is running in a second session (the task lock is unit-tested and the single-session case is exercised)"
     ]
   },
-  "piWebLogTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31402\n- Network:       http://127.0.0.1:31402\n✓ Ready in 487ms\n✓ Running next.config.ts took 144ms\n[pi-web] session_start dispatched to extensions for session 01a0e478-114a-7504-950f-806c617fa114\n"
+  "piWebLogTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31402\n- Network:       http://127.0.0.1:31402\n✓ Ready in 488ms\n✓ Running next.config.ts took 147ms\n[pi-web] session_start dispatched to extensions for session 01a0e486-185a-70e6-8ecb-01e481435617\n"
 }

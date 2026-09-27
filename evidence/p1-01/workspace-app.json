@@ -1,12 +1,12 @@
 {
-  "capturedAt": "2026-09-27T20:01:08.734Z",
-  "runRoot": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732",
+  "capturedAt": "2026-09-27T20:16:33.401Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399",
   "isolation": {
-    "configPath": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\orb-config.json",
-    "userDataDir": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\userData",
-    "realWorkspace": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\real-workspace",
-    "linkedWorkspace": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\linked-workspace",
-    "neverChosen": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\never-chosen",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\orb-config.json",
+    "userDataDir": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\userData",
+    "realWorkspace": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\real-workspace",
+    "linkedWorkspace": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\linked-workspace",
+    "neverChosen": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\never-chosen",
     "piWebUrl": "http://127.0.0.1:31990",
     "note": "no pi-web service is started; this run only exercises the workspace write path"
   },
@@ -38,52 +38,52 @@
     {
       "name": "a file is refused as a workspace",
       "ok": true,
-      "detail": "{\"ok\":false,\"message\":\"The selected path is not a directory.\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\a-file.txt\"}"
+      "detail": "{\"ok\":false,\"message\":\"The selected path is not a directory.\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\a-file.txt\"}"
     },
     {
       "name": "a real directory is accepted",
       "ok": true,
-      "detail": "{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\"}"
+      "detail": "{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\"}"
     },
     {
       "name": "a junction resolves to the same workspace identity as its target",
       "ok": true,
-      "detail": "{\"linked\":{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\"},\"real\":{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\"}}"
+      "detail": "{\"linked\":{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\"},\"real\":{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\"}}"
     },
     {
       "name": "an upper-cased spelling of the same directory is one identity",
       "ok": true,
-      "detail": "{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\"}"
+      "detail": "{\"ok\":true,\"message\":\"\",\"resolved\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\"}"
     },
     {
       "name": "committing a workspace enables Orb",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "the committed workspace is the resolved path",
       "ok": true,
-      "detail": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\real-workspace vs D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\real-workspace"
+      "detail": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\real-workspace vs D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\real-workspace"
     },
     {
       "name": "the configuration file was written",
       "ok": true,
-      "detail": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\orb-config.json"
+      "detail": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\orb-config.json"
     },
     {
       "name": "the persisted workspace matches the resolved path",
       "ok": true,
-      "detail": "{\n  \"version\": 1,\n  \"orbWorkspace\": \"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\n  \"shortcut\": \"CommandOrControl+Shift+Space\",\n  \"window\": {\n    \"alwaysOnTop\": true,\n    \"x\": null,\n    \"y\": null,\n    \"width\": 420,\n    \"height\": 640\n  }\n}\n"
+      "detail": "{\n  \"version\": 1,\n  \"orbWorkspace\": \"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\n  \"shortcut\": \"CommandOrControl+Shift+Space\",\n  \"window\": {\n    \"alwaysOnTop\": true,\n    \"x\": null,\n    \"y\": null,\n    \"width\": 420,\n    \"height\": 640\n  }\n}\n"
     },
     {
       "name": "the persisted file keeps the schema version",
       "ok": true,
-      "detail": "{\n  \"version\": 1,\n  \"orbWorkspace\": \"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\n  \"shortcut\": \"CommandOrControl+Shift+Space\",\n  \"window\": {\n    \"alwaysOnTop\": true,\n    \"x\": null,\n    \"y\": null,\n    \"width\": 420,\n    \"height\": 640\n  }\n}\n"
+      "detail": "{\n  \"version\": 1,\n  \"orbWorkspace\": \"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\n  \"shortcut\": \"CommandOrControl+Shift+Space\",\n  \"window\": {\n    \"alwaysOnTop\": true,\n    \"x\": null,\n    \"y\": null,\n    \"width\": 420,\n    \"height\": 640\n  }\n}\n"
     },
     {
       "name": "cancelling does not change the configuration file",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "cancelling creates no directory",
@@ -92,22 +92,22 @@
     {
       "name": "cancelling leaves the previously committed workspace in place",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "a missing workspace is not created without confirmation",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\"problem\":\"The selected directory does not exist.\",\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\"problem\":\"The selected directory does not exist.\",\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "the rejected selection is reported to the user",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\"problem\":\"The selected directory does not exist.\",\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\"problem\":\"The selected directory does not exist.\",\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "the rejected selection leaves the committed workspace intact",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790539268732\\\\real-workspace\",\"problem\":\"The selected directory does not exist.\",\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-01-app-1790540193399\\\\real-workspace\",\"problem\":\"The selected directory does not exist.\",\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31990\",\"reachable\":false,\"problem\":\"No pi-web service answered at http://127.0.0.1:31990. Start it yourself; Orb will not start, restart or stop it.\"},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "a session request against an unreachable pi-web fails with a message instead of crashing",
@@ -153,11 +153,11 @@
     "real": {
       "ok": true,
       "message": "",
-      "resolved": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\real-workspace"
+      "resolved": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\real-workspace"
     },
     "persistedConfig": {
       "version": 1,
-      "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-01-app-1790539268732\\real-workspace",
+      "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-01-app-1790540193399\\real-workspace",
       "shortcut": "CommandOrControl+Shift+Space",
       "window": {
         "alwaysOnTop": true,
@@ -168,6 +168,6 @@
       }
     }
   },
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-28900\n[pi-orb] desktop {\"at\":\"2026-09-27T20:01:09.316Z\",\"event\":\"revoke\"}",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31991/devtools/browser/d948faff-1e32-45a8-ac2e-9a7b6a37ee1b\nError occurred in handler for 'orb:ensure-session': Error: fetch failed\n    at file:///D:/workself/pi-orb/out/main/index.js:2777:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Session.<anonymous> (node:electron/js2c/browser_init:1:118174)"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-33468\n[pi-orb] desktop {\"at\":\"2026-09-27T20:16:33.989Z\",\"event\":\"revoke\"}",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31991/devtools/browser/7fbe90b7-c027-41b8-82a5-f5715ed6cbad\nError occurred in handler for 'orb:ensure-session': Error: fetch failed\n    at file:///D:/workself/pi-orb/out/main/index.js:2788:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Session.<anonymous> (node:electron/js2c/browser_init:1:118174)"
 }

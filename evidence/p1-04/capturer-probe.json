@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:01:57.628Z",
+  "capturedAt": "2026-09-27T20:17:22.374Z",
   "electronVersion": null,
   "sourceCount": 4,
   "windowSourceCount": 3,
@@ -99,5 +99,5 @@
       }
     }
   ],
-  "stderrTail": "[15528:0928/040157.537:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange.\n[15528:0928/040157.537:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange."
+  "stderrTail": "[24160:0928/041722.282:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange.\n[24160:0928/041722.282:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange."
 }
