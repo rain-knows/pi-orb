@@ -314,6 +314,79 @@ check(
   "a release README must not present unverified capability as working",
 );
 
+// ---------------------------------------------------------------------------
+// 9. Uninstall safety: the product's write surface must be confined to its own data directory and
+//    the workspace the user explicitly confirmed. Nothing may write into pi-web, its node_modules,
+//    or a workspace the user did not choose.
+// ---------------------------------------------------------------------------
+const productSources = [];
+for (const root of ["src/main", "pi-package/extensions"]) {
+  const absolute = join(repo, root);
+  if (!existsSync(absolute)) continue;
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.[cm]?ts$/.test(entry.name)) productSources.push(full);
+    }
+  };
+  walk(absolute);
+}
+
+// Write calls are the only way to change anything on disk, so they are what the audit inspects.
+const writeCallPattern = /\b(writeFileSync|mkdirSync|renameSync|rmSync|unlinkSync|appendFileSync|createWriteStream)\s*\(/g;
+const writeCalls = [];
+for (const file of productSources) {
+  const content = readFileSync(file, "utf8");
+  for (const match of content.matchAll(writeCallPattern)) {
+    const line = content.slice(0, match.index).split(/\r?\n/).length;
+    writeCalls.push({ file: relative(repo, file), line, call: match[1], text: content.split(/\r?\n/)[line - 1].trim() });
+  }
+}
+
+// The store owns the resolved path, so writes there are inside the Orb data directory by
+// construction. The workspace creation is the one user-directed write.
+const allowedWriteFiles = new Set([
+  "src/main/config-store.ts",
+  "src/main/bridge-server.ts",
+  "src/main/workspace.ts",
+]);
+
+// `relative` yields backslashes on Windows, so paths are normalized before comparison: comparing
+// a backslash path against a forward-slash allowlist silently reported every file as unexpected.
+const toPosix = (path) => path.split(/\\/).join("/");
+const unexpectedWriteFiles = [...new Set(writeCalls.map((entry) => toPosix(entry.file)))].filter(
+  (file) => !allowedWriteFiles.has(file),
+);
+check(
+  "product writes only happen in the modules that own the Orb data directory and the chosen workspace",
+  unexpectedWriteFiles.length === 0,
+  JSON.stringify({ writeFiles: [...new Set(writeCalls.map((entry) => toPosix(entry.file)))], unexpected: unexpectedWriteFiles }),
+);
+
+// No write call may target a pi-web path. A string mentioning pi-web in a comment is fine; a write
+// whose argument names one is not.
+const piWebWriteCalls = writeCalls.filter((entry) => /pi-web|node_modules/i.test(entry.text));
+check(
+  "no product write targets pi-web or a node_modules path",
+  piWebWriteCalls.length === 0,
+  JSON.stringify(piWebWriteCalls),
+);
+
+check(
+  "the workspace is only created after explicit confirmation",
+  /function createWorkspace\(\s*candidate: string,\s*confirmed: boolean/.test(
+    readFileSync(join(repo, "src/main/workspace.ts"), "utf8"),
+  ) && /if \(!confirmed\)/.test(readFileSync(join(repo, "src/main/workspace.ts"), "utf8")),
+  "workspace creation must be gated on a confirmation flag",
+);
+
+gate.writeSurface = {
+  writeCallCount: writeCalls.length,
+  files: [...new Set(writeCalls.map((entry) => toPosix(entry.file)))].sort(),
+  note: "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched",
+};
+
 gate.passed = gate.checks.every((entry) => entry.ok);
 gate.summary = {
   passed: gate.checks.filter((entry) => entry.ok).length,

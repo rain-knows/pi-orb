@@ -5,7 +5,7 @@
 > - `node evidence/p1-07/run-release-gate.mjs`（发布门禁，26 项）
 > - `node evidence/p1-07/run-lifecycle-regression.mjs`（折叠/停止/断连/代次生命周期，10 项）
 >
-> 原始结果：`license-inventory.json`、`release-gate.json`（26/26）、`lifecycle-regression.json`（10/10）
+> 原始结果：`license-inventory.json`、`release-gate.json`（29/29）、`lifecycle-regression.json`（10/10）
 > 状态：**门禁与生命周期通过**；**v0.1 尚不构成完整 M3 版本**，原因见 §6。
 
 ## 1. 交付内容
@@ -48,7 +48,7 @@
 
 这三者指向的上游项目 `uniffi-bindgen-react-native 0.31.0-3` **正是** 上游 NOTICE 所述的项目（`@ubjs` 为其更名版）。它们**均不带许可文件**，仅在 package.json 声明，因此许可文本由 `THIRD_PARTY_NOTICES.md` 提供。这是超出上游 NOTICE 范围的发现，已如实记入。
 
-## 3. 发布门禁实测（26/26）
+## 3. 发布门禁实测（29/29）
 
 ### 3.1 门禁覆盖项
 
@@ -62,8 +62,9 @@
 | 版本维护 | 版本/changelog/支持矩阵三者一致；驱动、Electron、Pi SDK 版本与实测一致 |
 | 证据完整性 | 7 份原生验收记录存在；未验证项仍在记录中 |
 | 发布卫生 | `.gitignore` 保留项目级 `.pi` 可版本化；README 如实标注未验证 |
+| **卸载安全** | 产品写入面仅限 `config-store.ts`、`bridge-server.ts`、`workspace.ts` 三个模块（即 Orb 自己的数据目录）；**无任何写入指向 pi-web 或 node_modules**；工作区创建必须带确认标志 |
 
-### 3.2 门禁可证伪（三次反向对照）
+### 3.2 门禁可证伪（五次反向对照）
 
 一个永不报警的检查等于没有检查（P0-02 曾因此误判）。因此每条关键检查都做了反向对照：
 
@@ -72,8 +73,10 @@
 | 在源码注入一个 `sk-…` 形式的假密钥 | `passed=false`，精确报出 `src/shared/__gate-test.ts: OpenAI-style API key`，退出码 1 |
 | 在清单注入一个 `license: "AGPL-3.0"` 的假依赖 | `passed=false`，报出 `no AGPL, GPL-3 or SSPL component is present`，退出码 1 |
 | 把支持矩阵里的版本号改成 `9.9.9` | `passed=false`，报出 `the support matrix records the project version :: looked for 0.1.0`，退出码 1 |
+| 注入一个写入 `pi-web/node_modules` 的模块 | `passed=false`，**两条**写入面检查同时报错，退出码 1 |
+| 在另一模块注入任意 `writeFileSync` | `passed=false`，报出写入面超出允许模块，退出码 1 |
 
-三次均退出码 1，恢复后回到 26/26。
+五次均退出码 1，恢复后回到 29/29。
 
 ## 4. 生命周期实测（10/10）
 

@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-27T20:04:56.570Z",
+  "capturedAt": "2026-09-27T20:14:06.931Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "8301 ms"
+      "detail": "7917 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "5271 ms"
+      "detail": "4654 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "4189 ms"
+      "detail": "3992 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "3309 ms"
+      "detail": "3438 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -131,11 +131,35 @@
       "name": "the README states the status truthfully",
       "ok": true,
       "detail": "a release README must not present unverified capability as working"
+    },
+    {
+      "name": "product writes only happen in the modules that own the Orb data directory and the chosen workspace",
+      "ok": true,
+      "detail": "{\"writeFiles\":[\"src/main/bridge-server.ts\",\"src/main/config-store.ts\",\"src/main/workspace.ts\"],\"unexpected\":[]}"
+    },
+    {
+      "name": "no product write targets pi-web or a node_modules path",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the workspace is only created after explicit confirmation",
+      "ok": true,
+      "detail": "workspace creation must be gated on a confirmation flag"
     }
   ],
   "passed": true,
+  "writeSurface": {
+    "writeCallCount": 7,
+    "files": [
+      "src/main/bridge-server.ts",
+      "src/main/config-store.ts",
+      "src/main/workspace.ts"
+    ],
+    "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
+  },
   "summary": {
-    "passed": 26,
+    "passed": 29,
     "failed": 0,
     "version": "0.1.0",
     "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files"

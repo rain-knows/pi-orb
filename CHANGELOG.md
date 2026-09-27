@@ -12,10 +12,12 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ### Added
 
-- P1-07 release gate (`evidence/p1-07/run-release-gate.mjs`, 26 checks): quality gates, the
-  non-destructive baseline, release hygiene, the license inventory, version agreement and the
-  presence of the unverified-capability records. Its key checks were falsified three times
-  (an injected credential, an injected AGPL dependency, a wrong version) and fail as expected.
+- P1-07 release gate (`evidence/p1-07/run-release-gate.mjs`, 29 checks): quality gates, the
+  non-destructive baseline, release hygiene, the license inventory, version agreement, the presence
+  of the unverified-capability records, and an uninstall-safety audit of the product's write surface.
+  Its decisive checks were falsified five times (an injected credential, an injected AGPL dependency,
+  a wrong version, a write into pi-web's node_modules, and a write from an unlisted module) and each
+  fails as expected.
 - Third-party license inventory and `THIRD_PARTY_NOTICES.md`, including how to obtain the source
   for the MPL-2.0 components.
 - `LICENSE`: the repository declared MIT without shipping the license text.
