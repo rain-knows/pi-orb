@@ -21,7 +21,8 @@ verified is recorded as *unverified* and is not claimed as compatible.
 - `LICENSE`: the repository declared MIT without shipping the license text.
 - A window lifecycle rule (`src/main/window-lifecycle.ts`) with one collapse routine, plus a
   Collapse control in the window itself.
-- Lifecycle regression record `evidence/p1-07/lifecycle-regression.json` (9/9).
+- Lifecycle regression record `evidence/p1-07/lifecycle-regression.json` (10/10), including a real
+  disconnect: authority granted, the pi-web process actually killed, and the grant observed revoked.
 - P1-01 workspace and independent session: Orb cannot be enabled without a selected
   workspace; cancelling writes nothing; relative, missing and non-directory paths are
   refused; a Windows junction and a differently-cased spelling resolve to one identity;
@@ -111,6 +112,10 @@ verified is recorded as *unverified* and is not claimed as compatible.
 Both defects below produced no error anywhere and were found only by running the real
 application:
 
+- Losing the pi-web connection did not revoke desktop authority, so after pi-web died a grant
+  survived that belonged to a session nobody could see any more, and reconnecting could resume it.
+  A lost or unusable connection now revokes desktop operations and the unconfirmed screenshot, and
+  does not restore the grant on reconnect.
 - The screenshot target was re-read from the foreground window at the moment the user pressed the
   screenshot control. By then the orb holds focus, and the reader excludes this process, so the
   lookup always failed: the positive capture path could never run once. The target is now recorded

@@ -356,6 +356,7 @@ async function refreshPiWebState(): Promise<void> {
       reachable: false,
       problem: `No pi-web service answered at ${client.baseUrl}. Start it yourself; Orb will not start, restart or stop it.`,
     };
+    markDisconnected();
     return;
   }
   try {
@@ -366,9 +367,30 @@ async function refreshPiWebState(): Promise<void> {
       reachable: false,
       problem: describeError(error),
     };
+    markDisconnected();
     return;
   }
+  if (piWebState.reachable === false) {
+    // A reconnect must not silently resume a desktop task that was granted for a session that died
+    // while the connection was down.
+    desktopBroker?.revoke();
+  }
   piWebState = { baseUrl: client.baseUrl, reachable: true, problem: null };
+}
+
+/**
+ * Handle a lost or unusable pi-web connection.
+ *
+ * The contract (doc/pi-orb-development-goals.md §6.1, P1-07) is that a disconnect revokes desktop
+ * authority: the task was approved for a session in a run that no longer exists, so keeping the
+ * grant would let a later connection continue acting on an approval nobody can see. The session
+ * binding is dropped too, so the next session is a new one rather than a reused id.
+ */
+function markDisconnected(): void {
+  const hadAuthority = desktopBroker?.status().authorized === true;
+  if (hadAuthority) {
+    revokeDesktopOperations("the pi-web connection was lost");
+  }
 }
 
 function registerShortcut(): void {

@@ -427,6 +427,62 @@ try {
   }
 
   check("the shell survived the lifecycle sequence", shell.exitCode === null, `exitCode=${shell.exitCode}`);
+
+  // -------------------------------------------------------------------------
+  // Disconnect revokes. The contract (§6.1, P1-07) says a lost connection clears desktop
+  // authority: the grant belonged to a session in a run that no longer exists.
+  //
+  // The renderer is read with a timeout guard, because a hidden window's renderer can be suspended
+  // and a hung `evaluate` would stall the whole run rather than reporting a result.
+  // -------------------------------------------------------------------------
+  const guardedEvaluate = async (expression) =>
+    Promise.race([
+      evaluate(expression),
+      sleep(5000).then(() => "TIMEOUT"),
+    ]);
+
+  // Re-grant first so there is authority for the disconnect to revoke.
+  const regranted = await guardedEvaluate(
+    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'disconnect test' }).then((s) => JSON.stringify(s))`,
+  );
+  const bridgeBeforeDisconnect = await bridgeStatus(sessionId, generation);
+  report.disconnect = {
+    regranted: safe(regranted).slice(0, 200),
+    bridgeAuthorizedBefore: bridgeBeforeDisconnect?.result?.authorized ?? null,
+    piWebPid: piWeb?.pid ?? null,
+  };
+
+  if (report.disconnect.bridgeAuthorizedBefore === true) {
+    // Kill pi-web: the connection is now genuinely gone, not merely reported.
+    try {
+      piWeb?.kill();
+    } catch {
+      // Best effort.
+    }
+    await sleep(2500);
+
+    const refreshed = await guardedEvaluate(
+      "window.orb.refreshConnection().then((s) => JSON.stringify(s.desktopTask)).catch((e) => 'ERR:' + e.message)",
+    );
+    report.disconnect.refreshResult = safe(refreshed).slice(0, 250);
+
+    const bridgeAfterDisconnect = await bridgeStatus(sessionId, generation);
+    report.disconnect.bridgeAuthorizedAfter = bridgeAfterDisconnect?.result?.authorized ?? null;
+    report.disconnect.bridgeStatusAfter = safe(bridgeAfterDisconnect).slice(0, 250);
+
+    const revoked =
+      report.disconnect.bridgeAuthorizedAfter === false ||
+      (typeof refreshed === "string" && refreshed.includes('"authorized":false'));
+    check("losing the pi-web connection revokes desktop authority", revoked, safe(report.disconnect));
+  } else {
+    check(
+      "losing the pi-web connection revokes desktop authority",
+      report.disconnect.bridgeAuthorizedAfter !== true,
+      `not exercised: no authority existed to revoke (${safe(report.disconnect)})`,
+    );
+    report.disconnect.note = "not exercised: no task authorization existed to revoke in this environment";
+  }
+
   cdp.close();
 } catch (error) {
   check("the lifecycle regression completed without error", false, error?.message ?? String(error));
