@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:18:58.981Z",
+  "capturedAt": "2026-09-27T20:42:52.387Z",
   "probe": "P1-05 read-only Cua runtime probe",
   "safety": {
     "desktopInputSent": false,
@@ -47,7 +47,7 @@
     "created": true,
     "shutdown": {
       "ok": true,
-      "elapsedMs": 1
+      "elapsedMs": 0
     }
   },
   "tools": {
@@ -212,7 +212,7 @@
   "observation": {
     "windows": {
       "count": 7,
-      "elapsedMs": 158,
+      "elapsedMs": 153,
       "hasZIndex": true,
       "hasBounds": true,
       "sample": [
@@ -381,7 +381,7 @@
       "conclusion": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
     },
     "desktopState": {
-      "elapsedMs": 87,
+      "elapsedMs": 96,
       "imageFields": [
         {
           "key": "mimeType",
@@ -452,12 +452,12 @@
   },
   "timingsMs": {
     "moduleImport": 50,
-    "driverCreate": 60,
-    "listToolsJson": 45,
-    "listWindows": 158,
-    "getDesktopState": 87,
-    "startSession": 0,
-    "shutdown": 1
+    "driverCreate": 61,
+    "listToolsJson": 43,
+    "listWindows": 153,
+    "getDesktopState": 96,
+    "startSession": 1,
+    "shutdown": 0
   },
   "checks": [
     {
@@ -493,7 +493,7 @@
     {
       "name": "a driver instance can be created in-process",
       "ok": true,
-      "detail": "create() took 60 ms"
+      "detail": "create() took 61 ms"
     },
     {
       "name": "the driver reports a runtime tool inventory",
@@ -503,7 +503,7 @@
     {
       "name": "window discovery works at runtime",
       "ok": true,
-      "detail": "7 windows in 158 ms"
+      "detail": "7 windows in 153 ms"
     },
     {
       "name": "window records carry bounds",
@@ -538,12 +538,12 @@
     {
       "name": "desktop state can be observed at runtime",
       "ok": true,
-      "detail": "{\"elapsedMs\":87,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
+      "detail": "{\"elapsedMs\":96,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
     },
     {
       "name": "a named session can be started",
       "ok": true,
-      "detail": "took 0 ms"
+      "detail": "took 1 ms"
     },
     {
       "name": "session state can be read",
@@ -558,7 +558,7 @@
     {
       "name": "the driver shuts down cleanly",
       "ok": true,
-      "detail": "1 ms"
+      "detail": "0 ms"
     }
   ],
   "passed": true

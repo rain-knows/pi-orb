@@ -1,12 +1,12 @@
 {
-  "capturedAt": "2026-09-27T20:37:13.305Z",
+  "capturedAt": "2026-09-27T20:43:12.480Z",
   "isolation": {
-    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541433264",
-    "agentDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541433264\\agent",
-    "homeDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541433264\\home",
-    "normalCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541433264\\normal-project",
-    "orbCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541433264\\orb-workspace",
-    "configPath": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541433264\\orb-config.json",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541792478",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541792478\\agent",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541792478\\home",
+    "normalCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541792478\\normal-project",
+    "orbCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541792478\\orb-workspace",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-06-tools-1790541792478\\orb-config.json",
     "extensionPath": "D:\\workself\\pi-orb\\pi-package\\extensions\\orb.ts",
     "baseUrl": "http://127.0.0.1:31411"
   },

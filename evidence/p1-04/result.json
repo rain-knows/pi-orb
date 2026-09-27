@@ -1,13 +1,13 @@
 {
-  "capturedAt": "2026-09-27T20:18:21.158Z",
+  "capturedAt": "2026-09-27T20:42:12.602Z",
   "isolation": {
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
-    "runRoot": "D:\\pi-orb-p1-runs\\p1-04-1790540301102",
-    "agentDir": "D:\\pi-orb-p1-runs\\p1-04-1790540301102\\agent",
-    "sessionDir": "D:\\pi-orb-p1-runs\\p1-04-1790540301102\\agent\\sessions",
-    "homeDir": "D:\\pi-orb-p1-runs\\p1-04-1790540301102\\home",
-    "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-04-1790540301102\\orb-workspace",
-    "configPath": "D:\\pi-orb-p1-runs\\p1-04-1790540301102\\orb-config.json",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-04-1790541732547",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\agent",
+    "sessionDir": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\agent\\sessions",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\home",
+    "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\orb-workspace",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\orb-config.json",
     "piWebUrl": "http://127.0.0.1:31301",
     "note": "isolated agent dir, isolated HOME, local fake provider; no real model, no real credentials",
     "screenshots": false,
@@ -15,7 +15,7 @@
   },
   "foregroundWindowAvailable": true,
   "helperMeasurement": {
-    "elapsedMs": 703,
+    "elapsedMs": 712,
     "ok": true,
     "foregroundFound": true,
     "dpiAwareness": {
@@ -103,17 +103,17 @@
     {
       "name": "no message was sent on the refusal path",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-04-1790540301102\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31301\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-04-1790541732547\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31301\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "a session can be created on demand for the workspace",
       "ok": true,
-      "detail": "01a0e485-057c-7201-9d86-96f385a2c619"
+      "detail": "01a0e49a-dcef-771e-9c06-4246973a62f4"
     },
     {
       "name": "the orb session exists for the image test",
       "ok": true,
-      "detail": "01a0e485-057c-7201-9d86-96f385a2c619"
+      "detail": "01a0e49a-dcef-771e-9c06-4246973a62f4"
     },
     {
       "name": "a text-only model never receives image data",
@@ -128,7 +128,7 @@
     {
       "name": "a plain text message still reaches the model",
       "ok": true,
-      "detail": "{\"index\":2,\"receivedAt\":1790540322734,\"lastUserText\":\"plain text only\",\"imagePartsInLastUserMessage\":0,\"anyImageInTranscript\":false,\"totalImagesInTranscript\":0}"
+      "detail": "{\"index\":2,\"receivedAt\":1790541754102,\"lastUserText\":\"plain text only\",\"imagePartsInLastUserMessage\":0,\"anyImageInTranscript\":false,\"totalImagesInTranscript\":0}"
     },
     {
       "name": "the shell is still alive at the end",
@@ -153,7 +153,7 @@
   "modelRequests": [
     {
       "index": 1,
-      "receivedAt": 1790540319180,
+      "receivedAt": 1790541750604,
       "lastUserText": "describe this synthetic image(image omitted: model does not support images)",
       "imagePartsInLastUserMessage": 0,
       "anyImageInTranscript": false,
@@ -161,12 +161,12 @@
     },
     {
       "index": 2,
-      "receivedAt": 1790540322734,
+      "receivedAt": 1790541754102,
       "lastUserText": "plain text only",
       "imagePartsInLastUserMessage": 0,
       "anyImageInTranscript": false,
       "totalImagesInTranscript": 0
     }
   ],
-  "electronStderrTail": "DevTools listening on ws://127.0.0.1:31303/devtools/browser/e0c61c1f-7162-4a10-8a4d-5f105b05347f"
+  "electronStderrTail": "DevTools listening on ws://127.0.0.1:31303/devtools/browser/9d57b9dc-c2fa-49e6-9be5-fab9b4f06705"
 }

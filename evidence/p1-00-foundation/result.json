@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:16:03.340Z",
+  "capturedAt": "2026-09-27T20:39:54.353Z",
   "platform": "win32",
   "node": "v24.19.0",
   "packageVersion": "0.1.0",
@@ -28,29 +28,29 @@
       "name": "typecheck",
       "command": "npx tsc --noEmit",
       "ok": true,
-      "durationMs": 8007,
+      "durationMs": 8068,
       "outputTail": ""
     },
     {
       "name": "lint",
       "command": "npx eslint .",
       "ok": true,
-      "durationMs": 4713,
+      "durationMs": 4683,
       "outputTail": ""
     },
     {
       "name": "unit tests",
       "command": "npx vitest run",
       "ok": true,
-      "durationMs": 3986,
-      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/orb-config.test.ts (20 tests) 8ms\n ✓ tests/screenshot.test.ts (22 tests) 48ms\n ✓ tests/recorded-target.test.ts (17 tests) 10ms\n ✓ tests/pending-capture.test.ts (11 tests) 8ms\n ✓ tests/orb-tools.test.ts (24 tests) 12ms\n ✓ tests/workspace.test.ts (11 tests) 96ms\n ✓ tests/window-lifecycle.test.ts (9 tests) 8ms\n ✓ tests/window-toggle.test.ts (13 tests) 9ms\n ✓ tests/orb-session.test.ts (15 tests) 14ms\n ✓ tests/accelerator.test.ts (12 tests) 9ms\n ✓ tests/desktop-task.test.ts (18 tests) 10ms\n ✓ tests/shortcut.test.ts (10 tests) 10ms\n ✓ tests/desktop-broker.test.ts (25 tests) 20ms\n ✓ tests/screenshot-flow.test.ts (24 tests) 76ms\n ✓ tests/generations.test.ts (7 tests) 3ms\n ✓ tests/desktop-capture.test.ts (6 tests) 2ms\n ✓ tests/bridge-server.test.ts (20 tests) 1087ms\n\n Test Files  17 passed (17)\n      Tests  264 passed (264)\n   Start at  04:15:56\n   Duration  1.67s (transform 43%, tests 36%, import 15%, worker 6%)"
+      "durationMs": 4043,
+      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/orb-tools.test.ts (24 tests) 12ms\n ✓ tests/orb-session.test.ts (15 tests) 15ms\n ✓ tests/pending-capture.test.ts (11 tests) 7ms\n ✓ tests/orb-config.test.ts (20 tests) 9ms\n ✓ tests/screenshot.test.ts (22 tests) 64ms\n ✓ tests/shortcut.test.ts (10 tests) 8ms\n ✓ tests/accelerator.test.ts (12 tests) 8ms\n ✓ tests/desktop-broker.test.ts (25 tests) 14ms\n ✓ tests/desktop-task.test.ts (18 tests) 9ms\n ✓ tests/recorded-target.test.ts (17 tests) 11ms\n ✓ tests/screenshot-flow.test.ts (24 tests) 66ms\n ✓ tests/window-toggle.test.ts (13 tests) 9ms\n ✓ tests/workspace.test.ts (11 tests) 100ms\n ✓ tests/bridge-client.test.ts (10 tests) 132ms\n ✓ tests/window-lifecycle.test.ts (9 tests) 5ms\n ✓ tests/generations.test.ts (7 tests) 3ms\n ✓ tests/desktop-capture.test.ts (6 tests) 2ms\n ✓ tests/bridge-server.test.ts (21 tests) 1152ms\n\n Test Files  18 passed (18)\n      Tests  275 passed (275)\n   Start at  04:39:47\n   Duration  1.76s (transform 39%, tests 38%, import 17%, worker 5%)"
     },
     {
       "name": "production build",
       "command": "npx electron-vite build",
       "ok": true,
-      "durationMs": 3302,
-      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 24 modules transformed.\nrendering chunks...\nout/main/index.js  105.65 kB\n✓ built in 228ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  4.34 kB\n✓ built in 16ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-CvdsVjsS.css    3.99 kB\n../../out/renderer/assets/index-DUxv4V33.js   660.33 kB\n✓ built in 513ms"
+      "durationMs": 3233,
+      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 24 modules transformed.\nrendering chunks...\nout/main/index.js  107.11 kB\n✓ built in 230ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  4.34 kB\n✓ built in 15ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-CvdsVjsS.css    3.99 kB\n../../out/renderer/assets/index-DUxv4V33.js   660.33 kB\n✓ built in 511ms"
     }
   ],
   "buildArtifacts": {
@@ -95,7 +95,7 @@
     ]
   },
   "nonDestructive": {
-    "verifiedAt": "2026-09-27T20:16:03.327Z",
+    "verifiedAt": "2026-09-27T20:39:54.339Z",
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
     "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
     "headUnchanged": true,
