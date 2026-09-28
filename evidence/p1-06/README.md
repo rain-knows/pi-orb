@@ -193,6 +193,28 @@ The workstation appears to be locked; unlock it and re-run. Nothing was sent to 
 
 **本次未消耗任何模型额度**：前置探测在发送任何消息前就中止了。
 
+### D 组逐项结论（task-4）
+
+下表只给结论，不把未验证当通过。两列分开写，因为“自动化已证明的部分”与“真实模型侧”不是同一件事：
+
+- **结果（真实模型侧）** — 五种标签之一：`通过` / `失败` / `未验证` / `驱动报成功但目标未收到` / `不适用`。
+- **自动化已证明的部分** — 与该项有关、但**不能代表**真实模型侧的那一半。
+
+| # | 项 | 结果（真实模型侧） | 自动化已证明的部分 + 判据来源 |
+|---|---|---|---|
+| D1 | 模型**实际发起** `orb_observe` | **未验证**：真实模型入口已就绪且除“需真实前台”外的前置已全部实测通过，但当前被工作站锁定阻断。历史上（2026-09-28）模型确实自主发起过两次 `orb_observe`，当时的 `not-configured` 已修复，但修复后未再取得结论，故**不计为通过** | 工具已注册且 provider 实收 schema：`tool-exposure.json`（7/7）。会话所用模型声明图像输入：`real-model-c7.json`（`input=["text","image"]`） |
+| D2 | 随后发起 `orb_click`，坐标来自该次观察（分数 0–1000） | **未验证**：同上。历史尝试中模型确实发起过 `orb_click`，且被 `no-task-authorization` **正确拒绝**（安全拒绝，不是缺陷），不能作为通过 | 分数寻址的映射已单测：`tests/coordinate-mapping.test.ts`；同一观察被重放会被拒 |
+| D3 | 每次动作后产生**新的观察**（一动作一观察） | **未验证**（模型是否遵守）。产品侧**强制执行**：重放同一观察被拒（`observation-unknown`/`stale-observation`），且动作结果文本要求 re-observe | `evidence/p1-06/loop-verification.json`；`tests/desktop-broker.test.ts` |
+| D4 | 目标窗口报告**命中预期位置** | **未验证**（由模型选点的那一次）。请注意：产品侧的“取点↔落点一致”已通过，但取点的是测试、不是模型 | C7 断言：取分数 `(611.6,360.4)` → 目标自身 JSONL `cell-mousedown` `cell=1,2`，格内偏移 `(58,43)` 对格心 `(60,45)`：`loop-verification.json`（39/39） |
+| D5 | 桌面任务面板显示状态且能 **Revoke**；撤销后不再执行 | **通过**（自动化 100% 覆盖该语义） | 真实 UI 路径 `revokeDesktopTask()` → 后续动作被拒 `no-task-authorization`：`loop-verification.json`；`tests/desktop-task.test.ts`。**人工点击**“Revoke”按钮的体验未验证 |
+| D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` | **未验证**：经 orb 工具路径的滚动在隔离闭环中被 broker 接受，但该次运行 Windows 未授予前台，目标**零个** `wheel` 事件，故不得计为通过 | **真机已定论的部分**（P1-05 直调驱动）：前台升级后目标自身日志记录真实 `wheel`、`overScroller:true`、`scrollTop` 实际位移：`evidence/p1-05/input-verification.json` |
+| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；Orb 会话恰好四个：`tool-exposure.json`（7/7，判据是 provider **实收** schema，不是 UI 标签） |
+| D8 | 让模型输入非敏感文本（`orb_type`） | **未验证**（经 orb 工具路径、由模型发起的那一次） | **原生文本框已通过**（P1-05 直调驱动）：向临时记事本投递并由读回文档证实（`P1ORBTYPED`）：`evidence/p1-05/input-verification.json`。**Chromium/Electron 内容投递不可用**（后台被拒，前台未做到稳定投递）—— 见 `evidence/p1-05/README.md` §4 |
+
+小结：D5、D7 自动化已定论；D3 的**规则**、D4 的**产品侧**已定论，但模型侧仍未验证；D1、D2、D6、D8 的模型侧均**未验证**，其中 D6 的那次运行属于“驱动报成功但目标未收到”，按规则不计为通过。
+
+任何一项要变成 `通过`，都需在**解锁的交互式桌面**下重跑 `evidence/p1-06/run-real-model-c7.mjs`（或按 `doc/manual-acceptance.md` §5/§6 手工执行）。
+
 ## 6. 明确未验证
 
 2026-09-28 的首次真实模型尝试中，模型确实自主调用了 `orb_observe`（省略和指定
