@@ -1,13 +1,13 @@
 {
-  "capturedAt": "2026-09-28T07:49:45.100Z",
+  "capturedAt": "2026-09-28T08:45:55.878Z",
   "scope": {
     "what": "C7 with a real model: a point picked off the real screenshot must be the point clicked",
     "chain": "target app <- locked Cua driver <- cua-adapter <- desktop-broker <- bridge <- pi-web <- real model"
   },
   "isolation": {
-    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581785098\\shell-data",
-    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581785098\\orb-config.json",
-    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-c7-agent-1790581785098",
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790585155874\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790585155874\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-c7-agent-1790585155875",
     "modelsJson": "hard link to the real file (no copy)",
     "authJson": "symlink to the real file (no copy)",
     "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
@@ -23,13 +23,13 @@
       "authJsonLinked": true
     },
     "interactiveDesktop": {
-      "process": "LockApp",
-      "title": "Windows Ĭ����������",
+      "process": "Idle",
+      "title": "",
       "inputDesktopAccessible": false
     },
-    "targetPid": 43496,
+    "targetPid": 43012,
     "target": {
-      "pid": 43496,
+      "pid": 43012,
       "windowBoundsDip": {
         "x": 120,
         "y": 90,
@@ -62,14 +62,14 @@
     "piWeb": {
       "ok": true,
       "baseUrl": "http://127.0.0.1:31502",
-      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31502\n- Network:       http://127.0.0.1:31502\n✓ Ready in 509ms\n✓ Running next.config.ts took 151ms\n"
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31502\n- Network:       http://127.0.0.1:31502\n✓ Ready in 490ms\n✓ Running next.config.ts took 148ms\n"
     },
     "handshake": {
-      "path": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581785098\\shell-data\\bridge-token.json",
-      "pid": 39112,
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790585155874\\shell-data\\bridge-token.json",
+      "pid": 47044,
       "generation": 1,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581785098\\orb-workspace",
-      "pipePath": "\\\\.\\pipe\\pi-orb-39112"
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790585155874\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-47044"
     },
     "rendererTarget": {
       "title": "pi-Orb",
@@ -81,14 +81,14 @@
     },
     "workspace": {
       "configured": true,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581785098\\orb-workspace",
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790585155874\\orb-workspace",
       "problem": null,
       "shortcut": "Control+Alt+F11",
       "shortcutRegistered": true,
       "shortcutProblem": null,
       "generation": 2,
       "busy": false,
-      "sessionId": "01a0e6fd-fd1c-760b-8319-3b692b0829ac",
+      "sessionId": "01a0e73a-976d-730d-b803-0900fd92e228",
       "piWeb": {
         "baseUrl": "http://127.0.0.1:31502",
         "reachable": true,
@@ -109,9 +109,9 @@
       }
     },
     "generation": 2,
-    "session": "01a0e6fd-fd1c-760b-8319-3b692b0829ac",
+    "session": "01a0e73a-976d-730d-b803-0900fd92e228",
     "model": {
-      "sessionId": "01a0e6fe-03e1-760b-8319-3b6bcbae10d6",
+      "sessionId": "01a0e73a-9e22-730d-b803-09027e7a7610",
       "selected": {
         "provider": "TZcode",
         "modelId": "deepseek-v4.1-flash"
@@ -123,8 +123,8 @@
       "declaredImageCapable": true
     },
     "windowChoice": {
-      "windowId": "3737604",
-      "pid": 43496,
+      "windowId": "3343528",
+      "pid": 43012,
       "appName": "electron.exe",
       "title": "P1-05 input target",
       "bounds": {
@@ -198,7 +198,7 @@
         "appName": "msedgewebview2.exe"
       },
       {
-        "pid": 43496,
+        "pid": 43012,
         "title": "P1-05 input target",
         "appName": "electron.exe"
       },
@@ -227,7 +227,12 @@
         "title": "Program Manager",
         "appName": "explorer.exe"
       }
-    ]
+    ],
+    "interactiveDesktopAtWake": {
+      "process": "Idle",
+      "title": "",
+      "inputDesktopAccessible": false
+    }
   },
   "checks": [
     {
@@ -238,17 +243,17 @@
     {
       "name": "the isolated shell published its own handshake",
       "ok": true,
-      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790581785098\\\\shell-data\\\\bridge-token.json\",\"pid\":39112,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790581785098\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-39112\"}"
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790585155874\\\\shell-data\\\\bridge-token.json\",\"pid\":47044,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790585155874\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-47044\"}"
     },
     {
       "name": "the isolated shell's pipe accepts a connection",
       "ok": true,
-      "detail": "\\\\.\\pipe\\pi-orb-39112"
+      "detail": "\\\\.\\pipe\\pi-orb-47044"
     },
     {
       "name": "the isolated shell is NOT the user's running orb",
       "ok": true,
-      "detail": "handshake pid 39112"
+      "detail": "handshake pid 47044"
     },
     {
       "name": "the orb renderer is reachable over CDP",
@@ -258,36 +263,36 @@
     {
       "name": "the wake shortcut registered",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790581785098\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31502\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790585155874\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31502\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "the isolated shell reports a workspace and a generation",
       "ok": true,
-      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790581785098\\\\orb-workspace\",\"generation\":2}"
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790585155874\\\\orb-workspace\",\"generation\":2}"
     },
     {
       "name": "the isolated shell created a real pi-web session",
       "ok": true,
-      "detail": "\"01a0e6fd-fd1c-760b-8319-3b692b0829ac\""
+      "detail": "\"01a0e73a-976d-730d-b803-0900fd92e228\""
     },
     {
       "name": "the session is served by a model that declares image input",
       "ok": true,
-      "detail": "{\"sessionId\":\"01a0e6fe-03e1-760b-8319-3b6bcbae10d6\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+      "detail": "{\"sessionId\":\"01a0e73a-9e22-730d-b803-09027e7a7610\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
     },
     {
       "name": "the driver lists the disposable target, identified by process id",
       "ok": true,
-      "detail": "grid pid=43496 candidates=[{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":20528,\"title\":\"新通知\",\"appName\":\"ShellExperienceHost.exe\"},{\"pid\":15192,\"title\":\"Windows 默认锁屏界面\",\"appName\":\"LockApp.exe\"},{\"pi…"
+      "detail": "grid pid=43012 candidates=[{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":20528,\"title\":\"新通知\",\"appName\":\"ShellExperienceHost.exe\"},{\"pid\":15192,\"title\":\"Windows 默认锁屏界面\",\"appName\":\"LockApp.exe\"},{\"pi…"
     },
     {
       "name": "an interactive desktop is available to foreground the target",
       "ok": false,
-      "detail": "{\"process\":\"LockApp\",\"title\":\"Windows Ĭ����������\",\"inputDesktopAccessible\":false}"
+      "detail": "{\"process\":\"Idle\",\"title\":\"\",\"inputDesktopAccessible\":false}"
     }
   ],
   "passed": false,
-  "error": "no interactive desktop: foreground is LockApp and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
-  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:31501/devtools/browser/87bd96b0-de11-48e8-a6bd-6141c288063f\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-39112\n[pi-orb] desktop {\"at\":\"2026-09-28T07:49:50.955Z\",\"event\":\"revoke\"}\n[pi-orb] recorded target: pid 15192 \"Windows Ĭ����������\" (2560x1600, dpi 144)\n[pi-orb] the recorded window (pid 15192) is not in the driver's window list; the previous desktop target is kept\n",
-  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31502\n- Network:       http://127.0.0.1:31502\n✓ Ready in 509ms\n✓ Running next.config.ts took 151ms\n[pi-web] session_start dispatched to extensions for session 01a0e6fd-fd1c-760b-8319-3b692b0829ac\n[pi-web] session_start dispatched to extensions for session 01a0e6fe-03e1-760b-8319-3b6bcbae10d6\n"
+  "error": "no interactive desktop: foreground is Idle and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
+  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:31501/devtools/browser/9ac8bd29-176b-42f6-894d-5e29ba280cbc\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-47044\n[pi-orb] desktop {\"at\":\"2026-09-28T08:56:02.640Z\",\"event\":\"revoke\"}\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target\n",
+  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31502\n- Network:       http://127.0.0.1:31502\n✓ Ready in 490ms\n✓ Running next.config.ts took 148ms\n[pi-web] session_start dispatched to extensions for session 01a0e73a-976d-730d-b803-0900fd92e228\n[pi-web] session_start dispatched to extensions for session 01a0e73a-9e22-730d-b803-09027e7a7610\n"
 }

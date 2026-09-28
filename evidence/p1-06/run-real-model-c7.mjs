@@ -153,6 +153,25 @@ $desk = [Q.N]::OpenInputDesktop(0, $false, 0x0100)
   }
 }
 
+/**
+ * Wait for an interactive desktop, sampling until the deadline.
+ *
+ * The lock is not a steady state while a user is at the machine: it was observed unlocked at one moment
+ * and locked again seconds later. Failing on the first locked sample would therefore abort a run that a
+ * short wait would have completed, so this polls — and it still aborts, with the reason, when the wait
+ * expires, without ever having sent anything to a model.
+ */
+async function waitForInteractiveDesktop(timeoutMs = 600_000) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  for (;;) {
+    last = probeInteractiveDesktop();
+    if (last?.inputDesktopAccessible === true) return last;
+    if (Date.now() >= deadline) return last;
+    await sleep(5000);
+  }
+}
+
 function readJsonl(path) {
   try {
     return readFileSync(path, "utf8")
@@ -514,10 +533,10 @@ try {
   stageAgentDir();
   writeOrbConfig();
 
-  // Probe the interactive desktop early, but do not abort on it yet: everything up to the wake needs
-  // no desktop, and gating here would hide the D-group wiring checks below. It is enforced before the
-  // wake, which is the first step that genuinely needs a foregroundable window.
-  const desktop = probeInteractiveDesktop();
+  // Wait for an interactive desktop before anything that needs one. The wait is bounded and reports the
+  // reason it gave up; while a user is at the machine the lock is intermittent, so an immediate failure
+  // would abandon runs that a short wait completes. Nothing is sent to a model either way.
+  const desktop = await waitForInteractiveDesktop();
   report.steps.interactiveDesktop = desktop;
 
   // The target first, so its window is what the orb records as "the window the user was looking at".
@@ -647,17 +666,20 @@ try {
   //
   // This is the first step that needs a real interactive desktop: while the session is locked no window
   // can be foregrounded, so the product would record the lock screen and then correctly refuse to
-  // capture it - a message that misattributes an environmental condition to a product defect. Enforced
-  // here, after the D-group wiring checks above have had their chance to run.
+  // capture it - a message that misattributes an environmental condition to a product defect. The lock
+  // is intermittent while a user is at the machine, so this re-waits here (freshly, not from the earlier
+  // sample) rather than giving up on one locked moment.
+  const desktopAtWake = await waitForInteractiveDesktop(120_000);
+  report.steps.interactiveDesktopAtWake = desktopAtWake;
   if (
     !check(
       "an interactive desktop is available to foreground the target",
-      desktop?.inputDesktopAccessible === true,
-      safe(desktop),
+      desktopAtWake?.inputDesktopAccessible === true,
+      safe(desktopAtWake),
     )
   ) {
     throw new Error(
-      `no interactive desktop: foreground is ${desktop?.process ?? "?"} and the input desktop is not accessible. ` +
+      `no interactive desktop: foreground is ${desktopAtWake?.process ?? "?"} and the input desktop is not accessible. ` +
         "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
     );
   }
