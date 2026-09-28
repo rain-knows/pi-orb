@@ -103,10 +103,18 @@ const html = `<!doctype html>
   // completely different failures.
   window.addEventListener('wheel', (e) => {
     const target = e.target;
+    // What is actually under the pointer, so "the wheel arrived over the strip" is measured rather than
+    // inferred from the coordinates we aimed at.
+    const under =
+      typeof document.elementFromPoint === 'function'
+        ? document.elementFromPoint(Math.round(e.clientX), Math.round(e.clientY))
+        : null;
     report('wheel', {
       clientPoint: { x: Math.round(e.clientX), y: Math.round(e.clientY) },
       deltaY: Math.round(e.deltaY),
       overScroller: target instanceof Element ? Boolean(target.closest('#scroller')) : false,
+      elementUnderPoint: under ? under.id || under.tagName : null,
+      scrollerScrollTop: document.getElementById('scroller').scrollTop,
     });
   }, { passive: true });
 </script>
@@ -115,7 +123,12 @@ const html = `<!doctype html>
 app.whenReady().then(async () => {
   const win = new BrowserWindow({
     width: GRID_COLUMNS * CELL_WIDTH + 20,
-    height: GRID_ROWS * CELL_HEIGHT + 190,
+    // Tall enough for the grid, the controls and the whole scroll strip. The strip previously hung past
+    // the bottom edge, so its centre lay outside the viewport and hit-testing found nothing there: the
+    // wheel reached the window at the aimed point but could not land on the intended element. The height
+    // is not left to "looks right" — the point is hit-tested below and reported, so a recurrence shows
+    // up as a failed assertion instead of as an inexplicable non-scroll.
+    height: GRID_ROWS * CELL_HEIGHT + 260,
     x: 120,
     y: 90,
     show: process.env.P1_05_TARGET_HIDDEN !== "1",
@@ -177,6 +190,25 @@ app.whenReady().then(async () => {
     const rect = document.getElementById('scroller').getBoundingClientRect();
     return { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2) };
   })()`);
+  // Is that centre actually reachable? A wheel only scrolls the strip if the point resolves to it, and a
+  // point outside the viewport resolves to nothing. Measured here so the caller can refuse to draw a
+  // conclusion from an unreachable point.
+  const scrollerReachability = await win.webContents.executeJavaScript(`(() => {
+    const scroller = document.getElementById('scroller');
+    const rect = scroller.getBoundingClientRect();
+    const x = Math.round(rect.left + rect.width / 2);
+    const y = Math.round(rect.top + rect.height / 2);
+    const element = document.elementFromPoint(x, y);
+    return {
+      viewport: { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight },
+      elementAtCentre: element ? (element.id || element.tagName) : null,
+      centreResolvesToScroller: element ? Boolean(element.closest('#scroller')) : false,
+      stripFitsViewport: rect.bottom <= document.documentElement.clientHeight && rect.top >= 0,
+      scrollerScrollHeight: scroller.scrollHeight,
+      scrollerClientHeight: scroller.clientHeight,
+      isScrollable: scroller.scrollHeight > scroller.clientHeight,
+    };
+  })()`);
   const scrollerDipScreenPoint = {
     x: contentBounds.x + scrollerCentreInContent.x,
     y: contentBounds.y + scrollerCentreInContent.y,
@@ -194,6 +226,7 @@ app.whenReady().then(async () => {
       centreInContent: scrollerCentreInContent,
       dipScreenPoint: scrollerDipScreenPoint,
       physicalScreenPoint: screen.dipToScreenPoint(scrollerDipScreenPoint),
+      reachability: scrollerReachability,
     },
   };
   if (geometryPath) writeFileSync(geometryPath, JSON.stringify(geometry, null, 2), "utf8");

@@ -9,6 +9,7 @@
 | [`pi-orb-development-goals.md`](./pi-orb-development-goals.md) | 产品目标、非破坏性合同、目标架构、P0/P1/P2 优先级、验收矩阵和阻塞规则 | 开发目标与验收基线 |
 | [`tech-stack.md`](./tech-stack.md) | 技术栈建议、选型依据、版本边界、P0 验证门槛和明确非目标 | 技术选型建议，待验证 |
 | [`support-matrix.md`](./support-matrix.md) | 唯一的版本兼容性声明来源：已验证 / 未验证 / 已知环境事实 | 随每个发布版本维护 |
+| [`manual-acceptance.md`](./manual-acceptance.md) | 唯一的人工验收入口：前置条件、A–D 四组步骤、记录规则与结果回写位置 | 需要真实按键／多屏／高权限窗口／真实模型时使用 |
 | [`cua-driver-integration.md`](./cua-driver-integration.md) | Cua 驱动接入事实：坐标空间、投递模式约束、会话与授权、许可义务 | P1-05 运行时实测结论 |
 | [`../evidence/p1-07/CONTRACT-MATRIX.md`](../evidence/p1-07/CONTRACT-MATRIX.md) | P1 合同对照：N1–N8 不变量与 §7.1 发布必测项的证据映射（含未验证项） | 随每个发布版本维护 |
 | [`pi-fff-lsp-necessity.md`](./pi-fff-lsp-necessity.md) | FFF 与 LSP 对当前 Pi 工作流的需要程度评估 | 可选开发工具评估，不属于运行时依赖 |
@@ -28,7 +29,8 @@
 1. 先读开发目标，了解产品范围和不可破坏的不变量。
 2. 再读技术栈文档，区分已确定方向、推荐选型和实施前验证项。
 3. 需要版本兼容性或“这个组合能不能用”的判断时，只读支持矩阵。
-4. 需要评估代码搜索或语义开发辅助时，再读 FFF/LSP 报告。
+4. 需要在真实桌面上做人工验收（真实按键、多屏、高权限窗口、真实模型在环）时，只读 [`manual-acceptance.md`](./manual-acceptance.md)。
+5. 需要评估代码搜索或语义开发辅助时，再读 FFF/LSP 报告。
 
 ## 文档维护约定
 

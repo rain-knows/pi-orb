@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-28T01:15:03.072Z",
+  "capturedAt": "2026-09-28T01:56:12.859Z",
   "probe": "P1-05 read-only Cua runtime probe",
   "safety": {
     "desktopInputSent": false,
@@ -47,7 +47,7 @@
     "created": true,
     "shutdown": {
       "ok": true,
-      "elapsedMs": 2
+      "elapsedMs": 1
     }
   },
   "tools": {
@@ -212,7 +212,7 @@
   "observation": {
     "windows": {
       "count": 6,
-      "elapsedMs": 160,
+      "elapsedMs": 169,
       "hasZIndex": true,
       "hasBounds": true,
       "sample": [
@@ -241,6 +241,29 @@
         },
         {
           "windowId": {
+            "__bigint": "3606900"
+          },
+          "pid": 38236,
+          "appName": "Notepad.exe",
+          "title": "*p1-05-keyboard-target.txt - Notepad",
+          "bounds": {
+            "x": 436,
+            "y": 429,
+            "width": 1906,
+            "height": 815
+          },
+          "isOnScreen": true,
+          "zIndex": {
+            "__bigint": "4"
+          },
+          "layer": 0,
+          "minimized": false,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
+        },
+        {
+          "windowId": {
             "__bigint": "1507986"
           },
           "pid": 6444,
@@ -254,7 +277,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "4"
+            "__bigint": "3"
           },
           "layer": 0,
           "minimized": false,
@@ -277,7 +300,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "3"
+            "__bigint": "2"
           },
           "layer": 0,
           "minimized": false,
@@ -300,33 +323,10 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "2"
-          },
-          "layer": 0,
-          "minimized": false,
-          "currentSpaceId": "undefined",
-          "onCurrentSpace": "undefined",
-          "spaceIds": "undefined"
-        },
-        {
-          "windowId": {
-            "__bigint": "1968416"
-          },
-          "pid": 12036,
-          "appName": "Notepad.exe",
-          "title": "*p1-05-keyboard-target.txt - Notepad",
-          "bounds": {
-            "x": -31993,
-            "y": -32000,
-            "width": 223,
-            "height": 32
-          },
-          "isOnScreen": false,
-          "zIndex": {
             "__bigint": "1"
           },
           "layer": 0,
-          "minimized": true,
+          "minimized": false,
           "currentSpaceId": "undefined",
           "onCurrentSpace": "undefined",
           "spaceIds": "undefined"
@@ -390,7 +390,7 @@
       "conclusion": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
     },
     "desktopState": {
-      "elapsedMs": 69,
+      "elapsedMs": 54,
       "imageFields": [
         {
           "key": "mimeType",
@@ -460,13 +460,13 @@
     }
   },
   "timingsMs": {
-    "moduleImport": 64,
-    "driverCreate": 74,
+    "moduleImport": 62,
+    "driverCreate": 69,
     "listToolsJson": 53,
-    "listWindows": 160,
-    "getDesktopState": 69,
+    "listWindows": 169,
+    "getDesktopState": 54,
     "startSession": 0,
-    "shutdown": 2
+    "shutdown": 1
   },
   "checks": [
     {
@@ -502,7 +502,7 @@
     {
       "name": "a driver instance can be created in-process",
       "ok": true,
-      "detail": "create() took 74 ms"
+      "detail": "create() took 69 ms"
     },
     {
       "name": "the driver reports a runtime tool inventory",
@@ -512,7 +512,7 @@
     {
       "name": "window discovery works at runtime",
       "ok": true,
-      "detail": "6 windows in 160 ms"
+      "detail": "6 windows in 169 ms"
     },
     {
       "name": "window records carry bounds",
@@ -547,7 +547,7 @@
     {
       "name": "desktop state can be observed at runtime",
       "ok": true,
-      "detail": "{\"elapsedMs\":69,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
+      "detail": "{\"elapsedMs\":54,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
     },
     {
       "name": "a named session can be started",
@@ -567,7 +567,7 @@
     {
       "name": "the driver shuts down cleanly",
       "ok": true,
-      "detail": "2 ms"
+      "detail": "1 ms"
     }
   ],
   "passed": true

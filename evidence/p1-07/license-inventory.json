@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-28T01:16:22.827Z",
+  "capturedAt": "2026-09-28T01:57:32.775Z",
   "method": "walked package.json dependencies (and optionalDependencies, which carry the native driver) transitively; devDependencies are excluded because they are not redistributed",
   "productionDependencyCount": 20,
   "installedCount": 8,

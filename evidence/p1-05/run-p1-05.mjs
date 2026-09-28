@@ -85,6 +85,34 @@ function activateWindow(hwnd) {
 const runRoot = join("D:\\pi-orb-p1-runs", `p1-05-${Date.now()}`);
 const electronBinary = join(repo, "node_modules", "electron", "dist", "electron.exe");
 
+/**
+ * Which keys are physically down right now, from the OS rather than from a target's event log.
+ *
+ * The window-log proxy this replaced could not distinguish product residue from the harness's own
+ * synthetic ALT tap (see evidence/lib/key-state.ps1). Sampling globally and comparing before/after also
+ * keeps a key the user happens to be holding from being reported as product residue.
+ */
+function sampleKeyState() {
+  try {
+    const raw = execFileSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        join(repo, "evidence", "lib", "key-state.ps1"),
+      ],
+      { encoding: "utf8", timeout: 30000, windowsHide: true },
+    );
+    const line = raw.trim().split(/\r?\n/).filter(Boolean).at(-1);
+    return { ok: true, ...JSON.parse(line) };
+  } catch (error) {
+    return { ok: false, error: String(error?.message ?? error).slice(0, 200) };
+  }
+}
+
 mkdirSync(runRoot, { recursive: true });
 
 /** Synthetic, recognizable test text. Never a credential, never user content. */
@@ -338,6 +366,10 @@ try {
   // Four widely separated cells: one correct hit could be luck, so each must land on its intended
   // cell with a plausible in-cell offset.
   const CELLS = ["0,0", "1,2", "2,3", "2,0"];
+  // Sampled before any input of our own, so a key already down (the user's, or the harness's ALT tap)
+  // is excluded from the residue verdict instead of being attributed to the product.
+  const keyStateBefore = sampleKeyState();
+  report.keyResidue = { before: keyStateBefore, after: null, residue: null, basis: null };
   // The front check is retried: raising a window is asynchronous, and a single reading immediately
   // after the request can still show the previous window. Reading the driver's own z-order is the
   // independent check — it does not trust the activation helper's report of what it did.
@@ -545,8 +577,13 @@ try {
   // -------------------------------------------------------------------------
   const scrollTargets = [];
 
-  async function attemptScroll(label, windowRecord, screenDipPoint) {
-    const readScrollCount = () => readGrid().filter((entry) => entry.kind === "scroll").length;
+  async function attemptScroll(label, windowRecord, screenDipPoint, options = {}) {
+    // The target logs a wheel as `wheel`; `scroll` is only emitted when the strip's scrollTop actually
+    // changes. Counting `scroll` conflated "the wheel never arrived" with "it arrived but the strip did
+    // not move", and made a delivered wheel look like a refusal (measured: a run logged
+    // `wheel deltaY=300` while this counted 0).
+    const readWheelCount = () => readGrid().filter((entry) => entry.kind === "wheel").length;
+    const readStripScrollCount = () => readGrid().filter((entry) => entry.kind === "scroll").length;
     // The driver adds the target's reported origin back to a request, so a request is the screen point
     // minus that origin — the same conversion clicks use. Passing the screen point directly would aim
     // the wheel at the wrong place while the driver still reported success (measured).
@@ -554,7 +591,8 @@ try {
       x: screenDipPoint.x - windowRecord.bounds.x,
       y: screenDipPoint.y - windowRecord.bounds.y,
     };
-    const before = readScrollCount();
+    const before = readWheelCount();
+    const beforeStrip = readStripScrollCount();
     let background = null;
     let backgroundError = null;
     try {
@@ -571,12 +609,14 @@ try {
       backgroundError = errorInfo(caught);
     }
     await sleep(800);
-    const afterBackground = readScrollCount();
+    const afterBackground = readWheelCount();
 
     const entry = {
       target: label,
       screenDipPoint,
       requestPoint,
+      creditedToDeliveryVerdict: options.creditedToDeliveryVerdict !== false,
+      note: options.note ?? null,
       background: {
         refused: background?.isError === true,
         errorCode: background?.errorCode ?? null,
@@ -610,6 +650,9 @@ try {
         foregroundError = errorInfo(caught);
       }
       await sleep(1200);
+      const wheels = readGrid().filter((entry) => entry.kind === "wheel");
+      const afterWheels = wheels.length;
+      const credited = options.creditedToDeliveryVerdict !== false;
       entry.escalation = {
         mechanism: "callTool('scroll', {delivery_mode:'foreground'})",
         requestedDeliveryMode: "foreground",
@@ -619,8 +662,14 @@ try {
         errorCode: foreground?.errorCode ?? null,
         text: String(foreground?.text ?? "").slice(0, 300),
         error: foregroundError,
-        delivered: readScrollCount() > afterBackground,
-        wheelEvents: readGrid().filter((entry) => entry.kind === "wheel").length,
+        // A wheel event reaching the target is the product-relevant fact; whether the point was over the
+        // scrollable strip is a separate, extra fact recorded below. Both are read from the grid target's
+        // own log, so they are reported only for the attempt that the grid can actually speak for —
+        // otherwise a different target's probe would appear to carry the grid's wheel counts.
+        delivered: credited ? afterWheels > afterBackground : null,
+        wheelEvents: credited ? afterWheels : null,
+        wheelDetail: credited ? wheels.slice(-3) : null,
+        stripScrolled: credited ? readStripScrollCount() > beforeStrip : null,
       };
     }
 
@@ -634,13 +683,63 @@ try {
   const gridScrollPoint = geometry.scroller?.dipScreenPoint ?? { x: 60, y: 390 };
   const gridScroll = await attemptScroll("grid/Electron", gridWindow, gridScrollPoint);
 
+  // The point that decides the verdict must actually lie inside the target it is meant to hit. Without
+  // this, an aim outside the window is indistinguishable from a delivery refusal: it produces the same
+  // "driver said success, target logged nothing" outcome, and the stage would report the OS as the cause.
+  const gridScrollInsideTarget =
+    gridScrollPoint.x >= geometry.contentBounds.x &&
+    gridScrollPoint.x <= geometry.contentBounds.x + geometry.contentBounds.width &&
+    gridScrollPoint.y >= geometry.contentBounds.y &&
+    gridScrollPoint.y <= geometry.contentBounds.y + geometry.contentBounds.height;
+  // The point that decides the verdict must be a point the wheel can actually land on. Previously the
+  // strip hung past the window's bottom edge, so its centre resolved to no element: the wheel arrived at
+  // the aimed point and still could not scroll the intended element, which reads exactly like a delivery
+  // refusal. Asserting reachability separates "the target made the point unusable" from "the OS refused
+  // the foreground swap".
+  const scrollerReachability = geometry.scroller?.reachability ?? null;
+  check(
+    "the target reports the scroll strip reachable at its own centre (the point is a usable aim)",
+    scrollerReachability?.centreResolvesToScroller === true && scrollerReachability?.isScrollable === true,
+    safe(scrollerReachability),
+  );
+  check(
+    "the scroll point that decides the verdict lies inside the credited target's own reported bounds",
+    gridScrollInsideTarget,
+    safe({ gridScrollPoint, contentBounds: geometry.contentBounds }),
+  );
+
   if (notepadWindow) {
-    // Notepad exposes no scrollable region we can read back, so this probes reachability only; the
-    // verdict for scrolling comes from the grid target, whose scroll log is ground truth.
-    await attemptScroll("notepad", notepadWindow, { x: 40, y: 120 });
+    // Reachability probe only, and deliberately excluded from the verdict below.
+    //
+    // Notepad exposes no scrollable region this script can read back, so nothing about whether a wheel
+    // reached it is observable here — only that the driver did not refuse. The point is derived from the
+    // window's own reported geometry rather than hardcoded: an earlier version passed a fixed point that
+    // lay outside this window (origin differs per run), which made the probe meaningless while still
+    // looking like a result.
+    const notepadReachabilityPoint = {
+      x: notepadWindow.bounds.x + Math.round(notepadWindow.bounds.width / 2),
+      y: notepadWindow.bounds.y + Math.round(notepadWindow.bounds.height / 3),
+    };
+    const probe = await attemptScroll("notepad", notepadWindow, notepadReachabilityPoint, {
+      creditedToDeliveryVerdict: false,
+      note: "no read-back channel on this target: its wheel log does not exist, so `delivered` here is not evidence for or against scrolling",
+    });
+    report.notepadReachabilityProbe = {
+      derivedFrom: "the driver's own reported bounds for this window, so the point lies inside it",
+      boundsUsed: notepadWindow.bounds,
+      point: notepadReachabilityPoint,
+      driverDidNotRefuse: probe.escalation?.refused === false,
+      observableDelivery: null,
+      note: "not counted toward scroll delivery; the grid target's own wheel log is the only ground truth",
+    };
   }
 
-  const scrollDelivered = scrollTargets.some((entry) => entry.escalation?.delivered === true);
+  // Only attempts with their own read-back channel may decide this. `attemptScroll` reads the *grid's*
+  // event log, so letting a different target's attempt count here would credit it with events it cannot
+  // have produced — and would let it flip the verdict to verified without any wheel reaching anything.
+  const scrollDelivered = scrollTargets.some(
+    (entry) => entry.creditedToDeliveryVerdict !== false && entry.escalation?.delivered === true,
+  );
   // Whether the wheel physically lands depends on Windows permitting the driver to swap the foreground
   // to the target. That is an OS/user-intent decision, not something the product controls, and it was
   // measured to vary between runs: the same call delivered 22 wheel events once and none on later runs,
@@ -652,9 +751,12 @@ try {
     note:
       "`deliveryMode` is NOT a field of the driver's ScrollInput (verified against the locked contract), so a typed scroll can never request foreground delivery; the escalation goes through callTool, which takes the tool-schema arguments. The driver reports '✅ Scrolled ... via SendInput wheel' even when the foreground swap was refused and no wheel event reached the target, so its summary is never the evidence.",
     deliveredAndObserved: scrollDelivered,
+    stripActuallyScrolled: scrollTargets.some(
+      (entry) => entry.creditedToDeliveryVerdict !== false && entry.escalation?.stripScrolled === true,
+    ),
     conclusion: scrollDelivered
-      ? "background scroll was refused with background_unavailable (documented behaviour for this window class) and the driver's prescribed foreground escalation delivered real wheel events, verified by the target's own wheel log."
-      : "the escalation was issued exactly as the driver prescribes, but no wheel event reached the target on this run: the OS did not hand the foreground to the target, and the driver reported success anyway. Scroll delivery is therefore UNVERIFIED on this run (it was observed to work on an earlier run).",
+      ? "background scroll was refused with background_unavailable (documented behaviour for this window class) and the driver's prescribed foreground escalation delivered a real wheel event that the target logged over its scrollable strip, which then moved — verified from the target's own event log, not from the driver's summary."
+      : "the escalation was issued exactly as the driver prescribes, but no wheel event reached the target on this run: the OS did not hand the foreground to the target, and the driver reported success anyway. Scroll delivery is therefore UNVERIFIED on this run (it has been observed to work on other runs).",
   };
 
   check(
@@ -764,10 +866,15 @@ try {
 
   report.releaseAndCancellation = {
     gridEventCounts: counts,
-    keysPressedAndReleased: {
+    // Kept, but explicitly *not* the residue verdict: this log cannot separate product input from the
+    // harness's own synthetic ALT tap (Windows swallows the lone ALT release in menu mode), which made
+    // an earlier version of this stage report 34 unmatched key-downs while no key was held.
+    targetLogKeyEvents: {
       down: counts["key-down"] ?? 0,
       up: counts["key-up"] ?? 0,
       balanced: (counts["key-down"] ?? 0) === (counts["key-up"] ?? 0),
+      whyNotTheVerdict:
+        "the target's log includes the foreground-unlock ALT tap, whose release Windows reports to the target inconsistently",
     },
     mouseButtonsPressedAndReleased: {
       down: counts["mouse-down"] ?? 0,
@@ -780,13 +887,27 @@ try {
       stateAfterEnd: safe(stateAfterEnd, 250),
       gridEventsDuringEnd: readGrid().length - eventsBeforeEnd,
     },
-    note: "the grid target reports every key and mouse down/up it receives, so an unmatched down would reveal a press left behind",
+    note: "the grid target reports every key and mouse down/up it receives; the residue verdict below uses the OS key state instead",
+  };
+
+  // Residue = down now but not down before the stage acted. Comparing whole sets rather than counts is
+  // what makes this immune to the harness's own synthetic taps and to a key the user is holding.
+  const keyStateAfter = sampleKeyState();
+  const beforeSet = new Set(keyStateBefore.ok ? keyStateBefore.down : []);
+  const residue = keyStateAfter.ok ? keyStateAfter.down.filter((key) => !beforeSet.has(key)) : null;
+  report.keyResidue = {
+    before: keyStateBefore,
+    after: keyStateAfter,
+    residue,
+    basis:
+      "GetAsyncKeyState sampled globally before and after this stage's own input; a key down after but not before is residue",
+    excludedAsPreExisting: keyStateBefore.ok ? keyStateBefore.down : null,
   };
 
   check(
     "no key was left pressed after the input sequence",
-    report.releaseAndCancellation.keysPressedAndReleased.balanced === true,
-    safe(report.releaseAndCancellation.keysPressedAndReleased),
+    keyStateAfter.ok === true && residue !== null && residue.length === 0,
+    safe(report.keyResidue),
   );
   check(
     "no mouse button was left pressed after the input sequence",

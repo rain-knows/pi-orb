@@ -22,14 +22,14 @@ v0.1 is defined as M1 + M2 + M3 + P1-07:
 | Milestone | State |
 |---|---|
 | M1 — floating window, dedicated workspace, chat | **Complete** (P1-01, P1-02, P1-03) |
-| M2 — explicitly authorized screenshot context | **Authorization and refusal paths complete**; the positive capture path is unverified on this machine (P1-04) |
-| M3 — one-action-one-observation computer use | **Click loop complete**; foreground delivery, typing and scrolling are unverified on this machine (P1-05, P1-06) |
+| M2 — explicitly authorized screenshot context | **Complete** (P1-04, 41/41): the positive path — record the user's target, capture by handle, preview, confirm, and the model receiving those exact bytes — is verified on this machine |
+| M3 — one-action-one-observation computer use | **Core loop complete** (P1-05, P1-06): background and **foreground** clicks land on the aimed target, and a foreground scroll both reaches and moves the intended element, judged from the target's own event log. Typing into Chromium content, elevated windows and multi-monitor remain unverified |
 | P1-07 — safety, regression and release gate | **Complete** |
 
-So the current build is **not** a complete v0.1, and M3 must not be described as done. The unverified
-capabilities are listed one by one in [`doc/support-matrix.md`](./doc/support-matrix.md) with manual
-verification steps; the release gate checks that those unverified records still exist, so a release
-cannot turn green by deleting them.
+So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
+must not be described as done. They are listed one by one in
+[`doc/support-matrix.md`](./doc/support-matrix.md) with manual verification steps; the release gate
+checks that those unverified records still exist, so a release cannot turn green by deleting them.
 
 Unverified means disabled or reported as unavailable, never silently faked. No mock stands in for a
 native input, cancellation or key-release check.

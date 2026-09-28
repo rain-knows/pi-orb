@@ -15,6 +15,22 @@ verified is recorded as *unverified* and is not claimed as compatible.
 Defects found by driving the real product instead of the internal APIs, with a real foreground window
 available:
 
+- Foreground scroll now demonstrably reaches and moves the target. The background→foreground escalation
+  the driver's own refusal prescribes delivered a real `wheel` event that the target logged over its
+  scrollable strip, and the strip's `scrollTop` actually changed. Previously this could not be shown at
+  all: see the three measurement defects below, each of which made a reachable action look like a refusal.
+- Three defects in the stage's own measurement, which are recorded because all three produced a
+  false "delivery refused" reading from a working path: Notepad's scroll point was hardcoded to a screen
+  coordinate *outside* its window, so nothing was ever aimed at it; the wheel counter read the `scroll`
+  event while the target logs wheels as `wheel`, so a delivered wheel counted as zero; and the target's
+  scroll strip hung past the window's bottom edge, so its centre resolved to no element and the wheel
+  landed on the window without being able to scroll anything. The target now reports its own hit-test
+  reachability and the runner asserts it, so this cannot recur silently.
+- Key residue is no longer judged from the target's event log. That proxy reported 34 unmatched
+  `key-down`s while no key was held: the foreground unlock deliberately taps ALT and Windows swallows
+  the matching standalone release. Residue is now measured from the OS's own global key state, sampled
+  before and after, and compared as a set difference — which also keeps a key the user happens to be
+  holding from being attributed to the product.
 - The native helper script was never copied into the build, so `out/main/native/foreground-window.ps1`
   did not exist and every attempt to record the target window failed in a built app — reported as "no
   foreground window", i.e. a missing build artifact disguised as an environment fact.
@@ -37,6 +53,11 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   unknown session `stale-generation` too.
 
 ### Added
+
+- `doc/manual-acceptance.md`: the single, step-by-step list of what genuinely cannot be automated
+  (real key presses, a second monitor, an elevated window, mid-press cancellation, and a real model
+  choosing to call the tools), with prerequisites, the five permitted result labels and where each
+  result has to be written back.
 
 - P1-07 release gate (`evidence/p1-07/run-release-gate.mjs`, 29 checks): quality gates, the
   non-destructive baseline, release hygiene, the license inventory, version agreement, the presence

@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-09-28T01:13:11.304Z",
+  "capturedAt": "2026-09-28T01:54:21.154Z",
   "electronVersion": null,
-  "sourceCount": 2,
-  "windowSourceCount": 1,
+  "sourceCount": 3,
+  "windowSourceCount": 2,
   "screenSourceCount": 1,
   "displayCount": 1,
   "displays": [
@@ -28,15 +28,25 @@
     {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome"
+    },
+    {
+      "id": "window:3606900:0",
+      "name": "*p1-05-keyboard-target.txt - Notepad"
     }
   ],
   "nativeWindowCount": 6,
-  "idsContainingNativeHandle": 1,
+  "idsContainingNativeHandle": 2,
   "idHandleMatches": [
     {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome",
       "middle": "329270",
+      "middleIsLiveHandle": true
+    },
+    {
+      "id": "window:3606900:0",
+      "name": "*p1-05-keyboard-target.txt - Notepad",
+      "middle": "3606900",
       "middleIsLiveHandle": true
     }
   ],
@@ -55,6 +65,16 @@
       }
     },
     {
+      "id": "window:3606900:0",
+      "name": "*p1-05-keyboard-target.txt - Notepad",
+      "displayId": "",
+      "hasThumbnail": false,
+      "thumbnailSize": {
+        "width": 0,
+        "height": 0
+      }
+    },
+    {
       "id": "screen:0:0",
       "name": "整个屏幕",
       "displayId": "1524534193",
@@ -65,5 +85,5 @@
       }
     }
   ],
-  "stderrTail": ""
+  "stderrTail": "[27772:0928/095421.048:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange.\n[27772:0928/095421.049:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange."
 }
