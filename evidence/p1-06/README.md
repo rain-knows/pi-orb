@@ -131,11 +131,62 @@ broker 对策略拒绝返回 `{ ok:false, refused:true, reason }`，而桥服务
 
 因此工具集注册了 `orb_type` 与 `orb_scroll`，在这类窗口上被驱动拒绝时会**如实报回**给模型与用户，不会静默成功；`orb_scroll` 能够按驱动规定升级到前台并生效。
 
+## 5.1 真实模型 C7 验收：入口已就绪，当前被「工作站已锁定」阻断
+
+自动化已验证**产品侧**的 C7：模型读图得到的那一点，与产品最终点击的那一点是同一个点
+（§3.4，本轮新增断言，`landedCell=1,2`，分数 `(611.6,360.4)`）。
+自动化**无法**验证**模型侧**：真实模型拿到真实截图后，是否自己决定调用 `orb_observe`、
+再用截图上读出的分数调用 `orb_click`。为此新增了一个可重复执行的入口：
+
+```powershell
+node evidence/p1-06/run-real-model-c7.mjs
+```
+
+它跑的是真实链路：丢弃式目标窗口 ← 锁定的 Cua 驱动 ← pi-Orb adapter/broker/bridge
+← **真实 pi-web** ← **真实模型**（`TZcode/deepseek-v4.1-flash`，声明支持图像）。
+
+**隔离方式（本项的核心约束）**：
+
+| 项 | 做法 | 理由 |
+|---|---|---|
+| 浮窗数据目录 | `--user-data-dir=<runRoot>\shell-data` | 绝不读写你正在运行的那个浮窗（pid 30620）的握手指令 |
+| 浮窗配置 | `PI_ORB_CONFIG=<runRoot>\orb-config.json` | 工作区指向本次临时目录，激活隔离会话的 Orb 模式 |
+| pi-web 配置目录 | 独立 agent 目录，`models.json` **硬链接**、`auth.json` **符号链接** | 用真实 provider/凭据，但**不产生任何凭据副本** |
+| 会话落点 | 上述隔离 agent 目录 | 不写入你 `~/.pi/agent/sessions` 下任何既有会话 |
+
+已实测确认隔离成立：真实 `~/.pi/agent/sessions` 下**没有**任何本次工作区的会话目录；
+临时 agent 目录（含链接）在结束时删除。
+
+**当前阻断原因（环境，不是产品）**：
+
+```
+foreground is LockApp and the input desktop is not accessible.
+The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.
+```
+
+连续 3 次探测一致：前台进程是 `LockApp`，`OpenInputDesktop` 失败。锁屏下**任何窗口都无法被前置**，
+因此反射式唤醒路径无法把丢弃式目标窗口记为“用户正在看的窗口”，截图授权链在第一步就断掉。
+这一项**必须**在解锁的交互式桌面下才能有结论。
+
+值得记下的一处产品观感问题（未改，先记录）：锁屏时产品报的是
+「The recorded window was replaced by a different one (now "Windows 默认锁屏界面")」，
+这对用户是**误导**——真实原因是“当前根本无法前置任何窗口”。harness 现在加了前置探测，
+把这个环境原因直接报出来，避免把它误判成产品缺陷。
+
+**本次未消耗任何模型额度**：前置探测在发送任何消息前就中止了。
+
 ## 6. 明确未验证
+
+2026-09-28 的首次真实模型尝试中，模型确实自主调用了 `orb_observe`（省略和指定
+`window_id` 各一次），但都收到 `Refused (not-configured): No Orb bridge pipe is known`。
+这证明了“模型决定调用”的连接点，**没有**证明观察或点击成功；C7 和 D2–D8 仍待复测。
+根因是扩展已读到包含 `pipePath` 的握手文件，却在 `BridgeClient.call` 时只传 token。
+现已改为传递完整握手对象，并用“无环境变量、仅握手文件”命名管道测试防止回归。
+pi-web 与 Orb 已重启；只读探针得到 `hello.ok=true` 和无效会话的 `unknown-session`。
 
 | 项 | 原因 |
 |---|---|
-| **模型真正调用 orb 工具** | 本环境无模型在环，无法让模型自主发起工具调用。工具暴露由 `tool-exposure.json` 验证（provider 实际收到 schema），策略与执行由本次整链路验证；二者的连接点"模型决定调用"未验证。 |
+| **模型真正调用 orb 工具** | 本环境无模型在环时无法验证；现已有真实模型入口 `evidence/p1-06/run-real-model-c7.mjs`（隔离真实 pi-web + 真实模型），但**当前工作站已锁定**（`LockApp` 在前台、输入桌面不可访问），唤醒路径无法前置丢弃式目标，故本次未取得结论，也未消耗模型额度。解锁后重跑即可。 |
 | **输入与滚动经 orb 工具** | **滚动已实测**（P1-05 前台升级到达并生效；本阶段闭环接受该调用）；**向 Chromium 内容输入文本**仍未验证（驱动对该事件类型不可用）。 |
 | **失败即停（batch-stopped）由真实驱动失败触发** | 由单测覆盖（`tests/desktop-broker.test.ts`）；本次整链路中未构造真实驱动失败。 |
 | 普通 vs 高权限窗口、多显示器 | 未对高权限窗口测试（不自动提权）；仅 1 个显示器。 |

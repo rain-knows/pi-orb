@@ -1,0 +1,42 @@
+{
+  "capturedAt": "2026-09-28T07:38:33.676Z",
+  "scope": {
+    "what": "C7 with a real model: a point picked off the real screenshot must be the point clicked",
+    "chain": "target app <- locked Cua driver <- cua-adapter <- desktop-broker <- bridge <- pi-web <- real model"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581113674\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790581113674\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-c7-agent-1790581113674",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "LockApp",
+      "title": "Windows Ĭ����������",
+      "inputDesktopAccessible": false
+    }
+  },
+  "checks": [
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": false,
+      "detail": "{\"process\":\"LockApp\",\"title\":\"Windows Ĭ����������\",\"inputDesktopAccessible\":false}"
+    }
+  ],
+  "passed": false,
+  "error": "no interactive desktop: foreground is LockApp and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
+  "shellTail": "",
+  "piWebTail": ""
+}
