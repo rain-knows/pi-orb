@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-09-28T01:06:59.183Z",
-  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790557619183",
+  "capturedAt": "2026-09-28T01:12:23.789Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790557943788",
   "shortcutUnderTest": "Control+Alt+F9",
   "isolation": {
     "note": "each app instance gets its own userData directory and Orb config; no pi-web service is started and none is needed",

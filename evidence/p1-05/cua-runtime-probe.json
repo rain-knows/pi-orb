@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:42:52.387Z",
+  "capturedAt": "2026-09-28T01:15:03.072Z",
   "probe": "P1-05 read-only Cua runtime probe",
   "safety": {
     "desktopInputSent": false,
@@ -47,7 +47,7 @@
     "created": true,
     "shutdown": {
       "ok": true,
-      "elapsedMs": 0
+      "elapsedMs": 2
     }
   },
   "tools": {
@@ -211,27 +211,27 @@
   },
   "observation": {
     "windows": {
-      "count": 7,
-      "elapsedMs": 153,
+      "count": 6,
+      "elapsedMs": 160,
       "hasZIndex": true,
       "hasBounds": true,
       "sample": [
         {
           "windowId": {
-            "__bigint": "723120"
+            "__bigint": "329270"
           },
-          "pid": 2756,
-          "appName": "Notepad.exe",
-          "title": "*p1-05-keyboard-target.txt - Notepad",
+          "pid": 25612,
+          "appName": "chrome.exe",
+          "title": "pi-orb - Pi Web - Google Chrome",
           "bounds": {
-            "x": 436,
-            "y": 429,
-            "width": 1906,
-            "height": 815
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1600
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "6"
+            "__bigint": "5"
           },
           "layer": 0,
           "minimized": false,
@@ -254,7 +254,7 @@
           },
           "isOnScreen": true,
           "zIndex": {
-            "__bigint": "5"
+            "__bigint": "4"
           },
           "layer": 0,
           "minimized": false,
@@ -269,29 +269,6 @@
           "pid": 18292,
           "appName": "ApplicationFrameHost.exe",
           "title": "设置",
-          "bounds": {
-            "x": 0,
-            "y": 0,
-            "width": 2560,
-            "height": 1600
-          },
-          "isOnScreen": true,
-          "zIndex": {
-            "__bigint": "4"
-          },
-          "layer": 0,
-          "minimized": false,
-          "currentSpaceId": "undefined",
-          "onCurrentSpace": "undefined",
-          "spaceIds": "undefined"
-        },
-        {
-          "windowId": {
-            "__bigint": "329270"
-          },
-          "pid": 25612,
-          "appName": "chrome.exe",
-          "title": "pi-orb - Pi Web - Google Chrome",
           "bounds": {
             "x": 0,
             "y": 0,
@@ -330,9 +307,32 @@
           "currentSpaceId": "undefined",
           "onCurrentSpace": "undefined",
           "spaceIds": "undefined"
+        },
+        {
+          "windowId": {
+            "__bigint": "1968416"
+          },
+          "pid": 12036,
+          "appName": "Notepad.exe",
+          "title": "*p1-05-keyboard-target.txt - Notepad",
+          "bounds": {
+            "x": -31993,
+            "y": -32000,
+            "width": 223,
+            "height": 32
+          },
+          "isOnScreen": false,
+          "zIndex": {
+            "__bigint": "1"
+          },
+          "layer": 0,
+          "minimized": true,
+          "currentSpaceId": "undefined",
+          "onCurrentSpace": "undefined",
+          "spaceIds": "undefined"
         }
       ],
-      "bigintIds": 7
+      "bigintIds": 6
     },
     "ownWin32Probe": {
       "ok": true,
@@ -349,7 +349,16 @@
     },
     "apps": {
       "count": 309,
-      "activeApp": null,
+      "activeApp": {
+        "pid": 25612,
+        "name": "Google Chrome",
+        "running": true,
+        "active": true,
+        "bundleId": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "launchPath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "kind": "desktop",
+        "lastUsed": "2026-09-22T00:08:17Z"
+      },
       "runningCount": 6,
       "note": "AppInfo.active identifies the active application, not the active window"
     }
@@ -381,7 +390,7 @@
       "conclusion": "CONFIRMED MISMATCH: getScreenSize reports the DPI-unaware virtualized resolution while window bounds report physical pixels. A click must not be derived from one and applied to the other."
     },
     "desktopState": {
-      "elapsedMs": 96,
+      "elapsedMs": 69,
       "imageFields": [
         {
           "key": "mimeType",
@@ -451,13 +460,13 @@
     }
   },
   "timingsMs": {
-    "moduleImport": 50,
-    "driverCreate": 61,
-    "listToolsJson": 43,
-    "listWindows": 153,
-    "getDesktopState": 96,
-    "startSession": 1,
-    "shutdown": 0
+    "moduleImport": 64,
+    "driverCreate": 74,
+    "listToolsJson": 53,
+    "listWindows": 160,
+    "getDesktopState": 69,
+    "startSession": 0,
+    "shutdown": 2
   },
   "checks": [
     {
@@ -493,7 +502,7 @@
     {
       "name": "a driver instance can be created in-process",
       "ok": true,
-      "detail": "create() took 61 ms"
+      "detail": "create() took 74 ms"
     },
     {
       "name": "the driver reports a runtime tool inventory",
@@ -503,7 +512,7 @@
     {
       "name": "window discovery works at runtime",
       "ok": true,
-      "detail": "7 windows in 153 ms"
+      "detail": "6 windows in 160 ms"
     },
     {
       "name": "window records carry bounds",
@@ -513,7 +522,7 @@
     {
       "name": "window ids are bigint as documented, not numbers",
       "ok": true,
-      "detail": "bigint ids: 7/7"
+      "detail": "bigint ids: 6/6"
     },
     {
       "name": "window records expose a front order (zIndex) for window identity binding",
@@ -538,12 +547,12 @@
     {
       "name": "desktop state can be observed at runtime",
       "ok": true,
-      "detail": "{\"elapsedMs\":96,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
+      "detail": "{\"elapsedMs\":69,\"imageFields\":[{\"key\":\"mimeType\",\"mimeType\":\"image/png\"}],\"keys\":[\"text\",\"images\",\"structuredJson\",\"isError\",\"errorCode\",\"action\",\"verification\",\"degraded\",\"rawJson\"],\"pixelsPersisted\":false}"
     },
     {
       "name": "a named session can be started",
       "ok": true,
-      "detail": "took 1 ms"
+      "detail": "took 0 ms"
     },
     {
       "name": "session state can be read",
@@ -558,7 +567,7 @@
     {
       "name": "the driver shuts down cleanly",
       "ok": true,
-      "detail": "0 ms"
+      "detail": "2 ms"
     }
   ],
   "passed": true

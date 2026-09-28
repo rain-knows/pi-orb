@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-09-27T20:39:54.447Z",
-  "runRoot": "D:\\pi-orb-p1-runs\\boot-smoke-1790541594447",
+  "capturedAt": "2026-09-28T01:11:40.908Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\boot-smoke-1790557900908",
   "checks": [
     {
       "name": "electron shell stays alive",
@@ -49,6 +49,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-33148",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31988/devtools/browser/eb6d58a7-afea-4d0e-b0e4-43962db7f9fc"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-7820",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31988/devtools/browser/6410ceb3-bc7f-40ac-b671-9ec3c700f738"
 }

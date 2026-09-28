@@ -1,20 +1,20 @@
 {
-  "capturedAt": "2026-09-28T01:04:26.207Z",
+  "capturedAt": "2026-09-28T01:16:22.988Z",
   "checks": [
     {
       "name": "the shell lists its desktop targets",
       "ok": true,
-      "detail": "{\"windowId\":\"657092\",\"pid\":7136,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"5\",\"isRecorded\":false}"
+      "detail": "{\"windowId\":\"5570920\",\"pid\":30444,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":684},\"zIndex\":\"5\",\"isRecorded\":false}"
     },
     {
       "name": "a session exists so authority can be granted",
       "ok": true,
-      "detail": "01a0e58a-fb8b-7208-a061-df519bec6b8c"
+      "detail": "01a0e595-ef18-7233-92d0-50b8528ec230"
     },
     {
       "name": "approving a desktop task grants authority",
       "ok": true,
-      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"lifecycle test\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790557786463,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":tru"
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"lifecycle test\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790558504158,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":tru"
     },
     {
       "name": "an explicit stop clears the authorization",
@@ -29,7 +29,7 @@
     {
       "name": "stopping desktop operations does not end the chat session",
       "ok": true,
-      "detail": "before=01a0e58a-fb8b-7208-a061-df519bec6b8c after=01a0e58a-fb8b-7208-a061-df519bec6b8c"
+      "detail": "before=01a0e595-ef18-7233-92d0-50b8528ec230 after=01a0e595-ef18-7233-92d0-50b8528ec230"
     },
     {
       "name": "the run generation is unchanged by a desktop stop",
@@ -49,13 +49,13 @@
     {
       "name": "losing the pi-web connection revokes desktop authority",
       "ok": true,
-      "detail": "{\"regranted\":\"\\\"{\\\\\\\"authorized\\\\\\\":true,\\\\\\\"taskId\\\\\\\":\\\\\\\"task-3\\\\\\\",\\\\\\\"scope\\\\\\\":\\\\\\\"disconnect test\\\\\\\",\\\\\\\"actionsUsed\\\\\\\":0,\\\\\\\"actionLimit\\\\\\\":12,\\\\\\\"expiresAt\\\\\\\":1790557787411,\\\\\\\"stopped\\\\\\\":false,\\\\\\\"stoppedReason\\\\\\\":null,\\\\\\\"lastObservationId\\\\\",\"bridgeAuthorizedBefore\":true,\"piWebPid\"…"
+      "detail": "{\"regranted\":\"\\\"{\\\\\\\"authorized\\\\\\\":true,\\\\\\\"taskId\\\\\\\":\\\\\\\"task-3\\\\\\\",\\\\\\\"scope\\\\\\\":\\\\\\\"disconnect test\\\\\\\",\\\\\\\"actionsUsed\\\\\\\":0,\\\\\\\"actionLimit\\\\\\\":12,\\\\\\\"expiresAt\\\\\\\":1790558505125,\\\\\\\"stopped\\\\\\\":false,\\\\\\\"stoppedReason\\\\\\\":null,\\\\\\\"lastObservationId\\\\\",\"bridgeAuthorizedBefore\":true,\"piWebPid\"…"
     }
   ],
   "passed": true,
   "environment": {
     "generation": 1,
-    "ensureResult": "01a0e58a-fb8b-7208-a061-df519bec6b8c",
+    "ensureResult": "01a0e595-ef18-7233-92d0-50b8528ec230",
     "piWebReachable": true
   },
   "approval": {
@@ -64,14 +64,14 @@
     "scope": "lifecycle test",
     "actionsUsed": 0,
     "actionLimit": 12,
-    "expiresAt": 1790557786463,
+    "expiresAt": 1790558504158,
     "stopped": false,
     "stoppedReason": null,
     "lastObservationId": null,
     "bridgeReady": true,
     "target": {
-      "windowId": "657092",
-      "pid": 7136,
+      "windowId": "5570920",
+      "pid": 30444,
       "appName": "electron.exe",
       "title": "P1-05 input target",
       "bounds": {
@@ -88,16 +88,16 @@
     "beforeAuthorized": true,
     "bridgeAuthorizedBefore": true,
     "bridgeTargetBefore": "P1-05 input target",
-    "collapseResponse": "{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"657092\",\"pid\":7136,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"",
+    "collapseResponse": "{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"5570920\",\"pid\":30444,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135",
     "bridgeAuthorizedAfter": false,
-    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"657092\",\"pid\":7136,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds"
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"5570920\",\"pid\":30444,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"boun"
   },
   "disconnect": {
-    "regranted": "\"{\\\"authorized\\\":true,\\\"taskId\\\":\\\"task-3\\\",\\\"scope\\\":\\\"disconnect test\\\",\\\"actionsUsed\\\":0,\\\"actionLimit\\\":12,\\\"expiresAt\\\":1790557787411,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\",
+    "regranted": "\"{\\\"authorized\\\":true,\\\"taskId\\\":\\\"task-3\\\",\\\"scope\\\":\\\"disconnect test\\\",\\\"actionsUsed\\\":0,\\\"actionLimit\\\":12,\\\"expiresAt\\\":1790558505125,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\",
     "bridgeAuthorizedBefore": true,
-    "piWebPid": 19884,
-    "refreshResult": "\"{\\\"authorized\\\":false,\\\"taskId\\\":null,\\\"scope\\\":null,\\\"actionsUsed\\\":0,\\\"actionLimit\\\":12,\\\"expiresAt\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridgeReady\\\":true,\\\"target\\\":{\\\"windowId\\\":\\\"657092\\\",\\\"pid\\\":7136,\\\"",
+    "piWebPid": 37376,
+    "refreshResult": "\"{\\\"authorized\\\":false,\\\"taskId\\\":null,\\\"scope\\\":null,\\\"actionsUsed\\\":0,\\\"actionLimit\\\":12,\\\"expiresAt\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridgeReady\\\":true,\\\"target\\\":{\\\"windowId\\\":\\\"5570920\\\",\\\"pid\\\":30444,",
     "bridgeAuthorizedAfter": false,
-    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"657092\",\"pid\":7136,\"appName\":\""
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"5570920\",\"pid\":30444,\"appName\""
   }
 }

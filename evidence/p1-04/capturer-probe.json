@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-09-27T20:41:13.774Z",
+  "capturedAt": "2026-09-28T01:13:11.304Z",
   "electronVersion": null,
-  "sourceCount": 4,
-  "windowSourceCount": 3,
+  "sourceCount": 2,
+  "windowSourceCount": 1,
   "screenSourceCount": 1,
   "displayCount": 1,
   "displays": [
@@ -26,27 +26,13 @@
   ],
   "idFormatExamples": [
     {
-      "id": "window:1181646:0",
-      "name": "Backstop Window"
-    },
-    {
-      "id": "window:723120:0",
-      "name": "*p1-05-keyboard-target.txt - Notepad"
-    },
-    {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome"
     }
   ],
   "nativeWindowCount": 6,
-  "idsContainingNativeHandle": 2,
+  "idsContainingNativeHandle": 1,
   "idHandleMatches": [
-    {
-      "id": "window:723120:0",
-      "name": "*p1-05-keyboard-target.txt - Notepad",
-      "middle": "723120",
-      "middleIsLiveHandle": true
-    },
     {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome",
@@ -58,26 +44,6 @@
   "anyThumbnailPresent": false,
   "error": null,
   "rawSourceSample": [
-    {
-      "id": "window:1181646:0",
-      "name": "Backstop Window",
-      "displayId": "",
-      "hasThumbnail": false,
-      "thumbnailSize": {
-        "width": 0,
-        "height": 0
-      }
-    },
-    {
-      "id": "window:723120:0",
-      "name": "*p1-05-keyboard-target.txt - Notepad",
-      "displayId": "",
-      "hasThumbnail": false,
-      "thumbnailSize": {
-        "width": 0,
-        "height": 0
-      }
-    },
     {
       "id": "window:329270:0",
       "name": "pi-orb - Pi Web - Google Chrome",
@@ -91,7 +57,7 @@
     {
       "id": "screen:0:0",
       "name": "整个屏幕",
-      "displayId": "",
+      "displayId": "1524534193",
       "hasThumbnail": false,
       "thumbnailSize": {
         "width": 0,
@@ -99,5 +65,5 @@
       }
     }
   ],
-  "stderrTail": "[27316:0928/044113.680:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange.\n[27316:0928/044113.680:ERROR:gpu\\ipc\\client\\command_buffer_proxy_impl.cc:490] GPU state invalid after WaitForGetOffsetInRange."
+  "stderrTail": ""
 }
