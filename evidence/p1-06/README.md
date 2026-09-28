@@ -168,6 +168,23 @@ The workstation appears to be locked; unlock it and re-run. Nothing was sent to 
 因此反射式唤醒路径无法把丢弃式目标窗口记为“用户正在看的窗口”，截图授权链在第一步就断掉。
 这一项**必须**在解锁的交互式桌面下才能有结论。
 
+**锁屏下仍已取得的真实证据（10/11 项前置通过，未消耗额度）**：
+
+| 检查 | 结果 | 证据 |
+|---|---|---|
+| 隔离 pi-web 启动 | 通过 | `http://127.0.0.1:31502` |
+| 隔离浮窗写出自己的握手指令 | 通过 | `pid` 与正在运行的 30620 **不同** |
+| 命名管道可连接 | 通过 | `\\.\pipe\pi-orb-<隔离 pid>` |
+| 隔离浮窗不是用户正在运行的那个 | 通过 | `handshake.pid !== 30620` |
+| CDP 可驱动 Orb 渲染层 | 通过 | `pi-Orb` / `out/renderer/index.html` |
+| 唤醒快捷键注册 | 通过 | `Control+Alt+F11`，`shortcutProblem` 为空 |
+| 真实 pi-web 会话已创建 | 通过 | 会话 id `01a0e6fe-…` |
+| **会话所用模型声明支持图像** | 通过 | `TZcode/deepseek-v4.1-flash`，`input=["text","image"]` |
+| 驱动列出丢弃式目标（按 pid） | 通过 | `P1-05 input target` |
+| 交互式桌面可用 | **失败** | `LockApp` 在前台，输入桌面不可访问 |
+
+即：**除“需要真实前台”这一步，D 组的链路与模型配置已全部就绪**，而这一步正是锁屏阻断的。
+
 值得记下的一处产品观感问题（未改，先记录）：锁屏时产品报的是
 「The recorded window was replaced by a different one (now "Windows 默认锁屏界面")」，
 这对用户是**误导**——真实原因是“当前根本无法前置任何窗口”。harness 现在加了前置探测，

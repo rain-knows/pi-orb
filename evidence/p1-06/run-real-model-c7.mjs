@@ -71,6 +71,8 @@ const WAKE_CHORD = "Control+Alt+F11";
 
 const REAL_AGENT_DIR = join(process.env.USERPROFILE ?? "", ".pi", "agent");
 const MODEL = { provider: "TZcode", id: "deepseek-v4.1-flash" };
+/** Basic auth for the isolated pi-web's own API, which is the same credential the shell uses. */
+const authHeader = `Basic ${Buffer.from(`pi:${PI_WEB_PASSWORD}`, "utf8").toString("base64")}`;
 
 for (const dir of [runRoot, WORKSPACE, agentDir, shellDataDir]) mkdirSync(dir, { recursive: true });
 
@@ -512,23 +514,11 @@ try {
   stageAgentDir();
   writeOrbConfig();
 
-  // Preflight the interactive desktop. While the session is locked the wake path cannot foreground
-  // the disposable window, and the product would then report a *misleading* failure ("the recorded
-  // window was replaced"), so this stops first and says what is actually wrong.
+  // Probe the interactive desktop early, but do not abort on it yet: everything up to the wake needs
+  // no desktop, and gating here would hide the D-group wiring checks below. It is enforced before the
+  // wake, which is the first step that genuinely needs a foregroundable window.
   const desktop = probeInteractiveDesktop();
   report.steps.interactiveDesktop = desktop;
-  if (
-    !check(
-      "an interactive desktop is available to foreground the target",
-      desktop?.inputDesktopAccessible === true,
-      safe(desktop),
-    )
-  ) {
-    throw new Error(
-      `no interactive desktop: foreground is ${desktop?.process ?? "?"} and the input desktop is not accessible. ` +
-        "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
-    );
-  }
 
   // The target first, so its window is what the orb records as "the window the user was looking at".
   const geometry = await startTarget();
@@ -586,6 +576,47 @@ try {
   report.steps.generation = generation;
   check("the isolated shell reports a workspace and a generation", Boolean(status?.workspace) && typeof generation === "number", safe({ workspace: status?.workspace, generation }));
 
+  // -------------------------------------------------------------------------
+  // Prerequisites that need NO desktop. These are checked before the desktop gate so the D-group
+  // wiring (a real session in Orb mode, served by a real image-capable model, with the extension
+  // loaded) is verified even when no window can be foregrounded.
+  // -------------------------------------------------------------------------
+  const sessionCreated = await orb(client, `window.orb.ensureSession()`);
+  report.steps.session = sessionCreated;
+  check("the isolated shell created a real pi-web session", typeof sessionCreated === "string" && sessionCreated.length > 0, safe(sessionCreated));
+
+  // Which model will serve this session, and can it see images? A screenshot can only reach a model
+  // that accepts image input, and pi-web refuses to upload one otherwise - so this is checked here
+  // rather than discovered after spending a turn.
+  //
+  // Note on the tool list: pi-web exposes no endpoint that returns a session's tools (the agent routes
+  // are `new`, `[id]/events`, `[id]/lease`, `[id]/bash-output`), so this harness does not invent one.
+  // The four Orb tools being offered is evidenced instead by the real session's own `toolCall` blocks
+  // in the verdict below: a model cannot call a tool it was never offered. The provider-side schema
+  // check is the separate stage `run-p1-06-tools.mjs` (7/7), which records what the provider receives.
+  const models = await fetch(`${piWebBaseUrl}/api/models?cwd=${encodeURIComponent(WORKSPACE)}`, {
+    headers: { authorization: authHeader },
+  }).then((r) => r.json()).catch(() => null);
+  const created = await fetch(`${piWebBaseUrl}/api/agent/new`, {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: authHeader },
+    body: JSON.stringify({ cwd: WORKSPACE, type: "ensure_session" }),
+  }).then((r) => r.json()).catch(() => null);
+  const selected = created?.model ?? null;
+  const selectedId = selected?.modelId ?? selected?.id ?? null;
+  const entry = (models?.modelList ?? []).find((m) => m.provider === selected?.provider && m.id === selectedId);
+  report.steps.model = {
+    sessionId: created?.sessionId ?? null,
+    selected,
+    input: entry?.input ?? null,
+    declaredImageCapable: Boolean(entry?.input?.includes("image")),
+  };
+  check(
+    "the session is served by a model that declares image input",
+    report.steps.model.declaredImageCapable === true,
+    safe(report.steps.model),
+  );
+
   // The desktop-tool target, chosen from the driver's own list. Match by PROCESS ID, not title: the
   // desktop also holds IME/text-input surfaces, and a title match can pick the wrong one. The driver's
   // `windowId` is the Win32 handle in the same id space (verified for P1-06), so it also foregrounds
@@ -613,6 +644,23 @@ try {
 
   // Record the target: bring the disposable window to the front, then press the real wake chord. The
   // record happens inside the product, before it takes focus, so it can only be this window.
+  //
+  // This is the first step that needs a real interactive desktop: while the session is locked no window
+  // can be foregrounded, so the product would record the lock screen and then correctly refuse to
+  // capture it - a message that misattributes an environmental condition to a product defect. Enforced
+  // here, after the D-group wiring checks above have had their chance to run.
+  if (
+    !check(
+      "an interactive desktop is available to foreground the target",
+      desktop?.inputDesktopAccessible === true,
+      safe(desktop),
+    )
+  ) {
+    throw new Error(
+      `no interactive desktop: foreground is ${desktop?.process ?? "?"} and the input desktop is not accessible. ` +
+        "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
+    );
+  }
   const wake = foregroundAndWake(choice.windowId);
   report.steps.wake = wake;
   await sleep(3000);
