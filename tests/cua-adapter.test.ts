@@ -61,14 +61,19 @@ function makeSdk(options: {
 
 const observation: DesktopObservation = {
   id: "obs-1",
-  window: { id: "42", pid: 4242, appName: "test", title: "test window" },
+  window: { id: "42", pid: 4242, appName: "test", title: "test window", bounds: { x: 0, y: 0, width: 1200, height: 800 } },
+  coordinateSpace: {
+    action: "screenshot-fraction",
+    space: 1000,
+    windowRect: { x: 0, y: 0, width: 1200, height: 800 },
+  },
   elements: [],
   capturedAt: 0,
   degraded: false,
 } as unknown as DesktopObservation;
 
-const click: ClickAction = { kind: "click", observationId: "obs-1", point: { x: 10, y: 20 } };
-const scroll: ScrollAction = { kind: "scroll", observationId: "obs-1", direction: "down", amount: 3, point: { x: 1, y: 2 } };
+const click: ClickAction = { kind: "click", observationId: "obs-1", position: { x: 500, y: 500 } };
+const scroll: ScrollAction = { kind: "scroll", observationId: "obs-1", direction: "down", amount: 3, position: { x: 500, y: 500 } };
 const type: TypeAction = { kind: "type", observationId: "obs-1", text: "hello" };
 
 function adapterWith(overrides: Parameters<typeof makeSdk>[0]) {
@@ -187,15 +192,23 @@ describe("CuaDriverAdapter background-to-foreground escalation", () => {
 
 describe("CuaDriverAdapter scroll coordinate conversion", () => {
   /**
-   * The driver adds the window's reported origin back to a request, so a request is the screen DIP
-   * point minus that origin. Clicks already did this; scrolls did not, so the wheel landed somewhere
-   * else while the driver still reported success. That is why P1-06's scroll reported ok:true with no
-   * event reaching the target.
+   * The driver's request space is window-relative, so the rect carries no screen origin: it is the
+   * driver's own reported size, which is the same report the request is measured against. The driver
+   * adds its window origin back itself.
+   *
+   * The point arrives as a screenshot fraction, so the fraction is mapped onto that rect. An earlier
+   * version subtracted the driver's *physical* origin from a *screen DIP* point — a mixed-unit bug —
+   * and the click landed one cell away from the intended one (evidence/p1-06/loop-verification.json).
    */
   function observationWithOrigin() {
     return {
       ...observation,
       window: { ...observation.window, bounds: { x: 189, y: 135, width: 735, height: 684 } },
+      coordinateSpace: {
+        action: "screenshot-fraction",
+        space: 1000,
+        windowRect: { x: 0, y: 0, width: 735, height: 684 },
+      },
     } as unknown as DesktopObservation;
   }
 
@@ -241,11 +254,13 @@ describe("CuaDriverAdapter scroll coordinate conversion", () => {
     const observed = await adapter.observe({ windowId: "42" });
     expect(observed.ok).toBe(true);
 
-    await adapter.act({ ...scroll, point: { x: 641, y: 422 } }, observationWithOrigin());
+    await adapter.act({ ...scroll, position: { x: 500, y: 500 } }, observationWithOrigin());
     const scrolled = calls.scroll[0] as { x: number; y: number };
-    // 641 - 189 = 452, 422 - 135 = 287. Passing the raw screen point would have sent 641/422.
-    expect(scrolled.x).toBe(452);
-    expect(scrolled.y).toBe(287);
+    // fraction 500/1000 onto the driver's own 735x684 bounds = (367.5, 342).
+    // An earlier version subtracted the physical origin from a DIP point and sent ~(182,183),
+    // which landed one cell away.
+    expect(scrolled.x).toBe(367.5);
+    expect(scrolled.y).toBe(342);
   });
 
   it("keeps the same converted point when it escalates to foreground", async () => {
@@ -285,13 +300,13 @@ describe("CuaDriverAdapter scroll coordinate conversion", () => {
     adapter.create();
     const observed = await adapter.observe({ windowId: "42" });
     if (!observed.ok) throw new Error("observation failed");
-    await adapter.act({ ...scroll, point: { x: 641, y: 422 } }, observationWithOrigin());
+    await adapter.act({ ...scroll, position: { x: 500, y: 500 } }, observationWithOrigin());
 
     const args = JSON.parse((calls.callTool[0] as [string, string])[1]);
     // The retry must aim at the same converted point, or the escalation would scroll elsewhere while
     // reporting success.
-    expect(args.x).toBe(452);
-    expect(args.y).toBe(287);
+    expect(args.x).toBe(367.5);
+    expect(args.y).toBe(342);
     expect(args.delivery_mode).toBe("foreground");
   });
 });

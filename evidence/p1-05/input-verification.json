@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-28T01:56:16.117Z",
+  "capturedAt": "2026-09-28T07:01:13.690Z",
   "scope": {
     "platform": "win32 x64",
     "driverVersion": "0.30.1",
@@ -119,7 +119,7 @@
           "x": -2,
           "y": 56
         },
-        "driverSummary": "✅ Posted click to Chromium pid 32840 at (188,192) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 43636 at (188,192) (background, no foreground swap).",
         "error": null,
         "landedCell": "0,0",
         "landedOffsetInCell": {
@@ -140,7 +140,7 @@
           "x": 238,
           "y": 146
         },
-        "driverSummary": "✅ Posted click to Chromium pid 32840 at (428,282) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 43636 at (428,282) (background, no foreground swap).",
         "error": null,
         "landedCell": "1,2",
         "landedOffsetInCell": {
@@ -161,7 +161,7 @@
           "x": 358,
           "y": 236
         },
-        "driverSummary": "✅ Posted click to Chromium pid 32840 at (548,372) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 43636 at (548,372) (background, no foreground swap).",
         "error": null,
         "landedCell": "2,3",
         "landedOffsetInCell": {
@@ -182,7 +182,7 @@
           "x": -2,
           "y": 236
         },
-        "driverSummary": "✅ Posted click to Chromium pid 32840 at (188,372) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 43636 at (188,372) (background, no foreground swap).",
         "error": null,
         "landedCell": "2,0",
         "landedOffsetInCell": {
@@ -201,7 +201,7 @@
     "verificationMethod": "read back through the accessibility tree's document value",
     "frontCheckTargetUsesGridWindow": true,
     "note": "the front check reports the grid window; for the keyboard test the Notepad window was opened last and is checked separately below",
-    "driverSummary": "📨 Sent 10 char(s) to pid 38236 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
+    "driverSummary": "📨 Sent 10 char(s) to pid 42988 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
     "error": null,
     "textBeforeContainsTyped": false,
     "textAfterContainsTyped": true,
@@ -244,10 +244,22 @@
           "text": "✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (372,540) (delivery_mode:foreground).",
           "error": null,
           "delivered": true,
-          "wheelEvents": 1,
+          "wheelEvents": 2,
           "wheelDetail": [
             {
-              "at": 1790560592663,
+              "at": 1790578890384,
+              "kind": "wheel",
+              "clientPoint": {
+                "x": 244,
+                "y": 394
+              },
+              "deltaY": 300,
+              "overScroller": true,
+              "elementUnderPoint": "DIV",
+              "scrollerScrollTop": 0
+            },
+            {
+              "at": 1790578890385,
               "kind": "wheel",
               "clientPoint": {
                 "x": 244,
@@ -265,8 +277,8 @@
       {
         "target": "notepad",
         "screenDipPoint": {
-          "x": 1389,
-          "y": 701
+          "x": 1188,
+          "y": 500
         },
         "requestPoint": {
           "x": 953,
@@ -289,12 +301,12 @@
             "y": 272
           },
           "targetScreenDipPoint": {
-            "x": 1389,
-            "y": 701
+            "x": 1188,
+            "y": 500
           },
           "refused": false,
           "errorCode": null,
-          "text": "✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (1390,702) (delivery_mode:foreground).",
+          "text": "✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (1189,501) (delivery_mode:foreground).",
           "error": null,
           "delivered": null,
           "wheelEvents": null,
@@ -314,8 +326,8 @@
       "cell-mousedown": 5,
       "mouse-down": 5,
       "mouse-up": 5,
-      "wheel": 1,
-      "scroll": 22
+      "wheel": 2,
+      "scroll": 21
     },
     "targetLogKeyEvents": {
       "down": 0,
@@ -341,7 +353,7 @@
       "refused": false,
       "effect": 2,
       "deliveryMode": 1,
-      "summary": "✅ Sent click via SendInput to pid 32840 at (250,181) (delivery_mode:foreground).",
+      "summary": "✅ Sent click via SendInput to pid 43636 at (250,181) (delivery_mode:foreground).",
       "error": null,
       "mouseDownEvents": 1,
       "delivered": true,
@@ -349,9 +361,9 @@
     }
   },
   "timingsMs": {
-    "moduleImport": 59,
-    "driverCreate": 75,
-    "listWindows": 74,
+    "moduleImport": 62,
+    "driverCreate": 77,
+    "listWindows": 77,
     "startSession": 1,
     "shutdown": 1
   },
@@ -374,7 +386,7 @@
     {
       "name": "the native driver module loads and a driver can be created",
       "ok": true,
-      "detail": "import 59 ms, create 75 ms"
+      "detail": "import 62 ms, create 77 ms"
     },
     {
       "name": "the environment exhibits the scaled-DPI case P0-04 warned about",
@@ -409,12 +421,12 @@
     {
       "name": "the driver reported background delivery without raising the window",
       "ok": true,
-      "detail": "[\"✅ Posted click to Chromium pid 32840 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 32840 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 32840 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 32840 at (188,372) (background, no foreground swap).\"]"
+      "detail": "[\"✅ Posted click to Chromium pid 43636 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 43636 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 43636 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 43636 at (188,372) (background, no foreground swap).\"]"
     },
     {
       "name": "background typing to a native application is delivered",
       "ok": true,
-      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 38236 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes n\"}"
+      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 42988 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes n\"}"
     },
     {
       "name": "the typed text is readable back from the target, so it actually landed",
@@ -449,7 +461,7 @@
     {
       "name": "the escalation was issued exactly as the driver prescribes (foreground, same converted point)",
       "ok": true,
-      "detail": "{\"escalation\":{\"mechanism\":\"callTool('scroll', {delivery_mode:'foreground'})\",\"requestedDeliveryMode\":\"foreground\",\"requestedRequestPoint\":{\"x\":182,\"y\":404},\"targetScreenDipPoint\":{\"x\":371,\"y\":539},\"refused\":false,\"errorCode\":null,\"text\":\"✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (372,540) (delivery_mode:foreground).\",\"error\":null,\"delivered\":true,\"wheelEvents\":1,\"wheelDetail\":[{\"a"
+      "detail": "{\"escalation\":{\"mechanism\":\"callTool('scroll', {delivery_mode:'foreground'})\",\"requestedDeliveryMode\":\"foreground\",\"requestedRequestPoint\":{\"x\":182,\"y\":404},\"targetScreenDipPoint\":{\"x\":371,\"y\":539},\"refused\":false,\"errorCode\":null,\"text\":\"✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (372,540) (delivery_mode:foreground).\",\"error\":null,\"delivered\":true,\"wheelEvents\":2,\"wheelDetail\":[{\"a"
     },
     {
       "name": "environment fact: the foreground wheel event reached the target on this run",
@@ -464,7 +476,7 @@
     {
       "name": "an explicit foreground click either delivers a real press or reports a refusal with a reason",
       "ok": true,
-      "detail": "{\"refused\":false,\"effect\":2,\"deliveryMode\":1,\"summary\":\"✅ Sent click via SendInput to pid 32840 at (250,181) (delivery_mode:foreground).\",\"error\":null,\"mouseDownEvents\":1,\"delivered\":true}"
+      "detail": "{\"refused\":false,\"effect\":2,\"deliveryMode\":1,\"summary\":\"✅ Sent click via SendInput to pid 43636 at (250,181) (delivery_mode:foreground).\",\"error\":null,\"mouseDownEvents\":1,\"delivered\":true}"
     },
     {
       "name": "a foreground click that reported success really produced a mouse press in the target",
@@ -474,7 +486,7 @@
     {
       "name": "no key was left pressed after the input sequence",
       "ok": true,
-      "detail": "{\"before\":{\"ok\":true,\"sampledAt\":1790560582036,\"down\":[]},\"after\":{\"ok\":true,\"sampledAt\":1790560598333,\"down\":[]},\"residue\":[],\"basis\":\"GetAsyncKeyState sampled globally before and after this stage's own input; a key down after but not before is residue\",\"excludedAsPreExisting\":[]}"
+      "detail": "{\"before\":{\"ok\":true,\"sampledAt\":1790578879687,\"down\":[]},\"after\":{\"ok\":true,\"sampledAt\":1790578896106,\"down\":[]},\"residue\":[],\"basis\":\"GetAsyncKeyState sampled globally before and after this stage's own input; a key down after but not before is residue\",\"excludedAsPreExisting\":[]}"
     },
     {
       "name": "no mouse button was left pressed after the input sequence",
@@ -502,12 +514,12 @@
   "keyResidue": {
     "before": {
       "ok": true,
-      "sampledAt": 1790560582036,
+      "sampledAt": 1790578879687,
       "down": []
     },
     "after": {
       "ok": true,
-      "sampledAt": 1790560598333,
+      "sampledAt": 1790578896106,
       "down": []
     },
     "residue": [],
@@ -517,14 +529,14 @@
   "notepadReachabilityProbe": {
     "derivedFrom": "the driver's own reported bounds for this window, so the point lies inside it",
     "boundsUsed": {
-      "x": 436,
-      "y": 429,
+      "x": 235,
+      "y": 228,
       "width": 1906,
       "height": 815
     },
     "point": {
-      "x": 1389,
-      "y": 701
+      "x": 1188,
+      "y": 500
     },
     "driverDidNotRefuse": true,
     "observableDelivery": null,

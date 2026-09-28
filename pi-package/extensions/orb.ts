@@ -51,23 +51,41 @@ const OBSERVE_PARAMS = Type.Object(
 );
 
 /**
- * Click parameters.
+ * Position parameters, shared by click and scroll.
  *
- * Both addressing forms are offered because measurement showed they are not equivalent
- * (doc/cua-driver-integration.md): an element token is DPI-independent but Chromium content
- * often exposes no elements, while a coordinate always works but must be an explicit screen
- * DIP value the observation reported. Exactly one form must be used.
+ * A position is a fraction of the screenshot the model is looking at: `[0,0]` is the screenshot's
+ * top-left and `[1000,1000]` its bottom-right. It is deliberately NOT a screen coordinate — the
+ * model cannot know where a window sits on the desktop, and asking it for one produced the
+ * documented wrong-place failure. The shell converts the fraction onto the window's own rect.
  */
+const POSITION_PARAMS = {
+  x: Type.Optional(
+    Type.Number({
+      minimum: 0,
+      maximum: 1000,
+      description:
+        "Horizontal fraction of the screenshot being viewed, 0 (left edge) to 1000 (right edge). Not a screen coordinate.",
+    }),
+  ),
+  y: Type.Optional(
+    Type.Number({
+      minimum: 0,
+      maximum: 1000,
+      description:
+        "Vertical fraction of the screenshot being viewed, 0 (top edge) to 1000 (bottom edge). Not a screen coordinate.",
+    }),
+  ),
+};
+
 const CLICK_PARAMS = Type.Object(
   {
     observation_id: Type.String({
-      description: "The observation_id from the orbit_observe result this action was decided from.",
+      description: "The observation_id from the orb_observe result this action was decided from.",
     }),
     element_token: Type.Optional(
       Type.String({ description: "Element token from the observation. Preferred when available." }),
     ),
-    x: Type.Optional(Type.Number({ description: "Screen DIP x coordinate. Requires y." })),
-    y: Type.Optional(Type.Number({ description: "Screen DIP y coordinate. Requires x." })),
+    ...POSITION_PARAMS,
   },
   { additionalProperties: false },
 );
@@ -98,8 +116,7 @@ const SCROLL_PARAMS = Type.Object(
       description: `Scroll ticks (1-${ORB_LIMITS.maxScrollAmount}).`,
     }),
     element_token: Type.Optional(Type.String({ description: "Scrollable element token." })),
-    x: Type.Optional(Type.Number({ description: "Screen DIP x coordinate to scroll at." })),
-    y: Type.Optional(Type.Number({ description: "Screen DIP y coordinate to scroll at." })),
+    ...POSITION_PARAMS,
   },
   { additionalProperties: false },
 );
@@ -168,10 +185,11 @@ export default function orbExtension(pi: ExtensionAPI): void {
       name: ORB_TOOLS.click,
       label: "Orb: click",
       description:
-        "Click once in the observed window, addressed by an element token or by an explicit screen DIP coordinate. Requires an authorized desktop task.",
+        "Click once in the observed window, addressed by an element token or by a position in the screenshot you are looking at. Requires an authorized desktop task.",
       promptSnippet: "Click once in the observed window",
       promptGuidelines: [
-        "Address the target by element_token when the observation provides one; use x/y only when it does not.",
+        "Address the target by element_token when the observation provides one; use x/y fractions only when it does not.",
+        "x and y are fractions of the screenshot you can see (0-1000), not screen coordinates. Read them off the image.",
         "Do not click twice from the same observation: observe again first.",
       ],
       parameters: CLICK_PARAMS,
@@ -180,7 +198,9 @@ export default function orbExtension(pi: ExtensionAPI): void {
           kind: "click",
           observationId: params.observation_id,
           ...(params.element_token ? { elementToken: params.element_token } : {}),
-          ...(params.x !== undefined && params.y !== undefined ? { point: { x: params.x, y: params.y } } : {}),
+          ...(params.x !== undefined && params.y !== undefined
+            ? { position: { x: params.x, y: params.y } }
+            : {}),
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },
@@ -210,7 +230,10 @@ export default function orbExtension(pi: ExtensionAPI): void {
       label: "Orb: scroll",
       description: "Scroll inside the observed window. Requires an authorized desktop task.",
       promptSnippet: "Scroll inside the observed window",
-      promptGuidelines: ["Prefer an element token for the scrollable container over a coordinate."],
+      promptGuidelines: [
+        "Prefer an element token for the scrollable container over a coordinate.",
+        "If you give x/y, they are fractions of the screenshot you can see (0-1000), not screen coordinates.",
+      ],
       parameters: SCROLL_PARAMS,
       async execute(_toolCallId, params, _signal, _onUpdate, toolCtx: ExtensionContext) {
         const action: DesktopAction = {
@@ -219,7 +242,9 @@ export default function orbExtension(pi: ExtensionAPI): void {
           direction: params.direction,
           amount: params.amount,
           ...(params.element_token ? { elementToken: params.element_token } : {}),
-          ...(params.x !== undefined && params.y !== undefined ? { point: { x: params.x, y: params.y } } : {}),
+          ...(params.x !== undefined && params.y !== undefined
+            ? { position: { x: params.x, y: params.y } }
+            : {}),
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },
@@ -248,7 +273,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
           }
           const result = await bridge.call(
             { type: "revoke", sessionId: commandCtx.sessionManager.getSessionId(), generation: sessionState.generation },
-            token.token,
+            token,
           );
           commandCtx.ui.notify(
             result.ok ? "Orb desktop task authorization revoked." : `Could not revoke: ${result.message}`,
@@ -325,7 +350,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
             action: payload.action,
           };
 
-    const result = await bridge.call(request, token.token);
+    const result = await bridge.call(request, token);
     if (!result.ok) {
       return textResult(`Refused (${result.reason}): ${result.message}`, {
         ok: false,
@@ -342,7 +367,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     if (!bridge || !token) return "Desktop task status: unavailable (no shell bridge).";
     const result = await bridge.call(
       { type: "status", sessionId: ctx.sessionManager.getSessionId(), generation },
-      token.token,
+      token,
     );
     if (!result.ok) return `Desktop task status: unavailable (${result.reason}: ${result.message})`;
     return `Desktop task status: ${renderResult(result.result)}`;
@@ -362,13 +387,16 @@ function renderResult(result: unknown): string {
   const record = result as Record<string, unknown>;
   if (typeof record.observationId === "string") {
     const observation = record as unknown as DesktopObservation;
+    const rect = observation.coordinateSpace.windowRect;
     const lines = [
       `observation_id: ${observation.observationId}`,
       `window: "${observation.window.title}" (${observation.window.appName}, pid ${observation.window.pid}, window id ${observation.window.id})`,
-      `window size (screen DIP): ${observation.coordinateSpace.windowSize}`,
-      `coordinate space for actions: ${observation.coordinateSpace.action}`,
+      `coordinate space for actions: x and y are fractions of the screenshot you can see, 0-${observation.coordinateSpace.space} on each axis ([0,0] top-left, [${observation.coordinateSpace.space},${observation.coordinateSpace.space}] bottom-right)`,
+      rect
+        ? `the screenshot covers this window (${Math.round(rect.width)}x${Math.round(rect.height)} px); a position is mapped onto it`
+        : "warning: this window's rect could not be determined, so x/y cannot be mapped; address the target by element token",
       observation.elementsUnavailable
-        ? "elements: unavailable for this window; address actions by explicit screen DIP coordinates"
+        ? "elements: unavailable for this window; address actions by x/y fractions read off the screenshot"
         : `elements (${observation.elements.length}):`,
     ];
     for (const element of observation.elements.slice(0, 40)) {

@@ -91,6 +91,22 @@ The MPL-2.0 text is at <https://www.mozilla.org/MPL/2.0/>.
 supplied by this notice rather than by the package, which is why the link above is included here
 instead of relying on the dependency tree.
 
+## 3.5 Design derived from `deepseek-harness-orb` (MIT)
+
+The model-facing position convention (a position is a fraction `0-1000` of the screenshot the model
+is looking at, mapped by the host onto the observed window's rect) is derived from the reference
+implementation [`rain-knows/deepseek-harness-orb`](https://github.com/rain-knows/deepseek-harness-orb),
+which is MIT licensed:
+
+> MIT License — Copyright (c) 2026 DeepSeek
+
+The reference's `packages/experimental/tool-computer-use/src/coordinates.ts` was read for its
+approach (`COORDINATE_SPACE = 1000`, validation of a two-number position, and the fraction-to-global
+mapping). pi-Orb's `src/shared/orb-tools.ts` implements the same contract against pi-Orb's own types
+and refusal vocabulary; no file was copied verbatim, and none of the reference's plugin lifecycle,
+attachment store, or macOS/multi-display code was taken. This entry exists so the derivation is
+recorded rather than silent.
+
 ## 4. Components deliberately not included
 
 | Component | Reason |

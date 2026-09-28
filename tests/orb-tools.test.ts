@@ -22,7 +22,11 @@ function observation(overrides: Partial<DesktopObservation> = {}): DesktopObserv
       appName: "editor.exe",
       bounds: { x: 0, y: 0, width: 1200, height: 800 },
     },
-    coordinateSpace: { action: "screen-dip", windowSize: "1200x800" },
+    coordinateSpace: {
+      action: "screenshot-fraction",
+      space: 1000,
+      windowRect: { x: 0, y: 0, width: 1200, height: 800 },
+    },
     elements: [],
     elementsUnavailable: false,
     degraded: false,
@@ -51,9 +55,23 @@ describe("validateAction", () => {
     expect(validateAction(action, observation(), budget)).toBeNull();
   });
 
-  it("accepts a click addressed by coordinates", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", point: { x: 10, y: 20 } };
+  it("accepts a click addressed by a screenshot fraction", () => {
+    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 10, y: 20 } };
     expect(validateAction(action, observation(), budget)).toBeNull();
+  });
+
+  it("accepts the extreme fractions, since they are the far edges of the screenshot", () => {
+    for (const position of [{ x: 0, y: 0 }, { x: 1000, y: 1000 }]) {
+      const action: DesktopAction = { kind: "click", observationId: "obs-1", position };
+      expect(validateAction(action, observation(), budget)).toBeNull();
+    }
+  });
+
+  it("refuses a fraction outside 0-1000 instead of clamping it, which would move the action", () => {
+    for (const position of [{ x: -1, y: 0 }, { x: 0, y: 1001 }, { x: Number.NaN, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }]) {
+      const action: DesktopAction = { kind: "click", observationId: "obs-1", position };
+      expect(validateAction(action, observation(), budget)).toBe("needs-element-or-point");
+    }
   });
 
   it("refuses a click with no target at all", () => {
@@ -66,13 +84,13 @@ describe("validateAction", () => {
       kind: "click",
       observationId: "obs-1",
       elementToken: "s1:0",
-      point: { x: 1, y: 2 },
+      position: { x: 1, y: 2 },
     };
     expect(validateAction(action, observation(), budget)).toBe("ambiguous-target");
   });
 
   it("refuses a non-finite coordinate instead of letting it reach the driver", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", point: { x: Number.NaN, y: 0 } };
+    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: Number.NaN, y: 0 } };
     expect(validateAction(action, observation(), budget)).toBe("needs-element-or-point");
   });
 
@@ -129,7 +147,7 @@ describe("validateAction", () => {
       observationId: "obs-1",
       direction: "down",
       amount: ORB_LIMITS.maxScrollAmount + 1,
-      point: { x: 0, y: 0 },
+      position: { x: 0, y: 0 },
     };
     expect(validateAction(tooMany, observation(), budget)).toBe("scroll-amount-out-of-range");
 
@@ -138,7 +156,7 @@ describe("validateAction", () => {
       observationId: "obs-1",
       direction: "down",
       amount: 0,
-      point: { x: 0, y: 0 },
+      position: { x: 0, y: 0 },
     };
     expect(validateAction(zero, observation(), budget)).toBe("scroll-amount-out-of-range");
 
@@ -147,7 +165,7 @@ describe("validateAction", () => {
       observationId: "obs-1",
       direction: "sideways",
       amount: 1,
-      point: { x: 0, y: 0 },
+      position: { x: 0, y: 0 },
     } as unknown as DesktopAction;
     expect(validateAction(badDirection, observation(), budget)).toBe("unsupported-direction");
 
@@ -156,7 +174,7 @@ describe("validateAction", () => {
       observationId: "obs-1",
       direction: "down",
       amount: 3,
-      point: { x: 0, y: 0 },
+      position: { x: 0, y: 0 },
     };
     expect(validateAction(ok, observation(), budget)).toBeNull();
   });

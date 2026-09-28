@@ -20,9 +20,10 @@ import type {
   DesktopAction,
   DesktopElement,
   DesktopObservation,
+  ScreenshotPosition,
   TypeAction,
 } from "@shared/orb-tools";
-import { ORB_LIMITS, boundElements } from "@shared/orb-tools";
+import { COORDINATE_SPACE, ORB_LIMITS, SCREENSHOT_CENTRE, boundElements, positionToRequest } from "@shared/orb-tools";
 import type { ActResult, DesktopDriver, ObserveResult } from "./desktop-task";
 
 /** A window record exactly as the driver reports it; bounds are physical pixels. */
@@ -145,7 +146,8 @@ export class CuaDriverAdapter implements DesktopDriver {
       const listed = await driver.listWindows(this.#options.sdk.ListWindowsInput.create({}));
       const windows = Array.isArray(listed?.windows) ? listed.windows : [];
       return windows.filter((window) => window.pid !== ownProcessId);
-    } catch {
+    } catch (error) {
+      console.warn(`[pi-orb] desktop window list failed: ${message(error)}`);
       return [];
     }
   }
@@ -196,22 +198,6 @@ export class CuaDriverAdapter implements DesktopDriver {
       };
     }
 
-    // `listWindows` bounds are physical pixels while a coordinate action is expressed in
-    // screen DIP. The measured relation is `request = screenDip - driverPhysicalOrigin`,
-    // verified on four widely separated cells (evidence/p1-05/input-verification.json).
-    // It is fitted, not derived, so it is recorded here rather than hidden.
-    const actionOrigin = { x: target.bounds.x, y: target.bounds.y };
-    this.#lastMapping = {
-      driverBoundsPhysical: target.bounds,
-      actionOrigin,
-      actionSpace: "screen-dip",
-      relation: "request = screenDip - driverPhysicalOrigin",
-      // Recorded because this is fitted, not derived: the physical and DIP spaces are not
-      // related by a uniform offset and scale on this platform.
-      coordinateMappingConfidence: "empirically-fitted",
-    };
-    this.#options.onMappingUsed?.(this.#lastMapping);
-
     let elements: readonly DesktopElement[] = [];
     let elementsUnavailable = false;
     let degraded = false;
@@ -259,14 +245,27 @@ export class CuaDriverAdapter implements DesktopDriver {
         bounds: target.bounds,
       },
       coordinateSpace: {
-        action: "screen-dip",
-        windowSize: `${Math.round(target.bounds.width / 1)}x${Math.round(target.bounds.height / 1)} physical px; actions use screen DIP (see coordinate mapping)`,
+        action: "screenshot-fraction",
+        space: COORDINATE_SPACE,
+        // The driver's request space is window-relative, so the rect's origin is 0,0 and only its
+        // size matters. The size comes from the driver's own reported bounds — the same report the
+        // request is measured against — which is what keeps the two ends consistent.
+        windowRect: { x: 0, y: 0, width: target.bounds.width, height: target.bounds.height },
       },
       elements,
       elementsUnavailable,
       degraded,
     };
     this.#observation = observation;
+    this.#lastMapping = {
+      driverBounds: target.bounds,
+      actionSpace: "screenshot-fraction",
+      relation: "request = fraction * driverReportedWindowSize (window-relative, origin 0)",
+      // Recorded because it is fitted from real runs, not derived from a contract: the committed
+      // passing run sent (452,287) for cell 1,2, and the fraction maps to (450,283).
+      coordinateMappingConfidence: "empirically-fitted",
+    };
+    this.#options.onMappingUsed?.(this.#lastMapping);
     return { ok: true, observation, error: null };
   }
 
@@ -305,11 +304,12 @@ export class CuaDriverAdapter implements DesktopDriver {
 
     try {
       if (action.kind === "click") {
-        const position = this.#positionFor(action.elementToken, action.point, observation);
+        const mapped = this.#mapPosition(action.elementToken, action.position, observation);
+        if (!mapped.ok) return { ok: false, refused: true, error: mapped.error };
         const result = await driver.click(
           this.#options.sdk.ClickInput.create({
             target,
-            position,
+            position: mapped.position,
             deliveryMode: this.#options.sdk.InputDeliveryMode.Background,
             button: this.#options.sdk.ClickButton.Left,
             count: 1,
@@ -349,11 +349,14 @@ export class CuaDriverAdapter implements DesktopDriver {
         left: this.#options.sdk.ScrollDirection.Left,
         right: this.#options.sdk.ScrollDirection.Right,
       }[action.direction];
-      const point = this.#positionRequestFor(action.point ?? { x: 0, y: 0 });
+      // An omitted position means "the middle of the observed picture", which is what the model
+      // means when it scrolls without picking a spot.
+      const point = this.#positionRequestFor(action.position ?? SCREENSHOT_CENTRE, observation);
+      if (!point.ok) return { ok: false, refused: true, error: point.error };
       const scrolled = await driver.scroll(
         this.#options.sdk.ScrollInput.create({
-          x: point.x,
-          y: point.y,
+          x: point.request.x,
+          y: point.request.y,
           direction,
           target,
           amount: BigInt(action.amount),
@@ -367,8 +370,8 @@ export class CuaDriverAdapter implements DesktopDriver {
         // call: the driver adds the window origin back. Passing the screen point here instead would
         // scroll at the wrong place while reporting success — measured, and it is why the first version
         // of this fix reported ok:true with no wheel event reaching the target.
-        x: point.x,
-        y: point.y,
+        x: point.request.x,
+        y: point.request.y,
         direction: action.direction,
         amount: action.amount,
         by: "line",
@@ -424,44 +427,74 @@ export class CuaDriverAdapter implements DesktopDriver {
     };
   }
 
-  #positionFor(
+  /**
+   * Build the driver's click position, from an element token or a screenshot fraction.
+   *
+   * Returns a refusal instead of throwing so the reason reaches the model as a reportable failure
+   * rather than as a tool crash.
+   */
+  #mapPosition(
     elementToken: string | undefined,
-    point: { x: number; y: number } | undefined,
+    position: ScreenshotPosition | undefined,
     observation: DesktopObservation,
-  ): unknown {
+  ):
+    | { readonly ok: true; readonly position: unknown }
+    | { readonly ok: false; readonly error: string } {
     if (elementToken) {
-      return new this.#options.sdk.ClickPosition.Element({ token: elementToken });
+      return { ok: true, position: new this.#options.sdk.ClickPosition.Element({ token: elementToken }) };
     }
-    if (!point) {
+    if (!position) {
       // validateAction already refuses this case; this is a defensive fallback.
-      throw new Error("No target was provided for the click.");
+      return { ok: false, error: "No target was provided for the click." };
     }
-    this.#recordMapping(point);
-    void observation;
-    return new this.#options.sdk.ClickPosition.Coordinates(this.#positionRequestFor(point));
+    const mapped = this.#positionRequestFor(position, observation);
+    if (!mapped.ok) return { ok: false, error: mapped.error };
+    return { ok: true, position: new this.#options.sdk.ClickPosition.Coordinates(mapped.request) };
   }
 
   /**
-   * Convert a screen DIP point into the request space the driver expects.
+   * Convert a screenshot fraction into the request space the driver expects.
    *
-   * Clicks and scrolls share one space: the driver adds the window's reported origin (physical pixels)
-   * back, so the request is the screen point minus that origin. Both actions must use the same
-   * conversion — a click that ignored it would miss, and a scroll that ignored it aimed the wheel at the
-   * wrong place while the driver still reported success.
+   * The driver's request space is **window-relative**: the driver adds the window's own reported
+   * origin back, so a request carries no screen origin at all. That is why the whole conversion is
+   * `fraction * window size`.
+   *
+   * Getting this wrong is not hypothetical. An earlier version subtracted the driver's *physical*
+   * origin from a *screen DIP* point — a mixed-unit bug — and the click landed one cell away
+   * (evidence/p1-06/loop-verification.json, the run whose `landedCell` is `0,1` for intended `1,2`).
+   * The rule below is what the committed *passing* run sent: `(452, 287)` for the cell whose
+   * fraction maps to `(450, 283)` on the driver's own 735x786 bounds.
+   *
+   * It is scale-invariant on the capture side, which is what makes it robust: the raster is rarely
+   * exactly the window's pixel size (P1-04 measured 1081x783 against 1083x783 physical), and because
+   * a position is a fraction of the image it is a fraction of the rect, so a resized capture cannot
+   * shift the result. Clicks and scrolls share this conversion: a scroll that skipped it aimed the
+   * wheel at the wrong place while the driver still reported success.
    */
-  #positionRequestFor(point: { x: number; y: number }): { x: number; y: number } {
-    const mapping = this.#lastMapping;
-    const origin = (mapping?.actionOrigin ?? { x: 0, y: 0 }) as { x: number; y: number };
-    return { x: point.x - origin.x, y: point.y - origin.y };
+  #positionRequestFor(
+    position: ScreenshotPosition,
+    observation: DesktopObservation,
+  ):
+    | { readonly ok: true; readonly request: { x: number; y: number } }
+    | { readonly ok: false; readonly error: string } {
+    const rect = observation.coordinateSpace.windowRect;
+    if (!rect) {
+      return {
+        ok: false,
+        error:
+          "This window's rect could not be determined, so a position cannot be mapped to it. Observe again, or address the target by element token.",
+      };
+    }
+    const request = positionToRequest(position, rect);
+    this.#recordMapping(position, request);
+    return { ok: true, request };
   }
 
   /** Record the conversion used, so it is visible rather than an invisible assumption. */
-  #recordMapping(screenDip: { x: number; y: number }): void {
-    const mapping = this.#lastMapping;
-    const origin = (mapping?.actionOrigin ?? { x: 0, y: 0 }) as { x: number; y: number };
+  #recordMapping(position: ScreenshotPosition, request: { x: number; y: number }): void {
     this.#lastMapping = {
-      ...(mapping ?? {}),
-      lastRequest: { screenDip, request: this.#positionRequestFor(screenDip), actionOrigin: origin },
+      ...(this.#lastMapping ?? {}),
+      lastRequest: { position, request },
     };
   }
 }

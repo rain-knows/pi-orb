@@ -37,6 +37,27 @@ export type OrbToolName = (typeof ORB_TOOLS)[keyof typeof ORB_TOOLS];
 export const ORB_TOOL_NAMES: readonly string[] = Object.values(ORB_TOOLS);
 
 /**
+ * Inclusive upper bound of the position space on each axis.
+ *
+ * A model-supplied position is a **fraction of the screenshot the model is looking at**, not a
+ * screen coordinate. Ported from the reference implementation
+ * (deepseek-harness-orb, MIT): the model cannot know where a window sits on the desktop, and
+ * asking it for a screen coordinate is what produced the documented wrong-cell failure
+ * (evidence/p1-06/d-group-prerequisites.md §5). A fraction of the image it can actually see is
+ * answerable without any desktop geometry, and the host maps it back deterministically.
+ */
+export const COORDINATE_SPACE = 1000;
+
+/** A model-supplied position in the 0-{@link COORDINATE_SPACE} fraction space of the screenshot. */
+export interface ScreenshotPosition {
+  readonly x: number;
+  readonly y: number;
+}
+
+/** The centre of a screenshot in fraction space, used when a position is optional and omitted. */
+export const SCREENSHOT_CENTRE: ScreenshotPosition = { x: COORDINATE_SPACE / 2, y: COORDINATE_SPACE / 2 };
+
+/**
  * The minimum observation shape the executor needs.
  *
  * `observationId` is the freshness token: an action must reference the observation it was
@@ -53,12 +74,26 @@ export interface DesktopObservation {
     /** Window bounds exactly as the driver reported them (physical pixels). */
     readonly bounds: { readonly x: number; readonly y: number; readonly width: number; readonly height: number };
   };
-  /** Interpreted screen-DIP size of the same window, for coordinate reasoning. */
+  /**
+   * How a model-supplied position is interpreted, plus the fact needed to map it.
+   *
+   * The model answers in fractions of the screenshot it can see; `windowRect` is the rect that same
+   * screenshot depicts, expressed in the space a driver request uses. That space is
+   * **window-relative**: its origin is `0,0`, because the driver adds the window's own reported origin
+   * back. It is `null` when the rect could not be determined, and a coordinate action is then refused
+   * rather than guessed.
+   */
   readonly coordinateSpace: {
-    /** The space a coordinate action must be expressed in. */
-    readonly action: "screen-dip";
-    /** Textual form of the size, so the model can reason without unit confusion. */
-    readonly windowSize: string;
+    /** A position is a fraction of the observed screenshot, never a screen coordinate. */
+    readonly action: "screenshot-fraction";
+    /** Inclusive upper bound on each axis. */
+    readonly space: number;
+    readonly windowRect: {
+      readonly x: number;
+      readonly y: number;
+      readonly width: number;
+      readonly height: number;
+    } | null;
   };
   readonly elements: readonly DesktopElement[];
   /** True when the driver reported no elements; element-addressed actions are impossible. */
@@ -78,8 +113,8 @@ export interface ClickAction {
   readonly observationId: string;
   /** Element token when available; preferred. */
   readonly elementToken?: string;
-  /** Screen DIP point, only when no element can address the target. */
-  readonly point?: { readonly x: number; readonly y: number };
+  /** Screenshot fraction, only when no element can address the target. */
+  readonly position?: ScreenshotPosition;
 }
 
 export interface TypeAction {
@@ -95,7 +130,8 @@ export interface ScrollAction {
   readonly direction: "up" | "down" | "left" | "right";
   readonly amount: number;
   readonly elementToken?: string;
-  readonly point?: { readonly x: number; readonly y: number };
+  /** Screenshot fraction to place the wheel at. Defaults to the screenshot centre. */
+  readonly position?: ScreenshotPosition;
 }
 
 export type DesktopAction = ClickAction | TypeAction | ScrollAction;
@@ -126,6 +162,7 @@ export type ActionRefusal =
   | "task-expired"
   | "needs-element-or-point"
   | "ambiguous-target"
+  | "coordinate-mapping-unavailable"
   | "text-too-long"
   | "scroll-amount-out-of-range"
   | "unsupported-direction"
@@ -142,8 +179,10 @@ const REFUSAL_MESSAGES: Record<ActionRefusal, string> = {
     "A previous action in this task failed, so the task was stopped. Observe again and ask the user how to proceed.",
   "task-limit-actions": `This task reached its action limit of ${ORB_LIMITS.maxActionsPerTask}. Ask the user to approve a new task.`,
   "task-expired": "This task exceeded its time limit and was stopped.",
-  "needs-element-or-point": "Provide either an element token or an explicit screen point.",
-  "ambiguous-target": "Provide exactly one of an element token or a screen point, not both.",
+  "needs-element-or-point": "Provide either an element token or a screenshot position.",
+  "ambiguous-target": "Provide exactly one of an element token or a screenshot position, not both.",
+  "coordinate-mapping-unavailable":
+    "This window's desktop rect could not be determined, so a position cannot be mapped to it. Address the target by element token instead, or observe again.",
   "text-too-long": `Text is limited to ${ORB_LIMITS.maxTypedCharacters} characters per action.`,
   "scroll-amount-out-of-range": `Scroll amount must be between 1 and ${ORB_LIMITS.maxScrollAmount}.`,
   "unsupported-direction": "Direction must be up, down, left or right.",
@@ -187,21 +226,62 @@ export function validateAction(
     ) {
       return "scroll-amount-out-of-range";
     }
-    return validateTarget(action.elementToken, action.point);
+    return validateTarget(action.elementToken, action.position);
   }
 
-  return validateTarget(action.elementToken, action.point);
+  return validateTarget(action.elementToken, action.position);
+}
+
+/**
+ * Require a position inside the 0-{@link COORDINATE_SPACE} fraction space.
+ *
+ * An out-of-range or non-finite position is refused here rather than clamped: clamping would
+ * silently move the action somewhere the model did not ask for, which is the wrong-window class of
+ * failure this product must not have.
+ */
+export function isUsablePosition(position: ScreenshotPosition | undefined): boolean {
+  if (!position) return false;
+  return (
+    Number.isFinite(position.x) &&
+    Number.isFinite(position.y) &&
+    position.x >= 0 &&
+    position.x <= COORDINATE_SPACE &&
+    position.y >= 0 &&
+    position.y <= COORDINATE_SPACE
+  );
+}
+
+/**
+ * Map a screenshot fraction onto the window rect that screenshot depicts.
+ *
+ * Pure so the conversion is unit-tested directly: it is the step C7 (screenshot point == input
+ * point) depends on, and getting it wrong is invisible until a click lands in the wrong place.
+ *
+ * Both ends are in the driver's request space, which is window-relative. Subtracting a screen origin
+ * here would be a mixed-unit bug: the driver's reported origin is in physical pixels while the model's
+ * fraction is dimensionless, so a fraction onto the *window rect* is the whole conversion. Measured:
+ * the committed P1-06 click sent `(452, 287)` for the cell whose physical offset in the window is
+ * `(641-189, 422-135) = (452, 287)` — i.e. exactly `fraction x window size`.
+ */
+export function positionToRequest(
+  position: ScreenshotPosition,
+  windowRect: { readonly x: number; readonly y: number; readonly width: number; readonly height: number },
+): { x: number; y: number } {
+  return {
+    x: windowRect.x + (position.x / COORDINATE_SPACE) * windowRect.width,
+    y: windowRect.y + (position.y / COORDINATE_SPACE) * windowRect.height,
+  };
 }
 
 function validateTarget(
   elementToken: string | undefined,
-  point: { readonly x: number; readonly y: number } | undefined,
+  position: ScreenshotPosition | undefined,
 ): ActionRefusal | null {
   const hasElement = typeof elementToken === "string" && elementToken.length > 0;
-  const hasPoint = point !== undefined;
-  if (hasElement && hasPoint) return "ambiguous-target";
-  if (!hasElement && !hasPoint) return "needs-element-or-point";
-  if (hasPoint && (!Number.isFinite(point.x) || !Number.isFinite(point.y))) return "needs-element-or-point";
+  const hasPosition = position !== undefined;
+  if (hasElement && hasPosition) return "ambiguous-target";
+  if (!hasElement && !hasPosition) return "needs-element-or-point";
+  if (hasPosition && !isUsablePosition(position)) return "needs-element-or-point";
   return null;
 }
 

@@ -593,6 +593,25 @@ try {
   const observationId = observeBeforeApproval.result?.observationId;
   const cell = geometry.cellCentres.find((entry) => entry.cell === "1,2");
 
+  /**
+   * The fraction of the observed screenshot that a screen-DIP point occupies.
+   *
+   * This stands in for the vision model: an action position is a fraction of the screenshot the
+   * model is looking at, and that screenshot depicts the window's own on-screen rect. The target
+   * reports its rect as ground truth, so the harness reads the fraction off it exactly as a model
+   * reads it off the image. The product then maps that fraction using the rect the *driver* reports,
+   * so any disagreement between the two shows up as a real offset instead of being cancelled out.
+   */
+  const fractionOfScreenDip = (screenDip) => {
+    const rect = geometry.windowBounds;
+    return {
+      x: ((screenDip.x - rect.x) / rect.width) * 1000,
+      y: ((screenDip.y - rect.y) / rect.height) * 1000,
+    };
+  };
+  /** The cell's own centre as a screenshot fraction — the number a model would produce. */
+  const cellFraction = () => fractionOfScreenDip(cell.dipScreenPoint);
+
   const eventsBeforeRefusal = readGrid().length;
   const refusedAct = await bridgeCall({
     type: "act",
@@ -601,7 +620,7 @@ try {
     action: {
       kind: "click",
       observationId,
-      point: cell.physicalScreenPoint ?? cell.dipScreenPoint,
+      position: cellFraction(),
     },
   });
   await sleep(1200);
@@ -671,7 +690,7 @@ try {
     type: "act",
     sessionId,
     generation,
-    action: { kind: "click", observationId: "obs-from-a-previous-turn", point: cell.physicalScreenPoint ?? cell.dipScreenPoint },
+    action: { kind: "click", observationId: "obs-from-a-previous-turn", position: cellFraction() },
   });
   report.policy.staleObservation = { response: safe(staleAct) };
   check(
@@ -705,7 +724,7 @@ try {
     action: {
       kind: "click",
       observationId: currentObservationId,
-      point: cell.physicalScreenPoint ?? cell.dipScreenPoint,
+      position: cellFraction(),
     },
   });
   await sleep(1500);
@@ -713,7 +732,8 @@ try {
   const hits = newEvents.filter((event) => event.kind === "cell-mousedown");
 
   report.clickLoop.aimedCell = "1,2";
-  report.clickLoop.aimedPoint = cell.physicalScreenPoint ?? cell.dipScreenPoint;
+  report.clickLoop.aimedFraction = cellFraction();
+  report.clickLoop.aimedScreenDip = cell.dipScreenPoint;
   report.clickLoop.response = safe(clickResponse);
   report.clickLoop.landedCell = hits[0]?.cell ?? null;
   report.clickLoop.landedOffsetInCell = hits[0]?.offsetInCell ?? null;
@@ -731,6 +751,16 @@ try {
     "the click landed on the intended cell",
     report.clickLoop.landedCell === "1,2",
     `intended 1,2, landed ${String(report.clickLoop.landedCell)}`,
+  );
+  // C7 (screenshot point == input point) in one shot: the harness produced the position the way the
+  // model would — as a fraction read off the screenshot — and the product mapped it back to the
+  // desktop independently, from the rect the driver reports rather than from the target's own rect.
+  // If the two rects disagreed, the offset would surface here as the wrong cell rather than being
+  // silently absorbed by the test.
+  check(
+    "C7: a position read off the screenshot lands on that same point in the target",
+    report.clickLoop.landedCell === "1,2",
+    `fraction=${safe(report.clickLoop.aimedFraction)} resolved from the target's own rect ${safe(report.clickLoop.aimedScreenDip)}; landed ${String(report.clickLoop.landedCell)}`,
   );
   check(
     "the click delivered both a press and a release",
@@ -776,7 +806,7 @@ try {
       observationId: scrollObservationId,
       direction: "down",
       amount: 3,
-      point: scrollPoint,
+      position: fractionOfScreenDip(scrollPoint),
     },
   });
   await sleep(2000);
@@ -784,7 +814,8 @@ try {
   const wheelEvents = readGrid().filter((event) => event.kind === "wheel");
   report.scrollLoop = {
     observationId: scrollObservationId,
-    point: scrollPoint,
+    fraction: fractionOfScreenDip(scrollPoint),
+    screenDip: scrollPoint,
     activation: activationForScroll,
     response: safe(scrollResponse),
     scrollEventsBefore: scrollsBefore,
@@ -824,7 +855,7 @@ try {
     action: {
       kind: "click",
       observationId: currentObservationId,
-      point: cell.physicalScreenPoint ?? cell.dipScreenPoint,
+      position: cellFraction(),
     },
   });
   report.clickLoop.replay = safe(replay);
@@ -853,7 +884,7 @@ try {
     type: "act",
     sessionId,
     generation,
-    action: { kind: "click", observationId: currentObservationId, point: cell.physicalScreenPoint ?? cell.dipScreenPoint },
+    action: { kind: "click", observationId: currentObservationId, position: cellFraction() },
   });
   report.revocation = { revoked, afterRevoke: safe(afterRevoke) };
   check("revoking through the UI clears the authorization", revoked.authorized === false, safe(revoked).slice(0, 200));
@@ -872,7 +903,7 @@ try {
     type: "act",
     sessionId,
     generation: generation,
-    action: { kind: "click", observationId: currentObservationId, point: cell.physicalScreenPoint ?? cell.dipScreenPoint },
+    action: { kind: "click", observationId: currentObservationId, position: cellFraction() },
   });
   report.revocation.newGeneration = {
     generationBefore: generation,

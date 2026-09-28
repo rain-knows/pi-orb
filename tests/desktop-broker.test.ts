@@ -14,7 +14,11 @@ function observation(id = "obs-1"): DesktopObservation {
       appName: "editor.exe",
       bounds: { x: 0, y: 0, width: 1200, height: 800 },
     },
-    coordinateSpace: { action: "screen-dip", windowSize: "1200x800" },
+    coordinateSpace: {
+      action: "screenshot-fraction",
+      space: 1000,
+      windowRect: { x: 0, y: 0, width: 1200, height: 800 },
+    },
     elements: [{ token: "s1:0", role: "Button", label: "OK", actions: ["invoke"] }],
     elementsUnavailable: false,
     degraded: false,
@@ -250,8 +254,8 @@ describe("parseAction", () => {
     expect(parsed.ok).toBe(true);
   });
 
-  it("accepts a click with a point", () => {
-    const parsed = parseAction({ kind: "click", observationId: "obs-1", point: { x: 1, y: 2 } });
+  it("accepts a click with a screenshot fraction", () => {
+    const parsed = parseAction({ kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } });
     expect(parsed.ok).toBe(true);
   });
 
@@ -260,7 +264,7 @@ describe("parseAction", () => {
       kind: "click",
       observationId: "obs-1",
       elementToken: "s1:0",
-      point: { x: 1, y: 2 },
+      position: { x: 1, y: 2 },
     });
     expect(parsed).toMatchObject({ ok: false });
   });
@@ -269,8 +273,8 @@ describe("parseAction", () => {
     expect(parseAction({ kind: "click", observationId: "obs-1" })).toMatchObject({ ok: false });
   });
 
-  it("refuses a point with a non-numeric coordinate", () => {
-    expect(parseAction({ kind: "click", observationId: "obs-1", point: { x: "1", y: 2 } })).toMatchObject({ ok: false });
+  it("refuses a position with a non-numeric coordinate", () => {
+    expect(parseAction({ kind: "click", observationId: "obs-1", position: { x: "1", y: 2 } })).toMatchObject({ ok: false });
   });
 
   it("accepts a type action and refuses a non-string text", () => {

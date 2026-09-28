@@ -13,7 +13,11 @@ function observation(id = "obs-1"): DesktopObservation {
       appName: "a",
       bounds: { x: 0, y: 0, width: 10, height: 10 },
     },
-    coordinateSpace: { action: "screen-dip", windowSize: "10x10" },
+    coordinateSpace: {
+      action: "screenshot-fraction",
+      space: 1000,
+      windowRect: { x: 0, y: 0, width: 10, height: 10 },
+    },
     elements: [],
     elementsUnavailable: true,
     degraded: false,

@@ -210,22 +210,22 @@ export function parseAction(value: unknown): ParseResult {
     return { ok: false, message: "Action must name the observation it was decided from." };
   }
 
-  const readPoint = (): { x: number; y: number } | undefined => {
-    const x = record.point;
-    if (typeof x !== "object" || x === null) return undefined;
-    const point = x as { x?: unknown; y?: unknown };
-    if (typeof point.x !== "number" || typeof point.y !== "number") return undefined;
-    return { x: point.x, y: point.y };
+  const readPosition = (): { x: number; y: number } | undefined => {
+    const value = record.position;
+    if (typeof value !== "object" || value === null) return undefined;
+    const position = value as { x?: unknown; y?: unknown };
+    if (typeof position.x !== "number" || typeof position.y !== "number") return undefined;
+    return { x: position.x, y: position.y };
   };
   const elementToken = typeof record.elementToken === "string" && record.elementToken.length > 0 ? record.elementToken : undefined;
 
   if (kind === "click") {
-    const point = readPoint();
-    if (!elementToken && !point) return { ok: false, message: "A click needs an element token or a point." };
-    if (elementToken && point) return { ok: false, message: "A click needs an element token or a point, not both." };
+    const position = readPosition();
+    if (!elementToken && !position) return { ok: false, message: "A click needs an element token or a position." };
+    if (elementToken && position) return { ok: false, message: "A click needs an element token or a position, not both." };
     return {
       ok: true,
-      action: { kind: "click", observationId, ...(elementToken ? { elementToken } : {}), ...(point ? { point } : {}) },
+      action: { kind: "click", observationId, ...(elementToken ? { elementToken } : {}), ...(position ? { position } : {}) },
     };
   }
 
@@ -242,7 +242,7 @@ export function parseAction(value: unknown): ParseResult {
       return { ok: false, message: "A scroll action needs a direction." };
     }
     if (typeof amount !== "number") return { ok: false, message: "A scroll action needs a numeric amount." };
-    const point = readPoint();
+    const position = readPosition();
     return {
       ok: true,
       action: {
@@ -251,7 +251,7 @@ export function parseAction(value: unknown): ParseResult {
         direction,
         amount,
         ...(elementToken ? { elementToken } : {}),
-        ...(point ? { point } : {}),
+        ...(position ? { position } : {}),
       },
     };
   }
