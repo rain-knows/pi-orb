@@ -25,6 +25,40 @@
 | pi-web | 已在 `http://127.0.0.1:30141` 运行 | `Invoke-WebRequest http://127.0.0.1:30141/api/web-auth` |
 | 模型 | pi-web 侧已配置一个支持工具调用、且最好支持图像的模型 | 在 pi-web 界面确认 |
 | Orb 工作区 | 在浮窗里点 **Choose workspace…** 选定一个专用目录 | 未选工作区时 Orb 模式**不会**启用（这是设计，不是故障） |
+| **orb 扩展已装载**（仅 D 组需要） | 运行 pi-web 的那个 Pi 配置必须声明 pi-Orb 的扩展 | 见 §1.1 |
+
+### 1.1 D 组必需：把 orb 扩展装进 Pi 配置
+
+**这是一个真实的安装步骤，不是可选项。** 产品**不会**自动把扩展写进你的 Pi 配置（那样做会静默修改你的环境）。
+未装载时，任何会话（包括浮窗自己的会话）都不会有 `orb_*` 工具，D 组无法开始。
+
+运行 pi-web 的 Pi 从 `~/.pi/agent/settings.json` 读取声明（本机为
+`C:\Users\JUSTLIKEZYP\.pi\agent\settings.json`）。用官方 CLI 声明本地包：
+
+```powershell
+pi install D:\workself\pi-orb\pi-package
+
+# 确认已写入
+pi list
+```
+
+- 实测：无论传绝对路径还是 `./pi-package`，CLI 都会把它归一成**相对 settings 文件**的路径
+  （存储为 `..\..\workself\pi-orb\pi-package`）并在 `pi list` 中正确解析回 `D:\workself\pi-orb\pi-package`。
+  两种写法都可以，不存在“相对当前目录”的坑。注意 CLI 写入的是 **`packages` 数组**，
+  不是 `extensions` 键——不要到 `extensions` 里找它。
+
+环境变量（可选，见 [`README.md`](../README.md)）：`PI_ORB_PI_WEB_URL`、`PI_ORB_PI_WEB_PASSWORD`、
+- 写入的是**你的**全局 Pi 配置。反悔时：`pi remove D:\workself\pi-orb\pi-package`。
+- 本地包是「按解析后的路径加载、不复制文件」，因此 `orb.ts` 里指向仓库
+  `src/shared/` 的相对 `import` 仍能解析（这正是测试用的加载方式）。
+- 装完必须**重启 pi-web**（Pi 在进程启动时读配置）。
+- 推荐顺序：`pi install` → 启动浮窗并选好工作区（这一步才会写出
+  `%APPDATA%\pi-orb\orb-config.json`，没有它 Orb 模式不会激活）→ 重启 pi-web → 开始 D 组。
+- 想先确认扩展能被加载，可单独跑 `node evidence/p1-06/run-p1-06-tools.mjs`：
+  它在隔离目录里验证「provider 实际收到的工具 schema」，**不碰你的配置**。
+
+若不想改动全局配置，D 组直接记为 `未验证` 并在 `evidence/p1-06/README.md` 写明原因。
+**不得**因此把它当作已通过。
 
 环境变量（可选，见 `README.md`）：`PI_ORB_PI_WEB_URL`、`PI_ORB_PI_WEB_PASSWORD`、
 `PI_ORB_CONFIG`。
