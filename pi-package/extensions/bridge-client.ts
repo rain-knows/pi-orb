@@ -108,16 +108,11 @@ readToken(): BridgeTokenFile | null {
   }
 }
 
-/** The pipe to connect to, preferring the handshake file over an override. */
-pipePathFor(token: BridgeTokenFile): string {
-  return token.pipePath || this.#options.pipePath;
-}
-
   /** Send one request and await the single line of JSON the shell replies with. */
-  async call(request: BridgeRequestBody, token: string, pipePath?: string): Promise<BridgeCallResult> {
-    const payload = `${JSON.stringify({ ...request, token })}\n`;
+  async call(request: BridgeRequestBody, handshake: BridgeTokenFile): Promise<BridgeCallResult> {
+    const payload = `${JSON.stringify({ ...request, token: handshake.token })}\n`;
     const timeoutMs = this.#options.timeoutMs ?? 30_000;
-    const target = pipePath || this.#options.pipePath;
+    const target = handshake.pipePath || this.#options.pipePath;
     if (!target) {
       return {
         ok: false,

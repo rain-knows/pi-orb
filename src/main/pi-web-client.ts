@@ -131,12 +131,40 @@ export class PiWebClient {
     return sessionId;
   }
 
-  async prompt(sessionId: string, text: string, images?: readonly ImageContent[]): Promise<void> {
+  async prompt(sessionId: string, text: string, images?: readonly ImageContent[], cwd?: string): Promise<void> {
+    if (images && images.length > 0) {
+      if (!cwd) throw new Error("The Orb workspace is unknown. The screenshot was not sent.");
+      await this.#requireImageModel(sessionId, cwd);
+    }
     await this.#sessionCommand(sessionId, {
       type: "prompt",
       message: text,
       ...(images && images.length > 0 ? { images } : {}),
     });
+  }
+
+  /** Check the selected session model against pi-web's own model list before uploading pixels. */
+  async #requireImageModel(sessionId: string, cwd: string): Promise<void> {
+    const selected = await this.getState(sessionId);
+    if (!selected.provider || !selected.modelId) {
+      throw new Error("The current model could not be identified. The screenshot was not sent.");
+    }
+    const response = await this.#request(`/api/models?cwd=${encodeURIComponent(cwd)}`, { method: "GET" });
+    if (!response.ok) {
+      throw new PiWebError("Could not check whether the current model supports images. The screenshot was not sent.", response.status);
+    }
+    const body = (await response.json().catch(() => ({}))) as {
+      modelList?: { provider?: string; id?: string; input?: string[] }[];
+    };
+    const model = body.modelList?.find(
+      (candidate) => candidate.provider === selected.provider && candidate.id === selected.modelId,
+    );
+    if (!model) {
+      throw new Error("The current model is missing from pi-web's model list. The screenshot was not sent.");
+    }
+    if (!model.input?.includes("image")) {
+      throw new Error("The current model does not support image input. Choose an image-capable model before sending the screenshot.");
+    }
   }
 
   async abort(sessionId: string): Promise<void> {

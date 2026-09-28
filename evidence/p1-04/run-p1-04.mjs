@@ -174,7 +174,7 @@ writeFileSync(
   `${JSON.stringify({
     version: 1,
     orbWorkspace,
-    shortcut: "CommandOrControl+Shift+Space",
+    shortcut: "Control+Alt+F11",
     window: { alwaysOnTop: true, x: 40, y: 40, width: 460, height: 640 },
   }, null, 2)}\n`,
   "utf8",
@@ -450,6 +450,8 @@ function foregroundAndWake(hwnd) {
       String(hwnd),
       "-LogPath",
       wakeLogPath,
+      "-Chord",
+      "ctrl+alt+f11",
     ],
     { encoding: "utf8", timeout: 60000, windowsHide: true },
   );
@@ -975,6 +977,28 @@ try {
     "discarding the preview uploads nothing",
     modelRequests.length === requestsBeforePreview,
     JSON.stringify(positive.discardSentNothing),
+  );
+
+  // A text-only model must be rejected by the Orb before pi-web accepts the image prompt.
+  const textOnlyPreview = JSON.parse(
+    await orb(`captureScreenshot({ generation: ${afterWake.generation}, text: 'inspect this image' }).then((r) => JSON.stringify(r))`),
+  );
+  const beforeTextOnlySend = modelRequests.length;
+  const textOnlyDecision = textOnlyPreview.ok
+    ? JSON.parse(await orb(
+        `resolveScreenshot({ generation: ${afterWake.generation}, observationId: ${JSON.stringify(textOnlyPreview.observationId)}, confirmed: true }).then((r) => JSON.stringify(r))`,
+      ))
+    : textOnlyPreview;
+  positive.textOnlyDecision = textOnlyDecision;
+  check(
+    "Orb rejects an image prompt for the selected text-only model",
+    textOnlyDecision.ok === false && textOnlyDecision.sent === false && /does not support image input/i.test(textOnlyDecision.message),
+    JSON.stringify(textOnlyDecision),
+  );
+  check(
+    "the rejected image prompt never reaches the provider",
+    modelRequests.length === beforeTextOnlySend,
+    `before=${beforeTextOnlySend} after=${modelRequests.length}`,
   );
 
   // Capture again and confirm it. The session is switched to the image-capable model first, so the

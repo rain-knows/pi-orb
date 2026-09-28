@@ -48,10 +48,9 @@ export interface WakeControllerOptions {
    * Ignore triggers that arrive within this many milliseconds of the last applied
    * one.
    *
-   * A held global accelerator auto-repeats, so without this a single long press
-   * would toggle the window many times and leave it in whichever state the parity
-   * happened to produce. The window can also be triggered from both the shortcut
-   * and the tray, which a simultaneous press would otherwise double-apply.
+   * Suppress closely spaced callbacks from global accelerator repeat and simultaneous
+   * shortcut/tray triggers. This time window cannot distinguish a long hold from a
+   * later deliberate press; see the A4 manual result in evidence/p1-03/README.md.
    */
   readonly cooldownMs?: number;
   readonly now?: () => number;

@@ -1,6 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createServer } from "node:net";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { BridgeClient } from "../pi-package/extensions/bridge-client";
 import { BRIDGE_PROTOCOL_VERSION } from "@shared/bridge-protocol";
@@ -97,7 +98,7 @@ describe("bridge call targets", () => {
   it("reports a clear refusal when no pipe is known", async () => {
     const result = await client(writeHandshakeFile()).call(
       { type: "status", sessionId: "s", generation: 1 },
-      "a".repeat(64),
+      { ...client(writeHandshakeFile()).readToken()!, pipePath: "" },
     );
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.reason).toBe("not-configured");
@@ -109,7 +110,27 @@ describe("bridge call targets", () => {
       tokenFile: writeHandshakeFile(),
       timeoutMs: 2000,
     });
-    const result = await bridge.call({ type: "status", sessionId: "s", generation: 1 }, "a".repeat(64));
+    const result = await bridge.call({ type: "status", sessionId: "s", generation: 1 }, bridge.readToken()!);
     expect(result.ok).toBe(false);
+  });
+
+  it("connects using the handshake pipe when no pipe environment override exists", async () => {
+    const pipePath = process.platform === "win32"
+      ? `\\\\.\\pipe\\pi-orb-handshake-test-${process.pid}-${Date.now()}`
+      : join(dir, "bridge.sock");
+    const bridge = client(writeHandshakeFile({ pipePath }));
+    const server = createServer((socket) => {
+      socket.on("data", (chunk) => {
+        const request = JSON.parse(chunk.toString("utf8")) as { type: string; token: string };
+        socket.end(`${JSON.stringify({ ok: request.type === "status" && request.token === "a".repeat(64), result: { reached: true } })}\n`);
+      });
+    });
+    await new Promise<void>((resolve) => server.listen(pipePath, resolve));
+    try {
+      const result = await bridge.call({ type: "status", sessionId: "s", generation: 7 }, bridge.readToken()!);
+      expect(result).toEqual({ ok: true, result: { reached: true } });
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 });

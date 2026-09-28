@@ -17,7 +17,7 @@ param(
   [Parameter(Mandatory = $true)][string]$Hwnd,
   [string]$LogPath,
   # The chord to send. Defaults to the product's default wake accelerator.
-  [ValidateSet('ctrl+shift+space')][string]$Chord = 'ctrl+shift+space',
+  [ValidateSet('ctrl+shift+space', 'ctrl+alt+f11')][string]$Chord = 'ctrl+shift+space',
   # Skip the key synthesis and only foreground the window.
   [switch]$ForegroundOnly
 )
@@ -109,12 +109,14 @@ function Send-Key([byte]$vk, [bool]$up) {
   Start-Sleep -Milliseconds 60
 }
 
+if ($Chord -eq 'ctrl+alt+f11') { $modifier = [byte]0x12; $key = [byte]0x7A }
+else { $modifier = [byte]0x10; $key = [byte]0x20 }
 Send-Key 0x11 $false   # Ctrl down
-Send-Key 0x10 $false   # Shift down
-Send-Key 0x20 $false   # Space down
+Send-Key $modifier $false
+Send-Key $key $false
 Start-Sleep -Milliseconds 120
-Send-Key 0x20 $true
-Send-Key 0x10 $true
+Send-Key $key $true
+Send-Key $modifier $true
 Send-Key 0x11 $true
 
 Write-Log @{ kind = 'keys-sent'; chord = $Chord; mechanism = 'keybd_event' }

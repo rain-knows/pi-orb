@@ -122,7 +122,7 @@ export class OrbSessionController {
     this.#running = true;
     this.#accumulator = { text: "" };
     try {
-      await this.#deps.client.prompt(sessionId, text, images);
+      await this.#deps.client.prompt(sessionId, text, images, this.#workspace ?? undefined);
     } catch (error) {
       // The prompt never started, so no idle event will arrive to clear the state.
       this.#running = false;
