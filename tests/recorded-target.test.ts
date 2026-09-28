@@ -85,6 +85,26 @@ describe("RecordedTargetStore.record", () => {
     expect(store.snapshot?.target.title).toBe("Second");
     expect(store.recordCount).toBe(2);
   });
+
+  it("drops the previous record when a new record cannot be taken", async () => {
+    // Real defect found by running the product: with the native helper missing from the build, the
+    // wake could not read a foreground window, the store kept the target recorded at startup, and a
+    // capture would have silently used a window the user had long since moved away from. A record
+    // that cannot be taken must leave no record, not a stale one.
+    let current: ReturnType<typeof target> | null = target({ title: "Chrome — someone else's window" });
+    const store = new RecordedTargetStore({
+      readForeground: async () => current,
+      isStillValid: async () => ({ valid: true, currentTitle: "" }),
+    });
+    await store.record();
+    expect(store.snapshot?.target.title).toBe("Chrome — someone else's window");
+
+    current = null;
+    const outcome = await store.record();
+    expect(outcome.ok).toBe(false);
+    expect(store.snapshot).toBeNull();
+    expect((await store.validate()).reason).toBe("no-record");
+  });
 });
 
 describe("RecordedTargetStore.validate", () => {

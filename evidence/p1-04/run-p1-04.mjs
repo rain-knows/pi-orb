@@ -24,6 +24,7 @@
 
 import { spawn, execFileSync } from "node:child_process";
 import { createServer } from "node:http";
+import { createHash } from "node:crypto";
 import { deflateSync } from "node:zlib";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -147,8 +148,10 @@ writeFileSync(
   }, null, 2)}\n`,
   "utf8",
 );
-// The model declares text-only input on purpose: this is how the "text-only model
-// refuses an image task" acceptance item is exercised.
+// Two models on purpose. `p1-model` declares text-only input, which is how the
+// "text-only model refuses an image task" acceptance item is exercised. `p1-vision`
+// accepts images, so the positive capture path can prove the confirmed pixels really
+// reach the provider instead of only reaching the local renderer.
 writeFileSync(
   join(agentDir, "models.json"),
   `${JSON.stringify({
@@ -159,6 +162,7 @@ writeFileSync(
         apiKey: "p1-isolated-test-key",
         models: [
           { id: "p1-model", name: "P1 text-only model", contextWindow: 32768, maxTokens: 256, input: ["text"] },
+          { id: "p1-vision", name: "P1 vision model", contextWindow: 32768, maxTokens: 256, input: ["text", "image"] },
         ],
       },
     },
@@ -202,22 +206,49 @@ const modelServer = createServer(async (req, res) => {
       const message = messages[index];
       if (message?.role !== "user") continue;
       const content = message.content;
-      if (typeof content === "string") return { text: content, imageParts: 0 };
+      if (typeof content === "string") return { text: content, imageParts: 0, imageHashes: [], imageBytes: [] };
       if (Array.isArray(content)) {
+        const images = content.filter((part) => part?.type === "image");
+        // The OpenAI-completions wire format may encode an image as `image_url` rather than a bare
+        // `image` part, so the raw part shapes are recorded too. Detecting only `type === "image"`
+        // would report "no image" for an image that was in fact delivered — a test bug that would
+        // wrongly convict the product.
+        const imageUrlParts = content.filter((part) => part?.type === "image_url");
+        // Strip a `data:<mime>;base64,` prefix before hashing: a data URL wraps the same base64 the
+        // preview held, so hashing the URL text would compare different strings and wrongly report
+        // that the bytes changed. The prefix is recorded so the encoding shape is visible too.
+        const stripDataUrl = (value) => String(value).replace(/^data:[^;]*;base64,/, "");
+        const rawImageValues = [
+          ...images.map((part) => String(part?.data ?? "")),
+          ...imageUrlParts.map((part) => String(part?.image_url?.url ?? "")),
+        ].filter((value) => value.length > 0);
+        const hashes = rawImageValues
+          .map(stripDataUrl)
+          .map((value) => createHash("sha256").update(value).digest("hex").slice(0, 16));
         return {
           text: content.map((part) => (typeof part?.text === "string" ? part.text : "")).join(""),
-          imageParts: content.filter((part) => part?.type === "image").length,
+          imageParts: images.length + imageUrlParts.length,
+          imageHashes: hashes,
+          imageBytes: rawImageValues.map((value) => stripDataUrl(value).length),
+          partTypes: content.map((part) => (typeof part?.type === "string" ? part.type : typeof part)),
+          imageValuePrefixes: rawImageValues.map((value) => value.slice(0, 32)),
         };
       }
     }
-    return { text: "", imageParts: 0 };
+    return { text: "", imageParts: 0, imageHashes: [], imageBytes: [] };
   })();
 
   modelRequests.push({
     index: modelRequests.length + 1,
     receivedAt: Date.now(),
+    model: body.model ?? null,
     lastUserText: lastUser.text.slice(0, 120),
     imagePartsInLastUserMessage: lastUser.imageParts,
+    // The exact bytes of every image in the last user message, so "what the user previewed"
+    // and "what the provider received" can be compared rather than assumed equal.
+    imageHashes: lastUser.imageHashes,
+    imageBytes: lastUser.imageBytes,
+    imageValuePrefixes: lastUser.imageValuePrefixes,
     anyImageInTranscript: serialized.includes('"image"'),
     totalImagesInTranscript: (serialized.match(/"type":"image"/g) ?? []).length,
   });
@@ -348,6 +379,119 @@ async function connect(webSocketDebuggerUrl) {
   return { send, close: () => socket.close() };
 }
 
+// ---------------------------------------------------------------------------
+// P1-04 positive-path helpers
+//
+// The positive path is driven only with a window this test creates itself, in a
+// separate process, holding nothing but a flat colour and two corner markers. The
+// product's own wake shortcut is then pressed as real synthesized keys, so the code
+// under test runs its normal path with no test hook and no widened permission.
+// ---------------------------------------------------------------------------
+const targetAppLogPath = join(runRoot, "p1-04-target.jsonl");
+const wakeLogPath = join(runRoot, "p1-04-wake.jsonl");
+// Unique per run so a stale window from an earlier run cannot satisfy the title match.
+const targetTitle = `P1-04 capture target ${Date.now().toString(36)}`;
+let targetApp = null;
+
+function readJsonl(path) {
+  try {
+    // Strip the BOM: PowerShell 5.1's `Add-Content -Encoding utf8` writes one, and a leading
+    // U+FEFF makes JSON.parse throw, which would make the log look empty rather than unreadable.
+    return readFileSync(path, "utf8")
+      .replace(/^\uFEFF/, "")
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map((line) => JSON.parse(line.replace(/^\uFEFF/, "")));
+  } catch {
+    return [];
+  }
+}
+
+/** Launch the disposable capture target and return its ready record. */
+async function startCaptureTarget() {
+  targetApp = spawn(electronBinary(), [".", `--user-data-dir=${join(runRoot, "target-userData")}`], {
+    cwd: join(repo, "evidence", "p1-04", "target-app"),
+    env: {
+      ...process.env,
+      P1_04_TARGET_LOG: targetAppLogPath,
+      P1_04_TARGET_TITLE: targetTitle,
+      P1_04_TARGET_X: "520",
+      P1_04_TARGET_Y: "140",
+    },
+    stdio: "ignore",
+    windowsHide: true,
+  });
+  const deadline = Date.now() + 30000;
+  while (Date.now() < deadline) {
+    const ready = readJsonl(targetAppLogPath).find((entry) => entry.kind === "ready");
+    if (ready) return ready;
+    await sleep(300);
+  }
+  throw new Error("the capture target never reported ready");
+}
+
+/**
+ * Foreground the test's own window and press the real wake accelerator.
+ *
+ * The escape hatch is that this targets only a handle reported by a process this test started, and
+ * sends only the wake chord — never typing, never clicking, never reading the window's content.
+ */
+function foregroundAndWake(hwnd) {
+  const raw = execFileSync(
+    "powershell.exe",
+    [
+      "-NoProfile",
+      "-NonInteractive",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      join(repo, "evidence", "p1-04", "wake-foreground.ps1"),
+      "-Hwnd",
+      String(hwnd),
+      "-LogPath",
+      wakeLogPath,
+    ],
+    { encoding: "utf8", timeout: 60000, windowsHide: true },
+  );
+  const line = raw.trim().split(/\r?\n/).filter(Boolean).at(-1);
+  return JSON.parse(line);
+}
+
+/**
+ * Decode the captured PNG in the product's own renderer and report pixel statistics.
+ *
+ * Decoding the exact base64 the preview was built from — rather than a re-capture — is what makes
+ * "the preview shows this window and not the orb" a measurement instead of a claim.
+ */
+async function pngStats(client, base64) {
+  const expression = `(async () => {
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + ${JSON.stringify(base64)};
+    await img.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let magenta = 0, accent = 0, dark = 0, total = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      total += 1;
+      if (r > 200 && b > 200 && g < 90) magenta += 1;
+      if (Math.abs(r - 0x4c) < 24 && Math.abs(g - 0x8b) < 24 && Math.abs(b - 0xf5) < 24) accent += 1;
+      if (r < 60 && g < 60 && b < 70) dark += 1;
+    }
+    return JSON.stringify({
+      width: canvas.width, height: canvas.height, total, magenta, accent, dark,
+      magentaFraction: magenta / total, accentFraction: accent / total, darkFraction: dark / total,
+    });
+  })()`;
+  const raw = await evaluate(client, expression);
+  if (typeof raw !== "string") return { error: String(raw?.__exception ?? raw) };
+  return JSON.parse(raw);
+}
+
 const result = {
   capturedAt: new Date().toISOString(),
   isolation: {
@@ -365,6 +509,7 @@ const result = {
   },
   foregroundWindowAvailable: null,
   helperMeasurement: null,
+  positivePath: null,
   checks: [],
   passed: false,
 };
@@ -384,6 +529,7 @@ async function evaluate(client, expression) {
 
 let electron;
 let electronErr = "";
+let electronOut = "";
 
 try {
   if (piWebHead !== EXPECTED_HEAD) throw new Error(`pi-web HEAD is ${piWebHead}, expected ${EXPECTED_HEAD}`);
@@ -453,7 +599,7 @@ try {
     },
   );
   electron.stderr.on("data", (chunk) => (electronErr += chunk.toString()));
-  electron.stdout.on("data", () => {});
+  electron.stdout.on("data", (chunk) => (electronOut += chunk.toString()));
 
   let pageTarget = null;
   for (let attempt = 0; attempt < 50; attempt += 1) {
@@ -495,12 +641,33 @@ try {
 
   // -------------------------------------------------------------------------
   // C. No target window -> capture refused, and NOTHING is uploaded.
+  //
+  //    A record does exist at this point (the startup record), so the refusal is
+  //    produced the way a user produces it: by collapsing the orb, which is the
+  //    product's own path for "the user has moved on from that window". This is also
+  //    what keeps the test from capturing whatever happened to be on the real desktop
+  //    at startup — a window this test did not create and has no business reading.
   // -------------------------------------------------------------------------
+  const collapsed = JSON.parse(
+    await orb(`collapseOrb().then((s) => JSON.stringify({ desktopTarget: s.target, authorized: s.authorized }))`),
+  );
+  result.startupRecordClearedOnCollapse = collapsed;
+  // Recorded as data, not asserted: `desktopTask.target` is the window the desktop tools would act on,
+  // which is a separate notion from the record the screenshot path consumes. Keeping the tool target
+  // after a collapse is harmless because the authority is revoked with it; keeping the screenshot
+  // record is not, which is what the capture refusal below checks.
+  check(
+    "collapsing the orb revokes the desktop authority",
+    collapsed.authorized === false,
+    JSON.stringify(collapsed),
+  );
+
   const beforeCapture = modelRequests.length;
   const capture = JSON.parse(
     await orb(`captureScreenshot({ generation: ${generation}, text: 'look at this' }).then((r) => JSON.stringify(r))`),
   );
   result.captureAttempt = capture;
+  result.captureRefusalMessage = capture.ok === false ? String(capture.message) : null;
 
   check(
     "a capture with no recorded target window is refused",
@@ -612,7 +779,264 @@ try {
   }
 
   // -------------------------------------------------------------------------
-  // E. The normal path still works and the shell survives all of the above.
+  // E. The positive capture path, driven only against a window this test creates.
+  //
+  //    This is the path P1-04's README recorded as unverified. It is exercised here
+  //    through the product's own wake shortcut and its own consent flow, with the
+  //    identity of the foreground window checked before anything is captured.
+  // -------------------------------------------------------------------------
+  const positive = {
+    targetTitle,
+    targetHwnd: null,
+    recordedTarget: null,
+    capture: null,
+    pixelStats: null,
+    discardSentNothing: null,
+    confirmed: null,
+    providerImage: null,
+  };
+  result.positivePath = positive;
+
+  const targetReady = await startCaptureTarget();
+  positive.targetHwnd = targetReady.hwnd;
+  positive.targetBounds = targetReady.bounds;
+  positive.targetPhysicalBounds = targetReady.physicalBounds ?? null;
+  check(
+    "the disposable capture target started with its own window",
+    Boolean(targetReady.hwnd) && targetReady.pid !== process.pid,
+    JSON.stringify({ hwnd: targetReady.hwnd, pid: targetReady.pid }),
+  );
+
+  // Wake with the test's own window in front. The record happens inside the product, before it takes
+  // focus, so the recorded target must be this window — never the window that happened to be in front
+  // beforehand. That check is the guard against capturing the user's real desktop.
+  const wakeResult = foregroundAndWake(targetReady.hwnd);
+  positive.wakeHelper = wakeResult;
+  positive.wakeLog = readJsonl(wakeLogPath);
+  check(
+    "the test's own window could be brought to the foreground",
+    wakeResult.ok === true,
+    JSON.stringify(wakeResult),
+  );
+  await sleep(3000);
+  const afterWake = await status();
+  positive.recordedTarget = afterWake.desktopTask?.target ?? null;
+  // Whether the product actually reacted to the synthesized chord is a separate fact from whether the
+  // chord was sent, and it is the first thing to check when the record looks stale.
+  positive.windowAfterWake = {
+    shortcutRegistered: afterWake.shortcutRegistered,
+    generation: afterWake.generation,
+    keysSent: positive.wakeLog.some((entry) => entry.kind === "keys-sent"),
+  };
+
+  // Whether the Cua driver is available decides which identity check can be made. The screenshot path
+  // records its target with the Win32 helper, which works without the driver; the desktop-tool target
+  // additionally needs the driver's window list. Recorded as data so "the driver was absent" cannot be
+  // mistaken for "the identity check passed".
+  const windowList = JSON.parse(
+    await orb(`listDesktopWindows().then((r) => JSON.stringify(r)).catch((e) => JSON.stringify({ ok: false, message: String(e.message) }))`),
+  );
+  positive.driverAvailable = windowList.ok === true;
+  positive.driverWindowCount = windowList.ok === true ? windowList.windows.length : null;
+  check(
+    "the desktop-tool target matches the window the test put in front (when the driver is available)",
+    windowList.ok !== true || positive.recordedTarget?.title === targetTitle,
+    JSON.stringify({
+      driverAvailable: positive.driverAvailable,
+      recorded: positive.recordedTarget,
+      expectedTitle: targetTitle,
+    }),
+  );
+  // Did the product react to the chord at all? The main process logs a record attempt and a
+  // revocation; their presence in stdout is the independent evidence that the wake ran.
+  positive.wakeEvidenceInAppLog = electronOut
+    .split(/\r?\n/)
+    .filter((line) => /wake|record|revok|desktop/i.test(line))
+    .slice(-12);
+  check(
+    "the product reacted to the synthesized wake chord",
+    positive.wakeLog.some((entry) => entry.kind === "keys-sent") && positive.recordedTarget?.title === targetTitle,
+    JSON.stringify({
+      keysSent: positive.wakeLog.some((entry) => entry.kind === "keys-sent"),
+      recordedTitle: positive.recordedTarget?.title,
+      expected: targetTitle,
+      appLog: positive.wakeEvidenceInAppLog,
+    }),
+  );
+  check(
+    "the wake recorded the test's own window as the target, not whatever was in front before",
+    positive.recordedTarget?.title === targetTitle,
+    JSON.stringify(positive.recordedTarget),
+  );
+  check(
+    "the recorded target is the test's window, not the orb itself",
+    positive.recordedTarget !== null && positive.recordedTarget.pid === targetReady.pid,
+    JSON.stringify({ recordedPid: positive.recordedTarget?.pid, targetPid: targetReady.pid, orbPid: electron.pid }),
+  );
+
+  // Capture for preview. Nothing is uploaded at this point.
+  const requestsBeforePreview = modelRequests.length;
+  const preview = JSON.parse(
+    await orb(`captureScreenshot({ generation: ${afterWake.generation}, text: 'what is on screen?' }).then((r) => JSON.stringify(r))`),
+  );
+  positive.capture = preview.ok
+    ? {
+        ok: true,
+        observationId: preview.observationId,
+        width: preview.width,
+        height: preview.height,
+        bytes: preview.bytes,
+        mimeType: preview.mimeType,
+        targetDescription: preview.targetDescription,
+        targetStale: preview.targetStale,
+        sha256: createHash("sha256").update(preview.data).digest("hex").slice(0, 16),
+      }
+    : preview;
+
+  check(
+    "capturing the recorded window succeeds",
+    preview.ok === true,
+    JSON.stringify(positive.capture).slice(0, 300),
+  );
+  // The identity check that does not depend on the driver: the capture itself must name the window
+  // this test created. This is the guard against capturing the user's real desktop.
+  check(
+    "the captured target is identified as the test's own window",
+    typeof preview.targetDescription === "string" && preview.targetDescription.includes(targetTitle),
+    String(preview.targetDescription),
+  );
+  check(
+    "the preview names the window that was recorded",
+    typeof preview.targetDescription === "string" && preview.targetDescription.includes(targetTitle),
+    String(preview.targetDescription),
+  );
+  check(
+    "the preview carries real image bytes",
+    preview.ok === true && preview.bytes > 1000 && preview.width > 0 && preview.height > 0,
+    JSON.stringify({ bytes: preview.bytes, width: preview.width, height: preview.height }),
+  );
+  // P1-04's coordinate requirement, stated as a measurement: the captured image must be the recorded
+  // window's own size, not the whole screen. The comparison is against the target's OWN physical
+  // bounds, reported by the target itself — not against the driver's bounds for the window, which
+  // describe the frame the driver will click in and are not the same rectangle. Comparing against the
+  // driver's rectangle produced a false failure that would have hidden whether the capture was correct.
+  const recordedPhysical = positive.recordedTarget?.bounds ?? null;
+  const screenPhysical = { width: 2560, height: 1600 };
+  positive.sizeComparison = {
+    captured: preview.ok ? { width: preview.width, height: preview.height } : null,
+    targetPhysicalBounds: positive.targetPhysicalBounds,
+    driverReportedBounds: recordedPhysical,
+    fullScreen: screenPhysical,
+  };
+  check(
+    "the captured image is the recorded window's size, not the whole screen",
+    preview.ok === true &&
+      positive.targetPhysicalBounds !== null &&
+      // desktopCapturer may trim a window's invisible border, so a small difference is expected; the
+      // point of the check is that the image is the window and not the whole desktop.
+      Math.abs(preview.width - positive.targetPhysicalBounds.width) <= 40 &&
+      Math.abs(preview.height - positive.targetPhysicalBounds.height) <= 60,
+    JSON.stringify(positive.sizeComparison),
+  );
+  check(
+    "the captured image is not the whole screen",
+    preview.ok === true && preview.width < screenPhysical.width && preview.height < screenPhysical.height,
+    JSON.stringify({ captured: positive.sizeComparison.captured, fullScreen: screenPhysical }),
+  );
+
+  if (preview.ok === true) {
+    positive.pixelStats = await pngStats(client, preview.data);
+    const stats = positive.pixelStats;
+    check(
+      "the preview really contains the recorded window's pixels",
+      typeof stats.magentaFraction === "number" && stats.magentaFraction > 0.5,
+      JSON.stringify(stats),
+    );
+    // The orb is always-on-top and may overlap the target, so if the preview contained the orb the
+    // orb's own colours would appear. They must not.
+    check(
+      "the preview does not smuggle in the orb's own overlay",
+      typeof stats.accentFraction === "number" && stats.accentFraction < 0.01,
+      JSON.stringify({ accentFraction: stats.accentFraction, orbAccent: "#4c8bf5" }),
+    );
+  }
+
+  // A preview that is never confirmed must upload nothing.
+  const previewDiscarded = JSON.parse(
+    await orb(`discardScreenshot().then((v) => JSON.stringify({ ok: v }))`),
+  );
+  await sleep(1500);
+  positive.discardSentNothing = {
+    discarded: previewDiscarded,
+    providerRequestsBefore: requestsBeforePreview,
+    providerRequestsAfter: modelRequests.length,
+  };
+  check(
+    "discarding the preview uploads nothing",
+    modelRequests.length === requestsBeforePreview,
+    JSON.stringify(positive.discardSentNothing),
+  );
+
+  // Capture again and confirm it. The session is switched to the image-capable model first, so the
+  // confirmed pixels are proven to reach the provider rather than being dropped on the way.
+  await piWebRequest(`/api/agent/${encodeURIComponent(sessionId)}`, {
+    method: "POST",
+    body: { type: "set_model", provider: "p1-local", modelId: "p1-vision" },
+  });
+  const requestsBeforeConfirm = modelRequests.length;
+  const preview2 = JSON.parse(
+    await orb(`captureScreenshot({ generation: ${afterWake.generation}, text: 'confirm this screenshot' }).then((r) => JSON.stringify(r))`),
+  );
+  const preview2Hash = preview2.ok
+    ? createHash("sha256").update(preview2.data).digest("hex").slice(0, 16)
+    : null;
+  const confirmed = preview2.ok
+    ? JSON.parse(
+        await orb(
+          `resolveScreenshot({ generation: ${afterWake.generation}, observationId: ${JSON.stringify(preview2.observationId)}, confirmed: true }).then((r) => JSON.stringify(r))`,
+        ),
+      )
+    : { ok: false, sent: false, message: preview2.message };
+  positive.confirmed = { previewSha256: preview2Hash, result: confirmed };
+  check(
+    "confirming the preview reports the message as sent",
+    confirmed.ok === true && confirmed.sent === true,
+    JSON.stringify(confirmed),
+  );
+
+  try {
+    await waitFor(() => modelRequests.length > requestsBeforeConfirm, 60000, "the confirmed image to reach the provider");
+  } catch {
+    // Recorded below as a failed check rather than thrown.
+  }
+  await sleep(1200);
+  const confirmedRequest = modelRequests.slice(requestsBeforeConfirm).find((request) => request.imagePartsInLastUserMessage > 0) ?? null;
+  positive.providerImage = confirmedRequest
+    ? {
+        model: confirmedRequest.model,
+        imageParts: confirmedRequest.imagePartsInLastUserMessage,
+        imageHashes: confirmedRequest.imageHashes,
+        previewSha256: preview2Hash,
+      }
+    : null;
+  check(
+    "the confirmed image reached the provider as image data",
+    confirmedRequest !== null,
+    JSON.stringify(modelRequests.slice(requestsBeforeConfirm).map((r) => ({ model: r.model, images: r.imagePartsInLastUserMessage }))),
+  );
+  check(
+    "the provider received the exact image bytes the user previewed",
+    confirmedRequest !== null && confirmedRequest.imageHashes.includes(preview2Hash),
+    JSON.stringify(positive.providerImage),
+  );
+  check(
+    "the confirmed image was sent to the image-capable model",
+    confirmedRequest?.model === "p1-vision",
+    String(confirmedRequest?.model),
+  );
+
+  // -------------------------------------------------------------------------
+  // F. The normal path still works and the shell survives all of the above.
   // -------------------------------------------------------------------------
   const beforeNormal = modelRequests.length;
   const normalSession = await piWebRequest("/api/agent/new", { method: "POST", body: { cwd: orbWorkspace, type: "ensure_session" } });
@@ -630,11 +1054,19 @@ try {
   client.close();
   result.modelRequests = modelRequests;
   result.electronStderrTail = electronErr.trim().split(/\r?\n/).slice(-8).join("\n");
+  result.electronStdoutTail = electronOut.trim().split(/\r?\n/).slice(-12).join("\n");
 } catch (error) {
   check("P1-04 verification completed without error", false, error?.message ?? String(error));
   result.electronStderrTail = electronErr.slice(-1500);
   result.piWebLogTail = serverLog.slice(-1500);
 } finally {
+  try {
+    if (targetApp) {
+      execFileSync("taskkill", ["/PID", String(targetApp.pid), "/T", "/F"], { stdio: "ignore" });
+    }
+  } catch {
+    // Best effort: the target app may already be gone.
+  }
   try {
     electron?.kill();
     await sleep(1200);

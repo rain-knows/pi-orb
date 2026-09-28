@@ -65,8 +65,15 @@ export class RecordedTargetStore {
   async record(): Promise<RecordOutcome> {
     const target = await this.#deps.readForeground().catch(() => null);
     if (!target) {
+      // A record that cannot be taken means there is no *current* record, so the previous one must
+      // not survive it. The whole reason a record is written at a wake is that the user is saying
+      // "this is the window I am looking at now"; keeping the older snapshot would let a later
+      // capture silently use a window the user has already moved away from — a privacy failure that
+      // presents as a successful capture.
+      //
       // The most common cause is that the orb itself already has focus. Saying so is more useful
       // than a generic failure, because it tells the user the order to do things in.
+      this.#snapshot = null;
       this.#deps.log?.("[pi-orb] no foreground window to record; the orb must not take focus first");
       return { ok: false, reason: "no-foreground-window" };
     }

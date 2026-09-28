@@ -26,6 +26,17 @@ export interface DesktopOperations {
   revokeDesktopTask(): void;
   /** Drop any unconfirmed screenshot. Idempotent. */
   discardPendingCapture(): void;
+  /**
+   * Drop the record of "the window the user was looking at". Idempotent.
+   *
+   * Collapsing means the user has moved on from that window, so the record stops being current. This
+   * was a real gap: the collapse routine revoked the task authority and dropped the pending capture
+   * but left the record, so after hiding the orb a screenshot would still silently capture the window
+   * that was in front whenever the orb last woke — the very reuse `revokeDesktopOperations` documents
+   * as forbidden. Because collapse is the path a user actually takes, the stale record was reachable
+   * in normal use, not just in theory.
+   */
+  clearRecordedTarget(): void;
 }
 
 export type WindowLifecycleAction = "collapsed" | "noop";
@@ -56,10 +67,11 @@ export class OrbWindowLifecycle {
   collapse(): WindowLifecycleAction {
     if (this.#target.isDestroyed()) return "noop";
     this.#target.hide();
-    // Order matters only in that both must happen; there is no window in which hiding should
-    // outlive the authority.
+    // Order matters only in that all of them must happen; there is no window in which hiding should
+    // outlive the authority, the pending capture or the record of the target window.
     this.#operations.revokeDesktopTask();
     this.#operations.discardPendingCapture();
+    this.#operations.clearRecordedTarget();
     this.#collapseCount += 1;
     this.#log("[pi-orb] orb collapsed: desktop operations revoked");
     return "collapsed";

@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:42:54.806Z",
+  "capturedAt": "2026-09-27T23:26:12.139Z",
   "scope": {
     "platform": "win32 x64",
     "driverVersion": "0.30.1",
@@ -17,7 +17,12 @@
     "pixelsWrittenToDisk": 0,
     "elevatedWindowTargeted": false,
     "userDocumentsTouched": false,
-    "skippedForSafety": []
+    "skippedForSafety": [
+      {
+        "action": "click",
+        "reason": "another window is in front: chrome.exe \"pi-orb - Pi Web - Google Chrome\""
+      }
+    ]
   },
   "artifacts": {
     "wrapper": {
@@ -94,108 +99,23 @@
   "clickVerification": {
     "deliveryMode": "Background",
     "frontCheck": {
-      "front": true,
+      "front": false,
       "frontWindow": {
-        "appName": "electron.exe",
-        "title": "P1-05 input target"
+        "appName": "chrome.exe",
+        "title": "pi-orb - Pi Web - Google Chrome"
       },
-      "reason": "target is front-most"
+      "reason": "another window is in front: chrome.exe \"pi-orb - Pi Web - Google Chrome\""
     },
     "coordinateSpace": "screen DIP, computed by the target via screen.dipToScreenPoint",
-    "attempts": [
-      {
-        "aimedCell": "0,0",
-        "aimedScreenDip": {
-          "x": 187,
-          "y": 191
-        },
-        "request": {
-          "x": -2,
-          "y": 56
-        },
-        "driverSummary": "✅ Posted click to Chromium pid 29752 at (188,192) (background, no foreground swap).",
-        "error": null,
-        "landedCell": "0,0",
-        "landedOffsetInCell": {
-          "x": 60,
-          "y": 46
-        },
-        "mouseDown": 1,
-        "mouseUp": 1,
-        "matched": true
-      },
-      {
-        "aimedCell": "1,2",
-        "aimedScreenDip": {
-          "x": 427,
-          "y": 281
-        },
-        "request": {
-          "x": 238,
-          "y": 146
-        },
-        "driverSummary": "✅ Posted click to Chromium pid 29752 at (428,282) (background, no foreground swap).",
-        "error": null,
-        "landedCell": "1,2",
-        "landedOffsetInCell": {
-          "x": 60,
-          "y": 46
-        },
-        "mouseDown": 1,
-        "mouseUp": 1,
-        "matched": true
-      },
-      {
-        "aimedCell": "2,3",
-        "aimedScreenDip": {
-          "x": 547,
-          "y": 371
-        },
-        "request": {
-          "x": 358,
-          "y": 236
-        },
-        "driverSummary": "✅ Posted click to Chromium pid 29752 at (548,372) (background, no foreground swap).",
-        "error": null,
-        "landedCell": "2,3",
-        "landedOffsetInCell": {
-          "x": 60,
-          "y": 46
-        },
-        "mouseDown": 1,
-        "mouseUp": 1,
-        "matched": true
-      },
-      {
-        "aimedCell": "2,0",
-        "aimedScreenDip": {
-          "x": 187,
-          "y": 371
-        },
-        "request": {
-          "x": -2,
-          "y": 236
-        },
-        "driverSummary": "✅ Posted click to Chromium pid 29752 at (188,372) (background, no foreground swap).",
-        "error": null,
-        "landedCell": "2,0",
-        "landedOffsetInCell": {
-          "x": 60,
-          "y": 46
-        },
-        "mouseDown": 1,
-        "mouseUp": 1,
-        "matched": true
-      }
-    ]
+    "attempts": []
   },
   "typingVerification": {
     "expectedText": "P1ORBTYPED",
     "target": "notepad.exe on a temporary file created by this script",
     "verificationMethod": "read back through the accessibility tree's document value",
-    "frontCheckTargetUsesGridWindow": true,
+    "frontCheckTargetUsesGridWindow": false,
     "note": "the front check reports the grid window; for the keyboard test the Notepad window was opened last and is checked separately below",
-    "driverSummary": "📨 Sent 10 char(s) to pid 2756 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
+    "driverSummary": "📨 Sent 10 char(s) to pid 36436 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
     "error": null,
     "textBeforeContainsTyped": false,
     "textAfterContainsTyped": true,
@@ -206,14 +126,14 @@
       {
         "target": "grid/Electron",
         "deliveryMode": "Background",
-        "frontBeforeAction": true,
+        "frontBeforeAction": false,
         "outcome": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
         "error": null
       },
       {
         "target": "grid/Electron",
         "deliveryMode": "Foreground",
-        "frontBeforeAction": true,
+        "frontBeforeAction": false,
         "outcome": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
         "error": null
       },
@@ -235,10 +155,7 @@
   },
   "releaseAndCancellation": {
     "gridEventCounts": {
-      "ready": 1,
-      "cell-mousedown": 4,
-      "mouse-down": 4,
-      "mouse-up": 4
+      "ready": 1
     },
     "keysPressedAndReleased": {
       "down": 0,
@@ -246,8 +163,8 @@
       "balanced": true
     },
     "mouseButtonsPressedAndReleased": {
-      "down": 4,
-      "up": 4,
+      "down": 0,
+      "up": 0,
       "balanced": true
     },
     "session": {
@@ -260,16 +177,15 @@
   },
   "refusals": {
     "foregroundDelivery": {
-      "refused": true,
-      "info": "{\"tag\":\"Tool\",\"inner\":{\"tool\":\"click\",\"message\":\"foreground_unavailable: Windows did not activate exact target HWND 0x200a0c (actual foreground HWND 0xe0422); no mouse input was sent\",\"errorCode\":\"\"},\"message\":\"DriverError.Tool\"}",
-      "text": "{\"inner\":{\"tool\":\"click\",\"message\":\"foreground_unavailable: Windows did not activate exact target HWND 0x200a0c (actual foreground HWND 0xe0422); no mouse input was sent\",\"errorCode\":\"\"},\"message\":\"DriverError.Tool\"}",
+      "refused": false,
+      "text": null,
       "interpretation": "foreground delivery requires activating the exact target HWND. This session has no foreground window at all (the OS reported HWND 0x0, and SetForegroundWindow was refused for Notepad), so neither foreground input nor any screenshot-input coordinate check can be exercised here."
     }
   },
   "timingsMs": {
-    "moduleImport": 49,
-    "driverCreate": 61,
-    "listWindows": 57,
+    "moduleImport": 66,
+    "driverCreate": 70,
+    "listWindows": 70,
     "startSession": 1,
     "shutdown": 1
   },
@@ -292,7 +208,7 @@
     {
       "name": "the native driver module loads and a driver can be created",
       "ok": true,
-      "detail": "import 49 ms, create 61 ms"
+      "detail": "import 66 ms, create 70 ms"
     },
     {
       "name": "the environment exhibits the scaled-DPI case P0-04 warned about",
@@ -310,29 +226,14 @@
       "detail": "{\"width\":1.464,\"height\":1.481,\"scaleFactor\":1.5,\"isUniformScaleOfDipBounds\":false}"
     },
     {
-      "name": "every click landed on its intended cell (coordinate space is consistent)",
-      "ok": true,
-      "detail": "[{\"aimed\":\"0,0\",\"landed\":\"0,0\"},{\"aimed\":\"1,2\",\"landed\":\"1,2\"},{\"aimed\":\"2,3\",\"landed\":\"2,3\"},{\"aimed\":\"2,0\",\"landed\":\"2,0\"}]"
-    },
-    {
-      "name": "the click landed near the centre of the intended cell, not merely inside it",
-      "ok": true,
-      "detail": "[{\"aimed\":\"0,0\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"1,2\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"2,3\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"2,0\",\"offset\":{\"x\":60,\"y\":46}}]"
-    },
-    {
-      "name": "each click delivered both a press and a release",
-      "ok": true,
-      "detail": "[{\"aimed\":\"0,0\",\"down\":1,\"up\":1},{\"aimed\":\"1,2\",\"down\":1,\"up\":1},{\"aimed\":\"2,3\",\"down\":1,\"up\":1},{\"aimed\":\"2,0\",\"down\":1,\"up\":1}]"
-    },
-    {
-      "name": "the driver reported background delivery without raising the window",
-      "ok": true,
-      "detail": "[\"✅ Posted click to Chromium pid 29752 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 29752 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 29752 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 29752 at (188,372) (background, no foreground swap).\"]"
+      "name": "clicks could be delivered (target was front-most)",
+      "ok": false,
+      "detail": "SKIPPED for safety: another window is in front: chrome.exe \"pi-orb - Pi Web - Google Chrome\""
     },
     {
       "name": "background typing to a native application is delivered",
       "ok": true,
-      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 2756 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no\"}"
+      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 36436 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes n\"}"
     },
     {
       "name": "the typed text is readable back from the target, so it actually landed",
@@ -351,8 +252,8 @@
     },
     {
       "name": "foreground delivery fails with a specific, diagnosable reason rather than silently",
-      "ok": true,
-      "detail": "{\"refused\":true,\"text\":\"{\\\"inner\\\":{\\\"tool\\\":\\\"click\\\",\\\"message\\\":\\\"foreground_unavailable: Windows did not activate exact target HWND 0x200a0c (actual foreground HWND 0xe0422); no mouse input was sent\\\",\\\"errorCode\\\":\\\"\\\"},\\\"message\\\":\\\"DriverError.Tool\\\"}\"}"
+      "ok": false,
+      "detail": "{\"refused\":false,\"text\":\"null\"}"
     },
     {
       "name": "no key was left pressed after the input sequence",
@@ -362,7 +263,7 @@
     {
       "name": "no mouse button was left pressed after the input sequence",
       "ok": true,
-      "detail": "{\"down\":4,\"up\":4,\"balanced\":true}"
+      "detail": "{\"down\":0,\"up\":0,\"balanced\":true}"
     },
     {
       "name": "a driver session can be started and ended, reporting itself inactive",
@@ -375,7 +276,7 @@
       "detail": "exitCode=null"
     }
   ],
-  "passed": true,
+  "passed": false,
   "summary": {
     "verified": [
       "locked version, license composition and binary hashes",

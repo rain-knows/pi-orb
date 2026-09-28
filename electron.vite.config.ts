@@ -1,10 +1,40 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
+import type { Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+
+/**
+ * Copy the native helper scripts next to the built main process.
+ *
+ * The main process runs the PowerShell foreground-window helper by path relative to its own
+ * directory (`join(__dirname, "native", "foreground-window.ps1")`). Vite only bundles what is
+ * imported, so without this the file never reaches `out/main/native/` and every attempt to record the
+ * target window fails at runtime — silently and only in a built app, because the failure is reported
+ * as "no foreground window", not as a missing file. That looked like "the user's desktop has no
+ * foreground window" when the real cause was a missing build artifact.
+ */
+function copyNativeScripts(): Plugin {
+  return {
+    name: "pi-orb:copy-native-scripts",
+    apply: "build",
+    generateBundle() {
+      for (const name of ["foreground-window.ps1"]) {
+        this.emitFile({
+          type: "asset",
+          // A fixed name is required: the runtime resolves this exact path, so a hashed name would
+          // break the lookup the same way the missing file did.
+          fileName: `native/${name}`,
+          source: readFileSync(resolve(__dirname, "src/main/native", name)),
+        });
+      }
+    },
+  };
+}
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin(), copyNativeScripts()],
     build: {
       outDir: "out/main",
       rollupOptions: {

@@ -474,6 +474,10 @@ function attachWakeController(win: BrowserWindow): void {
     {
       revokeDesktopTask: () => desktopBroker?.revoke(),
       discardPendingCapture: () => screenshotFlow?.discard(),
+      // Collapse is the route users actually take, so the record must be dropped here too. The
+      // revocation routine below documents this exact rule for a collapse, but only the tray, the
+      // shortcut and the window button reach this object, and it previously left the record in place.
+      clearRecordedTarget: () => recordedTarget.clear(),
     },
     (message) => console.log(message),
   );

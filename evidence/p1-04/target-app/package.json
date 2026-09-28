@@ -1,0 +1,8 @@
+{
+  "name": "p1-04-capture-target",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Disposable, self-describing capture target for P1-04 real-machine verification. Never shipped.",
+  "main": "main.mjs"
+}

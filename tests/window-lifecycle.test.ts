@@ -18,9 +18,10 @@ function target(destroyed = false): CollapseTarget & { hideCalls: number } {
   };
 }
 
-function operations(): DesktopOperations & { revokes: number; discards: number } {
+function operations(): DesktopOperations & { revokes: number; discards: number; clears: number } {
   let revokes = 0;
   let discards = 0;
+  let clears = 0;
   return {
     get revokes() {
       return revokes;
@@ -28,11 +29,17 @@ function operations(): DesktopOperations & { revokes: number; discards: number }
     get discards() {
       return discards;
     },
+    get clears() {
+      return clears;
+    },
     revokeDesktopTask: () => {
       revokes += 1;
     },
     discardPendingCapture: () => {
       discards += 1;
+    },
+    clearRecordedTarget: () => {
+      clears += 1;
     },
   };
 }
@@ -50,6 +57,7 @@ describe("OrbWindowLifecycle", () => {
     expect(win.hideCalls).toBe(1);
     expect(ops.revokes).toBe(1);
     expect(ops.discards).toBe(1);
+    expect(ops.clears).toBe(1);
   });
 
   it.each(COLLAPSE_ROUTES)("revokes on %s", () => {
@@ -60,6 +68,7 @@ describe("OrbWindowLifecycle", () => {
     new OrbWindowLifecycle(win, ops).collapse();
     expect(ops.revokes).toBe(1);
     expect(ops.discards).toBe(1);
+    expect(ops.clears).toBe(1);
     expect(win.hideCalls).toBe(1);
   });
 
@@ -71,6 +80,19 @@ describe("OrbWindowLifecycle", () => {
     lifecycle.collapse();
     expect(win.hideCalls).toBe(ops.revokes);
     expect(win.hideCalls).toBe(ops.discards);
+    expect(win.hideCalls).toBe(ops.clears);
+  });
+
+  it("drops the recorded target, so a later capture cannot reuse the window the user left", () => {
+    // Real gap found by running the product: collapse revoked the authority and dropped the pending
+    // capture but kept the record of the target window. Collapse is the path users actually take, so a
+    // screenshot after hiding the orb would still have captured the window that was in front at the
+    // last wake. The product's own revocation routine documented this rule for a collapse; only the
+    // wiring was missing.
+    const win = target();
+    const ops = operations();
+    new OrbWindowLifecycle(win, ops).collapse();
+    expect(ops.clears).toBe(1);
   });
 
   it("is idempotent and safe to call repeatedly", () => {
@@ -82,6 +104,7 @@ describe("OrbWindowLifecycle", () => {
     lifecycle.collapse();
     expect(win.hideCalls).toBe(3);
     expect(ops.revokes).toBe(3);
+    expect(ops.clears).toBe(3);
     expect(lifecycle.collapseCount).toBe(3);
   });
 

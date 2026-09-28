@@ -1,13 +1,13 @@
 {
-  "capturedAt": "2026-09-27T20:42:12.602Z",
+  "capturedAt": "2026-09-28T00:05:12.076Z",
   "isolation": {
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
-    "runRoot": "D:\\pi-orb-p1-runs\\p1-04-1790541732547",
-    "agentDir": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\agent",
-    "sessionDir": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\agent\\sessions",
-    "homeDir": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\home",
-    "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\orb-workspace",
-    "configPath": "D:\\pi-orb-p1-runs\\p1-04-1790541732547\\orb-config.json",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-04-1790553911997",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-04-1790553911997\\agent",
+    "sessionDir": "D:\\pi-orb-p1-runs\\p1-04-1790553911997\\agent\\sessions",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-04-1790553911997\\home",
+    "orbWorkspace": "D:\\pi-orb-p1-runs\\p1-04-1790553911997\\orb-workspace",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-04-1790553911997\\orb-config.json",
     "piWebUrl": "http://127.0.0.1:31301",
     "note": "isolated agent dir, isolated HOME, local fake provider; no real model, no real credentials",
     "screenshots": false,
@@ -15,7 +15,7 @@
   },
   "foregroundWindowAvailable": true,
   "helperMeasurement": {
-    "elapsedMs": 712,
+    "elapsedMs": 892,
     "ok": true,
     "foregroundFound": true,
     "dpiAwareness": {
@@ -29,11 +29,143 @@
     },
     "note": "P0-04 required the desktop helper to declare per-monitor-v2 DPI awareness; the helper reports whether the declaration actually took effect"
   },
+  "positivePath": {
+    "targetTitle": "P1-04 capture target mukhkgss",
+    "targetHwnd": "1575308",
+    "recordedTarget": {
+      "windowId": "1575308",
+      "pid": 16064,
+      "appName": "electron.exe",
+      "title": "P1-04 capture target mukhkgss",
+      "bounds": {
+        "x": 789,
+        "y": 210,
+        "width": 1065,
+        "height": 774
+      },
+      "zIndex": "5",
+      "isRecorded": false
+    },
+    "capture": {
+      "ok": true,
+      "observationId": "obs-mukhl6yg-wxgfm3d4",
+      "width": 1081,
+      "height": 783,
+      "bytes": 10821,
+      "mimeType": "image/png",
+      "targetDescription": "P1-04 capture target mukhkgss (1083x783, pid 16064, dpi 144)",
+      "targetStale": false,
+      "sha256": "6d89b71bf410a581"
+    },
+    "pixelStats": {
+      "width": 1081,
+      "height": 783,
+      "total": 846423,
+      "magenta": 767287,
+      "accent": 0,
+      "dark": 16157,
+      "magentaFraction": 0.9065053761535308,
+      "accentFraction": 0,
+      "darkFraction": 0.01908856446481251
+    },
+    "discardSentNothing": {
+      "discarded": {
+        "ok": true
+      },
+      "providerRequestsBefore": 1,
+      "providerRequestsAfter": 1
+    },
+    "confirmed": {
+      "previewSha256": "6d89b71bf410a581",
+      "result": {
+        "ok": true,
+        "sent": true
+      }
+    },
+    "providerImage": {
+      "model": "p1-vision",
+      "imageParts": 1,
+      "imageHashes": [
+        "6d89b71bf410a581"
+      ],
+      "previewSha256": "6d89b71bf410a581"
+    },
+    "targetBounds": {
+      "x": 520,
+      "y": 140,
+      "width": 722,
+      "height": 522
+    },
+    "targetPhysicalBounds": {
+      "x": 780,
+      "y": 210,
+      "width": 1083,
+      "height": 783
+    },
+    "wakeHelper": {
+      "title": "P1-04 capture target mukhkgss",
+      "ok": true,
+      "foregrounded": true,
+      "chordSent": "ctrl+shift+space"
+    },
+    "wakeLog": [
+      {
+        "kind": "foreground",
+        "foregroundTitle": "P1-04 capture target mukhkgss",
+        "at": 1790553941063,
+        "foregroundHwnd": "1575308",
+        "isForeground": true,
+        "setForegroundWindowReturned": true,
+        "targetHwnd": "1575308"
+      },
+      {
+        "mechanism": "keybd_event",
+        "kind": "keys-sent",
+        "chord": "ctrl+shift+space",
+        "at": 1790553941692
+      }
+    ],
+    "windowAfterWake": {
+      "shortcutRegistered": true,
+      "generation": 1,
+      "keysSent": true
+    },
+    "driverAvailable": true,
+    "driverWindowCount": 16,
+    "wakeEvidenceInAppLog": [
+      "[pi-orb] recorded target: pid 25612 \"pi-orb - Pi Web - Google Chrome\" (2582x1622, dpi 144)",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T00:05:18.882Z\",\"event\":\"revoke\"}",
+      "[pi-orb] orb collapsed: desktop operations revoked",
+      "[pi-orb] recorded target: pid 16064 \"P1-04 capture target mukhkgss\" (1083x783, dpi 144)"
+    ],
+    "sizeComparison": {
+      "captured": {
+        "width": 1081,
+        "height": 783
+      },
+      "targetPhysicalBounds": {
+        "x": 780,
+        "y": 210,
+        "width": 1083,
+        "height": 783
+      },
+      "driverReportedBounds": {
+        "x": 789,
+        "y": 210,
+        "width": 1065,
+        "height": 774
+      },
+      "fullScreen": {
+        "width": 2560,
+        "height": 1600
+      }
+    }
+  },
   "checks": [
     {
       "name": "target helper runs and returns JSON",
       "ok": true,
-      "detail": "{\"ok\":true,\"foreground\":{\"handle\":\"918562\",\"processId\":5400,\"title\":\"Windows 默认锁屏界面\",\"visible\":true,\"dpi\":144,\"bounds\":{\"x\":0,\"y\":0,\"width\":2560,\"height\":1600}},\"cursor\":{\"x\":933,\"y\":977},\"dpiAwareness\":{\"requestedPerMonitorV2\":true,\"setCallSucceeded\":true,\"awarenessValue\":2,\"isPerMonitorV2\":true,\"i"
+      "detail": "{\"ok\":true,\"foreground\":{\"handle\":\"329270\",\"processId\":25612,\"title\":\"pi-orb - Pi Web - Google Chrome\",\"visible\":true,\"dpi\":144,\"bounds\":{\"x\":-11,\"y\":-11,\"width\":2582,\"height\":1622}},\"cursor\":{\"x\":600,\"y\":1045},\"dpiAwareness\":{\"requestedPerMonitorV2\":true,\"setCallSucceeded\":true,\"awarenessValue\":2,\""
     },
     {
       "name": "target helper declares per-monitor-v2 DPI awareness",
@@ -48,7 +180,7 @@
     {
       "name": "environment fact: a genuine foreground window is available for the positive capture path",
       "ok": true,
-      "detail": "yes: Windows 默认锁屏界面"
+      "detail": "yes: pi-orb - Pi Web - Google Chrome"
     },
     {
       "name": "orb is configured and connected for this run",
@@ -64,6 +196,11 @@
       "name": "the bridge still exposes no generic IPC or pixel-writing helper",
       "ok": true,
       "detail": "[\"abort\",\"authorizeDesktopTask\",\"captureScreenshot\",\"chooseWorkspace\",\"collapseOrb\",\"discardScreenshot\",\"ensureSession\",\"getDesktopTaskStatus\",\"getStatus\",\"listDesktopWindows\",\"onSessionEvent\",\"refreshConnection\",\"resolveScreenshot\",\"revokeDesktopTask\",\"sendPrompt\",\"setDesktopTarget\",\"setShortcut\",\"setWorkspace\",\"validateWorkspace\"]"
+    },
+    {
+      "name": "collapsing the orb revokes the desktop authority",
+      "ok": true,
+      "detail": "{\"desktopTarget\":{\"windowId\":\"329270\",\"pid\":25612,\"appName\":\"chrome.exe\",\"title\":\"pi-orb - Pi Web - Google Chrome\",\"bounds\":{\"x\":0,\"y\":0,\"width\":2560,\"height\":1600},\"zIndex\":\"4\",\"isRecorded\":false},\"authorized\":false}"
     },
     {
       "name": "a capture with no recorded target window is refused",
@@ -103,17 +240,17 @@
     {
       "name": "no message was sent on the refusal path",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-04-1790541732547\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31301\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-04-1790553911997\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31301\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"329270\",\"pid\":25612,\"appName\":\"chrome.exe\",\"title\":\"pi-orb - Pi Web - Google Chrome\",\"bounds\":{\"x\":0,\"y\":0,\"width\":2560,\"height\":1600},\"zIndex\":\"4\",\"isRecorded\":false}}}"
     },
     {
       "name": "a session can be created on demand for the workspace",
       "ok": true,
-      "detail": "01a0e49a-dcef-771e-9c06-4246973a62f4"
+      "detail": "01a0e554-ca1c-77bb-8342-3ee9a8707608"
     },
     {
       "name": "the orb session exists for the image test",
       "ok": true,
-      "detail": "01a0e49a-dcef-771e-9c06-4246973a62f4"
+      "detail": "01a0e554-ca1c-77bb-8342-3ee9a8707608"
     },
     {
       "name": "a text-only model never receives image data",
@@ -126,9 +263,104 @@
       "detail": "{\"httpStatus\":200,\"responseError\":null,\"providerReceivedImage\":false,\"syntheticImageBytes\":180,\"newProviderRequests\":1,\"omissionAnnotationPresent\":true,\"observedLastUserText\":\"describe this synthetic image(image omitted: model does not support images)\"}"
     },
     {
+      "name": "the disposable capture target started with its own window",
+      "ok": true,
+      "detail": "{\"hwnd\":\"1575308\",\"pid\":16064}"
+    },
+    {
+      "name": "the test's own window could be brought to the foreground",
+      "ok": true,
+      "detail": "{\"title\":\"P1-04 capture target mukhkgss\",\"ok\":true,\"foregrounded\":true,\"chordSent\":\"ctrl+shift+space\"}"
+    },
+    {
+      "name": "the desktop-tool target matches the window the test put in front (when the driver is available)",
+      "ok": true,
+      "detail": "{\"driverAvailable\":true,\"recorded\":{\"windowId\":\"1575308\",\"pid\":16064,\"appName\":\"electron.exe\",\"title\":\"P1-04 capture target mukhkgss\",\"bounds\":{\"x\":789,\"y\":210,\"width\":1065,\"height\":774},\"zIndex\":\"5\",\"isRecorded\":false},\"expectedTitle\":\"P1-04 capture target mukhkgss\"}"
+    },
+    {
+      "name": "the product reacted to the synthesized wake chord",
+      "ok": true,
+      "detail": "{\"keysSent\":true,\"recordedTitle\":\"P1-04 capture target mukhkgss\",\"expected\":\"P1-04 capture target mukhkgss\",\"appLog\":[\"[pi-orb] recorded target: pid 25612 \\\"pi-orb - Pi Web - Google Chrome\\\" (2582x1622, dpi 144)\",\"[pi-orb] desktop {\\\"at\\\":\\\"2026-09-28T00:05:18.882Z\\\",\\\"event\\\":\\\"revoke\\\"}\",\"[pi-orb] orb collapsed: desktop operations revoked\",\"[pi-orb] recorded target: pid 16064 \\\"P1-04 capture target mukhkgss\\\" (1083x783, dpi 144)\"]}"
+    },
+    {
+      "name": "the wake recorded the test's own window as the target, not whatever was in front before",
+      "ok": true,
+      "detail": "{\"windowId\":\"1575308\",\"pid\":16064,\"appName\":\"electron.exe\",\"title\":\"P1-04 capture target mukhkgss\",\"bounds\":{\"x\":789,\"y\":210,\"width\":1065,\"height\":774},\"zIndex\":\"5\",\"isRecorded\":false}"
+    },
+    {
+      "name": "the recorded target is the test's window, not the orb itself",
+      "ok": true,
+      "detail": "{\"recordedPid\":16064,\"targetPid\":16064,\"orbPid\":20068}"
+    },
+    {
+      "name": "capturing the recorded window succeeds",
+      "ok": true,
+      "detail": "{\"ok\":true,\"observationId\":\"obs-mukhl6yg-wxgfm3d4\",\"width\":1081,\"height\":783,\"bytes\":10821,\"mimeType\":\"image/png\",\"targetDescription\":\"P1-04 capture target mukhkgss (1083x783, pid 16064, dpi 144)\",\"targetStale\":false,\"sha256\":\"6d89b71bf410a581\"}"
+    },
+    {
+      "name": "the captured target is identified as the test's own window",
+      "ok": true,
+      "detail": "P1-04 capture target mukhkgss (1083x783, pid 16064, dpi 144)"
+    },
+    {
+      "name": "the preview names the window that was recorded",
+      "ok": true,
+      "detail": "P1-04 capture target mukhkgss (1083x783, pid 16064, dpi 144)"
+    },
+    {
+      "name": "the preview carries real image bytes",
+      "ok": true,
+      "detail": "{\"bytes\":10821,\"width\":1081,\"height\":783}"
+    },
+    {
+      "name": "the captured image is the recorded window's size, not the whole screen",
+      "ok": true,
+      "detail": "{\"captured\":{\"width\":1081,\"height\":783},\"targetPhysicalBounds\":{\"x\":780,\"y\":210,\"width\":1083,\"height\":783},\"driverReportedBounds\":{\"x\":789,\"y\":210,\"width\":1065,\"height\":774},\"fullScreen\":{\"width\":2560,\"height\":1600}}"
+    },
+    {
+      "name": "the captured image is not the whole screen",
+      "ok": true,
+      "detail": "{\"captured\":{\"width\":1081,\"height\":783},\"fullScreen\":{\"width\":2560,\"height\":1600}}"
+    },
+    {
+      "name": "the preview really contains the recorded window's pixels",
+      "ok": true,
+      "detail": "{\"width\":1081,\"height\":783,\"total\":846423,\"magenta\":767287,\"accent\":0,\"dark\":16157,\"magentaFraction\":0.9065053761535308,\"accentFraction\":0,\"darkFraction\":0.01908856446481251}"
+    },
+    {
+      "name": "the preview does not smuggle in the orb's own overlay",
+      "ok": true,
+      "detail": "{\"accentFraction\":0,\"orbAccent\":\"#4c8bf5\"}"
+    },
+    {
+      "name": "discarding the preview uploads nothing",
+      "ok": true,
+      "detail": "{\"discarded\":{\"ok\":true},\"providerRequestsBefore\":1,\"providerRequestsAfter\":1}"
+    },
+    {
+      "name": "confirming the preview reports the message as sent",
+      "ok": true,
+      "detail": "{\"ok\":true,\"sent\":true}"
+    },
+    {
+      "name": "the confirmed image reached the provider as image data",
+      "ok": true,
+      "detail": "[{\"model\":\"p1-vision\",\"images\":1}]"
+    },
+    {
+      "name": "the provider received the exact image bytes the user previewed",
+      "ok": true,
+      "detail": "{\"model\":\"p1-vision\",\"imageParts\":1,\"imageHashes\":[\"6d89b71bf410a581\"],\"previewSha256\":\"6d89b71bf410a581\"}"
+    },
+    {
+      "name": "the confirmed image was sent to the image-capable model",
+      "ok": true,
+      "detail": "p1-vision"
+    },
+    {
       "name": "a plain text message still reaches the model",
       "ok": true,
-      "detail": "{\"index\":2,\"receivedAt\":1790541754102,\"lastUserText\":\"plain text only\",\"imagePartsInLastUserMessage\":0,\"anyImageInTranscript\":false,\"totalImagesInTranscript\":0}"
+      "detail": "{\"index\":3,\"receivedAt\":1790553950472,\"model\":\"p1-model\",\"lastUserText\":\"plain text only\",\"imagePartsInLastUserMessage\":0,\"imageHashes\":[],\"imageBytes\":[],\"imageValuePrefixes\":[],\"anyImageInTranscript\":false,\"totalImagesInTranscript\":0}"
     },
     {
       "name": "the shell is still alive at the end",
@@ -137,10 +369,28 @@
     }
   ],
   "passed": true,
+  "startupRecordClearedOnCollapse": {
+    "desktopTarget": {
+      "windowId": "329270",
+      "pid": 25612,
+      "appName": "chrome.exe",
+      "title": "pi-orb - Pi Web - Google Chrome",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1600
+      },
+      "zIndex": "4",
+      "isRecorded": false
+    },
+    "authorized": false
+  },
   "captureAttempt": {
     "ok": false,
     "message": "No target window has been recorded yet. Bring the window you want to share to the front, then wake the orb with the shortcut so it can record it before it takes focus."
   },
+  "captureRefusalMessage": "No target window has been recorded yet. Bring the window you want to share to the front, then wake the orb with the shortcut so it can record it before it takes focus.",
   "textOnlyModel": {
     "httpStatus": 200,
     "responseError": null,
@@ -153,20 +403,47 @@
   "modelRequests": [
     {
       "index": 1,
-      "receivedAt": 1790541750604,
+      "receivedAt": 1790553936023,
+      "model": "p1-model",
       "lastUserText": "describe this synthetic image(image omitted: model does not support images)",
       "imagePartsInLastUserMessage": 0,
+      "imageHashes": [],
+      "imageBytes": [],
+      "imageValuePrefixes": [],
       "anyImageInTranscript": false,
       "totalImagesInTranscript": 0
     },
     {
       "index": 2,
-      "receivedAt": 1790541754102,
+      "receivedAt": 1790553948858,
+      "model": "p1-vision",
+      "lastUserText": "confirm this screenshot",
+      "imagePartsInLastUserMessage": 1,
+      "imageHashes": [
+        "6d89b71bf410a581"
+      ],
+      "imageBytes": [
+        14428
+      ],
+      "imageValuePrefixes": [
+        "data:image/png;base64,iVBORw0KGg"
+      ],
+      "anyImageInTranscript": false,
+      "totalImagesInTranscript": 0
+    },
+    {
+      "index": 3,
+      "receivedAt": 1790553950472,
+      "model": "p1-model",
       "lastUserText": "plain text only",
       "imagePartsInLastUserMessage": 0,
+      "imageHashes": [],
+      "imageBytes": [],
+      "imageValuePrefixes": [],
       "anyImageInTranscript": false,
       "totalImagesInTranscript": 0
     }
   ],
-  "electronStderrTail": "DevTools listening on ws://127.0.0.1:31303/devtools/browser/9d57b9dc-c2fa-49e6-9be5-fab9b4f06705"
+  "electronStderrTail": "DevTools listening on ws://127.0.0.1:31303/devtools/browser/db58f9ea-934f-4a11-adc3-37cb6455d161",
+  "electronStdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-20068\n[pi-orb] recorded target: pid 25612 \"pi-orb - Pi Web - Google Chrome\" (2582x1622, dpi 144)\n[pi-orb] desktop {\"at\":\"2026-09-28T00:05:18.882Z\",\"event\":\"revoke\"}\n[pi-orb] orb collapsed: desktop operations revoked\n[pi-orb] recorded target: pid 16064 \"P1-04 capture target mukhkgss\" (1083x783, dpi 144)"
 }
