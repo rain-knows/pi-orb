@@ -706,25 +706,34 @@ try {
   );
 
   // 2. The real session record: did the model itself call the orb tools?
+  //
+  //    The field is `name`, not `toolName`: verified against a real session file, where a toolCall
+  //    block is `{ type, id, name, arguments }`. Reading the wrong key here would report "the model
+  //    never called the tool" on a perfect run, which is the worst possible false negative for C7, so
+  //    both spellings are accepted and the raw block shapes are kept in the report.
   const sessionFiles = [];
   const sessionsRoot = join(agentDir, "sessions");
   if (existsSync(sessionsRoot)) {
-    for (const dir of readdirSync(sessionsRoot)) {
-      const full = join(sessionsRoot, dir);
+    for (const entry of readdirSync(sessionsRoot, { withFileTypes: true })) {
+      // The directory also holds plain files (e.g. `.last-cleanup`), so only descend into directories.
+      if (!entry.isDirectory()) continue;
+      const full = join(sessionsRoot, entry.name);
       for (const file of readdirSync(full)) {
         if (file.endsWith(".jsonl")) sessionFiles.push(join(full, file));
       }
     }
   }
+  report.sessionFiles = sessionFiles.map((file) => file.replace(agentDir, "<agentDir>"));
   const calls = [];
   for (const file of sessionFiles) {
     for (const entry of readJsonl(file)) {
       const content = entry?.message?.content;
       if (!Array.isArray(content)) continue;
       for (const block of content) {
-        if (block?.type === "toolCall" && typeof block.toolName === "string") {
-          calls.push({ toolName: block.toolName, arguments: block.arguments ?? null });
-        }
+        if (block?.type !== "toolCall") continue;
+        const name = typeof block.name === "string" ? block.name : typeof block.toolName === "string" ? block.toolName : null;
+        if (!name) continue;
+        calls.push({ toolName: name, arguments: block.arguments ?? null });
       }
     }
   }
