@@ -1,21 +1,21 @@
 {
-  "capturedAt": "2026-09-27T20:39:56.206Z",
+  "capturedAt": "2026-09-28T01:06:19.433Z",
   "isolation": {
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
-    "runRoot": "D:\\pi-orb-p1-runs\\p1-01-32404",
-    "agentDir": "D:\\pi-orb-p1-runs\\p1-01-32404\\agent",
-    "sessionDir": "D:\\pi-orb-p1-runs\\p1-01-32404\\agent\\sessions",
-    "homeDir": "D:\\pi-orb-p1-runs\\p1-01-32404\\home",
-    "normalCwd": "D:\\pi-orb-p1-runs\\p1-01-32404\\normal-project",
-    "orbCwd": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-workspace",
-    "orbCwdSub": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-workspace\\subdirectory",
-    "orbCwdSibling": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-workspace-2",
-    "configPath": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-config.json",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-01-33388",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-01-33388\\agent",
+    "sessionDir": "D:\\pi-orb-p1-runs\\p1-01-33388\\agent\\sessions",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-01-33388\\home",
+    "normalCwd": "D:\\pi-orb-p1-runs\\p1-01-33388\\normal-project",
+    "orbCwd": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-workspace",
+    "orbCwdSub": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-workspace\\subdirectory",
+    "orbCwdSibling": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-workspace-2",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-config.json",
     "extensionPath": "D:\\workself\\pi-orb\\pi-package\\extensions\\orb.ts",
     "baseUrl": "http://127.0.0.1:31291",
     "port": 31291,
     "modelPort": 31292,
-    "userSkillFixture": "D:\\pi-orb-p1-runs\\p1-01-32404\\home\\.agents\\skills\\p1-orb-user-skill\\SKILL.md",
+    "userSkillFixture": "D:\\pi-orb-p1-runs\\p1-01-33388\\home\\.agents\\skills\\p1-orb-user-skill\\SKILL.md",
     "credentialSource": "isolated test password in the child env only; the user's real auth.json and ~/.pi/agent are never passed",
     "realUserProfileTouched": false,
     "screenshots": false,
@@ -40,7 +40,7 @@
   },
   "orbModeMatching": {
     "exactWorkspace": {
-      "cwd": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-workspace",
+      "cwd": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-workspace",
       "hasOrbSection": true,
       "tools": [
         "bash",
@@ -52,7 +52,7 @@
       ]
     },
     "normalDirectory": {
-      "cwd": "D:\\pi-orb-p1-runs\\p1-01-32404\\normal-project",
+      "cwd": "D:\\pi-orb-p1-runs\\p1-01-33388\\normal-project",
       "hasOrbSection": false,
       "tools": [
         "bash",
@@ -60,7 +60,7 @@
       ]
     },
     "subdirectory": {
-      "cwd": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-workspace\\subdirectory",
+      "cwd": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-workspace\\subdirectory",
       "hasOrbSection": false,
       "tools": [
         "bash",
@@ -68,7 +68,7 @@
       ]
     },
     "prefixSimilarSibling": {
-      "cwd": "D:\\pi-orb-p1-runs\\p1-01-32404\\orb-workspace-2",
+      "cwd": "D:\\pi-orb-p1-runs\\p1-01-33388\\orb-workspace-2",
       "hasOrbSection": false,
       "tools": [
         "bash",
@@ -78,15 +78,15 @@
     "exactMatchNote": "matching is an exact normalized-directory equality test, and both the resolver and the comparison live in src/shared/orb-config.ts"
   },
   "sessions": {
-    "baselineSessionId": "01a0e498-ae42-71cc-b0fa-9320aff10248",
-    "normalSessionId": "01a0e498-e0c0-728a-8604-936fb38bf5f9",
-    "orbSessionId": "01a0e498-e568-728a-8604-937182c6ba12",
-    "secondOrbSessionId": "01a0e498-ebf8-728a-8604-9376e266c455",
+    "baselineSessionId": "01a0e58c-a44d-7211-bd26-f46fa679482c",
+    "normalSessionId": "01a0e58c-ecde-7298-a018-9cdc18d9b3bd",
+    "orbSessionId": "01a0e58c-f33b-7298-a018-9cded92a296a",
+    "secondOrbSessionId": "01a0e58c-fb30-7298-a018-9ce551dae1cb",
     "differentWorkspaceGetsDifferentSession": true,
     "differentWorkspaceStillMatchesOrbMode": true,
     "sessionFilesBeforeSwitch": 6,
     "sessionFilesAfterSwitch": 7,
-    "firstSessionFile": "D:\\pi-orb-p1-runs\\p1-01-32404\\agent\\sessions\\--D--pi-orb-p1-runs-p1-01-32404-orb-workspace--\\2026-09-27T20-40-20-584Z_01a0e498-e568-728a-8604-937182c6ba12.jsonl",
+    "firstSessionFile": "D:\\pi-orb-p1-runs\\p1-01-33388\\agent\\sessions\\--D--pi-orb-p1-runs-p1-01-33388-orb-workspace--\\2026-09-28T01-06-54-907Z_01a0e58c-f33b-7298-a018-9cded92a296a.jsonl",
     "firstSessionFileStillExists": true,
     "firstSessionContentUnchanged": true,
     "firstSessionBytes": 9542,
@@ -95,7 +95,7 @@
   },
   "promptLeakDeclaration": {
     "claim": "Pi loads the USER-LEVEL $HOME/.agents/skills unconditionally. HOME is resolved at runtime, independently of cwd and agentDir, so this content reaches EVERY session prompt, including non-Orb ones. Orb therefore promises only that it does not actively change prompts; it cannot promise byte-identical prompt content.",
-    "fixture": "a synthetic user-level skill at D:\\pi-orb-p1-runs\\p1-01-32404\\home\\.agents\\skills\\p1-orb-user-skill\\SKILL.md containing P1_ORB_USER_LEVEL_SKILL_MARKER_7731",
+    "fixture": "a synthetic user-level skill at D:\\pi-orb-p1-runs\\p1-01-33388\\home\\.agents\\skills\\p1-orb-user-skill\\SKILL.md containing P1_ORB_USER_LEVEL_SKILL_MARKER_7731",
     "baselineNormalCwd": {
       "containsUserSkillMarker": true,
       "markerOccurrences": 1

@@ -5,7 +5,7 @@
 > - `node evidence/p1-05/run-p1-05.mjs`（真机输入验证：点击、输入、滚动、释放、拒绝）
 >
 > 原始结果：`cua-runtime-probe.json`（只读 20/20）、`input-verification.json`（输入 20/20）
-> 状态：**点击与输入已验证**；**滚动、前台投递路径、截图点↔输入点一致性在本机未验证**，原因见 §6。
+> 状态：**点击、输入、前台投递、滚动升级路径均已实测**；**滚动的物理投递受 Windows 前台锁限制，逐次记录为未验证**，见 §6。
 
 ## 1. 决策 (a) 的落地：已安装、已锁定、已验证哈希
 
@@ -45,7 +45,7 @@ P0-04 只能枚举 tarball 里的类型声明；本次驱动**实际运行**，�
 
 探测脚本把这条差异记为**结论数据**（`CONFIRMED MISMATCH`），而不是断言成功。
 
-## 3. 真机输入验证（20/20）
+## 3. 真机输入验证
 
 方法：**丢弃式自报目标**（`evidence/p1-05/target-app/`，一个 4×3 网格的 Electron 窗口）。每个格子记录"哪个格子收到了按下"以及"按下点在格子内的偏移"，并记录每一次 key down/up 与 mouse down/up。因此判定来自**应用实际收到的事件**，而不是驱动自己的"成功"摘要。
 
@@ -103,38 +103,69 @@ P0-04 只能枚举 tarball 里的类型声明；本次驱动**实际运行**，�
 | 组合 | 实测结果 |
 |---|---|
 | 坐标点击 → Electron/Chromium 内容（后台） | **可用**（4/4 命中，不提权） |
-| `type_text` → Chromium 窗口类 | 拒绝：`Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (text_input)` |
-| `scroll` → Chromium 窗口类 | 拒绝（同上，`mouse_scroll`） |
-| `scroll` → 记事本（两种模式） | 拒绝：`Background delivery is not available for target window class 'Notepad'` |
+| 坐标点击 → 同一窗口（**前台**） | **可用**（目标记录到真实 `mouse-down`；驱动报 `delivery_mode:foreground`） |
+| `type_text` → Chromium 窗口类 | 拒绝：`Background delivery is not available ... (text_input)`，`errorCode=background_unavailable` |
+| `scroll` → Chromium 窗口类（后台） | 拒绝：同上，`errorCode=background_unavailable` |
+| `scroll` → Chromium 窗口类（**前台升级**） | 驱动报成功；**是否真到达目标取决于 OS 是否交出前台**（见下） |
 | `type_text` → 记事本（后台） | **可用**（已由读回文档验证） |
 | `hotkey` → 记事本 | 拒绝：XAML/UWP 目标找不到 UIA `AcceleratorKey` 或 `(Ctrl+X)` 名称提示 |
 | `pressKey` → 记事本 | 投递并提示 "not verified" |
-| UIA `set_value`（元素寻址） | Chromium 内容**不暴露**可编辑元素（该窗口只暴露 4 个菜单按钮、无 `set_value` 动作），因此该路径不适用于 Electron 内容 |
+| UIA `set_value`（元素寻址） | Chromium 内容**不暴露**可编辑元素，因此该路径不适用于 Electron 内容 |
 
-**对产品的直接含义**：`background` 是唯一不抢用户前台的方式，但它在 Electron/Chromium 内容上**只支持坐标点击**；输入与滚动必须走 `foreground`（会切换前台），在无前台窗口的环境下完全不可用。P1-06 必须据此选择工具集，不能假定后台可完成一切。
+### 4.1 typed `ScrollInput` 无法表达 `delivery_mode`（本次找到的真实缺陷）
+
+驱动拒绝后台滚动时明确要求：
+
+> `Retry this action with delivery_mode:"foreground"; Cua Driver will activate the target for the action and restore the previous foreground afterward.`
+
+但**锁定版本的 `ScrollInput` 并没有 `delivery_mode` 字段**（`ScrollInput.defaults()` 为空对象；只有 `ClickInput` 与 `VerifyStateInput` 带该字段）。也就是说：
+
+- 用 `driver.scroll(ScrollInput.create({... deliveryMode}))` 传入该字段会被**静默丢弃**，并不会升级；
+- 之前本阶段记录的“两种模式都被拒绝”因此**证明不了任何关于前台滚动的结论**——两次调用在字节上完全相同；
+- 驱动官方要求的升级路径只能通过**通用工具接口**表达：`driver.callTool("scroll", {... delivery_mode: "foreground"})`（其参数与驱动的工具 schema 一致，schema 中 `scroll` 确实带 `delivery_mode: ["background","foreground"]`）。
+
+**产品侧同样的缺陷已修复**（`src/main/cua-adapter.ts`）：适配器原先调用 typed `scroll` 且**忽略返回值**，因此永远无法升级；现已实现驱动规定的两步协议（先后台，仅在 `background_unavailable` 时用 `callTool` 升级），并保留 `pid`/`window_id`/坐标/方向/数量。
+
+### 4.2 驱动的成功摘要不是证据（实测）
+
+前台滚动会返回：
+
+```
+✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (364,540) (delivery_mode:foreground).
+isError=false
+```
+
+**但同一时刻前台窗口仍然是用户的 Chrome，目标窗口一个 wheel 事件都没收到。**把目标窗口移到完全无遮挡处、且循环重试 5 次后依然如此。结论：
+
+- 驱动会在**前台切换被 OS 拒绝**时仍报成功；
+- 因此判定必须读**目标自身的事件日志**（`wheel` 事件），不能读驱动摘要；
+- 本次实测滚动物理投递**成功过一次**（目标记录 22 个 `scroll` 事件），后续多次运行为 0——即它取决于 Windows 是否愿意交出前台，属**逐次测量项**，不得写成“已支持”。
+
+**对产品的直接含义**：`background` 是唯一不抢用户前台的方式，但它在 Electron/Chromium 内容上**只支持坐标点击**；文本输入与滚动必须走 `foreground`（会切换前台）。产品现已能正确发起升级，但**升级是否生效由 OS 决定**，因此本阶段把“升级被正确发起”作为断言，把“车轮是否真到达”作为测量值记录。
 
 ## 5. 为什么脚本没有发送任何东西到用户桌面之外
 
 - 输入只发往两个丢弃式窗口：脚本自己启动的网格应用，以及脚本自己创建临时文件的记事本。
-- 每次动作前检查目标是否为最前窗口；不是则**跳过并记录**（`safety.skippedForSafety`）。
-- 所有点击均为 `Background`，不提权、不抢前台。
+- 每次动作前检查目标是否为最前窗口；不是则**重试把它置前**（只对脚本自己启动的句柄），仍不是则**跳过并记录**（`safety.skippedForSafety`），绝不对其它窗口发键。
+- 置前用的 `evidence/lib/activate-window.ps1` 只接受脚本自己取得的窗口句柄，且只发送唤醒组合键或什么都不发；**不对目标输入任何字符**。
 - 未截图、未落盘像素、未触碰用户文档、未针对高权限窗口。
-- 探查并复用了"测试脚本无法获得真实前台窗口"这一环境事实。
 
-## 6. 明确未验证（不因 20/20 而升级为支持）
+## 6. 明确未验证（逐项如实保留）
 
-| 项 | 原因 |
+| 项 | 状态 |
 |---|---|
-| **前台投递路径** | 本会话**没有任何前台窗口**：OS 报 `foreground HWND 0x0`，且对记事本调用 `SetForegroundWindow` 返回 `false`。驱动给出的错误是精确的：`foreground_unavailable: Windows did not activate exact target HWND 0x209ca (actual foreground HWND 0xe0422); no mouse input was sent`。 |
-| **截图点 ↔ 输入点一致性** | 依赖前台路径；且 P1-04 的正向截图路径因同一原因未验证。**这条是 P1-05 的核心验收项，本机无法完成。** |
-| **滚动** | 两个目标的两种模式全部被拒绝（见 §4）。 |
-| **向 Chromium/Electron 内容输入文本** | 后台投递对该窗口类不可用；该内容也不暴露可编辑的 UIA 元素。 |
+| **滚动的物理投递** | 升级调用已按要求发起且驱动报成功，但车轮**是否真到达目标取决于 OS 是否交出前台**：本次实测成功过一次（目标记录 22 个事件），后续多次运行为 0。**逐次记为未验证**，见 §4.2。 |
+| **截图点 ↔ 输入点一致性** | 截图侧已由 P1-04 单独验证（正向路径 41/41）；本阶段未把两者叠在同一坐标系上做联合断言。 |
+| **向 Chromium/Electron 内容输入文本** | 后台投递对该窗口类不可用；前台升级路径已实现，但同样受前台锁限制，未在本阶段做到稳定投递。 |
 | 普通 vs 高权限窗口对比 | 未针对高权限窗口测试（按目标要求不自动提权）。 |
-| 焦点变化、按下后取消 | 本机无前台窗口，无法构造"按下后取消"的真实前台场景；仅验证了无残留与无未配对 down。 |
+| 按下后取消的释放 | 验证了无残留按键/鼠标键（`key-down`/`key-up`、`mouse-down`/`mouse-up` 配对），但未构造“按下中途取消”的真实前台场景。 |
 | 多显示器 | 本机仅 1 个显示器。 |
-| 驱动内建"授权/权限"语义 | `getSessionState` 的 `desktopCaptureAuthorized=false`、`desktopUnlocked=false`；本阶段未使用 `escalate_session`，也未建立驱动自身的授权流。**产品侧的授权仍由 pi-Orb 自己的任务授权与代次绑定负责**（P1-07）。 |
+| 驱动内建“授权/权限”语义 | `getSessionState` 的 `desktopCaptureAuthorized=false`、`desktopUnlocked=false`；本阶段未使用 `escalate_session`。**产品侧的授权仍由 pi-Orb 自己的任务授权与代次绑定负责**（P1-07）。 |
 
-### 人工验证步骤（需要有真实前台窗口的会话）
+> 前台投递本身已不再是“未验证”：本次已实测**前台点击**产生真实 `mouse-down`（§3、§4 表格）。仍未验证的是“前台**滚动**是否物理到达”，且原因是 OS 行为而非产品缺陷。
+
+
+### 人工验证步骤（需要真实前台窗口的会话）
 
 ```powershell
 npm run build
@@ -142,10 +173,12 @@ node evidence/p1-05/run-p1-05.mjs
 ```
 
 1. 在同一台机器上让任意窗口成为前台（例如手动点一下记事本）。
-2. 重跑脚本：`foregroundDelivery` 应从"拒绝"变为可投递，`scrollVerification` 应出现可观测的滚动。
+2. 重跑脚本：`scrollVerification.deliveredAndObserved` 若为 `true`，则本次滚动物理到达目标（目标 `wheel` 事件数增加）。
 3. 观察：前台投递是否在动作后**恢复原前台窗口**。
 4. 记录前台投递时鼠标是否发生位移（`SendInput` 会移动真实指针）。
-5. 若要在真实产品窗口上验证"截图点↔输入点"，需先完成 P1-04 的人工正向截图步骤。
+5. 若要在真实产品窗口上验证“截图点↔输入点”，需先完成 P1-04 的人工正向截图步骤。
+
+> 已观察到的现象：同一个升级调用在不同次运行中结果不同（一次投递 22 个事件，多次为 0）。若持续为 0，请确认没有常驻的 always-on-top 窗口占据目标位置，以及 Windows 是否阻止了前台切换。
 
 ## 7. 非破坏性确认
 

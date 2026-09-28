@@ -10,6 +10,32 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+### Fixed
+
+Defects found by driving the real product instead of the internal APIs, with a real foreground window
+available:
+
+- The native helper script was never copied into the build, so `out/main/native/foreground-window.ps1`
+  did not exist and every attempt to record the target window failed in a built app — reported as "no
+  foreground window", i.e. a missing build artifact disguised as an environment fact.
+- A failed record left the previous one in place, so after that failure the orb kept pointing at
+  whatever was in front when it launched (on the test machine, the user's own browser window) and a
+  capture would have silently uploaded a window the user had moved away from. Collapse also left the
+  record alive, and collapse is the route users actually take.
+- The adapter discarded the driver's action results. The driver reports a refusal as a *normal return
+  value* (`effect: Refused` for `click`, `isError: true` for `scroll`/`typeText`), so every refused
+  action was reported to the model as a success.
+- The adapter could never escalate a scroll. `ScrollInput` has no `delivery_mode` field at the locked
+  version, so the `foreground` retry the driver's own refusal asks for was unexpressible through the
+  typed API. The documented background→foreground protocol now goes through `callTool` when — and only
+  when — the driver reports `background_unavailable`.
+- Scroll coordinates were not converted like click coordinates, so the wheel was aimed at the wrong
+  place while the driver still reported success. Both actions now share one conversion.
+
+Also fixed earlier in this cycle: the Pi extension sent run generation `0` while the shell's live
+  generation starts at `1`, so every desktop request was refused as stale, and the bridge called an
+  unknown session `stale-generation` too.
+
 ### Added
 
 - P1-07 release gate (`evidence/p1-07/run-release-gate.mjs`, 29 checks): quality gates, the

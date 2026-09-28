@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-09-27T20:40:26.244Z",
-  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790541626244",
+  "capturedAt": "2026-09-28T01:06:59.183Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-1790557619183",
   "shortcutUnderTest": "Control+Alt+F9",
   "isolation": {
     "note": "each app instance gets its own userData directory and Orb config; no pi-web service is started and none is needed",
@@ -138,7 +138,20 @@
       "stoppedReason": null,
       "lastObservationId": null,
       "bridgeReady": true,
-      "target": null
+      "target": {
+        "windowId": "329270",
+        "pid": 25612,
+        "appName": "chrome.exe",
+        "title": "pi-orb - Pi Web - Google Chrome",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1600
+        },
+        "zIndex": "5",
+        "isRecorded": false
+      }
     }
   }
 }

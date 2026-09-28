@@ -20,6 +20,7 @@ import type {
   DesktopAction,
   DesktopElement,
   DesktopObservation,
+  TypeAction,
 } from "@shared/orb-tools";
 import { ORB_LIMITS, boundElements } from "@shared/orb-tools";
 import type { ActResult, DesktopDriver, ObserveResult } from "./desktop-task";
@@ -49,6 +50,15 @@ export interface CuaDriverLike {
   click(input: unknown): Promise<unknown>;
   typeText(input: unknown): Promise<unknown>;
   scroll(input: unknown): Promise<unknown>;
+  /**
+   * The open-ended tool surface, which is the only way to express some arguments.
+   *
+   * The typed inputs do not cover everything the driver's own tool schemas advertise: for example
+   * `ScrollInput` has no `delivery_mode`, so the documented background→foreground escalation the
+   * driver asks for in its refusal cannot be expressed through `scroll(input)` at all. `callTool`
+   * takes the same arguments as the tool schema, so escalation goes through here.
+   */
+  callTool(name: string, argumentsJson: string): Promise<unknown>;
   shutdown(): Promise<void>;
 }
 
@@ -296,7 +306,7 @@ export class CuaDriverAdapter implements DesktopDriver {
     try {
       if (action.kind === "click") {
         const position = this.#positionFor(action.elementToken, action.point, observation);
-        await driver.click(
+        const result = await driver.click(
           this.#options.sdk.ClickInput.create({
             target,
             position,
@@ -305,6 +315,11 @@ export class CuaDriverAdapter implements DesktopDriver {
             count: 1,
           }),
         );
+        // `click` resolves to an ActionResult whose `effect` is `Refused` (4) when the driver declined.
+        // Reading it is not optional: the driver reports a refusal as a normal return, so ignoring the
+        // result reports a refused click to the model as a success.
+        const refusal = describeActionResult(result);
+        if (refusal) return { ok: false, refused: true, error: refusal };
         return { ok: true, refused: false, error: null };
       }
 
@@ -317,8 +332,15 @@ export class CuaDriverAdapter implements DesktopDriver {
               "Typing into a specific element is not supported by this driver path. Observe again and click the field first.",
           };
         }
-        await driver.typeText(this.#options.sdk.TypeTextInput.create({ text: action.text, target }));
-        return { ok: true, refused: false, error: null };
+        const typed = await driver.typeText(
+          this.#options.sdk.TypeTextInput.create({ text: action.text, target }),
+        );
+        return this.#escalateIfBackgroundUnavailable(
+          driver,
+          "type_text",
+          typed,
+          this.#textArguments(action, observation),
+        );
       }
 
       const direction = {
@@ -327,8 +349,8 @@ export class CuaDriverAdapter implements DesktopDriver {
         left: this.#options.sdk.ScrollDirection.Left,
         right: this.#options.sdk.ScrollDirection.Right,
       }[action.direction];
-      const point = action.point ?? { x: 0, y: 0 };
-      await driver.scroll(
+      const point = this.#positionRequestFor(action.point ?? { x: 0, y: 0 });
+      const scrolled = await driver.scroll(
         this.#options.sdk.ScrollInput.create({
           x: point.x,
           y: point.y,
@@ -337,10 +359,69 @@ export class CuaDriverAdapter implements DesktopDriver {
           amount: BigInt(action.amount),
         }),
       );
-      return { ok: true, refused: false, error: null };
+      // `scroll` resolves to a ToolResult, whose refusal is reported as `isError` with an `errorCode`
+      // (`background_unavailable` for a surface that drops posted events). Reading it is what makes the
+      // documented escalation possible at all.
+      return this.#escalateIfBackgroundUnavailable(driver, "scroll", scrolled, {
+        // The escalation takes the tool-schema arguments, which use the SAME request space as the typed
+        // call: the driver adds the window origin back. Passing the screen point here instead would
+        // scroll at the wrong place while reporting success — measured, and it is why the first version
+        // of this fix reported ok:true with no wheel event reaching the target.
+        x: point.x,
+        y: point.y,
+        direction: action.direction,
+        amount: action.amount,
+        by: "line",
+        pid: observation.window.pid,
+        window_id: observation.window.id,
+      });
     } catch (error) {
       return { ok: false, refused: isDriverRefusal(error), error: message(error) };
     }
+  }
+
+  /**
+   * Escalate a background refusal to foreground delivery, exactly as the driver prescribes.
+   *
+   * The driver's contract is explicit that background is the mandatory first attempt and that
+   * foreground is only for a target whose input stack drops posted events, signalled by a
+   * `background_unavailable` error. Escalating up front would steal the user's focus for no reason, so
+   * this only ever runs after the driver itself reported that background was impossible.
+   *
+   * The retry goes through `callTool` because the typed inputs cannot express `delivery_mode`; the
+   * typed path is what produces the refusal, and its own error names the argument to use.
+   */
+  async #escalateIfBackgroundUnavailable(
+    driver: CuaDriverLike,
+    toolName: "scroll" | "type_text",
+    result: unknown,
+    argumentsForForeground: Record<string, unknown>,
+  ): Promise<ActResult> {
+    const tool = result as { isError?: unknown; errorCode?: unknown; text?: unknown };
+    if (tool?.isError !== true) {
+      return { ok: true, refused: false, error: null };
+    }
+    // `degraded` results and other errors are reported as-is: only the escalation case is retried.
+    if (tool.errorCode !== "background_unavailable") {
+      return { ok: false, refused: false, error: describeToolResult(result) };
+    }
+
+    const escalated = await driver.callTool(
+      toolName,
+      JSON.stringify({ ...argumentsForForeground, delivery_mode: "foreground" }),
+    );
+    const refusal = describeToolResult(escalated);
+    if (refusal) return { ok: false, refused: true, error: refusal };
+    return { ok: true, refused: false, error: null };
+  }
+
+  /** The arguments a foreground type retry needs, shared with the first background attempt. */
+  #textArguments(action: TypeAction, observation: DesktopObservation): Record<string, unknown> {
+    return {
+      text: action.text,
+      pid: observation.window.pid,
+      window_id: observation.window.id,
+    };
   }
 
   #positionFor(
@@ -355,15 +436,33 @@ export class CuaDriverAdapter implements DesktopDriver {
       // validateAction already refuses this case; this is a defensive fallback.
       throw new Error("No target was provided for the click.");
     }
+    this.#recordMapping(point);
+    void observation;
+    return new this.#options.sdk.ClickPosition.Coordinates(this.#positionRequestFor(point));
+  }
+
+  /**
+   * Convert a screen DIP point into the request space the driver expects.
+   *
+   * Clicks and scrolls share one space: the driver adds the window's reported origin (physical pixels)
+   * back, so the request is the screen point minus that origin. Both actions must use the same
+   * conversion — a click that ignored it would miss, and a scroll that ignored it aimed the wheel at the
+   * wrong place while the driver still reported success.
+   */
+  #positionRequestFor(point: { x: number; y: number }): { x: number; y: number } {
     const mapping = this.#lastMapping;
     const origin = (mapping?.actionOrigin ?? { x: 0, y: 0 }) as { x: number; y: number };
-    const request = { x: point.x - origin.x, y: point.y - origin.y };
+    return { x: point.x - origin.x, y: point.y - origin.y };
+  }
+
+  /** Record the conversion used, so it is visible rather than an invisible assumption. */
+  #recordMapping(screenDip: { x: number; y: number }): void {
+    const mapping = this.#lastMapping;
+    const origin = (mapping?.actionOrigin ?? { x: 0, y: 0 }) as { x: number; y: number };
     this.#lastMapping = {
       ...(mapping ?? {}),
-      lastRequest: { screenDip: point, request, actionOrigin: origin },
+      lastRequest: { screenDip, request: this.#positionRequestFor(screenDip), actionOrigin: origin },
     };
-    void observation;
-    return new this.#options.sdk.ClickPosition.Coordinates(request);
   }
 }
 
@@ -421,6 +520,40 @@ export function chooseWindow(
 function isDriverRefusal(error: unknown): boolean {
   const tag = (error as { tag?: unknown })?.tag;
   return tag === "Tool" || tag === "InvalidArguments" || tag === "Configuration";
+}
+
+/** ActionEffect.Refused, from the driver's own enum. */
+const ACTION_EFFECT_REFUSED = 4;
+
+/**
+ * Describe a refused action, or return null when the action was not refused.
+ *
+ * The driver reports refusals two different ways depending on the call, and both arrive as a normal
+ * return value rather than as a thrown error — which is why ignoring the result silently reported
+ * refusals as successes:
+ *  - `click` returns an `ActionResult` whose `effect` is `Refused`;
+ *  - `scroll`/`typeText` return a `ToolResult` whose `isError` is true with an `errorCode`.
+ */
+function describeActionResult(result: unknown): string | null {
+  const action = result as { effect?: unknown; summary?: unknown; error?: unknown };
+  if (action?.effect !== ACTION_EFFECT_REFUSED) return null;
+  const detail = action.error as { code?: unknown; hint?: unknown } | undefined;
+  const parts = [typeof detail?.code === "string" ? detail.code : null, typeof detail?.hint === "string" ? detail.hint : null]
+    .filter((part): part is string => part !== null);
+  if (parts.length > 0) return parts.join(": ");
+  return typeof action.summary === "string" && action.summary.length > 0
+    ? action.summary
+    : "The driver refused the action.";
+}
+
+/** Describe a failed ToolResult, or return null when it succeeded. */
+function describeToolResult(result: unknown): string | null {
+  const tool = result as { isError?: unknown; errorCode?: unknown; text?: unknown };
+  if (tool?.isError !== true) return null;
+  const code = typeof tool.errorCode === "string" ? tool.errorCode : null;
+  const text = typeof tool.text === "string" && tool.text.length > 0 ? tool.text : null;
+  if (code && text) return `${code}: ${text}`;
+  return code ?? text ?? "The driver reported a failure.";
 }
 
 function message(error: unknown): string {

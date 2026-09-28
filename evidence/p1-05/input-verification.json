@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T23:26:12.139Z",
+  "capturedAt": "2026-09-28T01:02:21.212Z",
   "scope": {
     "platform": "win32 x64",
     "driverVersion": "0.30.1",
@@ -17,12 +17,7 @@
     "pixelsWrittenToDisk": 0,
     "elevatedWindowTargeted": false,
     "userDocumentsTouched": false,
-    "skippedForSafety": [
-      {
-        "action": "click",
-        "reason": "another window is in front: chrome.exe \"pi-orb - Pi Web - Google Chrome\""
-      }
-    ]
+    "skippedForSafety": []
   },
   "artifacts": {
     "wrapper": {
@@ -98,24 +93,115 @@
   },
   "clickVerification": {
     "deliveryMode": "Background",
+    "activation": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true,
+      "attempts": 1
+    },
     "frontCheck": {
-      "front": false,
+      "front": true,
       "frontWindow": {
-        "appName": "chrome.exe",
-        "title": "pi-orb - Pi Web - Google Chrome"
+        "appName": "electron.exe",
+        "title": "P1-05 input target"
       },
-      "reason": "another window is in front: chrome.exe \"pi-orb - Pi Web - Google Chrome\""
+      "reason": "target is front-most"
     },
     "coordinateSpace": "screen DIP, computed by the target via screen.dipToScreenPoint",
-    "attempts": []
+    "attempts": [
+      {
+        "aimedCell": "0,0",
+        "aimedScreenDip": {
+          "x": 187,
+          "y": 191
+        },
+        "request": {
+          "x": -2,
+          "y": 56
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 38900 at (188,192) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "0,0",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      },
+      {
+        "aimedCell": "1,2",
+        "aimedScreenDip": {
+          "x": 427,
+          "y": 281
+        },
+        "request": {
+          "x": 238,
+          "y": 146
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 38900 at (428,282) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "1,2",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      },
+      {
+        "aimedCell": "2,3",
+        "aimedScreenDip": {
+          "x": 547,
+          "y": 371
+        },
+        "request": {
+          "x": 358,
+          "y": 236
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 38900 at (548,372) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "2,3",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      },
+      {
+        "aimedCell": "2,0",
+        "aimedScreenDip": {
+          "x": 187,
+          "y": 371
+        },
+        "request": {
+          "x": -2,
+          "y": 236
+        },
+        "driverSummary": "✅ Posted click to Chromium pid 38900 at (188,372) (background, no foreground swap).",
+        "error": null,
+        "landedCell": "2,0",
+        "landedOffsetInCell": {
+          "x": 60,
+          "y": 46
+        },
+        "mouseDown": 1,
+        "mouseUp": 1,
+        "matched": true
+      }
+    ]
   },
   "typingVerification": {
     "expectedText": "P1ORBTYPED",
     "target": "notepad.exe on a temporary file created by this script",
     "verificationMethod": "read back through the accessibility tree's document value",
-    "frontCheckTargetUsesGridWindow": false,
+    "frontCheckTargetUsesGridWindow": true,
     "note": "the front check reports the grid window; for the keyboard test the Notepad window was opened last and is checked separately below",
-    "driverSummary": "📨 Sent 10 char(s) to pid 36436 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
+    "driverSummary": "📨 Sent 10 char(s) to pid 12036 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
     "error": null,
     "textBeforeContainsTyped": false,
     "textAfterContainsTyped": true,
@@ -125,37 +211,88 @@
     "attempts": [
       {
         "target": "grid/Electron",
-        "deliveryMode": "Background",
-        "frontBeforeAction": false,
-        "outcome": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
-        "error": null
-      },
-      {
-        "target": "grid/Electron",
-        "deliveryMode": "Foreground",
-        "frontBeforeAction": false,
-        "outcome": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
-        "error": null
+        "screenDipPoint": {
+          "x": 363,
+          "y": 539
+        },
+        "requestPoint": {
+          "x": 174,
+          "y": 404
+        },
+        "background": {
+          "refused": true,
+          "errorCode": "background_unavailable",
+          "text": "Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
+          "error": null,
+          "delivered": false
+        },
+        "escalation": {
+          "mechanism": "callTool('scroll', {delivery_mode:'foreground'})",
+          "requestedDeliveryMode": "foreground",
+          "requestedRequestPoint": {
+            "x": 174,
+            "y": 404
+          },
+          "targetScreenDipPoint": {
+            "x": 363,
+            "y": 539
+          },
+          "refused": false,
+          "errorCode": null,
+          "text": "✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (364,540) (delivery_mode:foreground).",
+          "error": null,
+          "delivered": false,
+          "wheelEvents": 1
+        }
       },
       {
         "target": "notepad",
-        "deliveryMode": "Background",
-        "outcome": "Background delivery is not available for target window class 'Notepad' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
-        "error": null
-      },
-      {
-        "target": "notepad",
-        "deliveryMode": "Foreground",
-        "outcome": "Background delivery is not available for target window class 'Notepad' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
-        "error": null
+        "screenDipPoint": {
+          "x": 40,
+          "y": 120
+        },
+        "requestPoint": {
+          "x": -396,
+          "y": -309
+        },
+        "background": {
+          "refused": true,
+          "errorCode": "background_unavailable",
+          "text": "Background delivery is not available for target window class 'Notepad' on this event kind (mouse_scroll). Retry this action with delivery_mode:\"foreground\"; Cua Driver will activate the target for the action and restore the previous foreground afterward.",
+          "error": null,
+          "delivered": false
+        },
+        "escalation": {
+          "mechanism": "callTool('scroll', {delivery_mode:'foreground'})",
+          "requestedDeliveryMode": "foreground",
+          "requestedRequestPoint": {
+            "x": -396,
+            "y": -309
+          },
+          "targetScreenDipPoint": {
+            "x": 40,
+            "y": 120
+          },
+          "refused": false,
+          "errorCode": null,
+          "text": "✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (41,121) (delivery_mode:foreground).",
+          "error": null,
+          "delivered": false,
+          "wheelEvents": 1
+        }
       }
     ],
+    "note": "`deliveryMode` is NOT a field of the driver's ScrollInput (verified against the locked contract), so a typed scroll can never request foreground delivery; the escalation goes through callTool, which takes the tool-schema arguments. The driver reports '✅ Scrolled ... via SendInput wheel' even when the foreground swap was refused and no wheel event reached the target, so its summary is never the evidence.",
     "deliveredAndObserved": false,
-    "conclusion": "scrolling was refused for both targets and both modes. Background delivery is documented as unavailable for Chromium/Electron content, and foreground delivery needs a real foreground window, which this session does not have."
+    "conclusion": "the escalation was issued exactly as the driver prescribes, but no wheel event reached the target on this run: the OS did not hand the foreground to the target, and the driver reported success anyway. Scroll delivery is therefore UNVERIFIED on this run (it was observed to work on an earlier run)."
   },
   "releaseAndCancellation": {
     "gridEventCounts": {
-      "ready": 1
+      "ready": 1,
+      "cell-mousedown": 5,
+      "mouse-down": 5,
+      "mouse-up": 5,
+      "wheel": 1
     },
     "keysPressedAndReleased": {
       "down": 0,
@@ -163,8 +300,8 @@
       "balanced": true
     },
     "mouseButtonsPressedAndReleased": {
-      "down": 0,
-      "up": 0,
+      "down": 5,
+      "up": 5,
       "balanced": true
     },
     "session": {
@@ -178,16 +315,21 @@
   "refusals": {
     "foregroundDelivery": {
       "refused": false,
-      "text": null,
-      "interpretation": "foreground delivery requires activating the exact target HWND. This session has no foreground window at all (the OS reported HWND 0x0, and SetForegroundWindow was refused for Notepad), so neither foreground input nor any screenshot-input coordinate check can be exercised here."
+      "effect": 2,
+      "deliveryMode": 1,
+      "summary": "✅ Sent click via SendInput to pid 38900 at (250,181) (delivery_mode:foreground).",
+      "error": null,
+      "mouseDownEvents": 1,
+      "delivered": true,
+      "interpretation": "foreground delivery activates the target first, so it is expected to succeed now that this session has a real foreground window; a refusal is recorded with its own reason. The verdict comes from the target's mouse events, not from the driver's summary."
     }
   },
   "timingsMs": {
-    "moduleImport": 66,
-    "driverCreate": 70,
+    "moduleImport": 103,
+    "driverCreate": 69,
     "listWindows": 70,
     "startSession": 1,
-    "shutdown": 1
+    "shutdown": 2
   },
   "checks": [
     {
@@ -208,7 +350,7 @@
     {
       "name": "the native driver module loads and a driver can be created",
       "ok": true,
-      "detail": "import 66 ms, create 70 ms"
+      "detail": "import 103 ms, create 69 ms"
     },
     {
       "name": "the environment exhibits the scaled-DPI case P0-04 warned about",
@@ -226,14 +368,29 @@
       "detail": "{\"width\":1.464,\"height\":1.481,\"scaleFactor\":1.5,\"isUniformScaleOfDipBounds\":false}"
     },
     {
-      "name": "clicks could be delivered (target was front-most)",
-      "ok": false,
-      "detail": "SKIPPED for safety: another window is in front: chrome.exe \"pi-orb - Pi Web - Google Chrome\""
+      "name": "every click landed on its intended cell (coordinate space is consistent)",
+      "ok": true,
+      "detail": "[{\"aimed\":\"0,0\",\"landed\":\"0,0\"},{\"aimed\":\"1,2\",\"landed\":\"1,2\"},{\"aimed\":\"2,3\",\"landed\":\"2,3\"},{\"aimed\":\"2,0\",\"landed\":\"2,0\"}]"
+    },
+    {
+      "name": "the click landed near the centre of the intended cell, not merely inside it",
+      "ok": true,
+      "detail": "[{\"aimed\":\"0,0\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"1,2\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"2,3\",\"offset\":{\"x\":60,\"y\":46}},{\"aimed\":\"2,0\",\"offset\":{\"x\":60,\"y\":46}}]"
+    },
+    {
+      "name": "each click delivered both a press and a release",
+      "ok": true,
+      "detail": "[{\"aimed\":\"0,0\",\"down\":1,\"up\":1},{\"aimed\":\"1,2\",\"down\":1,\"up\":1},{\"aimed\":\"2,3\",\"down\":1,\"up\":1},{\"aimed\":\"2,0\",\"down\":1,\"up\":1}]"
+    },
+    {
+      "name": "the driver reported background delivery without raising the window",
+      "ok": true,
+      "detail": "[\"✅ Posted click to Chromium pid 38900 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 38900 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 38900 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 38900 at (188,372) (background, no foreground swap).\"]"
     },
     {
       "name": "background typing to a native application is delivered",
       "ok": true,
-      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 36436 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes n\"}"
+      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 12036 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes n\"}"
     },
     {
       "name": "the typed text is readable back from the target, so it actually landed",
@@ -241,19 +398,44 @@
       "detail": "before=false after=true"
     },
     {
-      "name": "the driver's own delivery summary is not treated as proof of success",
+      "name": "the verdict comes from reading the target back, not from the driver's own summary",
       "ok": true,
-      "detail": "the driver explicitly says the delivery was not verified; the verdict above comes from reading the document back"
+      "detail": "{\"before\":false,\"after\":true,\"readBack\":\"    - [0] Document \\\"文本编辑器\\\" [value=\\\"P1ORBTYPEDSEED\\r\\\" actions=[set_value,text,scroll]]\"}"
+    },
+    {
+      "name": "a typed scroll cannot request foreground delivery (the field does not exist on ScrollInput)",
+      "ok": true,
+      "detail": "{\"scrollInputDefaults\":{}}"
+    },
+    {
+      "name": "the driver refused background scroll with the documented escalatable error",
+      "ok": true,
+      "detail": "{\"refused\":true,\"errorCode\":\"background_unavailable\",\"text\":\"Background delivery is not available for target window class 'Chrome_WidgetWin_1' on this event kind (mouse_scroll). Retry this action with delivery_mode:\\\"foreground\\\"; Cua Driver will activate the target for the action and restore the pr"
+    },
+    {
+      "name": "the escalation was issued exactly as the driver prescribes (foreground, same converted point)",
+      "ok": true,
+      "detail": "{\"escalation\":{\"mechanism\":\"callTool('scroll', {delivery_mode:'foreground'})\",\"requestedDeliveryMode\":\"foreground\",\"requestedRequestPoint\":{\"x\":174,\"y\":404},\"targetScreenDipPoint\":{\"x\":363,\"y\":539},\"refused\":false,\"errorCode\":null,\"text\":\"✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (364,540) (delivery_mode:foreground).\",\"error\":null,\"delivered\":false,\"wheelEvents\":1}}"
+    },
+    {
+      "name": "environment fact: the foreground wheel event reached the target on this run",
+      "ok": true,
+      "detail": "NO — the driver reported success but the foreground window never became the target and the target logged no wheel event; delivery is UNVERIFIED on this run"
     },
     {
       "name": "environment fact: scrolling could be exercised in this session",
       "ok": true,
-      "detail": "NO — every scroll attempt was refused (background unavailable for this window class; foreground needs a foreground window). Scrolling is therefore UNVERIFIED."
+      "detail": "NO — background and the foreground escalation were both refused; scrolling is therefore UNVERIFIED."
     },
     {
-      "name": "foreground delivery fails with a specific, diagnosable reason rather than silently",
-      "ok": false,
-      "detail": "{\"refused\":false,\"text\":\"null\"}"
+      "name": "an explicit foreground click either delivers a real press or reports a refusal with a reason",
+      "ok": true,
+      "detail": "{\"refused\":false,\"effect\":2,\"deliveryMode\":1,\"summary\":\"✅ Sent click via SendInput to pid 38900 at (250,181) (delivery_mode:foreground).\",\"error\":null,\"mouseDownEvents\":1,\"delivered\":true}"
+    },
+    {
+      "name": "a foreground click that reported success really produced a mouse press in the target",
+      "ok": true,
+      "detail": "{\"refused\":false,\"mouseDownEvents\":1}"
     },
     {
       "name": "no key was left pressed after the input sequence",
@@ -263,7 +445,7 @@
     {
       "name": "no mouse button was left pressed after the input sequence",
       "ok": true,
-      "detail": "{\"down\":0,\"up\":0,\"balanced\":true}"
+      "detail": "{\"down\":5,\"up\":5,\"balanced\":true}"
     },
     {
       "name": "a driver session can be started and ended, reporting itself inactive",
@@ -276,7 +458,13 @@
       "detail": "exitCode=null"
     }
   ],
-  "passed": false,
+  "passed": true,
+  "activation": {
+    "title": "P1-05 input target",
+    "ok": true,
+    "foregrounded": true,
+    "attempts": 1
+  },
   "summary": {
     "verified": [
       "locked version, license composition and binary hashes",

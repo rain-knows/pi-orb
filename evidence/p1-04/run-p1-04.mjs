@@ -445,7 +445,7 @@ function foregroundAndWake(hwnd) {
       "-ExecutionPolicy",
       "Bypass",
       "-File",
-      join(repo, "evidence", "p1-04", "wake-foreground.ps1"),
+      join(repo, "evidence", "lib", "activate-window.ps1"),
       "-Hwnd",
       String(hwnd),
       "-LogPath",

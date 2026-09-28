@@ -11,9 +11,12 @@
 | 窗口 bounds 是**物理像素**，而动作坐标是**屏幕 DIP** | 同一窗口：驱动报 735×684@(189,135)，Electron 报 502×462@(120,90)，缩放 150% | 不能把 `listWindows` 的 bounds 直接当动作坐标；两者也不是统一缩放关系（比值 1.464/1.481 ≠ 1.5） |
 | `getScreenSize` 报 **DIP**（1707×1067），不是物理分辨率 | 驱动实报 `{width:1707,height:1067,scale_factor:1.0}` | 不能用它推断物理像素尺寸 |
 | 窗口 id 是 `bigint` | 7/7 窗口均为 bigint | 不可转 number；序列化需转换 |
-| 窗口身份用 `windowId`，**不要**与错误信息里的 HWND 混用 | 驱动错误信息打印 `HWND 0x209ca`（十进制 133578），与 `listWindows` 的 `windowId` 属不同空间 | 混用会指向错误窗口。P1-06 必须先验证二者对应关系，**不得假定** |
-| `background` 投递对 Chromium/Electron 内容**仅支持坐标点击** | `type_text`/`scroll` 返回 `Background delivery is not available for target window class 'Chrome_WidgetWin_1'` | 输入与滚动必须走 `foreground`，而 `foreground` 需要真实前台窗口 |
-| `foreground` 需要能激活目标 HWND | 无前台窗口时报 `foreground_unavailable: ... (actual foreground HWND 0x0); no mouse input was sent` | 无前台窗口的环境下前台路径完全不可用；且它会移动真实指针并短暂切换前台 |
+| `windowId` **与 Win32 HWND 同一 id 空间** | 实测：驱动报 `2884448` 的窗口，其 `desktopCapturer` 源 id 为 `window:2884448:0`（P1-04 已证中间段是存活 HWND） | 因此可用同一句柄做 Win32 调用（置前、`IsWindow`）。但驱动**错误信息**里的 HWND 文本仍不可直接当 `windowId` 用，需比对 |
+| `background` 投递对 Chromium/Electron 内容**仅支持坐标点击** | `type_text`/`scroll` 返回 `Background delivery is not available for target window class 'Chrome_WidgetWin_1'`，`errorCode=background_unavailable` | 输入与滚动必须走 `foreground`；驱动要求**先试 background，被拒后才升级** |
+| **typed `ScrollInput` 没有 `delivery_mode` 字段** | `ScrollInput.defaults()` 为空；只有 `ClickInput`/`VerifyStateInput` 带该字段。驱动的拒绝文案却要求“retry with delivery_mode:\"foreground\"” | 用 typed `scroll` + `deliveryMode` 会被**静默丢弃**（不报错也不升级）。升级必须走 `callTool("scroll", {... delivery_mode:"foreground"})` |
+| 驱动的拒绝是**正常返回值**，不是抛出 | `click` → `effect: Refused`(4)；`scroll`/`typeText` → `isError:true` + `errorCode` | 忽略返回值的调用会把拒绝当成成功报给模型；两者都必须读取 |
+| 驱动会在**前台切换被拒**时仍报滚动成功 | 实测：返回 `✅ Scrolled down via SendInput wheel (3 tick(s)) ... (delivery_mode:foreground)`、`isError=false`，但前台窗口仍是用户的 Chrome，目标窗口零个 `wheel` 事件 | 判定必须读目标侧事件日志；不得用驱动摘要当证据 |
+| `foreground` 需要能激活目标 HWND | 无前台窗口时报 `foreground_unavailable: ... no mouse input was sent` | 该错误是精确且可诊断的；但成功报告并不能反推真的激活成功（见上一行） |
 | 驱动的"成功"摘要**不等于**动作生效 | `type_text` 摘要自称 "not verified — could not read the focused field back"，而文本确实落到了目标 | 判定必须由目标侧证实（P1-06 的"一动作一观察"正好需要这一点） |
 
 ## 2. 可用能力面（运行时 57 个工具，节选）
@@ -27,7 +30,7 @@
 
 SDK 侧对应方法名（`CuaDriver.prototype`，39 个）：`listWindows`、`listApps`、`getWindowState`、`getDesktopState`、`getScreenSize`、`getCursorPosition`、`verifyState`、`click`、`typeText`、`pressKey`、`hotkey`、`scroll`、`drag`、`moveCursor`、`invokeMenu`、`startSession`、`endSession`、`escalateSession`、`getSessionState`、`listSessions`、`shutdown`、`callTool` 等。
 
-`callTool({ name, arguments })` 是 MCP 工具名的直通入口，参数名用 snake_case（如 `element_token`、`delivery_mode`）。
+`callTool(name, argumentsJson)` 是 MCP 工具名的直通入口：第一个参数是工具名，第二个是 **JSON 字符串**（不是对象），参数名用 snake_case（如 `element_token`、`delivery_mode`）。它是唯一能表达 typed 输入缺失字段（如 `ScrollInput` 的 `delivery_mode`）的途径。
 
 ## 3. 坐标使用建议（P1-06 实现约定）
 

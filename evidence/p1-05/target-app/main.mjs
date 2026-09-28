@@ -98,6 +98,17 @@ const html = `<!doctype html>
   window.addEventListener('mouseup', () => report('mouse-up', {}));
   window.addEventListener('keydown', (e) => report('key-down', { key: e.key }));
   window.addEventListener('keyup', (e) => report('key-up', { key: e.key }));
+  // Every wheel event, regardless of which element is under the pointer. Without this, "no scroll event"
+  // cannot be told apart from "the wheel arrived but was not over the scrollable strip", which are
+  // completely different failures.
+  window.addEventListener('wheel', (e) => {
+    const target = e.target;
+    report('wheel', {
+      clientPoint: { x: Math.round(e.clientX), y: Math.round(e.clientY) },
+      deltaY: Math.round(e.deltaY),
+      overScroller: target instanceof Element ? Boolean(target.closest('#scroller')) : false,
+    });
+  }, { passive: true });
 </script>
 </body></html>`;
 
@@ -156,6 +167,21 @@ app.whenReady().then(async () => {
     }
   }
 
+  // The scrollable strip's own screen point, reported in the same two spaces as the cells.
+  //
+  // A caller needs this because the point an action is aimed at must be in screen DIP: the driver adds
+  // the window origin back, so a window-relative point lands outside the window and the wheel goes
+  // somewhere else while the driver still reports success. Deriving it here means the caller never has
+  // to guess the layout.
+  const scrollerCentreInContent = await win.webContents.executeJavaScript(`(() => {
+    const rect = document.getElementById('scroller').getBoundingClientRect();
+    return { x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2) };
+  })()`);
+  const scrollerDipScreenPoint = {
+    x: contentBounds.x + scrollerCentreInContent.x,
+    y: contentBounds.y + scrollerCentreInContent.y,
+  };
+
   const geometry = {
     windowBounds: bounds,
     contentBounds,
@@ -164,6 +190,11 @@ app.whenReady().then(async () => {
     scaleFactor: display.scaleFactor,
     grid: { columns: GRID_COLUMNS, rows: GRID_ROWS, cellWidth: CELL_WIDTH, cellHeight: CELL_HEIGHT },
     cellCentres,
+    scroller: {
+      centreInContent: scrollerCentreInContent,
+      dipScreenPoint: scrollerDipScreenPoint,
+      physicalScreenPoint: screen.dipToScreenPoint(scrollerDipScreenPoint),
+    },
   };
   if (geometryPath) writeFileSync(geometryPath, JSON.stringify(geometry, null, 2), "utf8");
   log({ kind: "ready", geometry });

@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-27T20:39:54.353Z",
+  "capturedAt": "2026-09-28T01:08:17.709Z",
   "platform": "win32",
   "node": "v24.19.0",
   "packageVersion": "0.1.0",
@@ -28,29 +28,29 @@
       "name": "typecheck",
       "command": "npx tsc --noEmit",
       "ok": true,
-      "durationMs": 8068,
+      "durationMs": 11694,
       "outputTail": ""
     },
     {
       "name": "lint",
       "command": "npx eslint .",
       "ok": true,
-      "durationMs": 4683,
+      "durationMs": 7289,
       "outputTail": ""
     },
     {
       "name": "unit tests",
       "command": "npx vitest run",
       "ok": true,
-      "durationMs": 4043,
-      "outputTail": "RUN  v5.0.2 D:/workself/pi-orb\n\n ✓ tests/orb-tools.test.ts (24 tests) 12ms\n ✓ tests/orb-session.test.ts (15 tests) 15ms\n ✓ tests/pending-capture.test.ts (11 tests) 7ms\n ✓ tests/orb-config.test.ts (20 tests) 9ms\n ✓ tests/screenshot.test.ts (22 tests) 64ms\n ✓ tests/shortcut.test.ts (10 tests) 8ms\n ✓ tests/accelerator.test.ts (12 tests) 8ms\n ✓ tests/desktop-broker.test.ts (25 tests) 14ms\n ✓ tests/desktop-task.test.ts (18 tests) 9ms\n ✓ tests/recorded-target.test.ts (17 tests) 11ms\n ✓ tests/screenshot-flow.test.ts (24 tests) 66ms\n ✓ tests/window-toggle.test.ts (13 tests) 9ms\n ✓ tests/workspace.test.ts (11 tests) 100ms\n ✓ tests/bridge-client.test.ts (10 tests) 132ms\n ✓ tests/window-lifecycle.test.ts (9 tests) 5ms\n ✓ tests/generations.test.ts (7 tests) 3ms\n ✓ tests/desktop-capture.test.ts (6 tests) 2ms\n ✓ tests/bridge-server.test.ts (21 tests) 1152ms\n\n Test Files  18 passed (18)\n      Tests  275 passed (275)\n   Start at  04:39:47\n   Duration  1.76s (transform 39%, tests 38%, import 17%, worker 5%)"
+      "durationMs": 5036,
+      "outputTail": " ✓ tests/recorded-target.test.ts (18 tests) 15ms\n ✓ tests/screenshot-flow.test.ts (24 tests) 72ms\n ✓ tests/accelerator.test.ts (12 tests) 10ms\n ✓ tests/orb-tools.test.ts (24 tests) 12ms\n ✓ tests/pending-capture.test.ts (11 tests) 12ms\n ✓ tests/desktop-task.test.ts (18 tests) 12ms\n ✓ tests/orb-session.test.ts (15 tests) 19ms\n ✓ tests/cua-adapter.test.ts (12 tests) 13ms\n ✓ tests/desktop-broker.test.ts (25 tests) 24ms\n ✓ tests/window-toggle.test.ts (13 tests) 10ms\n ✓ tests/shortcut.test.ts (10 tests) 10ms\n ✓ tests/orb-config.test.ts (20 tests) 6ms\n ✓ tests/window-lifecycle.test.ts (10 tests) 6ms\n ✓ tests/generations.test.ts (7 tests) 4ms\n ✓ tests/desktop-capture.test.ts (6 tests) 3ms\n ✓ tests/bridge-server.test.ts (21 tests) 1128ms\n\n Test Files  19 passed (19)\n      Tests  289 passed (289)\n   Start at  09:08:07\n   Duration  1.69s (transform 44%, tests 34%, import 16%, worker 6%)\n\n  Transform  transforming modules took 2.10s · 44% of tracked time, re-done on every run\n             persist transforms across runs with fsModuleCache: true\n             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns"
     },
     {
       "name": "production build",
       "command": "npx electron-vite build",
       "ok": true,
-      "durationMs": 3233,
-      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 24 modules transformed.\nrendering chunks...\nout/main/index.js  107.11 kB\n✓ built in 230ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  4.34 kB\n✓ built in 15ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-CvdsVjsS.css    3.99 kB\n../../out/renderer/assets/index-DUxv4V33.js   660.33 kB\n✓ built in 511ms"
+      "durationMs": 4485,
+      "outputTail": "vite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 24 modules transformed.\nrendering chunks...\nout/main/native/foreground-window.ps1    7.44 kB\nout/main/index.js                      111.84 kB\n✓ built in 275ms\nvite v7.3.6 building ssr environment for production...\ntransforming...\n✓ 2 modules transformed.\nrendering chunks...\nout/preload/index.js  4.34 kB\n✓ built in 17ms\nvite v7.3.6 building client environment for production...\ntransforming...\n✓ 30 modules transformed.\nrendering chunks...\n../../out/renderer/index.html                   0.71 kB\n../../out/renderer/assets/index-CvdsVjsS.css    3.99 kB\n../../out/renderer/assets/index-DUxv4V33.js   660.33 kB\n✓ built in 699ms"
     }
   ],
   "buildArtifacts": {
@@ -72,7 +72,28 @@
     "mainReferencesExistingPreload": true
   },
   "repositoryHygiene": {
-    "statusEntries": [],
+    "statusEntries": [
+      "CHANGELOG.md",
+      "doc/cua-driver-integration.md",
+      "doc/support-matrix.md",
+      "evidence/p1-04/wake-foreground.ps1 -> evidence/lib/activate-window.ps1",
+      "evidence/p1-01/result.json",
+      "evidence/p1-03/result.json",
+      "evidence/p1-04/result.json",
+      "evidence/p1-04/run-p1-04.mjs",
+      "evidence/p1-05/README.md",
+      "evidence/p1-05/input-verification.json",
+      "evidence/p1-05/run-p1-05.mjs",
+      "evidence/p1-05/target-app/main.mjs",
+      "evidence/p1-06/loop-verification.json",
+      "evidence/p1-06/run-p1-06.mjs",
+      "evidence/p1-06/tool-exposure.json",
+      "evidence/p1-07/CONTRACT-MATRIX.md",
+      "evidence/p1-07/lifecycle-regression.json",
+      "evidence/p1-07/release-gate.json",
+      "src/main/cua-adapter.ts",
+      "tests/cua-adapter.test.ts"
+    ],
     "ignoreCoverage": [
       {
         "entry": "node_modules/",
@@ -95,7 +116,7 @@
     ]
   },
   "nonDestructive": {
-    "verifiedAt": "2026-09-27T20:39:54.339Z",
+    "verifiedAt": "2026-09-28T01:08:17.693Z",
     "piWebRepo": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
     "head": "95a58744532c7fccaa933aa7757a1419ace67ed2",
     "headUnchanged": true,

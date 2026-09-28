@@ -1,13 +1,13 @@
-# Foreground a chosen window, then optionally send the real wake accelerator as synthesized keys.
+# Foreground a chosen window, then optionally send a keyboard chord. Shared by stage runners.
 #
-# Why this exists (P1-04 positive path): the product records "the window the user was looking at"
-# during a wake, and the record happens BEFORE the orb is shown. So to exercise the positive capture
-# path without adding a test hook to the product, the test must put its OWN disposable window in
-# front and then press the same global shortcut a user would press. The product then follows exactly
-# its normal path.
+# Why this exists (P1-04's positive capture path, P1-05's click/foreground delivery): the product
+# records "the window the user was looking at" during a wake, and records it BEFORE the orb is shown,
+# and the driver only delivers real input to a window that is in front. So a test that wants to
+# exercise those paths without adding a hook to the product must put its OWN disposable window in
+# front. For P1-04 the chord is then the product's real wake accelerator; P1-05 uses -ForegroundOnly.
 #
-# Safety: this only ever targets a window handle the caller obtained from a process the test itself
-# started, and it only sends the wake chord. It never types into the target and never reads the
+# Safety: this only ever targets a window handle the caller obtained from a process the caller started,
+# and it sends at most one wake chord. It never types text into the target and never reads the
 # target's content.
 #
 # Uses keybd_event rather than SendInput: SendInput needs an explicit-layout union struct, and setting
