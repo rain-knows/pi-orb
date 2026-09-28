@@ -47,6 +47,17 @@ available:
   when — the driver reports `background_unavailable`.
 - Scroll coordinates were not converted like click coordinates, so the wheel was aimed at the wrong
   place while the driver still reported success. Both actions now share one conversion.
+- The model was asked for a screen coordinate it could not know, and the observation did not tell it.
+  `renderResult()` printed the window's title, app and size but dropped `window.bounds`, so the window's
+  position on screen never reached the model; and the adapter built the size string with
+  `Math.round(target.bounds.width / 1)` — a no-op division — so no DPI conversion happened while the
+  label claimed "screen DIP". A position is now a **fraction of the screenshot the model is looking at**
+  (0–1000 on each axis), which it can read off the image, and the host maps it onto the window rect.
+  The first attempt at that mapping mixed units (a physical origin subtracted from a DIP point) and the
+  click landed one cell away; the request space was settled by measurement to
+  `request = fraction x driverReportedWindowSize`.
+- `run-real-model-c7.mjs` read `toolName` from a session's `toolCall` block; the real field is `name`, so
+  a successful real-model run would have been reported as "the model never called the tool".
 
 Also fixed earlier in this cycle: the Pi extension sent run generation `0` while the shell's live
   generation starts at `1`, so every desktop request was refused as stale, and the bridge called an
@@ -54,6 +65,10 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- `evidence/p1-06/run-real-model-c7.mjs`: the real-model C7 entry point (real pi-web + real model),
+  isolated so it never reads or writes the user's running orb — its own `--user-data-dir` and
+  `PI_ORB_CONFIG`, and an agent dir whose `models.json` is a hard link and `auth.json` a symlink, so the
+  real provider configuration is used with no second copy of any credential.
 - `doc/manual-acceptance.md`: the single, step-by-step list of what genuinely cannot be automated
   (real key presses, a second monitor, an elevated window, mid-press cancellation, and a real model
   choosing to call the tools), with prerequisites, the five permitted result labels and where each

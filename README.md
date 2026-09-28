@@ -23,7 +23,7 @@ v0.1 is defined as M1 + M2 + M3 + P1-07:
 |---|---|
 | M1 — floating window, dedicated workspace, chat | **Complete** (P1-01, P1-02, P1-03) |
 | M2 — explicitly authorized screenshot context | **Complete** (P1-04, 41/41): the positive path — record the user's target, capture by handle, preview, confirm, and the model receiving those exact bytes — is verified on this machine |
-| M3 — one-action-one-observation computer use | **Core loop complete** (P1-05, P1-06): background and **foreground** clicks land on the aimed target, and a foreground scroll both reaches and moves the intended element, judged from the target's own event log. Typing into Chromium content, elevated windows and multi-monitor remain unverified |
+| M3 — one-action-one-observation computer use | **Core loop complete** (P1-05, P1-06): background and **foreground** clicks land on the aimed target, a foreground scroll both reaches and moves the intended element, and a point picked off a screenshot lands on that same point in the target within one run — all judged from the target's own event log. The model addresses a position as a fraction of the screenshot it can see, not as a screen coordinate. Typing into Chromium content, elevated windows, multi-monitor, and a **real** model choosing to call the tools remain unverified |
 | P1-07 — safety, regression and release gate | **Complete** |
 
 So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
@@ -82,6 +82,27 @@ npm run build
 
 Credentials stay in the Electron main process. pi-Orb never starts, restarts or stops
 a pi-web service it did not start itself.
+
+### Installing the Pi extension
+
+The Orb tools exist only in a session whose Pi configuration declares this repository's package.
+pi-Orb does **not** register it for you — writing into your Pi settings would modify your environment
+unasked — so it is one explicit step, using the official CLI:
+
+```powershell
+pi install D:\workself\pi-orb\pi-package   # declare the local package
+pi list                                     # confirm; the CLI writes a `packages` array entry
+```
+
+Then restart pi-web: Pi reads the declaration at process start. To undo it, one command removes the
+declaration again (it copies no files, so nothing else is left behind):
+
+```powershell
+pi remove D:\workself\pi-orb\pi-package
+```
+
+The full walkthrough, including why a session without this step has no `orb_*` tool, is in
+[`doc/manual-acceptance.md`](./doc/manual-acceptance.md) §1.1.
 
 ## Non-destructive guarantees
 

@@ -2,10 +2,11 @@
 
 > 运行方式：
 > - `node evidence/p1-06/run-p1-06-tools.mjs`（工具暴露：真实 pi-web + 本机假 provider 捕获工具 schema）
-> - `node evidence/p1-06/run-p1-06.mjs`（工具闭环：真实 Electron 壳 + 真实驱动 + 丢弃式目标）
+> - `node evidence/p1-06/run-p1-06.mjs`（工具闭环：真实 Electron 壳 + 真实驱动 + 丢弃式目标；含 C7 取点↔落点断言）
+> - `node evidence/p1-06/run-real-model-c7.mjs`（真实模型 C7：隔离真实 pi-web + 真实模型；**需解锁的交互式桌面**）
 >
-> 原始结果：`tool-exposure.json`（7/7）、`loop-verification.json`（**38/38**）
-> 状态：**工具暴露与桌面闭环通过**（含真实点击与前台滚动）；**真实模型自主调用工具**与**向 Chromium 内容输入文本**未验证，见 §6。
+> 原始结果：`tool-exposure.json`（7/7）、`loop-verification.json`（**39/39**）、`real-model-c7.json`
+> 状态：**工具暴露与桌面闭环通过**（含真实点击、前台滚动、C7 产品侧闭环）；**真实模型自主调用工具**与**向 Chromium 内容输入文本**未验证，见 §5.1 与 §6。
 
 ## 1. 交付内容
 

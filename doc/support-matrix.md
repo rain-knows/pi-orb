@@ -58,22 +58,26 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **P1-01 工作区与独立会话**：未选工作区不能启用；取消零写入；精确 cwd 匹配（子目录与前缀相似同级目录均不匹配）；junction 与大小写拼写归一到同一标识；切换工作区不串会话且不毁历史 | 已验证 | `evidence/p1-01/`（集成 19/19，应用 22/22） |
 | **P1-02 Electron 最小浮窗**：聊天闭环、流式输出、显式停止、独立会话可被 pi-web 浏览、renderer 无 Node/无直连 | 已验证 | `evidence/p1-02/`（35/35） |
 | **P1-03 唤醒快捷键**：OS 级注册、冲突可诊断、改键与退出释放槽位 | 已验证（第二进程竞争探针） | `evidence/p1-03/`（20/20） |
-| **P1-04 截图授权与正向路径**：无目标拒绝且零上传、伪造确认零上传、text-only 模型不收到图像、per-monitor-v2 DPI 感知生效；真实窗口→预览→确认发送全链 | 已验证 | `evidence/p1-04/`（41/41） |
+| **P1-04 截图授权与正向路径**：无目标拒绝且零上传、伪造确认零上传、text-only 模型不收到图像、per-monitor-v2 DPI 感知生效；真实窗口→预览→确认发送全链 | 已验证 | `evidence/p1-04/`（43/43） |
+| **仅文本模型截图发送前拒绝**：Orb 从会话工作区查询当前模型能力，明确拒绝且 provider 请求数不增加；图像模型仍能发送 | 已验证（隔离产品链路） | `evidence/p1-04/result.json`（43/43）；人工复测待重启 Orb |
 | 捕获源窗口身份：`window:<hwnd>:<index>` 中间段为真实 Win32 句柄 | 已验证（只读枚举，不产生像素） | `evidence/p1-04/capturer-probe.json` |
 | **Cua 0.30.1 安装物**：版本、许可构成与两个裸二进制 SHA-256 均与 P0-04 清单一致 | 已验证 | `evidence/p1-05/input-verification.json` |
 | **Cua 运行时工具目录**：57 个工具；窗口 id 为 bigint；窗口有前序 zIndex | 已验证（驱动实际运行） | `evidence/p1-05/cua-runtime-probe.json` |
 | **坐标空间差异**：`getScreenSize` 报 1707x1067 而物理为 2560x1600；窗口 bounds 为物理像素，动作为屏幕 DIP | 已实测 | `evidence/p1-05/input-verification.json` |
-| **点击坐标换算的正确性**：规则为「请求 = 目标屏幕 DIP 点 − 驱动报告的窗口原点」（click 与 scroll 共用同一换算），实测 4/4 命中格心 | 已实测（经验拟合，非契约推导） | `evidence/p1-05/input-verification.json`；仅在同一窗口位置验证过，**不得**视为可跨场景可靠。见 `doc/cua-driver-integration.md` §1、§3 |
+| **点击坐标换算的正确性**（两种记录不一致，见 `doc/cua-driver-integration.md` §1） | 当前实现为「请求 = 分数 × 驱动上报窗口尺寸」，有最新 C7 地面真值支持；P1-05 记录的另一条规则相差约 1.2 格，**矛盾未裁决**，需解锁后受控实测 | `evidence/p1-06/loop-verification.json`；`evidence/p1-05/input-verification.json`（旧记录，勿据此反改） |
 | **后台点击**：4/4 瞄准格子命中，落点在格中心，且不抢前台 | 已验证（丢弃式自报网格目标） | `evidence/p1-05/input-verification.json` |
 | **后台输入文本**：向原生应用投递并由读回文档证实 | 已验证 | 同上 |
 | **前台点击投递**：目标记录到真实 `mouse-down`，驱动报 `delivery_mode:foreground` | 已验证 | 同上 |
 | **前台滚动的物理到达与生效**：目标记录到真实 `wheel`（`overScroller:true`，`elementUnderPoint` 为滚动区元素），且滚动条 `scrollTop` 实际位移 | 已验证（从目标自身事件日志判定，不采信驱动摘要） | 同上 |
 | **后台→前台升级**：typed `scroll` 无法表达 `delivery_mode`（字段不存在）；适配器改为仅在 `background_unavailable` 后用 `callTool` 升级，并保持同一换算点 | 已验证（单测 + 真机发起） | `evidence/p1-05/input-verification.json`、`tests/cua-adapter.test.ts` |
 | **驱动把拒绝当成功返回**：`scroll`/`typeText` 返回 `isError:true`、`click` 返回 `effect:Refused`，均不抛异常；适配器现读取结果并如实报拒 | 已验证（修复前会静默报成功） | 同上 |
-| 按键/鼠标无残留 | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
+| **按键/鼠标无残留** | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
+| **模型坐标契约：位置是截图分数（0–1000），由宿主映射回窗口** | 已验证（产品侧链路） | `tests/coordinate-mapping.test.ts`；`evidence/p1-06/loop-verification.json`（C7 断言） |
+| **截图取点→输入落点在**同一次运行**内一致（产品侧闭环断言）** | 已验证（自动化闭环：取的是截图分数，落点由目标自身日志判定） | `tests/coordinate-mapping.test.ts`；`evidence/p1-06/loop-verification.json` —— 取分数 `(611.6,360.4)` → 目标 JSONL 命中 `1,2`，格内偏移 `(58,43)` 对格心 `(60,45)` |
 | **Orb 工具仅限 Orb 模式**：普通会话无 orb 工具、Orb 会话恰好四个 | 已验证（provider 实际收到 schema） | `evidence/p1-06/tool-exposure.json` |
 | **桌面工具闭环**：授权/预算/新鲜度、拒绝零副作用、真实点击落点为目标格心 | 已验证（真实壳+驱动+自报目标） | `evidence/p1-06/loop-verification.json` |
 | 桥准入：无会话/错误令牌/浏览器来源/旧代次均被拒 | 已验证 | `evidence/p1-06/` + `tests/bridge-server.test.ts` |
+| Orb 扩展仅凭握手文件连接壳的命名管道：无需额外设置 `PI_ORB_BRIDGE_PIPE` | 已验证（隔离管道测试 + 当前壳只读探针） | `tests/bridge-client.test.ts`；2026-09-28 `hello.ok=true`，无效会话返回 `unknown-session` |
 | **第三方许可清单**：每个已安装生产依赖均声明许可，无 AGPL/GPL-3/SSPL | 已验证 | `evidence/p1-07/license-inventory.json` |
 | **`cua_driver_sdk.dll` 的 MPL 归属核实**：交付物中无任何证据把 MPL 归于该 DLL（无许可文本、不引用 uniffi runtime、仅导入系统库） | 已核实并记录 | `THIRD_PARTY_NOTICES.md` §3 |
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
@@ -89,10 +93,10 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 多显示器 | 本机仅 1 个显示器 | 多屏坐标、跳屏选区与截图分辨率未测；不得宣称已支持 |
 | elevated（高权限）窗口 | 未测试；按目标要求不自动提权 | 高权限窗口的截图与输入语义未知；不得由普通窗口结果外推 |
 | 被遮挡窗口 / DirectComposition 类窗口的截图 | 已测可靠的正常路径，但未构造遮挡场景 | 见 `evidence/p1-04/README.md` §4.4 |
-| **截图点 ↔ 输入点一致性（联合断言）** | 两侧各自已验证且使用同一换算规则，但未在同一次运行中「从截图取点→按该点输入→读回同一位置」 | **未验证**；不得据分段结果宣称两者一致 |
+| **真实模型的截图取点↔点击一致性**（C7 的模型侧） | 自动化只能证明产品侧映射；**模型侧未验证** —— 需真实模型拿到真实截图后自主调用 `orb_observe`→`orb_click`。入口已就绪（`evidence/p1-06/run-real-model-c7.mjs`，隔离真实 pi-web + 真实模型），但当前**工作站已锁定**（`LockApp` 前台、输入桌面不可访问），唤醒路径无法前置丢弃式目标 | 见 `evidence/p1-06/README.md` §5.1 |
 | **向 Chromium/Electron 内容输入文本** | 后台投递对该窗口类不可用；前台升级已实现但未做到稳定投递 | 见 `evidence/p1-05/README.md` §4 |
 | **按下中途取消的释放** | 「输入后无按键/鼠标残留」本身已在 §2 验证（OS 全局键态差分），但**未构造**真实前台下「按住后中途撤销」的场景 | 与 P1-07 的驱动级 session 结束断言区分 |
-| **真实模型自主调用 orb 工具** | 本环境无模型在环；工具 schema 暴露由 provider 实收验证 | 见 `evidence/p1-06/README.md` §6 |
+| **真实模型自主调用 orb 工具后的完整观察与动作** | 真实模型入口已就绪且**除“需真实前台”外的前置已全部实测通过**（隔离真实 pi-web + 真实会话 + 图像模型 `TZcode/deepseek-v4.1-flash` `input=[text,image]` + 扩展工具已注册）；当前被**工作站锁定**阻断，尚未取得观察/动作结论 | 见 `evidence/p1-06/README.md` §5.1 |
 | 失败即停由真实驱动失败触发 | 由单测覆盖（`tests/desktop-broker.test.ts`）；整链路未构造真实驱动失败 | 部分验证 |
 | 同一任务锁在多会话并发下的行为 | 单测覆盖；整链路只覆盖单会话 | 未验证 |
 | 驱动内建授权语义（`desktopCaptureAuthorized`、`desktopUnlocked`、`escalate_session`） | 本阶段未使用；状态实测均为 false | **未验证**；产品侧授权仍由 pi-Orb 自己的任务授权与代次绑定负责 |
@@ -108,7 +112,8 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | pi-web 其它版本 / 其它 Pi SDK 版本组合 | 只测试了 §1 中的单一组合 | 未测试的组合统称「未验证」 |
 | 上游更新后的兼容性 | 未对任何上游新版本跑过接入合同 | 按 §7.2 流程在独立环境验证后才发布新组合 |
 | 双 Alt 手势、选区上下文 | 属 P2，且用户交互尚未确认 | 不阻塞 v0.1；不得当作已实现 |
-| **完整 v0.1 发布** | 上表仍有未验证项（多显示器、高权限窗口、截图点↔输入点联合断言、向 Chromium 内容输入文本、按下中途取消、真实模型自主调用工具） | **未完成**；当前交付物不得声明为完整 v0.1 |
+| **点击坐标换算的两种记录不一致** | 当前实现为「请求 = 分数 × 驱动上报窗口尺寸」（有 P1-06 C7 地面真值支持）；P1-05 记录的另一条规则在同窗口位置下相差约 1.2 格，两者不可能同时命中同一格。**矛盾未裁决**，需解锁的交互式桌面下受控实测（同一窗口位置、两种请求值各点一次、读目标 JSONL） | 不得把任一条当作“已证实的通用公式”；也不得据 P1-05 旧记录反改已验证的映射。见 `doc/cua-driver-integration.md` §1 |
+| **完整 v0.1 发布** | 上表仍有未验证项（多显示器、高权限窗口、真实模型自主调用工具、向 Chromium 内容输入文本、按下中途取消），且 C7 的真实模型部分尚未取得结论 | **未完成**；当前交付物不得声明为完整 v0.1 |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）
 
@@ -120,3 +125,4 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | pi-web 工作树在基线捕获时已有 6 个用户改动文件 | 这些改动属用户所有，不得归因于 pi-Orb，也不得被本项目修改 |
 | Pi 无条件加载用户级 `~/.agents/skills`，`HOME` 运行时解析 | 该目录存在时会进入**所有**会话（含普通 cwd）的 prompt；Orb 只能承诺“不主动改变它” |
 | npm 11 默认拦截依赖安装脚本 | `electron` 与 `esbuild` 需显式 `npm approve-scripts`；`electron` 二进制经 `ELECTRON_MIRROR` 下载 |
+| 工作站锁屏时无法前置任何窗口 | 反射式唤醒路径无法把目标窗口记为“用户正在看的窗口”，截图授权链在第一步断掉；此时产品报「recorded window was replaced」对用户是**误导**（真正原因是没有可前置的窗口）。真实模型类验收必须在解锁的交互式桌面下进行。见 `evidence/p1-06/README.md` §5.1 |

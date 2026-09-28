@@ -37,9 +37,9 @@ Pi 无条件加载**用户级** `$HOME/.agents/skills`，`HOME` 在运行时解�
 | **普通 Web 非破坏性** | `../p1-06/tool-exposure.json`、`../p1-01/result.json`、`../p0-01/verify-baseline.mjs` | 通过。未覆盖 `read-only/default/full/configured` 等**预设切换**的逐项对比（P0-02 覆盖了 `set_tools` 置空与恢复）；**部分** |
 | **cwd 与模式** | `../p1-01/result.json`（精确匹配、子目录、前缀相似同级目录、大小写、junction）；`tests/workspace.test.ts`、`tests/orb-config.test.ts` | 通过。**未**验证"两个 cwd 同时运行"与网络路径实际访问 |
 | **生命周期** | `../p1-07/lifecycle-regression.json`；`../p0-03/result.json`（reload/resume/双客户端） | 通过。**未**覆盖 fork/换目录后的授权继承（换工作区已由 `src/main/index.ts` 撤权并留日志） |
-| **工具选择** | `../p1-06/tool-exposure.json`（模型实际收到的 schema）；`../p0-02/result.json`（W1 自动追加、reload、chat-only）；`tests/desktop-broker.test.ts`（终止同批后续动作） | 通过（模型看到的 schema 为准，非 UI 标签）。**未**由真实模型触发工具调用 |
+| **工具选择** | `../p1-06/tool-exposure.json`（模型实际收到的 schema）；`../p0-02/result.json`（W1 自动追加、reload、chat-only）；`tests/desktop-broker.test.ts`（终止同批后续动作） | 通过（模型看到的 schema 为准，非 UI 标签）。**未**由真实模型触发工具调用（入口已入仓 `../p1-06/run-real-model-c7.mjs`，当前被工作站锁定阻断） |
 | **图像** | `../p1-04/result.json`（41/41：目标记录、句柄匹配、尺寸与真实像素测量、遮罩排除、丢弃零上传、确认字节与 provider 收到字节 hash 一致）；`tests/screenshot-flow.test.ts` | 通过（含正向截图→预览→确认发送）。**未**验证：多屏、被遮挡窗口、高权限窗口、截图前窗口被关闭/句柄复用 |
-| **原生输入** | `../p1-05/input-verification.json`（后台点击 4/4 命中格心、**前台点击产生真实 `mouse-down`**、**前台滚动产生真实 `wheel` 且滚动条实际位移**、后台输入经读回证实、OS 全局键态差分证明无按键残留）；`tests/cua-adapter.test.ts`（拒绝即拒绝、升级条件、坐标换算） | **部分**：向 Chromium 内容输入文本、高权限窗口对比、按下中途取消均**未验证**。mock **未**被用来代替此项 |
+| **原生输入** | `../p1-05/input-verification.json`（后台点击 4/4 命中格心、**前台点击产生真实 `mouse-down`**、**前台滚动产生真实 `wheel` 且滚动条实际位移**、后台输入经读回证实、OS 全局键态差分证明无按键残留）；`tests/cua-adapter.test.ts`（拒绝即拒绝、升级条件、坐标换算）；`../p1-06/loop-verification.json`（**C7 产品侧闭环**：截图分数 → 目标自身 JSONL 命中 `1,2`）；`tests/coordinate-mapping.test.ts` | **部分**：向 Chromium 内容输入文本、高权限窗口对比、按下中途取消均**未验证**。**点击坐标换算的两种历史记录不一致**（见 `doc/cua-driver-integration.md` §1），当前实现有 C7 地面真值支持，矛盾未裁决。mock **未**被用来代替此项 |
 | **快捷键** | `../p1-03/result.json`（真实 OS 注册、第二进程竞争探针、冲突诊断、改键与退出释放） | 通过（OS 级）。**未**验证按键人工体验、AltGr/非 US 布局、锁屏恢复；双 Alt 属 P2，未启用 |
 | **进程与认证** | `../p0-03/result.json`（401/403/伪造 Host、壳退出不杀服务、旧代次拒绝）；`tests/bridge-server.test.ts`（令牌、浏览器来源、代次、策略拒绝上抛） | 通过。**未**验证 LAN 请求与真实 Electron 跨 origin cookie/SameSite 细节 |
 | **打包／卸载** | `THIRD_PARTY_NOTICES.md`、`../p1-07/license-inventory.json`、门禁的写入面审计（N6） | **部分**：许可与写入面已审计；**未**构建真实安装包，**未**做安装/卸载实测 |
@@ -54,7 +54,7 @@ Pi 无条件加载**用户级** `$HOME/.agents/skills`，`HOME` 在运行时解�
 | 全局快捷键唤醒/收起、托盘备用入口 | **可用**（按键人工体验待人工确认） |
 | 普通 Web 非破坏性、不双写会话、退出不杀服务 | **可用** |
 | 授权截图（预览、删除、确认发送） | **可用**：拒绝路径与正向路径均已实测（含预览字节与 provider 收到字节的 hash 一致）；未验证范围限多屏/遮挡/高权限窗口 |
-| 桌面点击闭环（一动作一观察、授权、预算、失败即停） | **可用**：后台点击与**前台点击**均已实测；失败即停由单测覆盖 |
+| 桌面点击闭环（一动作一观察、授权、预算、失败即停） | **可用**：后台点击与**前台点击**均已实测；失败即停由单测覆盖。模型给出的位置是**截图分数（0–1000）**，由宿主映射到窗口，不再要求模型提供屏幕绝对坐标 |
 | 桌面滚动 | **可用**：前台升级后目标记录到真实 `wheel` 且滚动条实际位移，由目标自身事件日志判定 |
 | 向 Chromium 内容输入文本 | **不可声明**：后台投递对该窗口类不可用，前台升级尚未做到稳定投递 |
 | 完整 v0.1（M1+M2+M3+P1-07） | **不可声明**：多显示器、高权限窗口、截图点↔输入点联合断言、向 Chromium 内容输入文本、按下中途取消、真实模型自主调用工具仍未验证 |
