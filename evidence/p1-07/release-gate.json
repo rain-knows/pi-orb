@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-29T13:28:28.926Z",
+  "capturedAt": "2026-09-29T14:12:00.555Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "12542 ms"
+      "detail": "10866 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "8574 ms"
+      "detail": "7399 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "7217 ms"
+      "detail": "6421 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "5173 ms"
+      "detail": "4745 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -45,7 +45,7 @@
     {
       "name": "the release ignore rules exclude dependencies and build output",
       "ok": true,
-      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".tmp/\",\"node_modules/\",\"out/\"]}"
+      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".tmp/\",\"node_modules/\",\"out/\",\"release/\"]}"
     },
     {
       "name": "no build output or dependency directory is staged for release",
@@ -153,6 +153,61 @@
       "detail": "AGENTS.md must name the durable checkout location and the playbook"
     },
     {
+      "name": "the packaging configuration exists and derives from the reference config",
+      "ok": true,
+      "detail": "electron-builder.config.mjs must record the reference file and commit it follows"
+    },
+    {
+      "name": "the packaging keeps native modules outside the archive",
+      "ok": true,
+      "detail": "without the unpack glob the packaged app cannot load koffi"
+    },
+    {
+      "name": "the packaging stays per-user, non-elevating and unsigned-only",
+      "ok": true,
+      "detail": "an installer that elevates or publishes is a different, unreviewed release shape"
+    },
+    {
+      "name": "the packaging does not rebuild the native modules it ships",
+      "ok": true,
+      "detail": "a from-source rebuild would replace the binaries every native evidence run used"
+    },
+    {
+      "name": "the packaging trims third-party build residue",
+      "ok": true,
+      "detail": "electron-builder's smart unpack would otherwise ship C++ sources and foreign-platform binaries"
+    },
+    {
+      "name": "the built package output is not versioned",
+      "ok": true,
+      "detail": "installers and unpacked trees must stay out of the repository"
+    },
+    {
+      "name": "the packaging scripts run the build before packing",
+      "ok": true,
+      "detail": "packing a stale out/ directory would ship code that was never built"
+    },
+    {
+      "name": "the P2-05 distribution records exist",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "the recorded packaged-artifact audit passed and carries its native-binary checks",
+      "ok": true,
+      "detail": "{\"passed\":true,\"checks\":25}"
+    },
+    {
+      "name": "the recorded packaged-application probe passed and still lists real windows",
+      "ok": true,
+      "detail": "{\"passed\":true,\"checks\":10}"
+    },
+    {
+      "name": "the installer steps that cannot be automated are recorded as manual",
+      "ok": true,
+      "detail": "clean-machine install, uninstall and SmartScreen must stay manual and unverified"
+    },
+    {
       "name": "the contract matrix covers every non-destructive invariant N1-N8",
       "ok": true,
       "detail": "[\"N1\",\"N2\",\"N3\",\"N4\",\"N5\",\"N6\",\"N7\",\"N8\"]"
@@ -194,7 +249,7 @@
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 36,
+    "passed": 47,
     "failed": 0,
     "version": "0.1.0",
     "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files"

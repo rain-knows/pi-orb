@@ -14,6 +14,10 @@ build/
 coverage/
 *.tsbuildinfo
 
+# electron-builder output (installers, unpacked app, blockmaps). The packaging
+# configuration that produces it is versioned; the binaries are not.
+release/
+
 # Local scratch space used by development and probes
 .tmp/
 .tmp-*/

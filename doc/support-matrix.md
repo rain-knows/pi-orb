@@ -86,12 +86,16 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **第三方许可清单**：每个已安装生产依赖均声明许可，无 AGPL/GPL-3/SSPL | 已验证 | `evidence/p1-07/license-inventory.json` |
 | **`cua_driver_sdk.dll` 的 MPL 归属核实**：交付物中无任何证据把 MPL 归于该 DLL（无许可文本、不引用 uniffi runtime、仅导入系统库） | 已核实并记录 | `THIRD_PARTY_NOTICES.md` §3 |
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
-| **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性 | 已验证（且五次反向对照可证伪） | `evidence/p1-07/release-gate.json`（32/32） |
+| **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性、打包配置与产物审计记录 | 已验证（且多次反向对照可证伪） | `evidence/p1-07/release-gate.json`（47/47） |
 | **生命周期**：折叠/停止/turn 完成或失败撤权与丢弃记录、不结束会话、不改代次、断连撤权 | 已验证 | `evidence/p1-07/lifecycle-regression.json`（10/10）与 `src/main/index.ts` 的统一撤权出口 |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原、hover/pin、系统主题、新会话 | 已接入（几何与 session controller 自动化通过；视觉和人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/renderer/App.tsx`、`doc/p2-01-reference-reuse.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘体验未验证） | `tests/double-alt.test.ts`、`src/main/double-alt.ts`、`src/main/index.ts`、`src/renderer/App.tsx` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/App.tsx`、`evidence/p2-03/README.md` |
 | **P2-04 桌面操作扩展**：参考项目热键、长按、同窗口拖拽、动作后回图与显式截图导出 | 已接入（broker/schema/driver、Pi image block、截图导出字节校验和参考 backend 取消释放测试通过；真实桌面动作、目标像素、保存对话框与剪贴板仍未人工验收） | `tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows.test.ts`、`tests/screenshot-export.test.ts`、`src/main/screenshot-export.ts`、`evidence/p2-04/README.md` |
+| **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 已验证（`release/0.1.0/pi-orb-0.1.0-win-x64.exe` 构建成功；配置沿用参考形态） | `electron-builder.config.mjs`、`doc/p2-05-distribution.md` |
+| **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留 | 已验证（25/25） | `evidence/p2-05/package-audit.json` |
+| **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、`orb:list-desktop-windows` 返回真实窗口（koffi 从 `app.asar.unpacked` 加载） | 已验证（10/10，并做过删除原生二进制后必须失败的反向对照） | `evidence/p2-05/packaged-smoke.json` |
+| **参考项目 Windows 后端自带的规格测试已移植**：窗口选择 10 条不变量 + 输入 13 条（键映射、UIPI 拒绝、剪贴板顺序、滚轮档位、PNG 头等） | 已验证（23/23，逐条对应参考 spec） | `tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts` |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -122,6 +126,10 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 选区上下文 | 属后续 P2 能力；尚未实现 | 不阻塞 v0.1；不得当作已实现 |
 | P2-03 选区／辅助功能文本 | Windows UI Automation 读取与 chip 已接入；真实 UIA、选区 bounds、macOS 辅助功能和原生工具栏仍未验收 | 不读取剪贴板，不模拟 Ctrl+C，不把来源标签当作授权 |
 | **完整 v0.1 发布** | 上表仍有未验证项（多显示器、高权限窗口、向 Chromium 内容输入文本） | **未完成**；当前交付物不得声明为完整 v0.1 |
+| **安装包在干净目标机上的安装／卸载／升级** | 安装会写 HKCU 与用户目录，在已装过的开发机上做不可复现；需要干净账户或一次性虚拟机 | 未验证；步骤见 `doc/manual-acceptance.md` §9（E1–E9） |
+| **未签名安装包的 SmartScreen 提示与绕过体验** | v0.1 不做代码签名；提示文案与用户侧行为需真实环境 | 未验证；不得宣称"可直接分发" |
+| **卸载后的用户数据与工作区保留** | 需要一次真实的安装→使用→卸载流程 | 未验证；代码侧写入面已由发布门禁审计（只写 Orb userData 与用户确认的工作区） |
+| **安装后的浮球观感、真实按键、多屏、DPI** | 属 P2-01/P1 人工项，打包不改变其状态 | 未验证 |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）
 

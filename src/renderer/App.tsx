@@ -1,3 +1,13 @@
+/**
+ * Orb renderer.
+ *
+ * Source: the DOM/CSS state machine of `deepseek-harness-orb` commit
+ * `72f1d738458a223696685a909e806b683eff5885`, `apps/desktop/renderer/floating.{html,css,js}`
+ * (MIT — see `THIRD_PARTY_NOTICES.md` §3.5) and `doc/p2-01-reference-reuse.md`. The interaction
+ * language (hover to expand, click to pin, history/permission popovers, 72px composer) is reused;
+ * the dsh host protocol behind it is not — session state comes from pi-web's public API through
+ * `window.orb`.
+ */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DesktopTaskStatus, DesktopWindowChoice, FloatingWindowState, OrbSessionEvent, OrbHistoryMessage, OrbSessionHistoryItem, OrbSelectionContext, WorkspaceStatus } from "@shared/ipc";
 import { formatBytes } from "@shared/screenshot";

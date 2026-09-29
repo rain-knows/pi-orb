@@ -3,6 +3,10 @@
  * Observation bounds, capture, and pointer input share physical pixels.
  * Production loads `user32` / `gdi32` through koffi on the first call.
  * Tests inject {@link WindowsDesktopOps} and never post real input.
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `packages/experimental/tool-computer-use/src/windows.ts` (MIT). One deliberate change: the input
+ * paths release held keys and mouse buttons in a `finally` block, which the reference only does on
+ * its normal path and which otherwise leaves a key stuck when a cancel lands mid-chord.
  * @module @deepseek-ai/dsh-experimental-tool-computer-use/src/windows
  */
 

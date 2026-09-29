@@ -5,6 +5,11 @@
  * window rectangles, `BitBlt`, and `SendInput` share physical pixels, then restores
  * the previous awareness. `.agents/notes/implemented/architecture/2026-09-23-windows-computer-use-per-monitor-dpi.md`
  * owns that decision.
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `packages/experimental/tool-computer-use/src/windows-native.ts` (MIT). Adapted to `koffi@2`
+ * (`koffi.sizeof` instead of `INPUT.size`, `koffi.address` for window handles, plus an x64
+ * `INPUT` size assertion); the reference declares `koffi@^3.1.0`, so re-read those spots on any
+ * koffi upgrade.
  * @module @deepseek-ai/dsh-experimental-tool-computer-use/src/windows-native
  */
 

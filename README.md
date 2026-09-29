@@ -62,6 +62,7 @@ P2 is being delivered as separately reviewable reference-reuse stages:
 | P2-02 — double-Alt screenshot gesture | **Implemented; real keyboard, AltGr and non-US layout acceptance remains unverified** |
 | P2-03 — pi-web history and selection context | **History and Windows UI Automation selection chip implemented; real UIA, multi-display/DPI and native selection toolbar remain unverified** |
 | P2-04 — reference desktop actions | **Hotkey, long press, same-window drag, authorized post-action image blocks and explicit screenshot export implemented; real desktop actions, target pixels and clipboard/save-dialog acceptance remain unverified** |
+| P2-05 — Windows distribution | **Unpacked app and per-user NSIS installer build; the packaged artifact's contents are audited (25/25) and the packaged app is started and driven (10/10, including a real desktop window enumeration). Clean-machine install, uninstall, upgrade and the unsigned-installer SmartScreen experience remain unverified** |
 
 So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
 must not be described as done. They are listed one by one in
@@ -81,7 +82,8 @@ native input, cancellation or key-release check.
 | `src/shared/` | Code shared by main, preload, renderer and the Pi extension (configuration schema and matching rules, IPC contract) |
 | `pi-package/` | Pi resources shipped with pi-orb; `extensions/orb.ts` is the Orb mode entry point |
 | `tests/` | Unit tests for pure logic and the workspace rules |
-| `evidence/` | Reproducible verification records, per P0/P1 stage |
+| `evidence/` | Reproducible verification records, per P0/P1/P2 stage |
+| `resources/` | Packaging assets (the application icon, derived from the approved product avatar) |
 | `doc/` | Goals, technology choices, support matrix and supporting research |
 
 ## Verification
@@ -108,6 +110,26 @@ npm run build
 ```
 
 `npm run dev` starts the Electron shell with a hot-reloading renderer.
+
+### Building a Windows distribution
+
+```powershell
+npm run package:win:dir   # release/<version>/win-unpacked, no NSIS download needed
+npm run package:win       # release/<version>/pi-orb-<version>-win-x64.exe (per-user NSIS, unsigned)
+node evidence/p2-05/run-p2-05.mjs   # build + audit the contents + start the packaged app
+```
+
+The packaging posture — electron-builder, per-user NSIS with elevation disabled, `asarUnpack` for
+native modules, no update feed — follows the reference project's
+[`apps/desktop/scripts/electron-builder-config.mjs`](https://github.com/rain-knows/deepseek-harness-orb)
+at the pinned commit; what is not copied is its dsh-monorepo release pipeline. Three deliberate
+deviations from electron-builder's defaults are documented in
+[`doc/p2-05-distribution.md`](./doc/p2-05-distribution.md) §4 (no native rebuild, third-party build
+residue trimmed, icon derived from the approved avatar asset).
+
+The installer is **unsigned**, so Windows SmartScreen will warn about an unknown publisher. Clean
+install, uninstall, upgrade and SmartScreen acceptance are manual steps, not automated ones: see
+[`doc/manual-acceptance.md`](./doc/manual-acceptance.md) §9.
 
 ### Environment
 

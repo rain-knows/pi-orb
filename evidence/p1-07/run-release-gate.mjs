@@ -349,6 +349,86 @@ check(
   "AGENTS.md must name the durable checkout location and the playbook",
 );
 
+// P2-05 packaging. A distribution config is not a release artefact by itself, but three of its
+// properties are load-bearing: native modules must be unpacked or the packaged app cannot load
+// koffi (proved by deleting the unpacked binary — the desktop call then fails), the install must
+// stay per-user and non-elevating, and the shipped binary must be the one the evidence describes
+// rather than a fresh from-source rebuild.
+const builderConfigPath = join(repo, "electron-builder.config.mjs");
+const builderConfig = existsSync(builderConfigPath) ? readFileSync(builderConfigPath, "utf8") : "";
+check(
+  "the packaging configuration exists and derives from the reference config",
+  builderConfig.includes("72f1d738458a223696685a909e806b683eff5885") &&
+    builderConfig.includes("electron-builder-config.mjs"),
+  "electron-builder.config.mjs must record the reference file and commit it follows",
+);
+check(
+  "the packaging keeps native modules outside the archive",
+  /asarUnpack:\s*\[[^\]]*\*\*\/\*\.\{node,dll,exe\}/.test(builderConfig),
+  "without the unpack glob the packaged app cannot load koffi",
+);
+check(
+  "the packaging stays per-user, non-elevating and unsigned-only",
+  /perMachine:\s*false/.test(builderConfig) &&
+    /allowElevation:\s*false/.test(builderConfig) &&
+    /publish:\s*null/.test(builderConfig),
+  "an installer that elevates or publishes is a different, unreviewed release shape",
+);
+check(
+  "the packaging does not rebuild the native modules it ships",
+  /npmRebuild:\s*false/.test(builderConfig),
+  "a from-source rebuild would replace the binaries every native evidence run used",
+);
+check(
+  "the packaging trims third-party build residue",
+  builderConfig.includes("node_modules/koffi/src/**") && builderConfig.includes("node_modules/uiohook-napi/libuiohook/**"),
+  "electron-builder's smart unpack would otherwise ship C++ sources and foreign-platform binaries",
+);
+check(
+  "the built package output is not versioned",
+  /^release\/$/m.test(readFileSync(join(repo, ".gitignore"), "utf8")),
+  "installers and unpacked trees must stay out of the repository",
+);
+check(
+  "the packaging scripts run the build before packing",
+  /"package:win":\s*"npm run build && electron-builder/.test(readFileSync(join(repo, "package.json"), "utf8")) &&
+    /"package:win:dir":\s*"npm run build && electron-builder/.test(readFileSync(join(repo, "package.json"), "utf8")),
+  "packing a stale out/ directory would ship code that was never built",
+);
+const p2_05Required = [
+  "evidence/p2-05/README.md",
+  "evidence/p2-05/run-p2-05.mjs",
+  "evidence/p2-05/package-audit.json",
+  "evidence/p2-05/packaged-smoke.json",
+  "doc/p2-05-distribution.md",
+];
+const missingP2_05 = p2_05Required.filter((path) => !existsSync(join(repo, path)));
+check("the P2-05 distribution records exist", missingP2_05.length === 0, JSON.stringify(missingP2_05));
+const packageAudit = existsSync(join(repo, "evidence/p2-05/package-audit.json"))
+  ? JSON.parse(readFileSync(join(repo, "evidence/p2-05/package-audit.json"), "utf8"))
+  : null;
+check(
+  "the recorded packaged-artifact audit passed and carries its native-binary checks",
+  packageAudit?.passed === true &&
+    (packageAudit.checks ?? []).some((entry) => entry.name.includes("koffi.node") && entry.ok),
+  JSON.stringify({ passed: packageAudit?.passed, checks: packageAudit?.checks?.length ?? 0 }),
+);
+const packagedSmoke = existsSync(join(repo, "evidence/p2-05/packaged-smoke.json"))
+  ? JSON.parse(readFileSync(join(repo, "evidence/p2-05/packaged-smoke.json"), "utf8"))
+  : null;
+check(
+  "the recorded packaged-application probe passed and still lists real windows",
+  packagedSmoke?.passed === true &&
+    (packagedSmoke.checks ?? []).some((entry) => entry.name.includes("lists real windows") && entry.ok),
+  JSON.stringify({ passed: packagedSmoke?.passed, checks: packagedSmoke?.checks?.length ?? 0 }),
+);
+const manual = readFileSync(join(repo, "doc/manual-acceptance.md"), "utf8");
+check(
+  "the installer steps that cannot be automated are recorded as manual",
+  manual.includes("E 组") && /未验证/.test(manual),
+  "clean-machine install, uninstall and SmartScreen must stay manual and unverified",
+);
+
 // The contract cross-check has to exist and has to keep its unverified rows, so a release cannot
 // drop the N1-N8 comparison or the §7.1 coverage table to look complete.
 const contractMatrixPath = join(repo, "evidence/p1-07/CONTRACT-MATRIX.md");

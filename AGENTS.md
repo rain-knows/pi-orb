@@ -14,13 +14,15 @@
 
 | 位置 | 说明 |
 |---|---|
-| `D:\pi-orb-ref\deepseek-harness-orb` | **本机优选检出**，完整工作树，按需保留 |
-| `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb` | 早期文档记录的检出，同提交 |
+| `D:\pi-orb-ref\deepseek-harness-orb` | **本机优选检出**；注意它是 sparse checkout（只含 `apps/desktop/src` 与 `packages`），打包脚本／测试目录不在其中 |
+| `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb` | 完整工作树检出（同提交）；**需要 `apps/desktop/scripts`、`apps/desktop/tests` 时看这里** |
 | `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-research` | 只读研究检出，同提交 |
 
 三个检出都固定在源提交 `72f1d738458a223696685a909e806b683eff5885`，只用于核对和移植，
 不作为 pi-orb 的运行时依赖；源码复用仍须在本仓库保留来源提交、许可证和适配说明。
-开发前先核对 `git -C D:\pi-orb-ref\deepseek-harness-orb rev-parse HEAD` 与该提交一致。
+开发前先核对 `git -C D:\pi-orb-ref\deepseek-harness-orb rev-parse HEAD` 与该提交一致；
+需要 sparse 检出里没有的目录时，用 `git sparse-checkout add <目录>` 或改看完整检出，
+不要凭记忆描述参考实现。
 
 **开发时的取材入口固定为 [`doc/reference-playbook.md`](./doc/reference-playbook.md)**：
 它给出参考文件索引、常量和交互规格、可复用／不可复用清单、各任务的作业流程以及与上游
@@ -39,3 +41,7 @@
 - 先完成能端到端运行的最小复用，再按阶段扩展。
 - 删除已经废弃的路径，不保留兼容层、静默回退或重复实现。
 - 阶段性工作必须有文档、测试或人工证据，并单独提交，保持开发可控。
+- 打包与分发的形态按 [`doc/reference-playbook.md`](./doc/reference-playbook.md) §9.4 执行：
+  只复用参考项目的打包形态，不搬它的 dsh 单体仓库发布管道；改动打包配置后必须跑
+  `node evidence/p2-05/run-p2-05.mjs`（构建 → 产物内容审计 → 启动打包产物），
+  且不得用“安装包构建成功”代替“包内是什么”与“它能不能跑”这两类证据。

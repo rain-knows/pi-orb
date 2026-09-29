@@ -1,6 +1,9 @@
 /**
  * Choose the Windows observation window from a z-order snapshot.
  * Native code supplies physical-pixel facts. This module does not call Win32.
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `packages/experimental/tool-computer-use/src/windows-foreground.ts` (MIT). Unmodified; the
+ * reference's own spec for it is ported in `tests/reference-windows-foreground.test.ts`.
  * @module @deepseek-ai/dsh-experimental-tool-computer-use/src/windows-foreground
  */
 

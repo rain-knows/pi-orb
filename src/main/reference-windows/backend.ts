@@ -1,6 +1,12 @@
 /**
  * Host-neutral contracts copied from deepseek-harness-orb's computer-use backend.
- * The Pi/Cordis session types are intentionally omitted; pi-orb owns that boundary.
+ *
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `packages/experimental/tool-computer-use/src/backend.ts` (MIT). Trimmed for pi-orb: the Cordis
+ * session types, the `createPlatformBackend` factory and the macOS/unsupported branches are gone,
+ * because pi-orb's only production backend is the Windows one and the Pi session boundary is
+ * pi-orb's own. Overlay handling is the single `backend.withGuiTurn` call site in
+ * `src/main/index.ts` rather than the reference's `wrapDesktopBackend`.
  */
 
 export type ImageMediaType = "image/png" | "image/jpeg" | "image/gif" | "image/webp";
@@ -26,7 +32,15 @@ export interface DesktopForeground {
 }
 
 export const FOCUS_NOTE = "Keyboard focus is not on an operable app. Click the target window first if the next step needs focus.";
-export const UNFOCUSED_WINDOW_NOTE = "Keyboard focus is on another window. Keyboard actions bring this window forward first.";
+/**
+ * Model-facing copy when the reported Windows window is not the keyboard foreground.
+ *
+ * Restored verbatim from the reference (commit `72f1d73`, `src/backend.ts:79-80`). The earlier
+ * pi-orb copy stopped after "bring this window forward first", so a model that needed focus on a
+ * specific control was never told to click inside the window first. `orb_hotkey` does bring the
+ * recorded target forward before posting keys, so the copy matches the executor.
+ */
+export const UNFOCUSED_WINDOW_NOTE = "Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.";
 export const FOCUS_FALLBACK_FOREGROUND: DesktopForeground = { appName: "none", focusNote: FOCUS_NOTE };
 
 export type ClickButton = "left" | "right";

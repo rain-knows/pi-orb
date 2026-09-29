@@ -5,6 +5,12 @@
   "type": "module",
   "description": "Electron desktop companion for pi-web: a floating orb window with an explicit, user-authorized desktop mode.",
   "license": "MIT",
+  "author": "pi-orb contributors",
+  "homepage": "https://github.com/rain-knows/pi-orb",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rain-knows/pi-orb.git"
+  },
   "main": "out/main/index.js",
   "engines": {
     "node": ">=24.19.0"
@@ -17,6 +23,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "package:win": "npm run build && electron-builder --config electron-builder.config.mjs --win --x64 --publish never",
+    "package:win:dir": "npm run build && electron-builder --config electron-builder.config.mjs --win --x64 --publish never --dir",
     "verify:p0-baseline": "node evidence/p0-01/verify-baseline.mjs"
   },
   "dependencies": {
@@ -32,6 +40,7 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "5.2.0",
     "electron": "44.4.5",
+    "electron-builder": "26.15.3",
     "electron-vite": "5.0.0",
     "eslint": "9.39.5",
     "typebox": "1.3.27",

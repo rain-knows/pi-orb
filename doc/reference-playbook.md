@@ -19,6 +19,7 @@
 | 改授权、撤权、取消、生命周期 | §8、§10.4 | `plugin.ts`（turn/end）、`overlay-guard.ts` | `src/main/index.ts`、`window-lifecycle.ts`、`desktop-broker.ts` |
 | 补测试或判断“算不算通过” | §9.1、§13 | 参考同名 `*.spec.ts` | `tests/*`、`evidence/*` |
 | 把参考代码搬进仓 | §10.5、§12 | 目标文件本体 | 对应目录 + `THIRD_PARTY_NOTICES.md` |
+| 改打包／安装包／分发形态 | §9.4、§10.6 | `apps/desktop/scripts/electron-builder-config.mjs`、`package-target.ts`、`runtime-file-policy.ts` | `electron-builder.config.mjs`、`package.json`、`evidence/p2-05/` |
 | 参考项目升级了新提交 | §11 | `git log`/`git diff` | `AGENTS.md`、本文件 §1／§6.1／§6.2、`support-matrix.md` |
 
 ## 1. 参考项目与本地检出
@@ -238,24 +239,27 @@ D:\workself\pi-orb\
 
 | 参考文件 | 参考行数 | pi-orb 文件 | pi-orb 行数 | 判定 |
 |---|---|---|---|---|
-| `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 31 | 一致；但**无调用方**（见 §6.2） |
-| `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 211 | 一致（含 `mapFractionToGlobal`/`mapNormalizedToGlobal`/`mapPixelToGlobal`/`requireNormalizedPosition`/`requirePixelPosition`/`modelPositionToHid`/`isForbiddenScreenshotHotkey`/`requireClickModifiers`） |
-| `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 34 | 一致 |
-| `src/observation-limits.ts` | 13 | `src/main/reference-windows/observation-limits.ts` | 13 | 一致 |
-| `src/windows-foreground.ts` | 187 | `src/main/reference-windows/windows-foreground.ts` | 187 | 一致 |
-| `src/windows.ts` | 494 | `src/main/reference-windows/windows.ts` | 509 | **优于参考**：补了 `try/finally` 释放已按下的键与鼠标键（参考在 20ms 修饰键间隔或 80ms 长按期间被 abort 会留下卡键）。这是本项目刻意改进，不得“还原”成参考写法 |
-| `src/windows-native.ts` | 826 | `src/main/reference-windows/windows-native.ts` | 837 | **koffi 2.x 适配**：`INPUT.size` → `koffi.sizeof(INPUT)`（`:448`、`:466`、`:571`）、`EnumWindows` 句柄改用 `koffi.address()`（`:151-153`），并补 x64 `INPUT` 结构体大小校验（`:571-572`）。参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@^2.14.1`：**升级 koffi 时必须重看这几处** |
-| `src/backend.ts` | 277 | `src/main/reference-windows/backend.ts` | 91 | **裁剪**：删除 `createPlatformBackend` 平台工厂、macOS/unsupported 分支与 `ImageMediaType` 的 dsh 依赖；接口收窄为 Windows |
-| `src/coordinate-mode.ts` | 346 | `src/main/reference-windows/coordinate-mode.ts` | 8 | **仅保留类型**：`CoordinateMode`、`ObservationRaster`；投影、`coordinateOutcome`、`toolsForCoordinateMode`、`firstFrameNotice` 未移植 |
+| `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 39 | 一致；`activeCaptureExcludeWindowIds` 被 `windows.ts` 读取，但**写入方无调用方**（见 §6.2） |
+| `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：只保留 `mapNormalizedToGlobal` 及其私有分数换算。参考的 11 个导出里 9 个在 pi-orb 无调用方（校验职责由 `src/shared/orb-tools.ts` 的 `validateAction` 唯一承担），按 N8 删除；需要 pixel 编码时按固定提交恢复 |
+| `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 38 | 一致（`delay` 供驱动使用；`wait`/`long_wait` 工具未移植） |
+| `src/observation-limits.ts` | 13 | `src/main/reference-windows/observation-limits.ts` | 16 | 一致 |
+| `src/windows-foreground.ts` | 187 | `src/main/reference-windows/windows-foreground.ts` | 190 | 一致；参考自带的 10 条不变量已移植到 `tests/reference-windows-foreground.test.ts` |
+| `src/windows.ts` | 494 | `src/main/reference-windows/windows.ts` | 513 | **优于参考**：补了 `try/finally` 释放已按下的键与鼠标键（参考在 20ms 修饰键间隔或 80ms 长按期间被 abort 会留下卡键）。这是本项目刻意改进，不得“还原”成参考写法 |
+| `src/windows-native.ts` | 826 | `src/main/reference-windows/windows-native.ts` | 843 | **koffi 2.x 适配**：`INPUT.size` → `koffi.sizeof(INPUT)`（`:448`、`:466`、`:571`）、`EnumWindows` 句柄改用 `koffi.address()`（`:151-153`），并补 x64 `INPUT` 结构体大小校验（`:571-572`）。参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@^2.14.1`：**升级 koffi 时必须重看这几处** |
+| `src/backend.ts` | 277 | `src/main/reference-windows/backend.ts` | 100 | **裁剪**：删除 `createPlatformBackend` 平台工厂、macOS/unsupported 分支与 `ImageMediaType` 的 dsh 依赖；接口收窄为 Windows。`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句 |
+| `src/coordinate-mode.ts` | 346 | *（已删除）* | — | **删除**：只留两个类型且无调用方等于死文件；像素模式未实现，类型随死函数一并去掉 |
+
+**参考测试的移植状态**：`windows-foreground.spec.ts` 的 10 条不变量与 `windows.spec.ts` 的 13 条
+（键映射、UIPI 拒绝、Explorer 文件夹、空标题省略、剪贴板顺序、滚轮档位、focus 恢复、取消与 PNG
+头）现在都在 `tests/reference-windows-foreground.test.ts` 与 `tests/reference-windows-input.test.ts`
+里逐条对应，且断言文本与参考一致（只去掉了 `.ts` 扩展名差异）。
 
 **当前可执行的收敛动作（按优先级）**：
 
-1. `coordinate-mode.ts` 目前只有 2 个类型且无调用方（`coordinates.ts` 引用它们）。要么按 P2 计划
-   接入像素编码（移植 `modelPositionToHid` 的调用方、`coordinateOutcome`、`toolsForCoordinateMode`），
-   要么删除该文件并把类型并入 `coordinates.ts`。保留“死文件”违反 N8。
-2. `windows.ts`/`windows-native.ts` 的 11–15 行差异必须逐行说明（是平台裁剪、pi-orb 适配，
-   还是无记录漂移）。核对方法见 §11.2。
-3. `backend.ts` 收窄是有意为之，但要在文件头写清“裁剪了哪些方法、为什么”，否则下次同步会误判。
+1. `windows.ts`/`windows-native.ts` 的行数差异必须能逐行说明（是平台裁剪、pi-orb 适配，
+   还是无记录漂移）。核对方法见 §11.2；当前差异均已在文件头注明来源与改动点。
+2. `backend.ts` 7 个只声明未调用的方法（见 §6.2）在决定接入哪几个之前保持声明状态，
+   但不得在文档里说成“已支持”。
 
 ### 6.2 已核实的移植缺口（2026 本轮审计结论）
 
@@ -263,14 +267,14 @@ D:\workself\pi-orb\
 
 | 缺口 | 事实 | 影响 | 建议动作 |
 |---|---|---|---|
-| `coordinate-mode.ts` 只剩类型 | pi-orb 8 行 vs 参考 346 行；无调用方，`millifraction` 事实上被硬编码 | 像素编码（pixel 模式）在 pi-orb 不可表达；参考的 `toolsForCoordinateMode` 改写工具描述的机制缺失 | 要么移植 `coordinateOutcome`/`coordinateModeOf`/`toolsForCoordinateMode`/投影，要么删除该文件并把两个类型并入 `coordinates.ts`（N8 不允许留死文件） |
-| 后端 7 个方法只声明未调用 | `inspectForeground`、`listApps`、`openApp`、`openInBrowser`、`openInFinder`、`copyImageToClipboard`、`backend.withGuiTurn` 无调用方（`ReferenceWindowsDriver` 只用 `listWindows`/`focusWindow` + `listScreens`/`capture`/`click`/`typeText`/`hotkey`/`longPress`/`drag`/`scroll`） | 模型拿不到 `inspectForeground` 的前台元数据（前台／非前台提示）；`list_apps`/`open_app`/`open_in_browser`/`open_in_finder`/`screenshot` 语义无落点 | 与 §7.1 的工具补齐一起做：先接进驱动与 Pi 工具，再接授权边界 |
-| 捕获排除列表恒为空 | `runWithCaptureExcludeWindowIds`（`capture-exclude.ts:26`）在 pi-orb **无任何调用方**，`activeCaptureExcludeWindowIds()` 永远是 `[]` | GDI 截图无法排除 Orb 自己；当前靠 `withGuiTurn` 隐藏窗口（`src/main/index.ts:358`）替代 | 保留现状但写清理由；若要恢复参考的 contentProtection/排除机制，按 `floating-window.ts:909-924` 与 `overlay-guard.ts` 接入 |
-| 前台提示文案被截断 | `UNFOCUSED_WINDOW_NOTE` 参考为“……hotkey brings this window forward first; click inside it if focus must land on a specific control.”，pi-orb 截到 “Keyboard actions bring this window forward first.” | 模型失去“先点进窗口再按热键”的下一步指引 | 恢复参考原句（纯文案，无适配成本） |
+| `coordinate-mode.ts` 只剩类型 | **已处理**：文件删除，像素模式未实现这一事实现在写在 `coordinates.ts` 的文件头里 | 像素编码（pixel 模式）在 pi-orb 不可表达 | 需要 pixel 时按固定提交恢复该文件与 `modelPositionToHid` 调用方，不要重新推导 |
+| 后端 7 个方法只声明未调用 | `inspectForeground`、`listApps`、`openApp`、`openInBrowser`、`openInFinder`、`copyImageToClipboard`、`backend.withGuiTurn` 无调用方（`ReferenceWindowsDriver` 只用 `listWindows`/`focusWindow` + `listScreens`/`capture`/`click`/`typeText`/`hotkey`/`longPress`/`drag`/`scroll`） | 模型拿不到 `inspectForeground` 的前台元数据（前台／非前台提示）；`list_apps`/`open_app`/`open_in_browser`/`open_in_finder`/`screenshot` 语义无落点 | 与 §7.1 的工具补齐一起做：先接进驱动与 Pi 工具，再接授权边界。`open_app` 另受 P2-04 的“目标重绑定规则确定后才开放”约束 |
+| 捕获排除列表恒为空 | `runWithCaptureExcludeWindowIds`（`capture-exclude.ts:26`）在 pi-orb **无任何调用方**，因此 `activeCaptureExcludeWindowIds()` 永远是 `[]`（读取方 `windows.ts:325` 是活的） | GDI 截图无法排除 Orb 自己；当前靠 `withGuiTurn` 隐藏窗口（`src/main/index.ts:358`）替代 | 保留现状但写清理由；若要恢复参考的 contentProtection/排除机制，按 `floating-window.ts:909-924` 与 `overlay-guard.ts` 接入 |
+| 前台提示文案被截断 | **已修复**：`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句，并由 `tests/reference-windows-input.test.ts` 钉住字面量 | — | 保持；该测试就是防止再次被简写的绊线 |
 | 观察新鲜度的实现方式不同 | 参考**没有** observation id／陈旧校验／限流（`grep observationId\|stale\|throttle` 无命中），靠“工具互斥 + 每次动作后重拍 + 策略禁止批式依赖动作”保证 | pi-orb 的 `observationId` + 拒绝原因 + 12 动作/5 分钟预算是**本项目新增**，不是参考语义 | 保留（这是授权边界所需），但文档里必须继续标注为 pi-orb 新增，不得说成“参考项目语义” |
-| 参考测试未移植 | `windows-foreground.spec.ts` 的 10 条不变量（壳类过滤、overlay hwnd 跳过、owner 链、瞬态并集、跨监视器分离）只有 1 条经 `tests/reference-windows.test.ts:130-135` 间接覆盖；另缺 `windowsVirtualKey`/`windowsKeyIsExtended` 键映射、UIPI 拒绝、Explorer 文件夹、滚轮档位、`delay()` 取消语义、PNG/JPEG 头校验 | 前台选择算法改动时没有回归网 | 按 §9.1 补测，优先 `windows-foreground` 与键映射 |
-| `coordinates.ts` 有死导出 | `assertAllowedHotkey`、`requireClickModifiers`、`modelPositionToHid`、`requirePixelPosition`、`mapPixelToGlobal` 在 pi-orb **无调用方**（只有 `mapNormalizedToGlobal` 被 `windows.ts:29` 使用）；生产里的禁用快捷键判定是 `src/shared/orb-tools.ts` 的 `validateHotkey` 重新实现 | 同一规则存在两套实现，参考的校验器形同注释；点击 `modifiers` 在参考与已移植 backend 中都支持，但 pi-orb 的 `ClickAction` 没有该字段 | 二选一：把工具层校验改为调用参考校验器（推荐），或删除未使用的导出；补 `button`/`count`/`modifiers` 时同时接上 `requireClickModifiers` |
-| 逐文件归属不完整 | `src/main/reference-windows/` 8 个文件里只有 `backend.ts:2` 点名仓库；其余 7 个只有 `@module @deepseek-ai/dsh-experimental-tool-computer-use/src/<name>` 标签，**没有仓库、提交或许可证行**；提交与许可证只在 `THIRD_PARTY_NOTICES.md`。`floating-window-controller.ts` 与 `src/renderer/App.tsx` 完全没有来源头，只在 `doc/p2-01-reference-reuse.md` 里以文字记录 | 归属满足于仓库级、不满足于文件级；“未复用原因”可追溯，但“这个文件从哪来”需要另查文档 | 给移植文件统一补一个来源头（仓库 + 提交 + 原路径 + MIT），或在 `THIRD_PARTY_NOTICES.md` 里逐文件列全并说明文档即归属源 |
+| 参考测试未移植 | **已处理**：`windows-foreground.spec.ts` 10 条与 `windows.spec.ts` 13 条全部移植（`tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts`），并做过变异反证 | — | 参考升级后按 §11 对比这两个 spec 的新增用例 |
+| `coordinates.ts` 有死导出 | **已处理**：11 个导出删除 9 个，只留 `mapNormalizedToGlobal`；唯一校验实现是 `src/shared/orb-tools.ts` 的 `validateAction`。`COORDINATE_SPACE = 1000` 仍在 `orb-tools.ts` 单独声明（共享层不能依赖主进程模块，且扩展包会独立打包） | 曾经同一规则两套实现 | 需要 `button`/`count`/`modifiers` 时，先在 `orb-tools.ts` 扩 schema，不要恢复参考的第二套校验 |
+| 逐文件归属不完整 | **已处理**：`src/main/reference-windows/` 每个文件都有“仓库 + 提交 + 原路径 + MIT”来源头；`floating-window-controller.ts`、`floating-geometry.ts`、`src/renderer/App.tsx` 也已补头；`THIRD_PARTY_NOTICES.md` §3.5 逐文件列全 | — | 新增移植文件时同步补头与清单 |
 | 存在虚假归属表述 | `src/main/double-alt.ts` 原头注释写“adapted to the reference interaction contract”，但参考项目**没有**全局快捷键与双 Alt 手势 | 把本项目新增能力说成参考项目能力，违反“不得把复用内容描述为原创”的对称要求（也不得把原创描述为复用） | 已改为明确“pi-orb 新增、无参考对应物”；审查其它头注释是否有同类表述 |
 
 ### 6.3 必须保持的坐标语义
@@ -420,11 +424,11 @@ D:\workself\pi-orb\
 - `docs/defensive-patterns.md`、`docs/agent-lifecycle.md` 是生命周期、并发、子进程与清理
   写法的参考读物；pi-orb 的窗口生命周期与撤权路径应先对照再改。
 - Windows 打包/签名/安装器脚本（`apps/desktop/tests/windows-*.ps1`、`windows-sign*.spec.ts`）
-  属发布基础设施，不属于运行时行为；P2-05 需要时按参考链路评估，不要提前引入。
+  属发布基础设施，不属于运行时行为；P2-05 的结论见 §9.4，不要凭印象提前引入别的形态。
 
-- 来源记录现状：`src/main/reference-windows/*` 没有逐文件 SPDX 头，来源由
-  `THIRD_PARTY_NOTICES.md` 统一登记（文件清单 + 提交 + 适配边界）。**新增移植文件时必须补登**，
-  否则来源不可追溯。
+- 来源记录现状：`src/main/reference-windows/*`、`floating-*.ts`、`src/renderer/App.tsx` 均有
+  “仓库 + 提交 + 原路径 + MIT”来源头，并同时登记在 `THIRD_PARTY_NOTICES.md` §3.5。
+  **新增移植文件时必须两处都补**，否则来源不可追溯。
 - 参考项目的依赖版本差异必须跟：参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@^2.14.1`；
   移植时的 `koffi.sizeof`/`koffi.address` 适配就是为此。升级 koffi 时重看
   `windows-native.ts:148-156`、`:448`、`:466`、`:571-572`。
@@ -438,6 +442,36 @@ D:\workself\pi-orb\
 - 可复现验证写入 `evidence/<阶段>/`，并在 `evidence/README.md` 建索引。
 - 事实只写一处：版本兼容性只在 `support-matrix.md`；产品不变量只在
   `pi-orb-development-goals.md`；本文件只负责“参考索引 + 取材规程”。
+
+### 9.4 F 面：打包与分发（P2-05 已落实的形态）
+
+参考项目的发布管道服务于“随包分发一整套 dsh 运行时”，pi-orb 连接用户自己的 pi-web，
+因此**只复用形态，不复用管道**。已确定的复用与不搬边界：
+
+| 复用（同形） | 参考位置 | pi-orb 落点 |
+|---|---|---|
+| electron-builder + JS 配置模块（不用 yml） | `apps/desktop/scripts/electron-builder-config.mjs` | `electron-builder.config.mjs` |
+| Windows 只有 NSIS，每用户安装、禁止提权 | `:235`、`:245-247` | `win.target`、`nsis.perMachine/allowElevation` |
+| `asar: true` + 原生模块解包 `**/*.{node,dll,exe}` | `:112`、`:71-72` | 同名键 |
+| 未签名产物不带更新源（`publish: null`） | `:253` | `publish: null` |
+| 裁剪第三方包内的构建残留 | `scripts/runtime-file-policy.ts:42` | `files` 排除段 |
+| 调用形状 `--config <file> --win --x64 --publish never [--dir]` | `scripts/package-target.ts:267-283` | `package:win` / `package:win:dir` |
+
+| 不搬 | 原因 |
+|---|---|
+| `DSH_DESKTOP_*` 环境契约（含必需的 `appId` 校验） | 那是 dsh 发行身份，不是 pi-orb 的 |
+| 随包 Node 运行时、`dsh/` 负载、`prepare:*` 系列 | pi-orb 包里没有第二套运行时 |
+| 自定义 NSIS 页面 / `installer.nsh` / `window-frame.dll` / `installWindowsDirectoryInstaller()` | 靠字符串替换 `app-builder-lib` 固定模板，升级即碎 |
+| eToken 签名链、发布记录、上传与 `nightly.yml` 更新源 | v0.1 不签名、不发布自动更新 |
+| macOS `dmg`/`zip`、Linux `AppImage` 目标 | 未验证的平台不得声明支持 |
+
+**改动打包配置前必须先看的三个非默认决定**（理由写在 `electron-builder.config.mjs` 与
+`doc/p2-05-distribution.md` §4）：`npmRebuild: false`（发出去的必须是证据测过的预编译二进制）、
+`files` 排除段（否则 smart unpack 会把 C++ 源码与其它平台二进制打进包）、
+图标由已批准的 `orb-avatar.png` 派生（不新增品牌素材）。
+
+验证一律走 `node evidence/p2-05/run-p2-05.mjs`（构建 → 内容审计 → 启动打包产物），
+不要用“安装包构建成功”代替内容与运行证据。
 
 ## 10. 常见开发任务的作业流程
 
@@ -487,6 +521,19 @@ D:\workself\pi-orb\
 4. 不修改参考项目算法去“适配”pi-orb 的偏好；需要差异时改适配层。
 5. 同批提交测试；`THIRD_PARTY_NOTICES.md` 与 `CHANGELOG.md` 同步更新。
 
+### 10.6 改打包、安装包或分发形态
+
+1. 先在 §9.4 的复用／不搬表里定位这一改动属于哪一类；涉及签名、自动更新、多平台时先停（§15）。
+2. 只改 `electron-builder.config.mjs` 与 `package.json` 的脚本；不要把 dsh 的 `prepare:*`
+   管道搬进来。
+3. 改动原生模块解包、`files` 裁剪或 `npmRebuild` 前，先回答“这会不会改变发出去的二进制”；
+   会的话必须重新跑全量原生证据，而不是只看打包是否成功。
+4. 跑 `node evidence/p2-05/run-p2-05.mjs`（构建 → 内容审计 → 打包产物启动探测），
+   两个 JSON 都要通过；只通过其中一个不算完成。
+5. 安装、卸载、升级、SmartScreen 的结论只能来自 `manual-acceptance.md` §9 的人工执行。
+6. `CHANGELOG.md`、`support-matrix.md`（保持“未验证”直到 §9 有结论）、`doc/p2-05-distribution.md`
+   三处同步；门禁会检查打包配置与审计记录是否仍在。
+
 ## 11. 与参考项目同步
 
 ### 11.1 重新获取检出
@@ -530,6 +577,8 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 | 真机证据 | 真实按键、多屏、DPI、高权限窗口、真实模型只能由 `doc/manual-acceptance.md` 的人工步骤判定 |
 | 反向对照 | 门禁类检查必须能证伪（参考 `evidence/p1-07/` 的“注入后必须失败”做法） |
 | 未验证标注 | 未取得结论的能力一律写“未验证”，不得用删除记录、放宽断言或 mock 变绿 |
+| 打包产物 | 不得用“安装包构建成功”代替证据：必须分别证明**包内有什么**（内容审计）与**它能不能跑**（启动打包产物并驱动 renderer / 调用一次真实桌面枚举） |
+| 人工边界 | 安装、卸载、升级、SmartScreen 属于干净环境人工项，登记在 `manual-acceptance.md` §9，不得在开发机上冒充已验证 |
 
 ## 14. 提交前检查清单
 
@@ -542,6 +591,8 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 - [ ] 测试是否覆盖拒绝路径与取消路径？真机项是否登记到 `manual-acceptance.md`？
 - [ ] 来源提交、许可证、`THIRD_PARTY_NOTICES.md`、`CHANGELOG.md` 是否同步？
 - [ ] `support-matrix.md` 是否需要按“已验证/未验证”更新（不得两处并存）？
+- [ ] 若改动打包配置：是否仍保持 `npmRebuild: false`、`asarUnpack` 原生模块、每用户 NSIS，
+      并跑过 `node evidence/p2-05/run-p2-05.mjs`？
 
 ## 15. 阻塞与停止规则
 

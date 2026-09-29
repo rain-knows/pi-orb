@@ -1,7 +1,7 @@
 /**
  * Floating orb geometry adapted from
  * deepseek-harness-orb/apps/desktop/src/floating-window.ts at
- * 72f1d738458a223696685a909e806b683eff5885.
+ * 72f1d738458a223696685a909e806b683eff5885 (MIT — see THIRD_PARTY_NOTICES.md §3.5).
  *
  * The geometry is intentionally kept in a small module so Pi session and
  * authorization code never owns the overlay layout rules.

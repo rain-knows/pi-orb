@@ -1,0 +1,60 @@
+{
+  "capturedAt": "2026-09-29T14:11:42.404Z",
+  "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790691102404",
+  "checks": [
+    {
+      "name": "the packaged application stays alive",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "the packaged application creates its window",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the packaged preload bridge reaches the renderer",
+      "ok": true,
+      "detail": "typeof window.orb = object"
+    },
+    {
+      "name": "the packaged renderer still has no Node access",
+      "ok": true,
+      "detail": "{\"require\":\"undefined\",\"process\":\"undefined\",\"module\":\"undefined\"}"
+    },
+    {
+      "name": "the packaged app answers IPC status",
+      "ok": true,
+      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"b"
+    },
+    {
+      "name": "the packaged app starts in the isolated unconfigured state",
+      "ok": true,
+      "detail": "configured=false reachable=false"
+    },
+    {
+      "name": "the built renderer bundle and its assets load from the archive",
+      "ok": true,
+      "detail": "{\"rootChildren\":1,\"orbNodes\":10,\"avatarLoaded\":true,\"avatarSrc\":\"file:///D:/workself/pi-orb/release/0.1.0/win-unpacked/resources/app.asar/out/renderer/assets/orb-avatar-BIleFNQm.png,file:///D:/workself/pi-orb/release/0.1.0/win-unpacked/reso"
+    },
+    {
+      "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
+      "ok": true,
+      "detail": "7 windows, first=\"\""
+    },
+    {
+      "name": "no desktop-driver failure was reported at startup",
+      "ok": true,
+      "detail": "none"
+    },
+    {
+      "name": "no module-resolution error was reported",
+      "ok": true,
+      "detail": "none"
+    }
+  ],
+  "passed": true,
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-70760\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/212e3986-bb69-4765-b99e-bf687e640738"
+}

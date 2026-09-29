@@ -111,20 +111,29 @@ which is MIT licensed:
 The following source files are imported from that fixed commit under
 `src/main/reference-windows/`:
 
-- `windows.ts`
-- `windows-native.ts`
+- `windows.ts` (one deliberate divergence: input paths release held keys and buttons in a `finally` block)
+- `windows-native.ts` (adapted to `koffi@2`; the reference declares `koffi@^3`)
 - `windows-foreground.ts`
-- `coordinates.ts`
+- `coordinates.ts` (trimmed to `mapNormalizedToGlobal`; the reference's unused validators are not carried)
 - `capture-exclude.ts`
 - `observation-limits.ts`
 - `wait.ts`
+- `backend.ts` (the local host-neutral contract replacing private DSH/Cordis types)
+
+The same commit's Electron shell is reused outside that directory:
+
+- `src/main/floating-geometry.ts` ← `apps/desktop/src/floating-window.ts` (geometry constants)
+- `src/main/floating-window-controller.ts` ← `apps/desktop/src/floating-window.ts` (window state machine)
+- `src/renderer/App.tsx`, `src/renderer/styles.css` ← `apps/desktop/renderer/floating.{html,css,js}`
+  (DOM, interaction language and styling; the dsh host protocol is replaced by pi-web's public API)
+- `src/main/selection-monitor.ts`, `src/main/windows-selection*.ts` ← `apps/desktop/src/selection-*.ts`,
+  `windows-selection*.ts` (selection reading; the reference's native toolbar is not ported)
 
 They retain the reference implementation's window selection, physical coordinate mapping, GDI
 capture, per-monitor DPI handling, Win32 `SendInput`, clipboard restoration and input cleanup. The
-small local `backend.ts` and `coordinate-mode.ts` files replace private DSH/Cordis types, and the
-imports use pi-orb's TypeScript build settings. The model-facing `orb_*` schemas, Pi session,
-authorization, bridge and screenshot confirmation flow remain pi-orb code. No reference plugin
-lifecycle, attachment store, or macOS/multi-display runtime was imported. This entry records both
+model-facing `orb_*` schemas, Pi session, authorization, bridge and screenshot confirmation flow
+remain pi-orb code. No reference plugin lifecycle, attachment store, configuration store, bundled
+`dsh` runtime, installer pages, or macOS/multi-display runtime was imported. This entry records both
 the source commit and the local adaptation boundary.
 
 ## 4. Components deliberately not included

@@ -63,8 +63,10 @@ pi-orb 的复用默认值应是“先复用参考项目已经跑通的软件实�
 
 ## 4. 验收门槛
 
-自动证据当前为：Vitest 319/319、P1-03 OS 探针通过、P1-06 当前参考 backend 真实模型 C7/D6/D8 通过、P1-07 release gate 32/32、生命周期
-回归 10/10、TypeScript/ESLint/build 通过。A4/A5 仍需人工真实键盘/托盘复测。
+自动证据当前为：Vitest 373/373（含移植的参考规格测试 23 条）、P1-03 OS 探针通过、P1-06 当前参考
+backend 真实模型 C7/D6/D8 通过、P1-07 release gate 47/47、生命周期回归 10/10、P2-05 产物内容审计
+25/25 与打包产物启动探测 10/10、TypeScript/ESLint/build 通过。A4/A5 仍需人工真实键盘/托盘复测；
+P2-05 的干净机安装／卸载／升级与 SmartScreen 属人工项。
 
 P1-05/C6 审计发现 broker 原先没有把撤权传播给正在执行的 native action，因此只验证 backend 的
 `AbortSignal` 释放不足以证明产品 Stop 可用。现已接通 broker → driver → 参考 backend 的取消信号；

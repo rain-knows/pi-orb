@@ -71,6 +71,61 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- **Windows distribution (P2-05).** pi-orb can now be built into something you can hand to someone:
+  `npm run package:win` produces a per-user NSIS installer and `npm run package:win:dir` an unpacked
+  app. The packaging posture is reused from the reference project's
+  `apps/desktop/scripts/electron-builder-config.mjs` — electron-builder driven by a JS config module,
+  NSIS as the only Windows target, per-user install with elevation disabled, `asar: true`, the
+  `**/*.{node,dll,exe}` unpack glob, and no update feed — while its dsh-monorepo release pipeline
+  (bundled runtime, custom NSIS pages, signing chain, upload flow) is deliberately not copied.
+  Three deviations from electron-builder's defaults are recorded with their reasons in
+  `doc/p2-05-distribution.md` §4: `npmRebuild: false` (the shipped binaries must be the prebuilt ones
+  every native evidence run used, not a fresh from-source build), a `files` exclusion list (smart
+  unpack otherwise ships koffi's C++ sources, its vendored headers and documentation, uiohook-napi's
+  vendored C sources and every other platform's `.node` — 129 unpacked files become 10), and
+  `resources/icon.ico` derived from the already-approved `src/renderer/orb-avatar.png` rather than a
+  new brand asset.
+- `evidence/p2-05/`: the stage is verified by two separate probes rather than by "the installer
+  built". `run-package-audit.mjs` (25/25) reads the built app and checks that the product files sit at
+  the paths the main process resolves at runtime, that the license obligations travel with the
+  artifact, and that no repository source, test, evidence file, credential, key, foreign-platform
+  binary or build toolchain leftover is inside. `run-packaged-smoke.mjs` (10/10) then launches the
+  packaged `pi-orb.exe` with an isolated profile and drives it over CDP: the bridge reaches the
+  renderer, the renderer still has no Node access, the built bundle and avatar load out of the asar,
+  and `orb:list-desktop-windows` returns real windows — which is the only external observation that
+  `koffi` loaded from `app.asar.unpacked`. Falsified by deleting that unpacked binary: the desktop
+  checks fail, and pass again once it is restored.
+- `doc/p2-05-distribution.md` and `doc/manual-acceptance.md` §9 (E1–E9): what is automated, and the
+  clean-machine install / uninstall / upgrade / SmartScreen steps that cannot be. The installer is
+  unsigned, so the unknown-publisher prompt is a recorded state, not a defect.
+- The release gate grows to 47 checks: it now also holds the packaging configuration to its
+  load-bearing properties (`asarUnpack` for native modules, per-user and non-elevating install,
+  `publish: null`, `npmRebuild: false`, third-party residue trimmed, `release/` ignored), requires the
+  P2-05 records to exist, and requires the recorded audit and probe results to have passed with their
+  native-binary checks intact.
+- `tests/reference-windows-foreground.test.ts` (10 cases) and `tests/reference-windows-input.test.ts`
+  (13 cases): the reference project's own specs for the ported Windows backend, now ported case by
+  case. They cover window selection (shell and overlay skipping, owner chains, transient unioning,
+  per-monitor separation), key mapping, extended keys, UIPI rejection, the clipboard
+  save-paste-restore order, wheel steps, focus restoration and cancellation. Six of them were
+  falsified by mutation before being accepted.
+- `doc/reference-playbook.md` §9.4 and §10.6: the packaging face of the reference index — what to
+  reuse, what never to copy, the three non-default decisions to check before touching the config, and
+  the procedure that requires both probes to pass.
+
+### Changed
+
+- The reuse playbook's §6.1/§6.2 audit findings were closed rather than left implied.
+  `src/main/reference-windows/coordinate-mode.ts` is deleted: it held two types with no live caller
+  while `src/shared/orb-tools.ts` owns the only validation implementation, and a dead file is exactly
+  what N8 forbids. `coordinates.ts` keeps only `mapNormalizedToGlobal` (9 of its 11 exports had no
+  caller); the file records that pixel encoding, if ever implemented, must be restored from the
+  pinned commit rather than re-derived. `UNFOCUSED_WINDOW_NOTE` is restored verbatim from the
+  reference, which had been truncated mid-sentence and left the model without the next step it should
+  take; the ported spec pins the literal. Every ported file now carries a repository + commit + path +
+  MIT header, and `THIRD_PARTY_NOTICES.md` §3.5 lists them individually, including the floating shell
+  and renderer files that were previously attributed only in prose.
+
 - `doc/reference-playbook.md`: the single entry point for reusing
   `deepseek-harness-orb` — where the pinned checkouts live, which reference file owns which
   behaviour (with line numbers), the constants and interaction specs that must match, the

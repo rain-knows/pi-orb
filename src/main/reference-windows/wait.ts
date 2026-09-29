@@ -1,5 +1,8 @@
 /**
  * Abortable delay used after GUI actions and by the wait and long_wait tools.
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `packages/experimental/tool-computer-use/src/wait.ts` (MIT). Unmodified; pi-orb has no wait tool
+ * yet, so only the abortable delay is live.
  * @module @deepseek-ai/dsh-experimental-tool-computer-use/src/wait
  */
 

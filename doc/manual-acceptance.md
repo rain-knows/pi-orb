@@ -268,6 +268,9 @@ node evidence/p1-06/run-p1-06.mjs
 node evidence/p1-06/run-real-model-c7.mjs
 node evidence/p1-07/run-lifecycle-regression.mjs
 node evidence/p1-07/run-release-gate.mjs
+
+# P2-05：打包与打包产物探测（需要先安装 electron-builder 依赖）
+node evidence/p2-05/run-p2-05.mjs
 ```
 
 > 后两个（`run-real-model-c7.mjs`、以及依赖真实前台的部分）需要**解锁的交互式桌面**；其余可随时重跑。
@@ -289,3 +292,32 @@ node evidence/p1-07/run-release-gate.mjs
 | macOS / Linux | 另一平台；Windows 结果不得外推 |
 | macOS 屏幕录制 / 辅助功能权限提示 | macOS |
 | 完整 v0.1 发布声明 | 上述各项有结论之后 |
+
+## 9. E 组：安装包在干净环境上的行为（P2-05）
+
+自动化已经证明的：产物可构建、内容可审计、打包后能启动并完成一次真实桌面枚举
+（`evidence/p2-05/`，25/25 + 10/10）。**未**证明的是安装行为本身——它写 HKCU 与用户目录，
+在已经装过的开发机上做不可复现，因此必须由人在干净环境（干净用户账户、或另一台机器、
+或一次性快照虚拟机）上执行。
+
+前置：已构建 `release/0.1.0/pi-orb-0.1.0-win-x64.exe`（`npm run package:win`）。
+记录前请确认测试账户中**没有**旧的 pi-orb 安装、且没有正在运行的 pi-orb。
+
+| 编号 | 步骤 | 预期 | 结论 |
+|---|---|---|---|
+| E1 | 双击安装包 | 出现安装向导（非一键静默）；可选安装目录；**不弹出 UAC 提权** | |
+| E2 | 安装到一个自定义目录并完成 | 安装成功；桌面与开始菜单出现 `pi-orb` 快捷方式 | |
+| E3 | 启动快捷方式 | 浮球出现；窗口标题为 `pi-orb`；未选工作区时显示 **Choose workspace** | |
+| E4 | 在 Windows「应用和功能」中确认条目 | 存在 `pi-orb` 条目，卸载命令指向安装目录内的卸载器 | |
+| E5 | 记录注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\*` 中 pi-orb 的 `InstallLocation` | 与实际安装目录一致（含或不含结尾分隔符都能定位） | |
+| E6 | **不卸载**直接再运行一次安装包（覆盖安装／升级） | 安装成功；不改动用户数据目录（`%APPDATA%\pi-orb`，含已选工作区与 `orb-config.json`） | |
+| E7 | 卸载（控制面板或安装目录内卸载器） | 安装目录被删除；开始菜单／桌面快捷方式消失 | |
+| E8 | 卸载后检查用户数据 | `%APPDATA%\pi-orb` 保留（或按产品声明的策略处理）；**用户选定的工作区目录内容一字未动**；pi-web 及其 `node_modules` 未被触碰 | |
+| E9 | 未签名安装包首次运行的 SmartScreen | 记录实际提示文案；确认是「未知发布者」而非失败 | |
+
+对 E9 的说明：v0.1 **不做代码签名**，因此首次运行必然出现未知发布者提示。这是已知且记录在案的
+状态，不是缺陷；不要为了让提示消失而临时禁用安全设置。
+
+记录规则同 §2。E 组任何一项得到结论后，回写本表并同步 `doc/support-matrix.md` §2／§3
+（不得两处并存）。在 E1–E9 全部有结论之前，`support-matrix.md` 中「Windows x64 安装包」保持
+**未验证**，且不得声明「已发布 v0.1」。

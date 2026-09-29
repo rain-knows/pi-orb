@@ -1,3 +1,13 @@
+/**
+ * Floating orb window lifecycle: geometry application, dock/expand transitions and display
+ * changes.
+ *
+ * Source: the window state machine in `deepseek-harness-orb` commit
+ * `72f1d738458a223696685a909e806b683eff5885`, `apps/desktop/src/floating-window.ts` (MIT — see
+ * `THIRD_PARTY_NOTICES.md` §3.5). The behaviour is reused; the host calls it makes (dsh RPC,
+ * overlay guard, observation frame) are not, because the Orb window here is a pi-orb shell over
+ * the user's existing pi-web.
+ */
 import { screen, type BrowserWindow } from "electron";
 import {
   FLOATING_BALL_WINDOW_SIZE,
