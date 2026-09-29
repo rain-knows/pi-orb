@@ -5,6 +5,21 @@ pi-orb adds a floating orb window with a dedicated working directory and an expl
 user-authorized desktop mode. It is **not** another agent harness: it reuses the
 existing pi-web / Pi session engine, model configuration and credentials.
 
+## Product direction
+
+pi-orb is a **non-destructive extension of pi-web**, built on Pi's supported plugin
+system and small Electron adapters. Its product shape, floating-window behavior,
+interaction language and desktop workflow are implemented by directly reusing the
+reference project [deepseek-harness-orb](https://github.com/rain-knows/deepseek-harness-orb)
+wherever possible. pi-web remains the owner of sessions, model loops, credentials and
+plugin loading; Orb-specific tools and prompts are scoped to the configured Orb workspace
+and explicit user authorization.
+
+The local read-only reference checkout used during development is
+`C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb`, pinned to
+`72f1d738458a223696685a909e806b683eff5885`. It is a research and source-audit checkout,
+not a runtime dependency. See [`AGENTS.md`](./AGENTS.md) for the reuse-first rules.
+
 - Development goals, non-destructive contract and acceptance matrix: [`doc/pi-orb-development-goals.md`](./doc/pi-orb-development-goals.md)
 - Technology choices and version boundaries: [`doc/tech-stack.md`](./doc/tech-stack.md)
 - Supported and unverified version combinations: [`doc/support-matrix.md`](./doc/support-matrix.md)
@@ -16,6 +31,11 @@ existing pi-web / Pi session engine, model configuration and credentials.
 
 **P1 feature-complete; not a complete v0.1 release.** All seven P1 tasks (`P1-01` … `P1-07`) are
 implemented and each has a reproducible record under [`evidence/`](./evidence/README.md).
+
+P2 work is now being delivered in small reference-reuse stages. P2-01's renderer shape follows
+the pinned DeepSeek Orb shell source and is recorded in [`doc/p2-01-reference-reuse.md`](./doc/p2-01-reference-reuse.md);
+the native drag, docking and multi-display acceptance remains explicitly unverified until its
+Electron window lifecycle is ported and tested.
 
 v0.1 is defined as M1 + M2 + M3 + P1-07:
 
