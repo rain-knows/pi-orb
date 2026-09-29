@@ -10,10 +10,21 @@
 悬浮窗和小型适配模块接入现有 pi-web；不复制或改写 pi-web 的会话引擎、模型循环、凭据管理和
 插件加载机制。普通 pi-web 会话必须保持原有行为，Orb 能力只在专用工作区和明确授权下出现。
 
-参考项目的本地只读检出位置：
-`C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb`
-（源提交：`72f1d738458a223696685a909e806b683eff5885`）。该目录只用于核对和移植，不作为
-pi-orb 的运行时依赖；源码复用仍须在本仓库保留来源提交、许可证和适配说明。
+参考项目的本地只读检出位置（按优先级）：
+
+| 位置 | 说明 |
+|---|---|
+| `D:\pi-orb-ref\deepseek-harness-orb` | **本机优选检出**，完整工作树，按需保留 |
+| `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb` | 早期文档记录的检出，同提交 |
+| `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-research` | 只读研究检出，同提交 |
+
+三个检出都固定在源提交 `72f1d738458a223696685a909e806b683eff5885`，只用于核对和移植，
+不作为 pi-orb 的运行时依赖；源码复用仍须在本仓库保留来源提交、许可证和适配说明。
+开发前先核对 `git -C D:\pi-orb-ref\deepseek-harness-orb rev-parse HEAD` 与该提交一致。
+
+**开发时的取材入口固定为 [`doc/reference-playbook.md`](./doc/reference-playbook.md)**：
+它给出参考文件索引、常量和交互规格、可复用／不可复用清单、各任务的作业流程以及与上游
+同步的步骤。新功能先在该手册定位参考实现，再决定移植或适配；不要凭印象“照参考风格写”。
 
 - 能直接移植参考项目代码、组件、样式或状态模型时，禁止自行重写等价实现。
 - 不能直接移植时，先记录参考项目对应文件、提交和差异，再写最小适配层。

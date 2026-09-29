@@ -1,5 +1,7 @@
 /**
- * Physical double-Alt gesture detection, adapted to the reference interaction contract.
+ * Physical double-Alt gesture detection. This is a pi-orb capability with no reference counterpart:
+ * deepseek-harness-orb has no global shortcut and no double-Alt gesture, so there is nothing to
+ * port here and nothing to claim parity with. See doc/reference-playbook.md §5.5.
  *
  * The detector only identifies the gesture. The caller decides what it means (pi-orb opens the
  * existing screenshot preview), so this module never captures a screen or sends a prompt.

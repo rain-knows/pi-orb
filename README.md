@@ -15,10 +15,18 @@ wherever possible. pi-web remains the owner of sessions, model loops, credential
 plugin loading; Orb-specific tools and prompts are scoped to the configured Orb workspace
 and explicit user authorization.
 
-The local read-only reference checkout used during development is
-`C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb`, pinned to
-`72f1d738458a223696685a909e806b683eff5885`. It is a research and source-audit checkout,
-not a runtime dependency. See [`AGENTS.md`](./AGENTS.md) for the reuse-first rules.
+The primary local read-only reference checkout is
+`D:\pi-orb-ref\deepseek-harness-orb`, pinned to
+`72f1d738458a223696685a909e806b683eff5885` (two further checkouts of the same commit are
+recorded in [`AGENTS.md`](./AGENTS.md)). They are research and source-audit checkouts, not runtime
+dependencies.
+
+Before changing anything that touches the floating shell, the desktop backend, the tool contract or
+the authorization path, start from
+[`doc/reference-playbook.md`](./doc/reference-playbook.md): it indexes the reference files, pins the
+constants and interaction specs that must match, lists what is reusable, adaptable or off limits, and
+gives the per-task procedure plus the upstream-sync steps. The reuse-first rules themselves are in
+[`AGENTS.md`](./AGENTS.md).
 
 - Development goals, non-destructive contract and acceptance matrix: [`doc/pi-orb-development-goals.md`](./doc/pi-orb-development-goals.md)
 - Technology choices and version boundaries: [`doc/tech-stack.md`](./doc/tech-stack.md)

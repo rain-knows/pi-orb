@@ -318,6 +318,36 @@ check(
   /P1/.test(readme) && /unverified/i.test(readme),
   "a release README must not present unverified capability as working",
 );
+check(
+  "the README points at the reference playbook that governs reuse",
+  readme.includes("doc/reference-playbook.md"),
+  "the reuse-first entry point must be reachable from the README",
+);
+
+// The reference playbook is the reuse-first entry point: it must record the pinned reference commit,
+// and the agent instructions must record where the local checkout lives and point at the playbook.
+// Without this an agent could start work without ever locating the reference source.
+const playbookPath = join(repo, "doc/reference-playbook.md");
+const playbook = existsSync(playbookPath) ? readFileSync(playbookPath, "utf8") : "";
+check(
+  "the reference playbook exists and pins the reference commit",
+  playbook.includes("72f1d738458a223696685a909e806b683eff5885"),
+  "doc/reference-playbook.md must name the pinned reference commit",
+);
+check(
+  "the reference playbook keeps the reuse index, the port procedure and the pre-commit checklist",
+  ["方面", "取材优先级", "常见开发任务的作业流程", "提交前检查清单"].every((fragment) =>
+    playbook.includes(fragment),
+  ),
+  "dropping a section would turn the playbook into prose instead of a working index",
+);
+const agentInstructions = readFileSync(join(repo, "AGENTS.md"), "utf8");
+check(
+  "the agent instructions record the local reference checkout and the playbook entry point",
+  agentInstructions.includes("D:\\pi-orb-ref\\deepseek-harness-orb") &&
+    agentInstructions.includes("doc/reference-playbook.md"),
+  "AGENTS.md must name the durable checkout location and the playbook",
+);
 
 // The contract cross-check has to exist and has to keep its unverified rows, so a release cannot
 // drop the N1-N8 comparison or the §7.1 coverage table to look complete.

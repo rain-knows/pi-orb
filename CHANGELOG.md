@@ -63,7 +63,33 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   generation starts at `1`, so every desktop request was refused as stale, and the bridge called an
   unknown session `stale-generation` too.
 
+- `src/main/double-alt.ts` claimed to be "adapted to the reference interaction contract", but
+  deepseek-harness-orb has no global shortcut and no double-Alt gesture at all. The gesture is a
+  pi-orb capability, so the header now says so instead of borrowing the reference project's
+  authority for a behaviour it does not have. The playbook audit that found this is described under
+  *Added*.
+
 ### Added
+
+- `doc/reference-playbook.md`: the single entry point for reusing
+  `deepseek-harness-orb` — where the pinned checkouts live, which reference file owns which
+  behaviour (with line numbers), the constants and interaction specs that must match, the
+  reusable / adaptable / off-limits split, the per-task procedure, the upstream sync steps and a
+  pre-commit checklist. Writing it produced a source-level audit of the existing port, recorded in
+  §6.1 and §6.3: the reference backend's `coordinates.ts`, `wait.ts`, `observation-limits.ts`,
+  `windows-foreground.ts` and `capture-exclude.ts` are byte-identical ports; `windows.ts` is a
+  deliberate improvement (it adds the `try/finally` key and button release the reference lacks);
+  `windows-native.ts` carries the `koffi@2` adaptations (`koffi.sizeof`, `koffi.address`) that a
+  future `koffi@3` upgrade must revisit. The audit also names what is still missing:
+  `coordinate-mode.ts` kept only its two types, seven declared backend methods have no caller, the
+  capture-exclude list is permanently empty, the `UNFOCUSED_WINDOW_NOTE` copy was truncated, and the
+  reference's `windows-foreground` invariants have no test.
+- The release gate now keeps the reuse entry point honest: it checks that
+  `doc/reference-playbook.md` exists, pins the reference commit and keeps its reuse index, port
+  procedure and checklist sections, and that `AGENTS.md` records the durable checkout and points at
+  the playbook. Gate count 32 → 36, still falsifiable in the same way as the other checks.
+- The local reference checkout is now recorded as `D:\pi-orb-ref\deepseek-harness-orb` (the durable
+  clone, same pinned commit) in `AGENTS.md` and `README.md`, alongside the two earlier temp checkouts.
 
 - `evidence/p1-06/run-real-model-c7.mjs`: the real-model C7 entry point (real pi-web + real model),
   isolated so it never reads or writes the user's running orb — its own `--user-data-dir` and

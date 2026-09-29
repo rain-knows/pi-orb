@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-29T12:52:33.784Z",
+  "capturedAt": "2026-09-29T13:28:28.926Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "13340 ms"
+      "detail": "12542 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "9170 ms"
+      "detail": "8574 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "5621 ms"
+      "detail": "7217 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4287 ms"
+      "detail": "5173 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -133,6 +133,26 @@
       "detail": "a release README must not present unverified capability as working"
     },
     {
+      "name": "the README points at the reference playbook that governs reuse",
+      "ok": true,
+      "detail": "the reuse-first entry point must be reachable from the README"
+    },
+    {
+      "name": "the reference playbook exists and pins the reference commit",
+      "ok": true,
+      "detail": "doc/reference-playbook.md must name the pinned reference commit"
+    },
+    {
+      "name": "the reference playbook keeps the reuse index, the port procedure and the pre-commit checklist",
+      "ok": true,
+      "detail": "dropping a section would turn the playbook into prose instead of a working index"
+    },
+    {
+      "name": "the agent instructions record the local reference checkout and the playbook entry point",
+      "ok": true,
+      "detail": "AGENTS.md must name the durable checkout location and the playbook"
+    },
+    {
       "name": "the contract matrix covers every non-destructive invariant N1-N8",
       "ok": true,
       "detail": "[\"N1\",\"N2\",\"N3\",\"N4\",\"N5\",\"N6\",\"N7\",\"N8\"]"
@@ -174,7 +194,7 @@
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 32,
+    "passed": 36,
     "failed": 0,
     "version": "0.1.0",
     "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files"
