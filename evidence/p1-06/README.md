@@ -152,7 +152,7 @@ broker 对策略拒绝返回 `{ ok:false, refused:true, reason }`，而桥服务
 node evidence/p1-06/run-real-model-c7.mjs
 ```
 
-它跑的是真实链路：丢弃式目标窗口 ← 参考项目 Windows native backend ← pi-Orb broker/bridge
+它跑的是真实链路：丢弃式目标窗口 ← 参考项目 Windows native backend ← pi-orb broker/bridge
 ← **真实 pi-web** ← **真实模型**（`TZcode/deepseek-v4.1-flash`，声明支持图像）。
 
 **隔离方式（本项的核心约束）**：

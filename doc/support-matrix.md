@@ -1,6 +1,6 @@
-# pi-Orb 支持矩阵
+# pi-orb 支持矩阵
 
-本文件是 pi-Orb 唯一的版本兼容性声明来源。**没有经过验收的组合一律标记为“未验证”**，不因代码可以编译、依赖可以安装或文档宣称跨平台而视为支持。
+本文件是 pi-orb 唯一的版本兼容性声明来源。**没有经过验收的组合一律标记为“未验证”**，不因代码可以编译、依赖可以安装或文档宣称跨平台而视为支持。
 
 - 维护规则见 [`pi-orb-development-goals.md`](./pi-orb-development-goals.md) §7.2（上游更新策略）。
 - 版本与许可取证的原始记录见 [`../evidence/p0-04/cua-artifact-manifest.json`](../evidence/p0-04/cua-artifact-manifest.json) 与 [`../evidence/p0-01/environment-baseline.json`](../evidence/p0-01/environment-baseline.json)。
@@ -12,7 +12,7 @@
 
 | 组件 | 版本 | 状态 | 依据 |
 |---|---|---|---|
-| pi-Orb | `0.1.0`（`Unreleased`） | 开发中 | 本仓库 `package.json` |
+| pi-orb | `0.1.0`（`Unreleased`） | 开发中 | 本仓库 `package.json` |
 | OS | Windows 11 x64（Build 26200） | 首发目标平台 | `evidence/p0-01/environment-baseline.json` |
 | Node.js | `24.19.0` | 开发基线 | `evidence/p0-01/environment-baseline.json` |
 | npm | `11.17.0` | 开发基线 | 同上 |
@@ -38,7 +38,7 @@
 | 依赖 | 约束 | 理由 |
 |---|---|---|
 | `electron` | **精确** `44.4.5` | 窗口、沙箱与跨 origin 行为必须锁定版本实测；P0-03 的第一个实测点就是该版本 |
-| `deepseek-harness-orb` Windows backend | **精确** `72f1d738458a223696685a909e806b683eff5885` | 直接导入并保留 MIT 通知；只在 pi-Orb 的 Pi/授权/bridge 边界做薄适配 |
+| `deepseek-harness-orb` Windows backend | **精确** `72f1d738458a223696685a909e806b683eff5885` | 直接导入并保留 MIT 通知；只在 pi-orb 的 Pi/授权/bridge 边界做薄适配 |
 | `@earendil-works/pi-coding-agent` | **精确** `0.87.1` | 与 pi-web `0.9.3` 的依赖对齐；扩展 API 以该版本的类型声明为准 |
 | `vite` | `7.3.6` | `electron-vite@5` 的 peer 范围是 `^5 \|\| ^6 \|\| ^7`，不含 `8` |
 | `typescript` | `5.9.3` | `typescript-eslint@8` 的 peer 上限为 `<6.1.0`，且不使用 TS 7 预览版 |
@@ -101,7 +101,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **向 Chromium/Electron 内容输入文本** | 后台投递对该窗口类不可用；前台升级已实现但未做到稳定投递 | 见 `evidence/p1-05/README.md` §4 |
 | 失败即停由真实驱动失败触发 | 由单测覆盖（`tests/desktop-broker.test.ts`）；整链路未构造真实驱动失败 | 部分验证 |
 | 同一任务锁在多会话并发下的行为 | 单测覆盖；整链路只覆盖单会话 | 未验证 |
-| 驱动内建授权语义（`desktopCaptureAuthorized`、`desktopUnlocked`、`escalate_session`） | 本阶段未使用；状态实测均为 false | **未验证**；产品侧授权仍由 pi-Orb 自己的任务授权与代次绑定负责 |
+| 驱动内建授权语义（`desktopCaptureAuthorized`、`desktopUnlocked`、`escalate_session`） | 本阶段未使用；状态实测均为 false | **未验证**；产品侧授权仍由 pi-orb 自己的任务授权与代次绑定负责 |
 | 窗口拖动/置顶/展开收起的人工体验 | 自动化只验证了窗口存在、标题、桥与聊天闭环 | 属人工确认；不得据自动断言宣称交互体验已验收 |
 | **快捷键的按键人工体验** | OS 注册、冲突诊断与释放已验证；真实 Electron + native hook 集成探针通过，但探针使用合成 F24 输入；真实键盘、AltGr/非 US 布局、锁屏/休眠恢复仍未复测 | 属人工确认；步骤见 `evidence/p1-03/README.md` |
 | 窗口位置的**跨启动**恢复 | 防抖保存已实现，但未做「移动→退出→重启→恢复」实测 | 未验证；不得宣称已支持 |
@@ -123,7 +123,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 本机 2560×1600 物理分辨率、约 150% 缩放；DPI-unaware 进程看到 1707×1067 | 桌面 helper 必须显式声明 per-monitor-v2 DPI awareness，否则截图坐标会被当作输入坐标而点错位置 |
 | 本机同时存在 `dpi=96`（42 窗口）与 `dpi=144`（256 窗口）两组窗口 | 换算不能假设全局单一比例 |
 | pi-web 的 abort 是协作式的 | 实测 abort 不中断底层 provider 请求：**不得**依赖 pi-web 的 abort 完成底层销毁；用户可观察保证（输出停止、任务锁释放）已验收 |
-| pi-web 工作树在基线捕获时已有 6 个用户改动文件 | 这些改动属用户所有，不得归因于 pi-Orb，也不得被本项目修改 |
+| pi-web 工作树在基线捕获时已有 6 个用户改动文件 | 这些改动属用户所有，不得归因于 pi-orb，也不得被本项目修改 |
 | Pi 无条件加载用户级 `~/.agents/skills`，`HOME` 运行时解析 | 该目录存在时会进入**所有**会话（含普通 cwd）的 prompt；Orb 只能承诺“不主动改变它” |
 | npm 11 默认拦截依赖安装脚本 | `electron` 与 `esbuild` 需显式 `npm approve-scripts`；`electron` 二进制经 `ELECTRON_MIRROR` 下载 |
 | 工作站锁屏时无法前置任何窗口 | 反射式唤醒路径无法把目标窗口记为“用户正在看的窗口”，截图授权链在第一步断掉；此时产品报「recorded window was replaced」对用户是**误导**（真正原因是没有可前置的窗口）。真实模型类验收必须在解锁的交互式桌面下进行。见 `evidence/p1-06/README.md` §5.1 |

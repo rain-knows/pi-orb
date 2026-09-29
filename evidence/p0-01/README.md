@@ -18,7 +18,7 @@
   - `components/SessionSidebar.tsx`
   - `docs/local-endfield-verification.md`
 
-这些文件属于已有工作树状态，后续不得归因于 pi-Orb。
+这些文件属于已有工作树状态，后续不得归因于 pi-orb。
 
 ## 变更文件哈希基线（可校验）
 
@@ -46,7 +46,7 @@ node evidence/p0-01/verify-baseline.mjs
 
 | 位置 | 本阶段是否写入 | 规则 |
 |---|---:|---|
-| pi-Orb 仓库 `evidence/**` | 是 | 只保存脱敏的版本、路径、状态和测试结果 |
+| pi-orb 仓库 `evidence/**` | 是 | 只保存脱敏的版本、路径、状态和测试结果 |
 | pi-web 工作树 | 否 | 不编辑、不安装扩展、不修改 `node_modules` |
 | 用户 Pi 配置／凭据 | 否 | 使用隔离目录或静态/离线测试；不得读取或覆盖真实凭据 |
 | 用户屏幕／截图 | 是（仅 P0-04，经用户许可） | 只读、每次 1 张、像素零落盘 |

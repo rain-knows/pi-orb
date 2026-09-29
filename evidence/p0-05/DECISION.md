@@ -31,7 +31,7 @@ P0-02 在真实 pi-web 装配下（固定 HEAD 快照 + 独立 `npm ci` + `next 
 - **候选：Cua Driver（trycua/cua）**，版本与许可已通过 `npm pack` 制品取证锁定（**未安装、未运行**）：
   - `@trycua/cua-driver@0.30.1`（wrapper，MIT）；`@trycua/cua-driver-win32-x64-msvc@0.30.1`（**`MIT AND MPL-2.0`**）。
   - 取证内容：tarball 及二进制 SHA-256、包内文件清单、能力符号枚举。详见 `evidence/p0-04/cua-artifact-manifest.json`。
-  - **许可差异**：真正交付的原生二进制在平台包里，许可不是纯 MIT。上游自带 `node-runtime-NOTICE.md`：其中一个 `.node` 文件是 MPL-2.0 派生构建，对应源码由上游在匹配 tag 提供。MPL-2.0 是文件级弱 copyleft，不传染整个 pi-Orb；分发需附 NOTICE 并告知如何取得对应源码。
+  - **许可差异**：真正交付的原生二进制在平台包里，许可不是纯 MIT。上游自带 `node-runtime-NOTICE.md`：其中一个 `.node` 文件是 MPL-2.0 派生构建，对应源码由上游在匹配 tag 提供。MPL-2.0 是文件级弱 copyleft，不传染整个 pi-orb；分发需附 NOTICE 并告知如何取得对应源码。
   - **残留不确定**：NOTICE 只点名 `.node`，而包许可字段含 MPL；26.8 MB 的 `cua_driver_sdk.dll` 未被 NOTICE 点名。P1-07 打包前必须核实，不得假定。
   - **能力面（从制品声明实际枚举）**：动作类（click/drag/move/type/press/hotkey/scroll/invoke-menu）、观察类（list-windows/apps、get-window-state/desktop-state/screen-size、snapshot、parse-visual-regions）、显式坐标空间 `VisualActionCoordinateSpace`、验证与升级原语（`ActionEvidence`、`VerifyState`、`BoundsExpectation`、`ActionEscalation`）、会话级授权（start/end/escalate、`DriverAuthorizationHost`）。
   - **平台权限不对称**：SDK 含 macOS 专属权限 API，未发现 Windows 对应符号；权限状态不能用单一跨平台形状建模。

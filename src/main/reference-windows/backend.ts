@@ -1,6 +1,6 @@
 /**
  * Host-neutral contracts copied from deepseek-harness-orb's computer-use backend.
- * The Pi/Cordis session types are intentionally omitted; pi-Orb owns that boundary.
+ * The Pi/Cordis session types are intentionally omitted; pi-orb owns that boundary.
  */
 
 export type ImageMediaType = "image/png" | "image/jpeg" | "image/gif" | "image/webp";

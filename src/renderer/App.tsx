@@ -255,7 +255,7 @@ export function App() {
   return (
     <div className="orb">
       <header className="orb__header">
-        <span className="orb__title">pi-Orb</span>
+        <span className="orb__title">pi-orb</span>
         <span className="orb__header-actions">
           <button
             type="button"

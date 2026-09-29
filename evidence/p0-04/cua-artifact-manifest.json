@@ -75,7 +75,7 @@
     "summary": "The wrapper package and the JS SDK layer are MIT. The native Windows package is declared 'MIT AND MPL-2.0' because one shipped file is an MPL-2.0-derived build, which is why the naive reading 'the repo is MIT' is incomplete.",
     "upstreamNoticeFile": "node-runtime-NOTICE.md",
     "upstreamNoticeVerdict": "cua_driver_node_runtime.node is a compatibility build derived from the N-API runtime in uniffi-bindgen-react-native 0.31.0-3, licensed MPL-2.0; upstream states the corresponding source is the pinned npm dependency plus the deterministic transformations in scripts/build-node-runtime.mjs, available at the release tag matching this package.",
-    "obligationForRedistribution": "MPL-2.0 is file-level weak copyleft. Shipping these artifacts unmodified requires carrying the NOTICE and telling recipients how to obtain the corresponding source (upstream already provides that path). It does not make the rest of pi-Orb MPL.",
+    "obligationForRedistribution": "MPL-2.0 is file-level weak copyleft. Shipping these artifacts unmodified requires carrying the NOTICE and telling recipients how to obtain the corresponding source (upstream already provides that path). It does not make the rest of pi-orb MPL.",
     "residualUncertainty": "The NOTICE names only cua_driver_node_runtime.node. The package license field is 'MIT AND MPL-2.0' and the 26.8 MB cua_driver_sdk.dll is listed in the same package, but the DLL is not explicitly named by the notice. Whether the DLL carries MPL obligations must be confirmed before release packaging (P1-07) rather than assumed either way.",
     "otherLicenseBoundaries": [
       "ClawHub skill copies are MIT-0 (not the repo license)",
@@ -115,7 +115,7 @@
     },
     "evidenceAndVerificationSemantics": {
       "symbols": ["ActionEvidence", "ActionResult", "ActionDelivery", "ActionEscalation", "VerifyStateInput", "VerifyStateOutput", "BoundsExpectation", "StatePredicate", "PredicateOutcome"],
-      "significance": "The driver exposes post-action verification and escalation primitives. This is the mechanism P1-06 needs for 'one action, one observation' and for refusing to continue a batch after a failed action, so pi-Orb should drive verification through it rather than reimplementing state comparison."
+      "significance": "The driver exposes post-action verification and escalation primitives. This is the mechanism P1-06 needs for 'one action, one observation' and for refusing to continue a batch after a failed action, so pi-orb should drive verification through it rather than reimplementing state comparison."
     },
     "authorizationModel": {
       "symbols": ["StartSessionInput", "EndSessionInput", "EscalateSessionInput", "ListSessionsInput", "GetSessionStateInput", "DriverAuthorizationRequest", "DriverAuthorizationDecision", "DriverAuthorizationHost", "RuntimeAuthorizationOptions", "TrustedSessionOptions"],

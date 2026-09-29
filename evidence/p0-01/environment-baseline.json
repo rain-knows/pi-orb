@@ -34,7 +34,7 @@
     "piSdk": "0.87.1"
   },
   "writes": {
-    "piOrbRepo": "evidence/** and future pi-Orb source only",
+    "piOrbRepo": "evidence/** and future pi-orb source only",
     "piWeb": "none",
     "userPiConfig": "none",
     "screenshots": "none",

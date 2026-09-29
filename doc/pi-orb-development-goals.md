@@ -1,7 +1,7 @@
-# pi-Orb 开发目标与优先级
+# pi-orb 开发目标与优先级
 
 - 文档版本：0.1；依据截至 2026-09-29 的对话和本机源码核对。
-- 项目暂定名称：**pi-Orb**。定位：pi-web 的开源 Electron 桌面伴随项目，不是另一个 agent harness。
+- 项目暂定名称：**pi-orb**。定位：pi-web 的开源 Electron 桌面伴随项目，不是另一个 agent harness。
 - 本文件同时保留原始开发目标和当前验收状态；实现结论以 `doc/support-matrix.md` 和对应 evidence 为准。
 - 第一原则：**非破坏性优先于功能数量、界面一致性和开发捷径。**
 - 前置研究：DeepSeek Orb → pi Computer Use 可行性调研（原文档不在当前仓库，暂不提供失效的仓内链接）。本文件采纳后续对话的新方向：Electron 悬浮窗是产品核心；不再把它排除在产品 MVP 之外。旧报告中“无浮球工具插件”的 MVP 只作为能力研究，不作为本项目最终范围。
@@ -67,9 +67,9 @@
 | 项目 | 地址及已核对基线 | 主要借鉴 | 不直接搬运 |
 |---|---|---|---|
 | **pi-web** | https://github.com/agegr/pi-web ；本次抓取的远端 `main` 历史中未找到文档原记录的 `95a58744532c7fccaa933aa7757a1419ace67ed2`，按 SHA 抓取返回 `not our ref`；本机 package `@agegr/pi-web@0.9.3`，依赖 Pi SDK `0.87.1` | 会话创建、API/SSE、历史读取、图片消息、扩展 UI 响应与资源加载 | 不复制整个服务端，不长期维护改名 fork，不假设 HTTP API 是永不变的公开 SDK |
-| **DeepSeek Orb** | https://github.com/rain-knows/deepseek-harness-orb ；Git `72f1d738458a223696685a909e806b683eff5885`；根 README 称基于 dsh 0.1.7，实验包声明 `0.1.7-rc.1` | 直接复用浮球交互、观察窗口裁剪、坐标投影、动作后回图、overlay 排除，以及 `tool-computer-use` 的 Windows `koffi/GDI/SendInput/clipboard` backend 和测试模式 | 只保留 pi-Orb 必需的 pi-web 会话、授权和 bridge 边界；不搬 Cordis 装配、dsh 附件引用格式、后台自动审批。Cua MCP/native driver 目录只用于对照实验，不作为第二套生产后端 |
+| **DeepSeek Orb** | https://github.com/rain-knows/deepseek-harness-orb ；Git `72f1d738458a223696685a909e806b683eff5885`；根 README 称基于 dsh 0.1.7，实验包声明 `0.1.7-rc.1` | 直接复用浮球交互、观察窗口裁剪、坐标投影、动作后回图、overlay 排除，以及 `tool-computer-use` 的 Windows `koffi/GDI/SendInput/clipboard` backend 和测试模式 | 只保留 pi-orb 必需的 pi-web 会话、授权和 bridge 边界；不搬 Cordis 装配、dsh 附件引用格式、后台自动审批。Cua MCP/native driver 目录只用于对照实验，不作为第二套生产后端 |
 
-两个仓库根 LICENSE 都是 MIT。pi-web 为 `Copyright (c) 2026 agegr`，DeepSeek 仓库为 `Copyright (c) 2026 DeepSeek`。借用实质性代码时保留版权及许可文本，逐文件记录来源提交／修改；检查原生依赖、二进制和素材各自许可。MIT 不授予第三方商标背书，不把 pi-Orb 描述为上游官方产品。DeepSeek Orb 的 `THIRD_PARTY_NOTICES.md` 是审阅入口，不代替新依赖的许可证检查。
+两个仓库根 LICENSE 都是 MIT。pi-web 为 `Copyright (c) 2026 agegr`，DeepSeek 仓库为 `Copyright (c) 2026 DeepSeek`。借用实质性代码时保留版权及许可文本，逐文件记录来源提交／修改；检查原生依赖、二进制和素材各自许可。MIT 不授予第三方商标背书，不把 pi-orb 描述为上游官方产品。DeepSeek Orb 的 `THIRD_PARTY_NOTICES.md` 是审阅入口，不代替新依赖的许可证检查。
 
 上文旧 `pi-web` 提交及其证据链接属于历史调研基线；后续开发应以用户维护的 fork 实际提交重新核验。
 
@@ -108,11 +108,11 @@ DeepSeek Orb 代码索引：
 
 这不是“参考风格”清单，而是实现决策：
 
-1. **先搬已经验证的实现，再写适配。** Windows 桌面能力以参考项目 `packages/experimental/tool-computer-use/src/windows.ts`、`windows-native.ts`、`windows-foreground.ts`、`coordinates.ts` 和对应测试为源代码基线。pi-Orb 只把它们接到自己的 `DesktopTaskController`、Pi 工具协议和 named-pipe bridge。
+1. **先搬已经验证的实现，再写适配。** Windows 桌面能力以参考项目 `packages/experimental/tool-computer-use/src/windows.ts`、`windows-native.ts`、`windows-foreground.ts`、`coordinates.ts` 和对应测试为源代码基线。pi-orb 只把它们接到自己的 `DesktopTaskController`、Pi 工具协议和 named-pipe bridge。
 2. **Cua 只做探针，不做长期 fallback。** P0/P1 的 Cua 探针保留为证据脚本；当参考 backend 覆盖桌面观察、点击、输入和滚动后，删除运行时 Cua action path、foreground escalation 和“失败后换另一后端”的兼容逻辑。Orb 的 Electron 截图预览仍是独立的用户确认边界。
 3. **同一能力只保留一个实现。** `SendInput`、窗口激活、剪贴板、坐标换算和滚轮投递不得同时存在 PowerShell、Cua、native 三套生产路径。替换完成后删除旧文件、旧选项和旧测试，不以 feature flag 或静默回退保留。
 4. **集成边界不能复制上游内部系统。** pi-web/Pi session、Orb 授权、代次、目标窗口记录和 bridge 是本项目边界；模型循环、桌面策略和平台输入实现来自上游并保持其语义。
-5. **验收以目标事实为准。** 上游函数返回成功只能证明调用完成；截图像素、目标事件日志和文本读回才是 pi-Orb 的通过证据。D6 若目标没有 `wheel` 和 `scrollTop` 变化，必须保留失败并继续替换/修复唯一生产 backend。
+5. **验收以目标事实为准。** 上游函数返回成功只能证明调用完成；截图像素、目标事件日志和文本读回才是 pi-orb 的通过证据。D6 若目标没有 `wheel` 和 `scrollTop` 变化，必须保留失败并继续替换/修复唯一生产 backend。
 
 ## 4. 目标架构与责任划分
 
@@ -121,7 +121,7 @@ DeepSeek Orb 代码索引：
 | 层 | 责任 | 不负责 |
 |---|---|---|
 | pi-web 原服务 | Pi 会话与消息循环、模型与凭据、已有插件资源和历史；正常浏览器客户端继续工作 | 不默认成为远程桌面控制服务器，不因 Orb 改变所有会话提示 |
-| pi-Orb Electron 壳 | 窗口／托盘／唤醒、专用目录设置、截图预览、原生授权、桌面能力生命周期 | 不另起一套 Pi 会话引擎，不给 renderer Node 或任意 shell 权限 |
+| pi-orb Electron 壳 | 窗口／托盘／唤醒、专用目录设置、截图预览、原生授权、桌面能力生命周期 | 不另起一套 Pi 会话引擎，不给 renderer Node 或任意 shell 权限 |
 | Orb Pi 扩展 | 识别专用 cwd、模式命令、工具注册／选择、追加提示词、动作结果图片、每次执行校验 | 不修改实际会话 cwd、不修改用户 global defaultTools、不把提示词当授权 |
 | pi-web 客户端适配 | 小范围封装会话创建、图片发送、SSE、状态和停止；重用协议行为 | 不访问 pi-web 内部 globalThis 注册表，不 hook 私有方法 |
 | 单一桌面后端 | 窗口观察、截图、输入与释放；可能由 Electron 主进程管理的独立 native helper／Cua 子进程执行 | 不自行选择模型、不拥有聊天循环、不自行提升桌面授权 |
@@ -169,7 +169,7 @@ Pi 扩展位于 pi-web Node 服务，Electron renderer→main 的 IPC **不能�
 | P0-04 驱动候选只读探针 | P0-01，实际截图前明确许可 | 锁定 Cua 候选版本／许可证、工具目录、权限状态、截图样本元数据及耗时；同时固定参考项目 native backend 的 source/test 基线 | 工具发现、目标窗口身份、图片解码／尺寸、坐标约定、只读取消、关机清理有记录；可说明 Cua 与 native 的差异 | 不发送鼠标键盘，不把“截图正常”当点击准确；Cua 只作为证据探针，不升级为第二条生产后端 |
 | P0-05 选择最小接入方案 | P0-02、P0-03、P0-04 | 一页决策：直接复用参考项目 native backend，接入 Orb 授权/bridge；记录未通过项和最小适配边界 | 原生 backend 的 source/test 移植计划和依赖许可成立后进入 P1；必须改上游时列符号、原因、默认行为及测试，请用户决定 | 不接受 Cua/native 双轨；不自动接受长期 fork；未决定双 Alt 不阻塞普通快捷键路线 |
 
-### P1：最小可用 pi-Orb
+### P1：最小可用 pi-orb
 
 #### 里程碑 M1：独立小窗能正常聊天，不含自动输入
 
@@ -258,7 +258,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 
 ### 7.2 上游更新策略
 
-1. 记录支持组合：pi-Orb 版本、pi-web 版本／提交、Pi SDK 版本、Electron 版本、驱动版本和 OS。没有测试的组合称“未验证”，不自动宣称兼容。
+1. 记录支持组合：pi-orb 版本、pi-web 版本／提交、Pi SDK 版本、Electron 版本、驱动版本和 OS。没有测试的组合称“未验证”，不自动宣称兼容。
 2. 上游更新进入独立测试环境，先对 W1–W5/P1–P3 的接入合同跑 CI；再运行本机桥和关键截图／输入 smoke。不得直接更新正在处理用户任务的共享服务。
 3. 适配只集中在小模块，使用明确边界；变动超过这个边界，先讨论上游通用扩展点。无需在 Orb 里保留被废弃的旧 API 路径。
 4. 发布通过验证的新支持组合和变更说明。升级失败保留用户数据、停止启用不兼容桌面能力；用户可选择重新安装已验证发行版。**这是发布版本选择，不是在代码中建设永久兼容层或迁移兜底。**
@@ -284,7 +284,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 
 | 对话要求 | 文档覆盖 |
 |---|---|
-| 独立开源 pi-Orb、易维护 | §1、§2、§4、§7.2 |
+| 独立开源 pi-orb、易维护 | §1、§2、§4、§7.2 |
 | 非破坏性第一、方便更新 pi-web | N1–N8、P0、P1-07、§7.2 |
 | 共享 Pi/插件而悬浮窗有专用模式 | §4.1–4.3、P0-02、P1-06 |
 | 专用 cwd 设置，不要求 cwd 强隔离 | §1、§4.2、P1-01、§6.2 |

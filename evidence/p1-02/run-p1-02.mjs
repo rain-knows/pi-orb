@@ -447,7 +447,7 @@ try {
 
   // --- A. window and security posture --------------------------------------
   check("electron shell is alive", electron.exitCode === null, `exitCode=${electron.exitCode}`);
-  check("orb window exists", pageTarget.title === "pi-Orb", pageTarget.title);
+  check("orb window exists", pageTarget.title === "pi-orb", pageTarget.title);
   check("preload bridge is exposed", (await evaluate(client, "typeof window.orb")) === "object");
   const sandbox = JSON.parse(
     await evaluate(client, "JSON.stringify({require: typeof require, process: typeof process, module: typeof module, Buffer: typeof Buffer})"),
@@ -606,7 +606,7 @@ try {
   result.stopPropagation = {
     modelAcceptedRequest: slowRequest !== undefined,
     providerStreamDisconnectedByPiWeb: slowRequest?.clientDisconnected === true,
-    note: "pi-web's abort is cooperative: the agent loop stops at the next checkpoint. A false value here means the in-flight provider request was allowed to finish rather than being torn down, which is pi-web behaviour and not a pi-Orb guarantee.",
+    note: "pi-web's abort is cooperative: the agent loop stops at the next checkpoint. A false value here means the in-flight provider request was allowed to finish rather than being torn down, which is pi-web behaviour and not a pi-orb guarantee.",
   };
 
   // The lock must be free again: a later message has to be accepted, not refused.

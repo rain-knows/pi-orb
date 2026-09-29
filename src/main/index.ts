@@ -1,5 +1,5 @@
 /**
- * Electron main process for pi-Orb.
+ * Electron main process for pi-orb.
  *
  * Responsibilities (doc/pi-orb-development-goals.md §4.1):
  *  - own the window, tray and global wake shortcut,
@@ -428,7 +428,7 @@ function requireBroker(): DesktopBroker {
  *
  * Probes reachability before authenticating, so "nothing is listening" and
  * "authentication failed" produce different, actionable messages. Never starts,
- * restarts or stops the service: pi-Orb connects to an existing pi-web and
+ * restarts or stops the service: pi-orb connects to an existing pi-web and
  * reports when there is none (invariant N4).
  */
 async function refreshPiWebState(): Promise<void> {
@@ -587,7 +587,7 @@ function revokeDesktopOperations(reason: string): void {
 
 function createTray(): void {
   tray = new Tray(createTrayIcon());
-  tray.setToolTip("pi-Orb");
+  tray.setToolTip("pi-orb");
   tray.setContextMenu(
     Menu.buildFromTemplate([
       // "Show" is an explicit wake, not a toggle: a menu item labelled Show must never hide a focused

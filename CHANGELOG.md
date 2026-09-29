@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to pi-Orb are recorded here. The format follows
+All notable changes to pi-orb are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -251,6 +251,6 @@ application:
 - `0.x` while the minimum usable product is incomplete. Minor versions add capability,
   patch versions fix defects; a breaking change to the configuration schema or the IPC
   contract raises the minor version and is described here.
-- A release records its verified combination (pi-Orb, Node, Electron, Pi SDK, pi-web,
+- A release records its verified combination (pi-orb, Node, Electron, Pi SDK, pi-web,
   desktop driver, OS) in the support matrix. Verified rows are evidence-backed; see the
   linked file under `evidence/`.

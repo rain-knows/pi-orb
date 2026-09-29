@@ -1,18 +1,18 @@
-# pi-Orb third-party notices
+# pi-orb third-party notices
 
-This file records the third-party components redistributed with a pi-Orb Windows x64 release, and
+This file records the third-party components redistributed with a pi-orb Windows x64 release, and
 the license obligations that follow. It is generated and checked against
 [`evidence/p1-07/license-inventory.json`](./evidence/p1-07/license-inventory.json), which is
 reproducible with `node evidence/p1-07/collect-licenses.mjs`.
 
-- Inventory captured for: pi-Orb `0.1.0` (unreleased), Windows x64
+- Inventory captured for: pi-orb `0.1.0` (unreleased), Windows x64
 - Desktop backend: Windows source imported from `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885` (MIT)
 - Windows native FFI: `koffi@2.14.1` (MIT)
 - Keyboard edge detection: `uiohook-napi@1.5.5` (MIT)
 
-## 1. pi-Orb itself
+## 1. pi-orb itself
 
-pi-Orb is MIT licensed (see [`LICENSE`](./LICENSE)). Its own source is the only first-party code in
+pi-orb is MIT licensed (see [`LICENSE`](./LICENSE)). Its own source is the only first-party code in
 a release.
 
 ## 2. Redistributed components by license
@@ -36,7 +36,7 @@ under `notInstalledOnThisPlatform` in the inventory rather than being silently o
 ## 3. Historical Cua evidence
 
 The repository contains historical Cua probe records under `evidence/p0-04` and `evidence/p1-05`.
-Those packages are no longer production dependencies and are not redistributed by current pi-Orb.
+Those packages are no longer production dependencies and are not redistributed by current pi-orb.
 The following records are retained only to explain the earlier P1 investigation and the decision to
 replace that path with the imported MIT backend.
 
@@ -44,7 +44,7 @@ replace that path with the imported MIT backend.
 
 MPL-2.0 is file-level weak copyleft. Redistributing these artifacts unmodified requires carrying the
 notice and telling recipients how to obtain the corresponding source. It does not make the rest of
-pi-Orb MPL, and it does not require publishing pi-Orb's own source.
+pi-orb MPL, and it does not require publishing pi-orb's own source.
 
 ### 3.1 Which files carry MPL-2.0
 
@@ -122,8 +122,8 @@ The following source files are imported from that fixed commit under
 They retain the reference implementation's window selection, physical coordinate mapping, GDI
 capture, per-monitor DPI handling, Win32 `SendInput`, clipboard restoration and input cleanup. The
 small local `backend.ts` and `coordinate-mode.ts` files replace private DSH/Cordis types, and the
-imports use pi-Orb's TypeScript build settings. The model-facing `orb_*` schemas, Pi session,
-authorization, bridge and screenshot confirmation flow remain pi-Orb code. No reference plugin
+imports use pi-orb's TypeScript build settings. The model-facing `orb_*` schemas, Pi session,
+authorization, bridge and screenshot confirmation flow remain pi-orb code. No reference plugin
 lifecycle, attachment store, or macOS/multi-display runtime was imported. This entry records both
 the source commit and the local adaptation boundary.
 
@@ -133,12 +133,12 @@ the source commit and the local adaptation boundary.
 |---|---|
 | `cua-agent[omni]` | pulls in `ultralytics`, which is AGPL-3.0 |
 | ClawHub skill copies | MIT-0; a separate distribution, not part of this package |
-| Kasm (MIT), OmniParser (CC-BY-4.0) | not redistributed by pi-Orb |
+| Kasm (MIT), OmniParser (CC-BY-4.0) | not redistributed by pi-orb |
 | Any `darwin-*` / `linux-*` / `win32-arm64` platform package | not installed on Windows x64, so not shipped |
 
 ## 5. Trademarks
 
-pi-Orb is an independent open-source project. It is not affiliated with, endorsed by, or an official
+pi-orb is an independent open-source project. It is not affiliated with, endorsed by, or an official
 product of the pi-web, Pi, Cua or DeepSeek projects. The MIT licenses of those projects do not grant
 trademark rights.
 

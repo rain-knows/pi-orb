@@ -1,6 +1,6 @@
 // P1-07 release gate.
 //
-// The executable gate for a pi-Orb release. It answers the questions the development goals attach to
+// The executable gate for a pi-orb release. It answers the questions the development goals attach to
 // P1-07 (§7.1, §7.2) plus the non-destructive contract, so "v0.1 is ready" is a reproducible fact
 // rather than a statement:
 //

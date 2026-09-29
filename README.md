@@ -1,7 +1,7 @@
-# pi-Orb
+# pi-orb
 
 An open-source Electron desktop companion for [pi-web](https://github.com/agegr/pi-web).
-pi-Orb adds a floating orb window with a dedicated working directory and an explicit,
+pi-orb adds a floating orb window with a dedicated working directory and an explicit,
 user-authorized desktop mode. It is **not** another agent harness: it reuses the
 existing pi-web / Pi session engine, model configuration and credentials.
 
@@ -42,7 +42,7 @@ native input, cancellation or key-release check.
 | `src/preload/` | Sandboxed `contextBridge` bridge; the only channel between renderer and main |
 | `src/renderer/` | React UI for the orb window |
 | `src/shared/` | Code shared by main, preload, renderer and the Pi extension (configuration schema and matching rules, IPC contract) |
-| `pi-package/` | Pi resources shipped with pi-Orb; `extensions/orb.ts` is the Orb mode entry point |
+| `pi-package/` | Pi resources shipped with pi-orb; `extensions/orb.ts` is the Orb mode entry point |
 | `tests/` | Unit tests for pure logic and the workspace rules |
 | `evidence/` | Reproducible verification records, per P0/P1 stage |
 | `doc/` | Goals, technology choices, support matrix and supporting research |
@@ -80,13 +80,13 @@ npm run build
 | `PI_ORB_PI_WEB_PASSWORD` | pi-web password used by the main process. |
 | `PI_ORB_CONFIG` | Overrides the Orb configuration path. The Pi extension reads the same variable. |
 
-Credentials stay in the Electron main process. pi-Orb never starts, restarts or stops
+Credentials stay in the Electron main process. pi-orb never starts, restarts or stops
 a pi-web service it did not start itself.
 
 ### Installing the Pi extension
 
 The Orb tools exist only in a session whose Pi configuration declares this repository's package.
-pi-Orb does **not** register it for you — writing into your Pi settings would modify your environment
+pi-orb does **not** register it for you — writing into your Pi settings would modify your environment
 unasked — so it is one explicit step, using the official CLI:
 
 ```powershell
@@ -111,11 +111,11 @@ The following are contract requirements, not aspirations
 
 - **N1–N3** A session whose working directory is not the configured Orb workspace
   gains no tool, no command and no prompt section.
-- **N4** pi-Orb only connects to an existing pi-web. It never takes ownership of a
+- **N4** pi-orb only connects to an existing pi-web. It never takes ownership of a
   service it did not start.
 - **N5** Two clients may browse the same session; only one entry point holds control
   of a task.
-- **N6** Installing, closing or removing pi-Orb deletes no user workspace file and no
+- **N6** Installing, closing or removing pi-orb deletes no user workspace file and no
   history.
 - **N7** Disconnect, reload, session change, lock and exit revoke desktop authority
   and release keys, mouse, locks and listeners.
@@ -126,12 +126,12 @@ The following are contract requirements, not aspirations
 `~/.agents/skills` unconditionally, resolved from `HOME` at runtime and independent
 of both `cwd` and `agentDir` (see [`evidence/p0-01/README.md`](./evidence/p0-01/README.md)).
 When that directory exists it reaches the prompt of **every** session, including
-normal non-Orb ones. pi-Orb therefore promises that it does not actively change those
+normal non-Orb ones. pi-orb therefore promises that it does not actively change those
 prompts — it cannot promise the prompt content is byte-identical.
 
 ## Licensing
 
-pi-Orb is MIT licensed (see [`LICENSE`](./LICENSE)).
+pi-orb is MIT licensed (see [`LICENSE`](./LICENSE)).
 
 Third-party obligations are recorded in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
 The bundled desktop backend is the MIT licensed Windows implementation imported from

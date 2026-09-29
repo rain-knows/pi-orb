@@ -1,4 +1,4 @@
-# pi-Orb 技术栈与选型依据
+# pi-orb 技术栈与选型依据
 
 - 文档状态：当前实现基线与选型记录
 - 依据：[`pi-orb-development-goals.md`](./pi-orb-development-goals.md) 及其中记录的 Pi、pi-web、Electron 和 DeepSeek Orb 证据；FFF/LSP 仅作为可选开发工具另行评估
@@ -6,7 +6,7 @@
 
 ## 1. 结论
 
-pi-Orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi-web/Pi 会话服务 + Pi 扩展 + 独立桌面能力适配器**的最小分层架构。
+pi-orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi-web/Pi 会话服务 + Pi 扩展 + 独立桌面能力适配器**的最小分层架构。
 
 首发建议如下：
 
@@ -23,7 +23,7 @@ pi-Orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi
 | Orb 自有配置 | Electron `app.getPath('userData')` 下的独立配置 | 只保存工作区、窗口、快捷键等 Orb 配置；不改写 Pi 全局默认值 |
 | 测试 | TypeScript 类型检查、单元/协议测试、Electron 集成测试、Windows 真机 smoke | 推荐分层；mock 不能替代原生输入取消与释放测试 |
 | 打包 | Electron Forge 作为首选候选，Windows x64 优先 | 需通过干净机器安装、卸载和许可检查后才能锁定 |
-| FFF/LSP | 不作为产品运行时依赖 | 作为可选开发工具单独试点；不应混入 pi-Orb 运行时技术栈 |
+| FFF/LSP | 不作为产品运行时依赖 | 作为可选开发工具单独试点；不应混入 pi-orb 运行时技术栈 |
 
 ## 2. 已确定方向、推荐项与待验证项
 
@@ -88,7 +88,7 @@ pi-web 客户端适配层只封装已观察到的公开行为：
 
 ### 3.3 桌面能力后端
 
-桌面后端必须通过单一适配器提供观察、截图、点击、输入、滚动、取消和清理语义。实现基线直接取 DeepSeek Orb 固定提交中的 `windows.ts`、`windows-native.ts`、`windows-foreground.ts` 和坐标测试；pi-Orb 的适配只负责授权、代次、目标记录和 bridge。
+桌面后端必须通过单一适配器提供观察、截图、点击、输入、滚动、取消和清理语义。实现基线直接取 DeepSeek Orb 固定提交中的 `windows.ts`、`windows-native.ts`、`windows-foreground.ts` 和坐标测试；pi-orb 的适配只负责授权、代次、目标记录和 bridge。
 
 P0-04 的 Cua Driver MCP 只读探针仍作为证据，记录版本、许可证、工具目录、截图尺寸、坐标空间、权限和取消语义；探针结果不能决定生产 backend，也不能在 native backend 失败时自动接管。P1-05 只验证最终选择的原生 backend 在丢弃目标上的输入、DPI、焦点、普通/高权限窗口和取消释放。
 
@@ -110,7 +110,7 @@ Electron renderer 与 pi-web 的 Node 服务不是同一进程，不能把 rende
 
 | 组件 | 当前文档中的证据 | 解释 |
 |---|---|---|
-| Pi SDK | `0.87.1` | 本机安装包和调研基线；不是已验证的 pi-Orb 运行组合 |
+| Pi SDK | `0.87.1` | 本机安装包和调研基线；不是已验证的 pi-orb 运行组合 |
 | pi-web | `@agegr/pi-web@0.9.3` | 当前记录的本机包版本；远端固定提交需重新核验 |
 | Electron | `44.4.5` | 已锁定并通过 Electron 浮窗、截图、桥接和构建验证 |
 | Node.js | `24.19.0` | 当前开发与验收基线；其它版本未验证 |
@@ -121,7 +121,7 @@ Electron renderer 与 pi-web 的 Node 服务不是同一进程，不能把 rende
 
 在 P0-01/P0-05 完成前，不宣称任意版本兼容。首个支持组合至少要记录：
 
-- pi-Orb 版本、Node.js 版本和 Electron 版本；
+- pi-orb 版本、Node.js 版本和 Electron 版本；
 - pi-web 版本/提交与 Pi SDK 版本；
 - renderer 构建工具和桌面驱动版本；
 - Windows 版本、架构、键盘布局及相关权限状态；
@@ -144,7 +144,7 @@ P0 和大部分 P1 已完成。当前产品已启用显式授权的桌面工具�
 ## 6. 明确不纳入技术栈
 
 - 不复制 Pi 的模型调用循环、模型管理、插件市场、会话引擎或 DeepSeek Orb 的整个后端。
-- 不把 FFF、LSP、MCP 搜索工具作为 pi-Orb 运行时依赖；它们只属于可选开发工作流，原有评估见 [`pi-fff-lsp-necessity.md`](./pi-fff-lsp-necessity.md)。
+- 不把 FFF、LSP、MCP 搜索工具作为 pi-orb 运行时依赖；它们只属于可选开发工作流，原有评估见 [`pi-fff-lsp-necessity.md`](./pi-fff-lsp-necessity.md)。
 - 不引入通用多租户权限系统、cwd 强隔离、远程桌面控制、全桌面常驻录制或完整后台调度中心。
 - 不依赖双 Alt 才能启动 MVP，不推测 Codex 的内部实现，也不自动上传截图。
 - 不在首版预设多个平台后端、多个 LSP/FFF 实现、多个包管理器或多个 renderer 框架。

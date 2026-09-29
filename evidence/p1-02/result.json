@@ -29,7 +29,7 @@
     {
       "name": "orb window exists",
       "ok": true,
-      "detail": "pi-Orb"
+      "detail": "pi-orb"
     },
     {
       "name": "preload bridge is exposed",
@@ -83,17 +83,17 @@
     {
       "name": "the user message is shown",
       "ok": true,
-      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
+      "detail": "pi-orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
     },
     {
       "name": "the assistant reply is shown",
       "ok": true,
-      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
+      "detail": "pi-orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
     },
     {
       "name": "the shell reports the session it is using",
       "ok": true,
-      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
+      "detail": "pi-orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSend\nStop\n\nSession 01a0e3d1 ready."
     },
     {
       "name": "the shell reports the session it created",
@@ -133,7 +133,7 @@
     {
       "name": "streamed partial output is visible mid-turn",
       "ok": true,
-      "detail": "pi-Orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSLOW please stream for a while\nSLOW-STREAM-\nSend\nStop"
+      "detail": "pi-orb\nConnected\n\nD:\\pi-orb-p1-runs\\p1-02-1790528525077\\orb-workspace\n\nhello from the orb\np1-ok\nSLOW please stream for a while\nSLOW-STREAM-\nSend\nStop"
     },
     {
       "name": "the shell reports a busy turn",
@@ -198,7 +198,7 @@
   "stopPropagation": {
     "modelAcceptedRequest": true,
     "providerStreamDisconnectedByPiWeb": false,
-    "note": "pi-web's abort is cooperative: the agent loop stops at the next checkpoint. A false value here means the in-flight provider request was allowed to finish rather than being torn down, which is pi-web behaviour and not a pi-Orb guarantee."
+    "note": "pi-web's abort is cooperative: the agent loop stops at the next checkpoint. A false value here means the in-flight provider request was allowed to finish rather than being torn down, which is pi-web behaviour and not a pi-orb guarantee."
   },
   "modelRequests": [
     {

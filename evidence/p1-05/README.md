@@ -178,7 +178,7 @@ isError=false
 | 普通 vs 高权限窗口对比 | 未针对高权限窗口测试（按目标要求不自动提权）。 |
 | 按下后取消的释放 | **已验证**：`probe-reference-cancel.mjs` 真实 native 长按取消后，目标自身日志收到 `mouse-down=1`、匹配 `mouse-up=1`，且 backend 正确报告取消；结果见 `reference-cancel.json`。 |
 | 多显示器 | 本机仅 1 个显示器。 |
-| 驱动内建“授权/权限”语义 | `getSessionState` 的 `desktopCaptureAuthorized=false`、`desktopUnlocked=false`；本阶段未使用 `escalate_session`。**产品侧的授权仍由 pi-Orb 自己的任务授权与代次绑定负责**（P1-07）。 |
+| 驱动内建“授权/权限”语义 | `getSessionState` 的 `desktopCaptureAuthorized=false`、`desktopUnlocked=false`；本阶段未使用 `escalate_session`。**产品侧的授权仍由 pi-orb 自己的任务授权与代次绑定负责**（P1-07）。 |
 
 > 前台**点击**已由目标日志确认产生真实 `mouse-down`。前台滚动有一次历史成功证据，但最新复跑未重现；滚动仍须按每次目标日志判定，不能作为稳定支持能力。
 

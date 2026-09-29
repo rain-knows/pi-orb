@@ -26,7 +26,7 @@
 
 | 断言 | 实测 |
 |---|---|
-| Electron 存活、窗口标题 `pi-Orb` | 通过 |
+| Electron 存活、窗口标题 `pi-orb` | 通过 |
 | preload bridge 暴露到 renderer | 通过 |
 | renderer **无** `require`/`process`/`module`/`Buffer` | 通过 |
 | 桥只有固定 9 个方法，**无** `ipcRenderer`/`invoke`/`send`/`require` 直通 | 通过（实测导出：`abort, chooseWorkspace, ensureSession, getStatus, onSessionEvent, refreshConnection, sendPrompt, setWorkspace, validateWorkspace`） |

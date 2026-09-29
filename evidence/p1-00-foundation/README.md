@@ -96,7 +96,7 @@ P0 结束时仓库只有文档和证据，没有任何可运行工程。P1 要�
 | 断言 | 结果 |
 |---|---|
 | Electron 进程保持存活 | 通过 |
-| 创建了 orb 窗口（标题 `pi-Orb`） | 通过 |
+| 创建了 orb 窗口（标题 `pi-orb`） | 通过 |
 | preload bridge 暴露到 renderer（`typeof window.orb === "object"`） | 通过 |
 | renderer 内**无** `require`/`process`/`module`（沙箱生效） | 通过 |
 | contextBridge → ipcMain 往返成功并返回状态 | 通过 |

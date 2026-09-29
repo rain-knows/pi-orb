@@ -37,7 +37,7 @@
 
 **许可结论**：真正交付给用户的是平台包里的原生二进制（一个 26.8 MB `cua_driver_sdk.dll` 与一个 `cua_driver_node_runtime.node`）。平台包许可为 `MIT AND MPL-2.0`，**不是纯 MIT**。
 
-- MPL-2.0 是**文件级弱 copyleft**：分发未修改的制品需附 NOTICE 并告知如何取得对应源码（上游已给出路径），不会传染整个 pi-Orb。
+- MPL-2.0 是**文件级弱 copyleft**：分发未修改的制品需附 NOTICE 并告知如何取得对应源码（上游已给出路径），不会传染整个 pi-orb。
 - **残留不确定项**：NOTICE 只点名了 `.node` 文件，而包许可字段是 `MIT AND MPL-2.0`；26.8 MB 的 DLL 未被 NOTICE 明确点名。发布打包前（P1-07）必须核实 DLL 是否承担 MPL 义务，**不得自行假定任意一侧**。
 - 其它许可边界：ClawHub 的 skill 副本为 MIT-0；Kasm(MIT)、OmniParser(CC-BY-4.0)；可选 `cua-agent[omni]` 含 ultralytics **AGPL-3.0**，不引入。
 

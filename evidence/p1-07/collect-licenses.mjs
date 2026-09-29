@@ -1,6 +1,6 @@
 // P1-07 license inventory.
 //
-// Collects the license of every production dependency that would ship with pi-Orb, plus the
+// Collects the license of every production dependency that would ship with pi-orb, plus the
 // locked desktop driver packages, and records them with their license text location. The point is
 // a release-time artefact that can be audited without re-reading node_modules by hand.
 //

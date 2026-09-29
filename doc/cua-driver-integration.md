@@ -64,7 +64,7 @@ SDK 侧对应方法名（`CuaDriver.prototype`，39 个）：`listWindows`、`li
 |---|---|
 | `startSession`/`endSession` 可用且廉价 | 实测 1 ms 量级 |
 | `getSessionState` 含 `desktopCaptureAuthorized`、`desktopUnlocked`、`captureScope`、`effectiveScope` | 实测均为 false/0（本阶段未升级权限） |
-| `escalate_session` 存在但**未使用** | 产品侧授权不由驱动决定；pi-Orb 的任务授权与运行代次绑定自行负责（P1-07） |
+| `escalate_session` 存在但**未使用** | 产品侧授权不由驱动决定；pi-orb 的任务授权与运行代次绑定自行负责（P1-07） |
 | 会话结束后再查状态会明确报错 | "this session has ended; call start_session explicitly to…" |
 
 ## 5. 许可义务（带入 P1-07）

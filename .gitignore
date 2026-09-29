@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# pi-Orb repository ignore rules
+# pi-orb repository ignore rules
 #
 # Intent: keep product source, documents and auditable text evidence under
 # version control; keep every generated artifact, local run directory, binary
@@ -19,7 +19,7 @@ coverage/
 .tmp-*/
 *.log
 
-# Local pi-Orb run directories (probes write outside the repository, but a
+# Local pi-orb run directories (probes write outside the repository, but a
 # local override may place them here)
 .pi-orb-runs/
 runs/
@@ -58,7 +58,7 @@ auth.json
 *.node
 *.exe
 
-# Screenshots and captured pixels. pi-Orb never writes pixels to disk by
+# Screenshots and captured pixels. pi-orb never writes pixels to disk by
 # default; an explicit user export must not end up in the repository.
 *.png
 *.jpg

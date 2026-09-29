@@ -58,7 +58,7 @@ function positionOf(position: ScreenshotPosition | undefined): [number, number] 
 }
 
 /**
- * Pi-Orb's narrow driver seam over the reference project's Windows backend.
+ * pi-orb's narrow driver seam over the reference project's Windows backend.
  * Window identity is still owned by the Orb: the backend is never asked to guess a target.
  */
 export class ReferenceWindowsDriver implements DesktopDriver {
@@ -107,7 +107,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           throw new Error("The reference backend did not select the recorded target window.");
         }
         // Force the same capture path used by the reference tool. The image is intentionally not
-        // forwarded here because pi-Orb's screenshot consent flow owns model attachments.
+        // forwarded here because pi-orb's screenshot consent flow owns model attachments.
         await this.#options.backend.capture(screen);
         const observation: DesktopObservation = {
           observationId: `obs-${Date.now().toString(36)}-${++observationCounter}`,

@@ -72,7 +72,7 @@
       "pipePath": "\\\\.\\pipe\\pi-orb-26528"
     },
     "rendererTarget": {
-      "title": "pi-Orb",
+      "title": "pi-orb",
       "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
     },
     "shortcut": {
@@ -225,7 +225,7 @@
     ],
     "interactiveDesktopAtWake": {
       "process": "electron",
-      "title": "pi-Orb",
+      "title": "pi-orb",
       "inputDesktopAccessible": true
     },
     "wake": {
@@ -292,7 +292,7 @@
     {
       "name": "the orb renderer is reachable over CDP",
       "ok": true,
-      "detail": "{\"title\":\"pi-Orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+      "detail": "{\"title\":\"pi-orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
     },
     {
       "name": "the wake shortcut registered",
@@ -322,7 +322,7 @@
     {
       "name": "an interactive desktop is available to foreground the target",
       "ok": true,
-      "detail": "{\"process\":\"electron\",\"title\":\"pi-Orb\",\"inputDesktopAccessible\":true}"
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-orb\",\"inputDesktopAccessible\":true}"
     },
     {
       "name": "the product recorded the disposable target, not the user's desktop",
