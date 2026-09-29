@@ -46,6 +46,14 @@ v0.1 is defined as M1 + M2 + M3 + P1-07:
 | M3 — one-action-one-observation computer use | **Core loop complete** (P1-05, P1-06): background and **foreground** clicks land on the aimed target, a foreground scroll both reaches and moves the intended element, and a point picked off a screenshot lands on that same point in the target within one run — all judged from the target's own event log. The model addresses a position as a fraction of the screenshot it can see, not as a screen coordinate. Typing into Chromium content, elevated windows, multi-monitor, and a **real** model choosing to call the tools remain unverified |
 | P1-07 — safety, regression and release gate | **Complete** |
 
+P2 is being delivered as separately reviewable reference-reuse stages:
+
+| Stage | State |
+|---|---|
+| P2-01 — reference floating shell, geometry and interactions | **Implemented; real multi-display, DPI and manual drag acceptance remains unverified** |
+| P2-02 — double-Alt screenshot gesture | **Implemented; real keyboard, AltGr and non-US layout acceptance remains unverified** |
+| P2-03 — pi-web session history entry | **Implemented through pi-web public session APIs; selection text and native observation overlay remain unimplemented** |
+
 So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
 must not be described as done. They are listed one by one in
 [`doc/support-matrix.md`](./doc/support-matrix.md) with manual verification steps; the release gate
