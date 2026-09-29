@@ -133,6 +133,7 @@ export function App() {
   const floatingClasses = [
     "orb",
     expanded ? "orb--expanded" : "orb--collapsed",
+    selectionContext ? "orb--has-selection" : "",
     pinned ? "orb--pinned" : "",
     `orb--expand-${floatingState.horizontal}`,
     `orb--expand-${floatingState.vertical}`,

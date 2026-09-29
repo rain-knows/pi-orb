@@ -77,7 +77,8 @@ button { cursor: pointer; }
 .orb--collapsed .orb__ball, .orb--expanded .orb__ball { position: absolute; z-index: 8; right: var(--orb-chrome); bottom: var(--orb-chrome); display: grid; width: var(--orb-ball); height: var(--orb-ball); place-items: center; padding: 0; border: 0; border-radius: 50%; background: #111; box-shadow: 0 3px 8px rgb(17 17 17 / 32%); pointer-events: auto; cursor: pointer; }
 .orb__ball img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; pointer-events: none; }
 .orb--collapsed .orb__ball { right: 12px; bottom: 12px; }
-.orb--expanded .orb__messages { padding: 24px 0 10px; }
+.orb--expanded .orb__messages { padding: 24px 0 86px; }
+.orb--expanded.orb--has-selection .orb__messages { padding-bottom: 114px; }
 .orb--expanded .orb__composer { position: absolute; z-index: 7; right: 16px; bottom: 16px; left: 16px; height: 72px; padding: 0 12px; border: 0; border-radius: 36px; background: #eee; }
 .orb--expanded .orb__composer--has-selection { height: 100px; border-radius: 24px; }
 .orb--expanded .orb__composer textarea { height: 100%; padding: 12px 80px 12px 8px; }
@@ -96,7 +97,9 @@ button { cursor: pointer; }
 .orb--expanded.orb--expand-down .orb__composer { top: 16px; bottom: auto; }
 .orb--expanded.orb--expand-down .orb__composer-footer { top: 21px; bottom: auto; }
 .orb--expanded.orb--expand-down .orb__messages { padding-top: 86px; padding-bottom: 10px; }
+.orb--expanded.orb--expand-down.orb--has-selection .orb__messages { padding-top: 114px; }
 .orb--expanded.orb--expand-up .orb__messages { padding-top: 24px; padding-bottom: 86px; }
+.orb--expanded.orb--expand-up.orb--has-selection .orb__messages { padding-bottom: 114px; }
 .orb__dock-tab { display: none; position: absolute; z-index: 9; top: 8px; width: 6px; height: 72px; padding: 0; border: 0; border-radius: 999px; background: #75757f; box-shadow: 0 0 0 6px rgb(117 117 127 / 7%), 0 0 0 4px rgb(117 117 127 / 13%), 0 0 0 2px rgb(117 117 127 / 20%); cursor: pointer; }
 .orb--docked-left .orb__dock-tab { left: 0; display: block; }
 .orb--docked-right .orb__dock-tab { right: 0; display: block; }
