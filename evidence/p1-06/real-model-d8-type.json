@@ -1,0 +1,511 @@
+{
+  "capturedAt": "2026-09-28T13:10:50.837Z",
+  "testCase": "d8-type",
+  "scope": {
+    "what": "real model observes a disposable target, focuses its text field, and types a synthetic marker",
+    "chain": "target app <- locked Cua driver <- cua-adapter <- desktop-broker <- bridge <- pi-web <- real model"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790601050835\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790601050835\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d8-type-agent-1790601050835",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "ChatGPT",
+      "title": "ChatGPT",
+      "inputDesktopAccessible": true
+    },
+    "targetPid": 50472,
+    "target": {
+      "pid": 50472,
+      "windowBoundsDip": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBoundsDip": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "scaleFactor": 1.5,
+      "cell00": {
+        "cell": "0,0",
+        "centreInContent": {
+          "x": 60,
+          "y": 45
+        },
+        "dipScreenPoint": {
+          "x": 187,
+          "y": 191
+        },
+        "physicalScreenPoint": {
+          "x": 281,
+          "y": 287
+        }
+      }
+    },
+    "piWeb": {
+      "ok": true,
+      "baseUrl": "http://127.0.0.1:31502",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31502\n- Network:       http://127.0.0.1:31502\n✓ Ready in 537ms\n✓ Running next.config.ts took 159ms\n"
+    },
+    "handshake": {
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790601050835\\shell-data\\bridge-token.json",
+      "pid": 49968,
+      "generation": 1,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790601050835\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-49968"
+    },
+    "rendererTarget": {
+      "title": "pi-Orb",
+      "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
+    },
+    "shortcut": {
+      "registered": true,
+      "problem": null
+    },
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790601050835\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 2,
+      "busy": false,
+      "sessionId": "01a0e823-f782-70dd-91a9-748e3b049b8a",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31502",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "taskId": null,
+        "scope": null,
+        "actionsUsed": 0,
+        "actionLimit": 12,
+        "expiresAt": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true,
+        "target": null
+      }
+    },
+    "generation": 2,
+    "session": "01a0e823-f782-70dd-91a9-748e3b049b8a",
+    "model": {
+      "sessionId": "01a0e823-fd95-70dd-91a9-74918e1abd11",
+      "selected": {
+        "provider": "TZcode",
+        "modelId": "deepseek-v4.1-flash"
+      },
+      "input": [
+        "text",
+        "image"
+      ],
+      "declaredImageCapable": true
+    },
+    "windowChoice": {
+      "windowId": "4457106",
+      "pid": 50472,
+      "appName": "electron.exe",
+      "title": "P1-05 input target",
+      "bounds": {
+        "x": 189,
+        "y": 135,
+        "width": 735,
+        "height": 786
+      },
+      "zIndex": "8",
+      "isRecorded": false
+    },
+    "windowCandidates": [
+      {
+        "pid": 14792,
+        "title": "Windows 输入体验",
+        "appName": "TextInputHost.exe"
+      },
+      {
+        "pid": 14792,
+        "title": "Windows 输入体验",
+        "appName": "TextInputHost.exe"
+      },
+      {
+        "pid": 14792,
+        "title": "Windows 输入体验",
+        "appName": "TextInputHost.exe"
+      },
+      {
+        "pid": 20528,
+        "title": "新通知",
+        "appName": "ShellExperienceHost.exe"
+      },
+      {
+        "pid": 15192,
+        "title": "Windows 默认锁屏界面",
+        "appName": "LockApp.exe"
+      },
+      {
+        "pid": 14804,
+        "title": "搜索",
+        "appName": "SearchHost.exe"
+      },
+      {
+        "pid": 20528,
+        "title": "记事本 的跳转列表",
+        "appName": "ShellExperienceHost.exe"
+      },
+      {
+        "pid": 14784,
+        "title": "开始",
+        "appName": "StartMenuExperienceHost.exe"
+      },
+      {
+        "pid": 20528,
+        "title": "Windows Shell Experience 主机",
+        "appName": "ShellExperienceHost.exe"
+      },
+      {
+        "pid": 50472,
+        "title": "P1-05 input target",
+        "appName": "electron.exe"
+      },
+      {
+        "pid": 7236,
+        "title": "ChatGPT",
+        "appName": "ChatGPT.exe"
+      },
+      {
+        "pid": 52828,
+        "title": "设置",
+        "appName": "SystemSettings.exe"
+      },
+      {
+        "pid": 18292,
+        "title": "设置",
+        "appName": "ApplicationFrameHost.exe"
+      },
+      {
+        "pid": 25612,
+        "title": "TZCODE - Google Chrome",
+        "appName": "chrome.exe"
+      },
+      {
+        "pid": 38260,
+        "title": "*p1-05-keyboard-target.txt - Notepad",
+        "appName": "Notepad.exe"
+      },
+      {
+        "pid": 45964,
+        "title": "com.ccswitch.desktop-siw",
+        "appName": "cc-switch.exe"
+      },
+      {
+        "pid": 14792,
+        "title": "Windows 输入体验",
+        "appName": "TextInputHost.exe"
+      },
+      {
+        "pid": 34328,
+        "title": "Program Manager",
+        "appName": "explorer.exe"
+      }
+    ],
+    "interactiveDesktopAtWake": {
+      "process": "electron",
+      "title": "pi-Orb",
+      "inputDesktopAccessible": true
+    },
+    "wake": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true,
+      "chordSent": "ctrl+alt+f11"
+    },
+    "recordedTarget": {
+      "windowId": "4457106",
+      "pid": 50472,
+      "appName": "electron.exe",
+      "title": "P1-05 input target",
+      "bounds": {
+        "x": 189,
+        "y": 135,
+        "width": 735,
+        "height": 786
+      },
+      "zIndex": "8",
+      "isRecorded": false
+    },
+    "approved": {
+      "authorized": true,
+      "scope": "click the labelled disposable text field and type P1ORBD8TEST once",
+      "target": "P1-05 input target"
+    },
+    "capture": {
+      "ok": true,
+      "observationId": "obs-mul9ncuw-0aph2hu9",
+      "width": 749,
+      "height": 795,
+      "bytes": 32779,
+      "targetDescription": "P1-05 input target (753x795, pid 50472, dpi 144)",
+      "targetStale": false
+    },
+    "resolve": {
+      "ok": true,
+      "sent": true
+    },
+    "waitedForIdle": true,
+    "bridgeDiagnostics": [
+      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-49968",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T13:10:57.211Z\",\"event\":\"revoke\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T13:11:14.778Z\",\"event\":\"authorize\",\"sessionId\":\"01a0e823-f782-70dd-91a9-748e3b049b8a\",\"generation\":2,\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\"}",
+      "[pi-orb] desktop coordinate mapping: {\"driverBounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"actionSpace\":\"screenshot-fraction\",\"relation\":\"request = fraction * driverReportedWindowSize (window-relative, origin 0)\",\"coordinateMappingConfidence\":\"empirically-fitted\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T13:11:23.558Z\",\"event\":\"observe\",\"sessionId\":\"01a0e823-f782-70dd-91a9-748e3b049b8a\",\"observationId\":\"obs-mul9nijp-1\",\"windowId\":\"4457106\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T13:11:26.784Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-mul9nijp-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T13:11:26.876Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-mul9nijp-1\"}",
+      "[pi-orb] desktop coordinate mapping: {\"driverBounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"actionSpace\":\"screenshot-fraction\",\"relation\":\"request = fraction * driverReportedWindowSize (window-relative, origin 0)\",\"coordinateMappingConfidence\":\"empirically-fitted\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-28T13:11:30.301Z\",\"event\":\"observe\",\"sessionId\":\"01a0e823-f782-70dd-91a9-748e3b049b8a\",\"observationId\":\"obs-mul9nnr1-2\",\"windowId\":\"4457106\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}"
+    ]
+  },
+  "checks": [
+    {
+      "name": "the isolated pi-web started",
+      "ok": true,
+      "detail": "http://127.0.0.1:31502"
+    },
+    {
+      "name": "the isolated shell published its own handshake",
+      "ok": true,
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790601050835\\\\shell-data\\\\bridge-token.json\",\"pid\":49968,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790601050835\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-49968\"}"
+    },
+    {
+      "name": "the isolated shell's pipe accepts a connection",
+      "ok": true,
+      "detail": "\\\\.\\pipe\\pi-orb-49968"
+    },
+    {
+      "name": "the isolated shell is NOT the user's running orb",
+      "ok": true,
+      "detail": "handshake pid 49968"
+    },
+    {
+      "name": "the orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "{\"title\":\"pi-Orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+    },
+    {
+      "name": "the wake shortcut registered",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790601050835\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:31502\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+    },
+    {
+      "name": "the isolated shell reports a workspace and a generation",
+      "ok": true,
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790601050835\\\\orb-workspace\",\"generation\":2}"
+    },
+    {
+      "name": "the isolated shell created a real pi-web session",
+      "ok": true,
+      "detail": "\"01a0e823-f782-70dd-91a9-748e3b049b8a\""
+    },
+    {
+      "name": "the session is served by a model that declares image input",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a0e823-fd95-70dd-91a9-74918e1abd11\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+    },
+    {
+      "name": "the driver lists the disposable target, identified by process id",
+      "ok": true,
+      "detail": "grid pid=50472 candidates=[{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":14792,\"title\":\"Windows 输入体验\",\"appName\":\"TextInputHost.exe\"},{\"pid\":20528,\"title\":\"新通知\",\"appName\":\"ShellExperienceHost.exe\"},{\"pid\":15192,\"title\":\"Windows 默认锁屏界面\",\"appName\":\"LockApp.exe\"},{\"pid\":14804,\"title\":\"搜索\",\"appName\":\"SearchHost.exe\"},{\"pid\":20528,\"tit…"
+    },
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-Orb\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the product recorded the disposable target, not the user's desktop",
+      "ok": true,
+      "detail": "{\"windowId\":\"4457106\",\"pid\":50472,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"8\",\"isRecorded\":false}"
+    },
+    {
+      "name": "the desktop target was set to the disposable window",
+      "ok": true,
+      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"4457106\",\"pid\":50472,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"8\",\"isRecorded\":true}}"
+    },
+    {
+      "name": "the desktop task was approved through the product's UI path",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790601374778,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"4457106\",\"pid\":50472,\"appName\":\"electron.exe\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"8\",\"isRecorded\":true}}"
+    },
+    {
+      "name": "a screenshot of the recorded target was captured for preview",
+      "ok": true,
+      "detail": "{\"ok\":true,\"observationId\":\"obs-mul9ncuw-0aph2hu9\",\"width\":749,\"height\":795,\"bytes\":32779,\"targetDescription\":\"P1-05 input target (753x795, pid 50472, dpi 144)\",\"targetStale\":false}"
+    },
+    {
+      "name": "the preview describes the disposable target window, not the orb",
+      "ok": true,
+      "detail": "P1-05 input target (753x795, pid 50472, dpi 144)"
+    },
+    {
+      "name": "the confirmed screenshot was sent with the instruction",
+      "ok": true,
+      "detail": "{\"ok\":true,\"sent\":true}"
+    },
+    {
+      "name": "D8 (target's own log): the exact synthetic marker reached the text field",
+      "ok": false,
+      "detail": "[]"
+    },
+    {
+      "name": "the real model called orb_observe on its own",
+      "ok": true,
+      "detail": "[{\"toolName\":\"orb_observe\",\"arguments\":{}},{\"toolName\":\"orb_observe\",\"arguments\":{}}]"
+    },
+    {
+      "name": "the real model called orb_type on its own",
+      "ok": false,
+      "detail": "[]"
+    },
+    {
+      "name": "the model observed before acting",
+      "ok": false,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\"]"
+    },
+    {
+      "name": "the model observed again after its action",
+      "ok": false,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\"]"
+    },
+    {
+      "name": "D8: the model clicked the disposable field before typing",
+      "ok": false,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\"]"
+    },
+    {
+      "name": "D8: the model observed again between focus click and text input",
+      "ok": false,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\"]"
+    }
+  ],
+  "passed": false,
+  "targetLog": {
+    "events": [
+      {
+        "kind": "ready",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      }
+    ],
+    "matches": [],
+    "cellDowns": []
+  },
+  "sessionFiles": [
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1790601050835-orb-workspace--\\2026-09-28T13-11-06-371Z_01a0e823-f782-70dd-91a9-748e3b049b8a.jsonl"
+  ],
+  "modelToolCalls": [
+    {
+      "toolName": "orb_observe",
+      "arguments": {}
+    },
+    {
+      "toolName": "orb_click",
+      "arguments": {
+        "observation_id": "obs-mul9nijp-1",
+        "x": 500,
+        "y": 705
+      }
+    },
+    {
+      "toolName": "orb_observe",
+      "arguments": {}
+    }
+  ],
+  "finishedAt": "2026-09-28T13:11:41.391Z"
+}

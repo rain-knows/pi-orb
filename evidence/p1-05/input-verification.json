@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-28T07:01:13.690Z",
+  "capturedAt": "2026-09-28T12:11:57.988Z",
   "scope": {
     "platform": "win32 x64",
     "driverVersion": "0.30.1",
@@ -119,7 +119,7 @@
           "x": -2,
           "y": 56
         },
-        "driverSummary": "✅ Posted click to Chromium pid 43636 at (188,192) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 50884 at (188,192) (background, no foreground swap).",
         "error": null,
         "landedCell": "0,0",
         "landedOffsetInCell": {
@@ -140,7 +140,7 @@
           "x": 238,
           "y": 146
         },
-        "driverSummary": "✅ Posted click to Chromium pid 43636 at (428,282) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 50884 at (428,282) (background, no foreground swap).",
         "error": null,
         "landedCell": "1,2",
         "landedOffsetInCell": {
@@ -161,7 +161,7 @@
           "x": 358,
           "y": 236
         },
-        "driverSummary": "✅ Posted click to Chromium pid 43636 at (548,372) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 50884 at (548,372) (background, no foreground swap).",
         "error": null,
         "landedCell": "2,3",
         "landedOffsetInCell": {
@@ -182,7 +182,7 @@
           "x": -2,
           "y": 236
         },
-        "driverSummary": "✅ Posted click to Chromium pid 43636 at (188,372) (background, no foreground swap).",
+        "driverSummary": "✅ Posted click to Chromium pid 50884 at (188,372) (background, no foreground swap).",
         "error": null,
         "landedCell": "2,0",
         "landedOffsetInCell": {
@@ -199,9 +199,9 @@
     "expectedText": "P1ORBTYPED",
     "target": "notepad.exe on a temporary file created by this script",
     "verificationMethod": "read back through the accessibility tree's document value",
-    "frontCheckTargetUsesGridWindow": true,
+    "frontCheckTargetUsesGridWindow": false,
     "note": "the front check reports the grid window; for the keyboard test the Notepad window was opened last and is checked separately below",
-    "driverSummary": "📨 Sent 10 char(s) to pid 42988 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes no ValuePattern). If it didn't land, retry with delivery_mode:\"foreground\".",
+    "driverSummary": "📨 Sent 10 char(s) to pid 38260 via PostMessage (30ms delay; the field changed and now contains the requested text, but the insertion point is not known). Take a fresh snapshot to verify the intended final value before retrying.",
     "error": null,
     "textBeforeContainsTyped": false,
     "textAfterContainsTyped": true,
@@ -243,35 +243,10 @@
           "errorCode": null,
           "text": "✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (372,540) (delivery_mode:foreground).",
           "error": null,
-          "delivered": true,
-          "wheelEvents": 2,
-          "wheelDetail": [
-            {
-              "at": 1790578890384,
-              "kind": "wheel",
-              "clientPoint": {
-                "x": 244,
-                "y": 394
-              },
-              "deltaY": 300,
-              "overScroller": true,
-              "elementUnderPoint": "DIV",
-              "scrollerScrollTop": 0
-            },
-            {
-              "at": 1790578890385,
-              "kind": "wheel",
-              "clientPoint": {
-                "x": 244,
-                "y": 394
-              },
-              "deltaY": 300,
-              "overScroller": true,
-              "elementUnderPoint": "DIV",
-              "scrollerScrollTop": 0
-            }
-          ],
-          "stripScrolled": true
+          "delivered": false,
+          "wheelEvents": 0,
+          "wheelDetail": [],
+          "stripScrolled": false
         }
       },
       {
@@ -316,18 +291,16 @@
       }
     ],
     "note": "`deliveryMode` is NOT a field of the driver's ScrollInput (verified against the locked contract), so a typed scroll can never request foreground delivery; the escalation goes through callTool, which takes the tool-schema arguments. The driver reports '✅ Scrolled ... via SendInput wheel' even when the foreground swap was refused and no wheel event reached the target, so its summary is never the evidence.",
-    "deliveredAndObserved": true,
-    "stripActuallyScrolled": true,
-    "conclusion": "background scroll was refused with background_unavailable (documented behaviour for this window class) and the driver's prescribed foreground escalation delivered a real wheel event that the target logged over its scrollable strip, which then moved — verified from the target's own event log, not from the driver's summary."
+    "deliveredAndObserved": false,
+    "stripActuallyScrolled": false,
+    "conclusion": "the escalation was issued exactly as the driver prescribes, but no wheel event reached the target on this run: the OS did not hand the foreground to the target, and the driver reported success anyway. Scroll delivery is therefore UNVERIFIED on this run (it has been observed to work on other runs)."
   },
   "releaseAndCancellation": {
     "gridEventCounts": {
       "ready": 1,
       "cell-mousedown": 5,
       "mouse-down": 5,
-      "mouse-up": 5,
-      "wheel": 2,
-      "scroll": 21
+      "mouse-up": 5
     },
     "targetLogKeyEvents": {
       "down": 0,
@@ -353,7 +326,7 @@
       "refused": false,
       "effect": 2,
       "deliveryMode": 1,
-      "summary": "✅ Sent click via SendInput to pid 43636 at (250,181) (delivery_mode:foreground).",
+      "summary": "✅ Sent click via SendInput to pid 50884 at (250,181) (delivery_mode:foreground).",
       "error": null,
       "mouseDownEvents": 1,
       "delivered": true,
@@ -361,11 +334,11 @@
     }
   },
   "timingsMs": {
-    "moduleImport": 62,
-    "driverCreate": 77,
-    "listWindows": 77,
+    "moduleImport": 75,
+    "driverCreate": 70,
+    "listWindows": 124,
     "startSession": 1,
-    "shutdown": 1
+    "shutdown": 2
   },
   "checks": [
     {
@@ -386,7 +359,7 @@
     {
       "name": "the native driver module loads and a driver can be created",
       "ok": true,
-      "detail": "import 62 ms, create 77 ms"
+      "detail": "import 75 ms, create 70 ms"
     },
     {
       "name": "the environment exhibits the scaled-DPI case P0-04 warned about",
@@ -421,12 +394,12 @@
     {
       "name": "the driver reported background delivery without raising the window",
       "ok": true,
-      "detail": "[\"✅ Posted click to Chromium pid 43636 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 43636 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 43636 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 43636 at (188,372) (background, no foreground swap).\"]"
+      "detail": "[\"✅ Posted click to Chromium pid 50884 at (188,192) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 50884 at (428,282) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 50884 at (548,372) (background, no foreground swap).\",\"✅ Posted click to Chromium pid 50884 at (188,372) (background, no foreground swap).\"]"
     },
     {
       "name": "background typing to a native application is delivered",
       "ok": true,
-      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 42988 via PostMessage (30ms delay; not verified — could not read the focused field back, e.g. the target isn't foreground or exposes n\"}"
+      "detail": "{\"error\":null,\"summary\":\"📨 Sent 10 char(s) to pid 38260 via PostMessage (30ms delay; the field changed and now contains the requested text, but the insertion point is not known). Take \"}"
     },
     {
       "name": "the typed text is readable back from the target, so it actually landed",
@@ -461,22 +434,22 @@
     {
       "name": "the escalation was issued exactly as the driver prescribes (foreground, same converted point)",
       "ok": true,
-      "detail": "{\"escalation\":{\"mechanism\":\"callTool('scroll', {delivery_mode:'foreground'})\",\"requestedDeliveryMode\":\"foreground\",\"requestedRequestPoint\":{\"x\":182,\"y\":404},\"targetScreenDipPoint\":{\"x\":371,\"y\":539},\"refused\":false,\"errorCode\":null,\"text\":\"✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (372,540) (delivery_mode:foreground).\",\"error\":null,\"delivered\":true,\"wheelEvents\":2,\"wheelDetail\":[{\"a"
+      "detail": "{\"escalation\":{\"mechanism\":\"callTool('scroll', {delivery_mode:'foreground'})\",\"requestedDeliveryMode\":\"foreground\",\"requestedRequestPoint\":{\"x\":182,\"y\":404},\"targetScreenDipPoint\":{\"x\":371,\"y\":539},\"refused\":false,\"errorCode\":null,\"text\":\"✅ Scrolled down via SendInput wheel (3 tick(s)) at screen (372,540) (delivery_mode:foreground).\",\"error\":null,\"delivered\":false,\"wheelEvents\":0,\"wheelDetail\":[],"
     },
     {
       "name": "environment fact: the foreground wheel event reached the target on this run",
       "ok": true,
-      "detail": "yes — the target logged real wheel events"
+      "detail": "NO — the driver reported success but the foreground window never became the target and the target logged no wheel event; delivery is UNVERIFIED on this run"
     },
     {
       "name": "environment fact: scrolling could be exercised in this session",
       "ok": true,
-      "detail": "yes — background was refused and the prescribed foreground escalation delivered wheel events"
+      "detail": "NO — background and the foreground escalation were both refused; scrolling is therefore UNVERIFIED."
     },
     {
       "name": "an explicit foreground click either delivers a real press or reports a refusal with a reason",
       "ok": true,
-      "detail": "{\"refused\":false,\"effect\":2,\"deliveryMode\":1,\"summary\":\"✅ Sent click via SendInput to pid 43636 at (250,181) (delivery_mode:foreground).\",\"error\":null,\"mouseDownEvents\":1,\"delivered\":true}"
+      "detail": "{\"refused\":false,\"effect\":2,\"deliveryMode\":1,\"summary\":\"✅ Sent click via SendInput to pid 50884 at (250,181) (delivery_mode:foreground).\",\"error\":null,\"mouseDownEvents\":1,\"delivered\":true}"
     },
     {
       "name": "a foreground click that reported success really produced a mouse press in the target",
@@ -486,7 +459,7 @@
     {
       "name": "no key was left pressed after the input sequence",
       "ok": true,
-      "detail": "{\"before\":{\"ok\":true,\"sampledAt\":1790578879687,\"down\":[]},\"after\":{\"ok\":true,\"sampledAt\":1790578896106,\"down\":[]},\"residue\":[],\"basis\":\"GetAsyncKeyState sampled globally before and after this stage's own input; a key down after but not before is residue\",\"excludedAsPreExisting\":[]}"
+      "detail": "{\"before\":{\"ok\":true,\"sampledAt\":1790597524409,\"down\":[]},\"after\":{\"ok\":true,\"sampledAt\":1790597541380,\"down\":[]},\"residue\":[],\"basis\":\"GetAsyncKeyState sampled globally before and after this stage's own input; a key down after but not before is residue\",\"excludedAsPreExisting\":[]}"
     },
     {
       "name": "no mouse button was left pressed after the input sequence",
@@ -514,12 +487,12 @@
   "keyResidue": {
     "before": {
       "ok": true,
-      "sampledAt": 1790578879687,
+      "sampledAt": 1790597524409,
       "down": []
     },
     "after": {
       "ok": true,
-      "sampledAt": 1790578896106,
+      "sampledAt": 1790597541380,
       "down": []
     },
     "residue": [],

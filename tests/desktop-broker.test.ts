@@ -29,15 +29,21 @@ function observation(id = "obs-1"): DesktopObservation {
 interface DriverDouble extends DesktopDriver {
   readonly observed: number;
   readonly acted: DesktopAction[];
+  readonly consumed: number;
   readonly lastObservation: DesktopObservation | null;
 }
 
 /** A driver double that records what it was asked to do and can be made to fail. */
 function fakeDriver(
-  options: { readonly observeFails?: string; readonly actFails?: ActResult } = {},
+  options: {
+    readonly observeFails?: string;
+    readonly actFails?: ActResult;
+    readonly actWait?: (signal: AbortSignal) => Promise<ActResult>;
+  } = {},
 ): DriverDouble {
   const acted: DesktopAction[] = [];
   let observed = 0;
+  let consumed = 0;
   let current: DesktopObservation | null = null;
 
   // Getters are defined, not copied: `Object.assign` would snapshot the value at assign
@@ -49,6 +55,9 @@ function fakeDriver(
     get acted() {
       return acted;
     },
+    get consumed() {
+      return consumed;
+    },
     get lastObservation() {
       return current;
     },
@@ -58,10 +67,15 @@ function fakeDriver(
       current = observation(`obs-${observed}`);
       return { ok: true, observation: current, error: null };
     },
-    async act(action): Promise<ActResult> {
+    async act(action, _observation, signal): Promise<ActResult> {
       acted.push(action);
+      if (options.actWait && signal) return options.actWait(signal);
       if (options.actFails) return options.actFails;
       return { ok: true, refused: false, error: null };
+    },
+    consumeObservation(): void {
+      consumed += 1;
+      current = null;
     },
   };
 }
@@ -122,6 +136,49 @@ describe("DesktopBroker authorization", () => {
     const result = (await instance.act(click("obs-1"), "sess", 1)) as Record<string, unknown>;
     expect(result).toMatchObject({ reason: "no-task-authorization" });
     expect(driver.acted).toHaveLength(0);
+    expect(driver.consumed).toBe(1);
+  });
+
+  it("does not let a new grant reuse an observation from the revoked task", async () => {
+    const { broker: instance, driver } = broker();
+    instance.authorize({ sessionId: "sess", generation: 1, scope: "first task" });
+    await instance.observe("sess", 1);
+    instance.revoke();
+    instance.authorize({ sessionId: "sess", generation: 1, scope: "second task" });
+
+    const result = (await instance.act(click("obs-1"), "sess", 1)) as Record<string, unknown>;
+    expect(result).toMatchObject({ ok: false, reason: "observation-unknown" });
+    expect(driver.acted).toHaveLength(0);
+    expect(driver.consumed).toBe(1);
+    expect(instance.status().lastObservationId).toBe(null);
+  });
+
+  it("aborts an in-flight action on revoke without accounting it to a replacement task", async () => {
+    let actionSignal: AbortSignal | undefined;
+    let finishAction: ((result: ActResult) => void) | undefined;
+    const actionDone = new Promise<ActResult>((resolve) => {
+      finishAction = resolve;
+    });
+    const { broker: instance } = broker({
+      actWait: (signal) => {
+        actionSignal = signal;
+        return actionDone;
+      },
+    });
+
+    instance.authorize({ sessionId: "sess", generation: 1, scope: "first task" });
+    const observed = (await instance.observe("sess", 1)) as Record<string, unknown>;
+    const action = instance.act(click(String(observed.observationId)), "sess", 1);
+    await Promise.resolve();
+    expect(actionSignal).toBeDefined();
+
+    instance.revoke();
+    expect(actionSignal?.aborted).toBe(true);
+    finishAction?.({ ok: false, refused: false, error: "desktop task was revoked" });
+
+    await expect(action).resolves.toMatchObject({ ok: false, reason: "no-task-authorization" });
+    instance.authorize({ sessionId: "sess", generation: 1, scope: "replacement task" });
+    expect(instance.status()).toMatchObject({ authorized: true, actionsUsed: 0, lastObservationId: null });
   });
 
   it("reports the approved scope and the remaining action budget", async () => {
@@ -198,7 +255,7 @@ describe("DesktopBroker one-action-one-observation", () => {
 
     // Acting twice from the first observation must be refused.
     const replay = (await instance.act(click(String(first.observationId)), "sess", 1)) as Record<string, unknown>;
-    expect(replay).toMatchObject({ reason: "stale-observation" });
+    expect(replay).toMatchObject({ reason: "observation-unknown" });
     expect(driver.acted).toHaveLength(2);
   });
 });

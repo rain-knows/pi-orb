@@ -6,7 +6,9 @@ the license obligations that follow. It is generated and checked against
 reproducible with `node evidence/p1-07/collect-licenses.mjs`.
 
 - Inventory captured for: pi-Orb `0.1.0` (unreleased), Windows x64
-- Desktop driver: `@trycua/cua-driver@0.30.1` with `@trycua/cua-driver-win32-x64-msvc@0.30.1`
+- Desktop backend: Windows source imported from `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885` (MIT)
+- Windows native FFI: `koffi@2.14.1` (MIT)
+- Keyboard edge detection: `uiohook-napi@1.5.5` (MIT)
 
 ## 1. pi-Orb itself
 
@@ -17,14 +19,12 @@ a release.
 
 | Component | Version | License | Ships a license file | Obligation |
 |---|---|---|---|---|
-| `@trycua/cua-driver` | 0.30.1 | MIT | no | include copyright and permission notice |
-| `@trycua/cua-driver-win32-x64-msvc` | 0.30.1 | **MIT AND MPL-2.0** | no (ships `node-runtime-NOTICE.md`) | include both notices; MPL file-level obligations for the derived runtime |
-| `@ubjs/core` | 0.31.0-3 | **MPL-2.0** | no | include notice; state how to obtain the corresponding source |
-| `@ubjs/node` | 0.31.0-3 | **MPL-2.0** | no | include notice; state how to obtain the corresponding source |
-| `@ubjs/node-win32-x64-msvc` | 0.31.0-3 | **MPL-2.0** | no | include notice; state how to obtain the corresponding source |
 | `react` | 19.3.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `react-dom` | 19.3.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `scheduler` | 0.28.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
+| `uiohook-napi` | 1.5.5 | MIT | yes (`LICENSE`) | include copyright and permission notice |
+| `koffi` | 2.14.1 | MIT | yes (`LICENSE`) | include copyright and permission notice |
+| `node-gyp-build` | 4.8.4 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 
 No AGPL, GPL-3 or SSPL component is present in the production graph; the inventory fails the release
 gate if one appears.
@@ -33,7 +33,14 @@ Declared optional packages for other operating systems and architectures (`darwi
 `win32-arm64-msvc`) are **not installed** on this platform and therefore do not ship. They are listed
 under `notInstalledOnThisPlatform` in the inventory rather than being silently omitted.
 
-## 3. The MPL-2.0 question, answered with evidence
+## 3. Historical Cua evidence
+
+The repository contains historical Cua probe records under `evidence/p0-04` and `evidence/p1-05`.
+Those packages are no longer production dependencies and are not redistributed by current pi-Orb.
+The following records are retained only to explain the earlier P1 investigation and the decision to
+replace that path with the imported MIT backend.
+
+## 3.1 Historical MPL-2.0 analysis
 
 MPL-2.0 is file-level weak copyleft. Redistributing these artifacts unmodified requires carrying the
 notice and telling recipients how to obtain the corresponding source. It does not make the rest of
@@ -81,6 +88,7 @@ states that the DLL is MPL-derived, this file must be updated and the DLL added 
   development dependency plus the deterministic transformations in `scripts/build-node-runtime.mjs`.
 - `@ubjs/*` (MPL-2.0): <https://github.com/jhugman/uniffi-bindgen-react-native> at
   `0.31.0-3`, path `runtimes/napi`.
+- `uiohook-napi` (MIT): <https://github.com/SnosMe/uiohook-napi> at the npm `1.5.5` source tree.
 
 The MPL-2.0 text is at <https://www.mozilla.org/MPL/2.0/>.
 
@@ -100,12 +108,24 @@ which is MIT licensed:
 
 > MIT License — Copyright (c) 2026 DeepSeek
 
-The reference's `packages/experimental/tool-computer-use/src/coordinates.ts` was read for its
-approach (`COORDINATE_SPACE = 1000`, validation of a two-number position, and the fraction-to-global
-mapping). pi-Orb's `src/shared/orb-tools.ts` implements the same contract against pi-Orb's own types
-and refusal vocabulary; no file was copied verbatim, and none of the reference's plugin lifecycle,
-attachment store, or macOS/multi-display code was taken. This entry exists so the derivation is
-recorded rather than silent.
+The following source files are imported from that fixed commit under
+`src/main/reference-windows/`:
+
+- `windows.ts`
+- `windows-native.ts`
+- `windows-foreground.ts`
+- `coordinates.ts`
+- `capture-exclude.ts`
+- `observation-limits.ts`
+- `wait.ts`
+
+They retain the reference implementation's window selection, physical coordinate mapping, GDI
+capture, per-monitor DPI handling, Win32 `SendInput`, clipboard restoration and input cleanup. The
+small local `backend.ts` and `coordinate-mode.ts` files replace private DSH/Cordis types, and the
+imports use pi-Orb's TypeScript build settings. The model-facing `orb_*` schemas, Pi session,
+authorization, bridge and screenshot confirmation flow remain pi-Orb code. No reference plugin
+lifecycle, attachment store, or macOS/multi-display runtime was imported. This entry records both
+the source commit and the local adaptation boundary.
 
 ## 4. Components deliberately not included
 

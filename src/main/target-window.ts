@@ -5,11 +5,9 @@
  * recorded *before* waking, otherwise the orb becomes the foreground window and
  * captures itself.
  *
- * Implementation note for P1-05: the locked Cua contract exposes an `active` flag on
- * its window records (`cua_driver_contract.d.ts`), which is the intended replacement
- * for this lookup once the driver is installed. This module is the seam: only
- * `readTargetWindow` has to change, and the capture, limit and confirmation rules
- * above it stay as they are.
+ * The desktop tool backend now uses the imported reference Windows implementation directly.
+ * This reader remains for the product screenshot-consent path, whose Electron capture and
+ * pre-wake target recording are intentionally separate from model desktop actions.
  */
 
 import { execFile } from "node:child_process";

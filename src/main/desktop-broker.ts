@@ -51,6 +51,9 @@ export interface BrokerStatus {
 export class DesktopBroker {
   readonly #options: DesktopBrokerOptions;
   readonly #controller: DesktopTaskController;
+  /** Task id that owned the current driver observation; null means it was read-only pre-authorization. */
+  #observationTaskId: string | null = null;
+  #activeAction: AbortController | null = null;
 
   constructor(options: DesktopBrokerOptions) {
     this.#options = options;
@@ -68,13 +71,26 @@ export class DesktopBroker {
    * bound to the session and generation so it cannot survive a run change.
    */
   authorize(input: { sessionId: string; generation: number; scope: string }): BrokerStatus {
+    this.#abortActiveAction("desktop task was replaced");
+    // A new task must never inherit a picture captured under the previous grant. An observation
+    // made before any grant is intentionally retained so the user can inspect it before approving.
+    if (this.#observationTaskId !== null) {
+      this.#consumeObservation();
+      this.#options.driver.resetActionContext?.();
+      this.#controller.clearObservation();
+    }
     this.#controller.authorize(input);
     this.#log({ event: "authorize", ...input });
     return this.status();
   }
 
   revoke(): void {
+    this.#abortActiveAction("desktop task was revoked");
     this.#controller.revoke();
+    // Drop the backend's copy as well as the controller's observation id. The driver is the
+    // source used by action validation, so leaving it populated would allow reuse after regrant.
+    this.#consumeObservation();
+    this.#options.driver.resetActionContext?.();
     this.#log({ event: "revoke" });
   }
 
@@ -97,6 +113,8 @@ export class DesktopBroker {
   async observe(sessionId: string, _generation: number, windowId?: string): Promise<unknown> {
     const result = await this.#options.driver.observe(windowId ? { windowId } : {});
     if (!result.ok || !result.observation) {
+      this.#consumeObservation();
+      this.#controller.clearObservation();
       this.#log({ event: "observe-failed", error: result.error });
       return {
         ok: false,
@@ -106,12 +124,18 @@ export class DesktopBroker {
       };
     }
     this.#controller.observe(result.observation.observationId);
+    this.#observationTaskId = this.#controller.state.authorization?.taskId ?? null;
     this.#log({
       event: "observe",
       sessionId,
       observationId: result.observation.observationId,
       windowId: result.observation.window.id,
       elementCount: result.observation.elements.length,
+      coordinateSpace: {
+        action: result.observation.coordinateSpace?.action ?? null,
+        space: result.observation.coordinateSpace?.space ?? null,
+        hasWindowRect: result.observation.coordinateSpace?.windowRect != null,
+      },
     });
     return { ok: true, ...result.observation };
   }
@@ -141,11 +165,42 @@ export class DesktopBroker {
       return refusal(refusalReason);
     }
 
-    const result: ActResult = await this.#options.driver.act(parsed.action, observation!);
+    this.#log({
+      event: "act-observation",
+      kind: parsed.action.kind,
+      observationId: observation!.observationId,
+      coordinateSpace: {
+        present: observation!.coordinateSpace != null,
+        space: observation!.coordinateSpace?.space ?? null,
+        hasWindowRect: observation!.coordinateSpace?.windowRect != null,
+      },
+    });
+
+    const taskId = this.#controller.state.authorization?.taskId ?? null;
+    const actionController = new AbortController();
+    this.#activeAction = actionController;
+    let result: ActResult;
+    try {
+      result = await this.#options.driver.act(parsed.action, observation!, actionController.signal);
+    } catch (error) {
+      result = {
+        ok: false,
+        refused: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    } finally {
+      if (this.#activeAction === actionController) this.#activeAction = null;
+    }
+
+    // A revoke or replacement may have happened while the native action was unwinding. Do not
+    // account that old result against a new grant or consume the new grant's observation.
+    if (this.#controller.state.authorization?.taskId !== taskId) {
+      return refusal("no-task-authorization");
+    }
     this.#controller.recordOutcome(result.ok, result.error);
     // The observation is spent either way. A failed action must not be retried from the same
     // picture, and a successful one must be followed by a fresh look.
-    this.#options.driver.consumeObservation?.();
+    this.#consumeObservation();
 
     if (!result.ok) {
       // A failure stops the batch; the message says so, because the model must not retry
@@ -181,6 +236,17 @@ export class DesktopBroker {
   #currentObservation(): DesktopObservation | null {
     const driver = this.#options.driver as { lastObservation?: DesktopObservation | null };
     return driver.lastObservation ?? null;
+  }
+
+  #consumeObservation(): void {
+    this.#options.driver.consumeObservation?.();
+    this.#observationTaskId = null;
+  }
+
+  #abortActiveAction(reason: string): void {
+    const action = this.#activeAction;
+    this.#activeAction = null;
+    if (action && !action.signal.aborted) action.abort(new Error(reason));
   }
 
   #log(entry: Record<string, unknown>): void {

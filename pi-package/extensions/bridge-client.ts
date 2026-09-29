@@ -48,7 +48,7 @@ function nonBlank(value: string | undefined): string | null {
 }
 
 export interface BridgeClientOptions {
-  /** Fallback pipe when the handshake file does not name one. */
+  /** Explicit pipe override for tests or controlled embedding; production uses the handshake pipe. */
   readonly pipePath: string;
   readonly tokenFile: string;
   /** Per-request timeout. A hung shell must not hang the model's tool call. */

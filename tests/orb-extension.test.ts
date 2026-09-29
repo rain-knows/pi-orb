@@ -1,0 +1,34 @@
+import { describe, expect, it } from "vitest";
+import { renderResult } from "../pi-package/extensions/orb";
+
+describe("Orb extension result rendering", () => {
+  it("renders an action result with an observation id as action JSON", () => {
+    const result = {
+      ok: true,
+      action: "click",
+      observationId: "obs-1",
+      actionsUsed: 1,
+      next: "Observe the window again before the next action.",
+    };
+
+    expect(JSON.parse(renderResult(result))).toEqual(result);
+  });
+
+  it("renders observations with their coordinate contract", () => {
+    const result = {
+      observationId: "obs-1",
+      window: { id: "42", pid: 24, title: "Target", appName: "target.exe" },
+      coordinateSpace: {
+        action: "screenshot-fraction",
+        space: 1000,
+        windowRect: { x: 0, y: 0, width: 800, height: 600 },
+      },
+      elements: [],
+      elementsUnavailable: true,
+      degraded: false,
+    };
+
+    expect(renderResult(result)).toContain("observation_id: obs-1");
+    expect(renderResult(result)).toContain("800x600 px");
+  });
+});

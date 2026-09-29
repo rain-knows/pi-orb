@@ -28,9 +28,13 @@ export type ToggleAction = "noop" | "wake" | "collapse";
  *    window is sitting behind something else, and a user reaching for the wake
  *    shortcut wants it back, not hidden.
  */
-export function decideToggle(state: WindowState): ToggleAction {
+export function decideToggle(state: WindowState, source: TriggerSource = "shortcut"): ToggleAction {
   if (state.destroyed) return "noop";
   if (state.minimized) return "wake";
+  // A tray click is an explicit toggle. Clicking the tray naturally moves focus away from the
+  // orb, so using the shortcut's focus-sensitive rule here would make the second click wake again
+  // forever instead of hiding the visible orb.
+  if (source === "tray" && state.visible) return "collapse";
   if (state.visible && state.focused) return "collapse";
   return "wake";
 }
@@ -83,15 +87,15 @@ export class WakeController {
    * cooldown window. Waking never creates a session, starts a screenshot or sends
    * anything: it only changes window visibility.
    */
-  trigger(_source: TriggerSource): Promise<ToggleAction | "throttled"> {
-    return this.#apply();
+  trigger(source: TriggerSource): Promise<ToggleAction | "throttled"> {
+    return this.#apply(source);
   }
 
-  async #apply(): Promise<ToggleAction | "throttled"> {
+  async #apply(source: TriggerSource): Promise<ToggleAction | "throttled"> {
     const now = this.#now();
     if (now - this.#lastAppliedAt < this.#cooldownMs) return "throttled";
 
-    const action = decideToggle(this.#target.getState());
+    const action = decideToggle(this.#target.getState(), source);
     this.#lastAppliedAt = now;
     this.#lastAction = action;
 

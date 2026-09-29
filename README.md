@@ -77,7 +77,7 @@ npm run build
 | Variable | Meaning |
 |---|---|
 | `PI_ORB_PI_WEB_URL` | pi-web base URL. Default `http://127.0.0.1:30141`. |
-| `PI_ORB_PI_WEB_PASSWORD` | pi-web password used by the main process. `PI_WEB_PASSWORD` is accepted as a fallback. |
+| `PI_ORB_PI_WEB_PASSWORD` | pi-web password used by the main process. |
 | `PI_ORB_CONFIG` | Overrides the Orb configuration path. The Pi extension reads the same variable. |
 
 Credentials stay in the Electron main process. pi-Orb never starts, restarts or stops
@@ -133,8 +133,7 @@ prompts — it cannot promise the prompt content is byte-identical.
 
 pi-Orb is MIT licensed (see [`LICENSE`](./LICENSE)).
 
-Third-party obligations are recorded in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md),
-including the MPL-2.0 components and how to obtain their corresponding source. The bundled desktop
-driver is `@trycua/cua-driver@0.30.1` with the Windows platform package licensed
-`MIT AND MPL-2.0`; whether the 26.8 MB `cua_driver_sdk.dll` carries an MPL obligation was resolved
-by inspecting the shipped artifact and is documented there.
+Third-party obligations are recorded in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+The bundled desktop backend is the MIT licensed Windows implementation imported from
+`deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`; historical Cua probe
+records remain under `evidence/` but are not production dependencies.

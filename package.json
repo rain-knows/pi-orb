@@ -20,9 +20,10 @@
     "verify:p0-baseline": "node evidence/p0-01/verify-baseline.mjs"
   },
   "dependencies": {
-    "@trycua/cua-driver": "0.30.1",
+    "koffi": "^2.14.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "uiohook-napi": "1.5.5"
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "0.87.1",
@@ -42,6 +43,8 @@
   "allowScripts": {
     "electron@44.4.5": true,
     "esbuild@0.28.2": true,
-    "esbuild@0.25.12": true
+    "esbuild@0.25.12": true,
+    "uiohook-napi@1.5.5": true,
+    "koffi": "true"
   }
 }

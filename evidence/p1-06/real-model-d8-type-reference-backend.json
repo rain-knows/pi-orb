@@ -1,0 +1,637 @@
+{
+  "capturedAt": "2026-09-29T00:35:19.720Z",
+  "testCase": "d8-type",
+  "scope": {
+    "what": "real model observes a disposable target, focuses its text field, and types a synthetic marker",
+    "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
+    "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d8-type-agent-1790642119679",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "ChatGPT",
+      "title": "ChatGPT",
+      "inputDesktopAccessible": true
+    },
+    "targetPid": 39232,
+    "target": {
+      "pid": 39232,
+      "windowBoundsDip": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBoundsDip": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "scaleFactor": 1.5,
+      "cell00": {
+        "cell": "0,0",
+        "centreInContent": {
+          "x": 60,
+          "y": 45
+        },
+        "dipScreenPoint": {
+          "x": 187,
+          "y": 191
+        },
+        "physicalScreenPoint": {
+          "x": 281,
+          "y": 287
+        }
+      }
+    },
+    "piWeb": {
+      "ok": true,
+      "baseUrl": "http://127.0.0.1:45952",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:45952\n- Network:       http://127.0.0.1:45952\n✓ Ready in 549ms\n✓ Running next.config.ts took 163ms\n"
+    },
+    "handshake": {
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\shell-data\\bridge-token.json",
+      "pid": 5272,
+      "generation": 1,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-5272"
+    },
+    "rendererTarget": {
+      "title": "pi-Orb",
+      "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
+    },
+    "shortcut": {
+      "registered": true,
+      "problem": null
+    },
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 2,
+      "busy": false,
+      "sessionId": "01a0ea96-a14c-7155-99c9-8db17164baeb",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:45952",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "taskId": null,
+        "scope": null,
+        "actionsUsed": 0,
+        "actionLimit": 12,
+        "expiresAt": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true,
+        "target": null
+      }
+    },
+    "generation": 2,
+    "session": "01a0ea96-a14c-7155-99c9-8db17164baeb",
+    "model": {
+      "sessionId": "01a0ea96-a73f-7155-99c9-8db3f4871bbb",
+      "selected": {
+        "provider": "TZcode",
+        "modelId": "deepseek-v4.1-flash"
+      },
+      "input": [
+        "text",
+        "image"
+      ],
+      "declaredImageCapable": true
+    },
+    "interactiveDesktopBeforeTarget": {
+      "process": "electron",
+      "title": "pi-Orb",
+      "inputDesktopAccessible": true
+    },
+    "windowChoice": {
+      "windowId": "20382672",
+      "pid": 39232,
+      "appName": "electron",
+      "title": "P1-05 input target",
+      "bounds": {
+        "x": 189,
+        "y": 135,
+        "width": 735,
+        "height": 786
+      },
+      "zIndex": "320",
+      "isRecorded": false
+    },
+    "windowCandidates": [
+      {
+        "pid": 34328,
+        "title": "",
+        "appName": "explorer"
+      },
+      {
+        "pid": 39232,
+        "title": "P1-05 input target",
+        "appName": "electron"
+      },
+      {
+        "pid": 7236,
+        "title": "ChatGPT",
+        "appName": "ChatGPT"
+      },
+      {
+        "pid": 25612,
+        "title": "TZCODE - Google Chrome",
+        "appName": "chrome"
+      },
+      {
+        "pid": 38260,
+        "title": "*p1-05-keyboard-target.txt - Notepad",
+        "appName": "Notepad"
+      },
+      {
+        "pid": 45964,
+        "title": "com.ccswitch.desktop-siw",
+        "appName": "cc-switch"
+      },
+      {
+        "pid": 45964,
+        "title": "",
+        "appName": "cc-switch"
+      },
+      {
+        "pid": 25392,
+        "title": "",
+        "appName": "ApifoxAppAgent"
+      },
+      {
+        "pid": 12844,
+        "title": "",
+        "appName": "clash-verge"
+      },
+      {
+        "pid": 34328,
+        "title": "Program Manager",
+        "appName": "explorer"
+      }
+    ],
+    "interactiveDesktopAtWake": {
+      "process": "electron",
+      "title": "pi-Orb",
+      "inputDesktopAccessible": true
+    },
+    "wake": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true,
+      "chordSent": "ctrl+alt+f11"
+    },
+    "recordedTarget": {
+      "windowId": "20382672",
+      "pid": 39232,
+      "appName": "electron",
+      "title": "P1-05 input target",
+      "bounds": {
+        "x": 189,
+        "y": 135,
+        "width": 735,
+        "height": 786
+      },
+      "zIndex": "327",
+      "isRecorded": false
+    },
+    "approved": {
+      "authorized": true,
+      "scope": "click the labelled disposable text field and type P1ORBD8TEST once",
+      "target": "P1-05 input target"
+    },
+    "capture": {
+      "ok": true,
+      "observationId": "obs-muly3m3i-cyk2o63s",
+      "width": 749,
+      "height": 795,
+      "bytes": 32835,
+      "targetDescription": "P1-05 input target (753x795, pid 39232, dpi 144)",
+      "targetStale": false
+    },
+    "resolve": {
+      "ok": true,
+      "sent": true
+    },
+    "waitedForIdle": true,
+    "bridgeDiagnostics": [
+      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-5272",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:26.064Z\",\"event\":\"revoke\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:44.038Z\",\"event\":\"authorize\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"generation\":2,\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:50.715Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"observationId\":\"obs-muly3q5w-1\",\"windowId\":\"20382672\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:53.429Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-muly3q5w-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:53.594Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muly3q5w-1\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:56.239Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"observationId\":\"obs-muly3ufd-2\",\"windowId\":\"20382672\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:58.844Z\",\"event\":\"act-observation\",\"kind\":\"type\",\"observationId\":\"obs-muly3ufd-2\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:59.149Z\",\"event\":\"act\",\"kind\":\"type\",\"observationId\":\"obs-muly3ufd-2\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-29T00:36:01.581Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"observationId\":\"obs-muly3yjt-3\",\"windowId\":\"20382672\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}"
+    ]
+  },
+  "checks": [
+    {
+      "name": "the isolated pi-web started",
+      "ok": true,
+      "detail": "http://127.0.0.1:45952"
+    },
+    {
+      "name": "the isolated shell published its own handshake",
+      "ok": true,
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\shell-data\\\\bridge-token.json\",\"pid\":5272,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-5272\"}"
+    },
+    {
+      "name": "the isolated shell's pipe accepts a connection",
+      "ok": true,
+      "detail": "\\\\.\\pipe\\pi-orb-5272"
+    },
+    {
+      "name": "the isolated shell is NOT the user's running orb",
+      "ok": true,
+      "detail": "handshake pid 5272"
+    },
+    {
+      "name": "the orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "{\"title\":\"pi-Orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+    },
+    {
+      "name": "the wake shortcut registered",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:45952\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+    },
+    {
+      "name": "the isolated shell reports this run's workspace and a generation",
+      "ok": true,
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"generation\":2}"
+    },
+    {
+      "name": "the isolated shell created a real pi-web session",
+      "ok": true,
+      "detail": "\"01a0ea96-a14c-7155-99c9-8db17164baeb\""
+    },
+    {
+      "name": "the session is served by a model that declares image input",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a0ea96-a73f-7155-99c9-8db3f4871bbb\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+    },
+    {
+      "name": "an interactive desktop is available before target enumeration",
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-Orb\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the driver lists the disposable target, identified by process id",
+      "ok": true,
+      "detail": "grid pid=39232 candidates=[{\"pid\":34328,\"title\":\"\",\"appName\":\"explorer\"},{\"pid\":39232,\"title\":\"P1-05 input target\",\"appName\":\"electron\"},{\"pid\":7236,\"title\":\"ChatGPT\",\"appName\":\"ChatGPT\"},{\"pid\":25612,\"title\":\"TZCODE - Google Chrome\",\"appName\":\"chrome\"},{\"pid\":38260,\"title\":\"*p1-05-keyboard-target.txt - Notepad\",\"appName\":\"Notepad\"},{\"pid\":45964,\"title\":\"com.ccswitch.desktop-siw\",\"appName\":\"cc-switch\"},{\"pid\":45964,\"title\"…"
+    },
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-Orb\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the product recorded the disposable target, not the user's desktop",
+      "ok": true,
+      "detail": "{\"windowId\":\"20382672\",\"pid\":39232,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":false}"
+    },
+    {
+      "name": "the desktop target was set to the disposable window",
+      "ok": true,
+      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"20382672\",\"pid\":39232,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":true}}"
+    },
+    {
+      "name": "the desktop task was approved through the product's UI path",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790642444038,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"20382672\",\"pid\":39232,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":true}}"
+    },
+    {
+      "name": "a screenshot of the recorded target was captured for preview",
+      "ok": true,
+      "detail": "{\"ok\":true,\"observationId\":\"obs-muly3m3i-cyk2o63s\",\"width\":749,\"height\":795,\"bytes\":32835,\"targetDescription\":\"P1-05 input target (753x795, pid 39232, dpi 144)\",\"targetStale\":false}"
+    },
+    {
+      "name": "the preview describes the disposable target window, not the orb",
+      "ok": true,
+      "detail": "P1-05 input target (753x795, pid 39232, dpi 144)"
+    },
+    {
+      "name": "the confirmed screenshot was sent with the instruction",
+      "ok": true,
+      "detail": "{\"ok\":true,\"sent\":true}"
+    },
+    {
+      "name": "D8 (target's own log): the exact synthetic marker reached the text field",
+      "ok": true,
+      "detail": "[{\"at\":1790642159074,\"kind\":\"text-input\",\"value\":\"P1ORBD8TEST\"}]"
+    },
+    {
+      "name": "the real model called orb_observe on its own",
+      "ok": true,
+      "detail": "[{\"toolName\":\"orb_observe\",\"arguments\":{}},{\"toolName\":\"orb_observe\",\"arguments\":{}}]"
+    },
+    {
+      "name": "the real model called orb_type on its own",
+      "ok": true,
+      "detail": "[{\"toolName\":\"orb_type\",\"arguments\":{\"observation_id\":\"obs-muly3ufd-2\",\"text\":\"P1ORBD8TEST\"}}]"
+    },
+    {
+      "name": "the model observed before acting",
+      "ok": true,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+    },
+    {
+      "name": "the model observed again after its action",
+      "ok": true,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+    },
+    {
+      "name": "D8: the model clicked the disposable field before typing",
+      "ok": true,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+    },
+    {
+      "name": "D8: the model observed again between focus click and text input",
+      "ok": true,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+    }
+  ],
+  "passed": true,
+  "targetLog": {
+    "events": [
+      {
+        "kind": "ready",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "text-input",
+        "cell": null,
+        "offsetInCell": null,
+        "value": "P1ORBD8TEST",
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      }
+    ],
+    "matches": [
+      {
+        "at": 1790642159074,
+        "kind": "text-input",
+        "value": "P1ORBD8TEST"
+      }
+    ],
+    "cellDowns": [
+      {}
+    ]
+  },
+  "sessionFiles": [
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1790642119679-orb-workspace--\\2026-09-29T00-35-35-373Z_01a0ea96-a14c-7155-99c9-8db17164baeb.jsonl"
+  ],
+  "modelToolCalls": [
+    {
+      "toolName": "orb_observe",
+      "arguments": {}
+    },
+    {
+      "toolName": "orb_click",
+      "arguments": {
+        "observation_id": "obs-muly3q5w-1",
+        "x": 510,
+        "y": 740
+      }
+    },
+    {
+      "toolName": "orb_observe",
+      "arguments": {}
+    },
+    {
+      "toolName": "orb_type",
+      "arguments": {
+        "observation_id": "obs-muly3ufd-2",
+        "text": "P1ORBD8TEST"
+      }
+    },
+    {
+      "toolName": "orb_observe",
+      "arguments": {}
+    }
+  ],
+  "finishedAt": "2026-09-29T00:36:04.651Z"
+}

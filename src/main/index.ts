@@ -29,6 +29,7 @@ import { loadOrbConfig, defaultConfigPath, saveOrbConfig } from "./config-store"
 import { validateWorkspace, createWorkspace } from "./workspace";
 import { RunGenerations } from "./generations";
 import { ShortcutRegistry } from "./shortcut";
+import { ShortcutEdgeGuard } from "./shortcut-edge-guard";
 import { WakeController } from "./window-toggle";
 import { OrbWindowLifecycle } from "./window-lifecycle";
 import { OrbSessionController } from "./orb-session";
@@ -39,7 +40,7 @@ import { captureTargetWindow } from "./desktop-capture";
 import { ScreenshotFlow } from "./screenshot-flow";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
-import { CuaDriverAdapter, type CuaSdkLike, type CuaWindowInfo } from "./cua-adapter";
+import { ReferenceWindowsDriver, type ReferenceWindowInfo } from "./reference-windows-driver";
 import {
   IPC,
   type DesktopTaskStatus,
@@ -54,9 +55,11 @@ import {
   type WorkspaceStatus,
 } from "@shared/ipc";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
+import { uIOhook } from "uiohook-napi";
 
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
+const shortcutEdgeGuard = new ShortcutEdgeGuard(uIOhook);
 const targetWindowReader = new Win32TargetWindowReader();
 
 /**
@@ -76,7 +79,7 @@ let screenshotFlow: ScreenshotFlow;
  * starts the orb; the bridge listens from startup so the extension can report its state.
  */
 let desktopBroker: DesktopBroker | null = null;
-let cuaAdapter: CuaDriverAdapter | null = null;
+let referenceDriver: ReferenceWindowsDriver | null = null;
 let bridge: BridgeServer | null = null;
 
 /**
@@ -113,7 +116,7 @@ let lastShortcutProblem: string | null = null;
 let lastDesktopProblem: string | null = null;
 let isQuitting = false;
 const piWebBaseUrl = process.env.PI_ORB_PI_WEB_URL ?? "http://127.0.0.1:30141";
-const piWebPassword = process.env.PI_ORB_PI_WEB_PASSWORD ?? process.env.PI_WEB_PASSWORD;
+const piWebPassword = process.env.PI_ORB_PI_WEB_PASSWORD;
 
 /**
  * pi-web connection state.
@@ -136,6 +139,9 @@ const client = new PiWebClient({
 
 function emit(event: OrbSessionEvent): void {
   if (event.type === "idle" || event.type === "error") {
+    // A completed or failed turn cannot retain desktop authority. Revoke before releasing the
+    // generation lock so the next turn always starts without a stale target or active action.
+    revokeDesktopOperations(event.type === "idle" ? "the turn completed" : "the turn failed");
     // The turn is over. The single-task lock must not outlive it, or the orb would
     // refuse every later message for the rest of the run.
     //
@@ -262,25 +268,53 @@ function desktopTaskStatus(): DesktopTaskStatus {
  */
 async function startDesktop(): Promise<void> {
   try {
-    const sdk = (await import("@trycua/cua-driver")) as unknown as CuaSdkLike;
-    cuaAdapter = new CuaDriverAdapter({
-      sdk,
+    const [{ createProductionWindowsOps }, { createWindowsDesktopBackend }] = await Promise.all([
+      import("./reference-windows/windows-native"),
+      import("./reference-windows/windows"),
+    ]);
+    const ops = createProductionWindowsOps();
+    referenceDriver = new ReferenceWindowsDriver({
+      ops,
+      backend: createWindowsDesktopBackend(ops),
       ownProcessId: process.pid,
-      onMappingUsed: (mapping) => console.log(`[pi-orb] desktop coordinate mapping: ${JSON.stringify(mapping)}`),
-      // The adapter refuses to guess a target, so this is the only source of one.
-      resolveRecordedTarget: () =>
-        desktopTarget ? { pid: desktopTarget.pid, title: desktopTarget.title } : undefined,
+      resolveRecordedTarget: () => {
+        if (desktopTarget) {
+          return {
+            handle: desktopTarget.windowId,
+            pid: desktopTarget.pid,
+            title: desktopTarget.title,
+          };
+        }
+        const target = recordedTarget.snapshot?.target;
+        return target
+          ? { handle: target.handle, pid: target.processId, title: target.title }
+          : undefined;
+      },
+      withGuiTurn: async <T>(run: () => Promise<T>): Promise<T> => {
+        const current = window;
+        if (!current || current.isDestroyed()) return run();
+        const wasVisible = current.isVisible();
+        current.setIgnoreMouseEvents(true, { forward: true });
+        if (wasVisible) current.hide();
+        try {
+          return await run();
+        } finally {
+          if (!current.isDestroyed()) {
+            current.setIgnoreMouseEvents(false);
+            if (wasVisible) current.showInactive();
+          }
+        }
+      },
     });
-    cuaAdapter.create();
   } catch (error) {
     console.warn(`[pi-orb] desktop driver unavailable: ${describeError(error)}`);
-    cuaAdapter = null;
+    referenceDriver = null;
   }
 
-  if (!cuaAdapter) return;
+  if (!referenceDriver) return;
 
   desktopBroker = new DesktopBroker({
-    driver: cuaAdapter,
+    driver: referenceDriver,
     isLive: (sessionId, generation) =>
       generations.current === generation && session?.sessionId === sessionId,
     log: (entry) => {
@@ -442,10 +476,29 @@ function markDisconnected(): void {
 }
 
 function registerShortcut(): void {
-  const result = shortcuts.apply(config.shortcut, () => void wake?.trigger("shortcut"));
+  if (!shortcutEdgeGuard.enabled) {
+    lastShortcutProblem = shortcutEdgeGuard.error ?? "Keyboard edge detection is unavailable.";
+    shortcuts.release();
+    console.warn(`[pi-orb] ${lastShortcutProblem}`);
+    return;
+  }
+  const result = shortcuts.apply(config.shortcut, onShortcutTrigger);
   if (!result.registered) {
     console.warn(`[pi-orb] wake shortcut not registered: ${result.reason}`);
+  } else {
+    shortcutEdgeGuard.configure(result.accelerator);
+    if (shortcutEdgeGuard.error) {
+      shortcuts.release();
+      lastShortcutProblem = shortcutEdgeGuard.error;
+      console.warn(`[pi-orb] ${shortcutEdgeGuard.error}`);
+      return;
+    }
+    lastShortcutProblem = null;
   }
+}
+
+function onShortcutTrigger(): void {
+  if (shortcutEdgeGuard.accept()) void wake?.trigger("shortcut");
 }
 
 /**
@@ -526,6 +579,7 @@ function revokeDesktopOperations(reason: string): void {
   // collapse the user is no longer working with that window, so keeping it would let a later capture
   // silently reuse a window the user has moved on from. A fresh wake records a fresh target.
   recordedTarget.clear();
+  desktopTarget = null;
   if (hadAuthority || hadCapture) {
     console.log(`[pi-orb] desktop operations revoked: ${reason}`);
   }
@@ -584,17 +638,29 @@ function registerIpc(): void {
       lastShortcutProblem = "No shortcut was provided.";
       return currentStatus();
     }
+    if (!shortcutEdgeGuard.enabled) {
+      lastShortcutProblem = shortcutEdgeGuard.error ?? "Keyboard edge detection is unavailable.";
+      return currentStatus();
+    }
     const previous = config.shortcut;
-    const result = shortcuts.apply(candidate, () => void wake?.trigger("shortcut"));
+    const result = shortcuts.apply(candidate, onShortcutTrigger);
     if (!result.registered) {
       // Do not persist a shortcut that does not work, and put the previous one back
       // so the orb stays reachable. The reason still reaches the user through the
       // status snapshot.
       lastShortcutProblem = result.reason;
-      shortcuts.apply(previous, () => void wake?.trigger("shortcut"));
+      const restored = shortcuts.apply(previous, onShortcutTrigger);
+      if (restored.registered) shortcutEdgeGuard.configure(restored.accelerator);
       return currentStatus();
     }
     lastShortcutProblem = null;
+    shortcutEdgeGuard.configure(result.accelerator);
+    if (shortcutEdgeGuard.error) {
+      shortcuts.release();
+      lastShortcutProblem = shortcutEdgeGuard.error;
+      console.warn(`[pi-orb] ${shortcutEdgeGuard.error}`);
+      return currentStatus();
+    }
     // Persist the canonical form that was actually registered, not the raw input.
     config = { ...config, shortcut: result.accelerator };
     saveOrbConfig(configPath, config);
@@ -752,10 +818,10 @@ function registerIpc(): void {
   ipcMain.handle(IPC.getDesktopTaskStatus, () => desktopTaskStatus());
 
   ipcMain.handle(IPC.listDesktopWindows, async (): Promise<ListDesktopWindowsResult> => {
-    if (!cuaAdapter) {
+    if (!referenceDriver) {
       return { ok: false, message: "The desktop driver is unavailable, so windows cannot be listed." };
     }
-    const windows = await cuaAdapter.listWindows(process.pid);
+    const windows = referenceDriver.listWindows();
     return {
       ok: true,
       windows: windows.map((window) => toWindowChoice(window)),
@@ -773,10 +839,10 @@ function registerIpc(): void {
     if (typeof windowId !== "string" || windowId.length === 0) {
       return { ok: false, message: "No window was chosen." };
     }
-    if (!cuaAdapter) {
+    if (!referenceDriver) {
       return { ok: false, message: "The desktop driver is unavailable, so a target cannot be set." };
     }
-    const windows = await cuaAdapter.listWindows(process.pid);
+    const windows = referenceDriver.listWindows();
     const match = windows.find((window) => String(window.windowId) === windowId);
     if (!match) {
       return { ok: false, message: "That window is no longer available." };
@@ -833,6 +899,9 @@ function registerIpc(): void {
     if (!parsed) throw new Error("Malformed abort request.");
     const check = generations.check(parsed.generation);
     if (!check.ok) throw new Error(describeGenerationFailure(check.reason));
+    // Revoke before awaiting pi-web's cooperative abort. A provider may take time to unwind, but
+    // native desktop input must stop immediately when the user presses Stop.
+    revokeDesktopOperations("the user stopped the running turn");
     try {
       await session.abort();
     } finally {
@@ -946,11 +1015,11 @@ function debounce(action: () => void, delayMs: number): () => void {
 
 function quit(): void {
   isQuitting = true;
+  shortcutEdgeGuard.stop();
   shortcuts.releaseAll();
   // Shutdown must not leave an image waiting to be sent, nor a task grant a later run could inherit.
   revokeDesktopOperations("the shell is quitting");
   void bridge?.close();
-  void cuaAdapter?.shutdown();
   removeHandshake(app.getPath("userData"));
   session.dispose();
   generations.end();
@@ -985,6 +1054,9 @@ void app.whenReady().then(async () => {
   createTray();
   window = createWindow();
   attachWakeController(window);
+  if (!shortcutEdgeGuard.start()) {
+    console.warn(`[pi-orb] ${shortcutEdgeGuard.error ?? "Keyboard edge detection is unavailable."}`);
+  }
   registerShortcut();
 
   // The connection probe runs first: the window is already created, so its first snapshot must
@@ -1022,21 +1094,22 @@ async function showOrb(): Promise<void> {
  * Align the desktop tool target with the recorded window.
  *
  * The driver's window list is the only source of a usable window id, so the recorded window is
- * matched into it by (process id, title). When the recorded window is not in the list, the previous
- * target is kept rather than cleared, so a temporary absence does not silently drop a user's choice.
+ * matched into it by (process id, title). When the recorded window is not in the list, the target is
+ * cleared rather than retaining a stale driver id that may now refer to a different window.
  */
 async function syncDesktopTargetFromRecord(): Promise<void> {
   const snapshot = recordedTarget.snapshot;
-  if (!snapshot || !cuaAdapter) return;
-  const windows = await cuaAdapter.listWindows(process.pid);
+  if (!snapshot || !referenceDriver) return;
+  const windows = referenceDriver.listWindows();
   const match = windows.find(
     (window) => window.pid === snapshot.target.processId && window.title === snapshot.target.title,
   );
   if (match) {
     desktopTarget = toWindowChoice(match);
   } else {
+    desktopTarget = null;
     console.log(
-      `[pi-orb] the recorded window (pid ${snapshot.target.processId}) is not in the driver's window list; the previous desktop target is kept`,
+      `[pi-orb] the recorded window (pid ${snapshot.target.processId}) is not in the driver's window list; the desktop target was cleared`,
     );
   }
 }
@@ -1058,7 +1131,7 @@ async function recordDesktopTarget(): Promise<void> {
 }
 
 /** Convert a driver window record into the shape the window shows the user. */
-function toWindowChoice(window: CuaWindowInfo): DesktopWindowChoice {
+function toWindowChoice(window: ReferenceWindowInfo): DesktopWindowChoice {
   return {
     windowId: String(window.windowId),
     pid: window.pid ?? -1,
@@ -1082,7 +1155,6 @@ app.on("before-quit", () => {
   shortcuts.releaseAll();
   revokeDesktopOperations("the shell is quitting");
   void bridge?.close();
-  void cuaAdapter?.shutdown();
   removeHandshake(app.getPath("userData"));
   session?.dispose();
 });

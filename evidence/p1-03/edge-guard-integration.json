@@ -1,0 +1,55 @@
+{
+  "capturedAt": "2026-09-29T00:57:02.572Z",
+  "shortcut": "Control+Alt+F24",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-03-edge-1790643422572",
+  "isolation": {
+    "userDataDir": "D:\\pi-orb-p1-runs\\p1-03-edge-1790643422572\\electron-data",
+    "syntheticKeyEvents": 12,
+    "note": "The probe uses only Control+Alt+F24 and a temporary Electron profile; it is not the manual A4 result."
+  },
+  "ready": {
+    "type": "ready",
+    "guardStarted": true,
+    "registered": true,
+    "guardError": null
+  },
+  "report": {
+    "callbacks": 2,
+    "accepted": 2,
+    "guardEnabled": true,
+    "guardError": null
+  },
+  "checks": [
+    {
+      "name": "Electron started the native edge guard",
+      "ok": true,
+      "detail": "{\"type\":\"ready\",\"guardStarted\":true,\"registered\":true,\"guardError\":null}"
+    },
+    {
+      "name": "Electron registered the integration shortcut",
+      "ok": true,
+      "detail": "{\"type\":\"ready\",\"guardStarted\":true,\"registered\":true,\"guardError\":null}"
+    },
+    {
+      "name": "the guard has no startup error",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "name": "a held shortcut produced at least one OS callback",
+      "ok": true,
+      "detail": "{\"callbacks\":2,\"accepted\":2,\"guardEnabled\":true,\"guardError\":null}"
+    },
+    {
+      "name": "the first hold was accepted once per edge",
+      "ok": true,
+      "detail": "{\"callbacks\":2,\"accepted\":2,\"guardEnabled\":true,\"guardError\":null}"
+    },
+    {
+      "name": "the hook remained enabled for both holds",
+      "ok": true,
+      "detail": "{\"callbacks\":2,\"accepted\":2,\"guardEnabled\":true,\"guardError\":null}"
+    }
+  ],
+  "passed": true
+}

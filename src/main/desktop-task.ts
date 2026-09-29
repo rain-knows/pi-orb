@@ -133,6 +133,11 @@ export class DesktopTaskController {
     this.#lastObservationId = observationId;
   }
 
+  /** Forget the current observation when its driver-side frame is no longer usable. */
+  clearObservation(): void {
+    this.#lastObservationId = null;
+  }
+
   /** Clear the stopped state after the user explicitly continues. */
   continueAfterStop(): void {
     this.#stopped = false;
@@ -208,14 +213,14 @@ export interface ActResult {
 /**
  * The driver seam.
  *
- * The broker talks to the Cua driver only through this interface, so the batch rules can
+ * The broker talks to the desktop backend only through this interface, so the batch rules can
  * be tested without a real desktop and so P1-07 can swap or stub the driver.
  */
 export interface DesktopDriver {
   /** Observe one window and return the current element list. */
   observe(input: { readonly windowId?: string }): Promise<ObserveResult>;
   /** Deliver exactly one action against an observed window. */
-  act(action: DesktopAction, observation: DesktopObservation): Promise<ActResult>;
+  act(action: DesktopAction, observation: DesktopObservation, signal?: AbortSignal): Promise<ActResult>;
   /**
    * Drop the current observation after an action ran.
    *
@@ -223,4 +228,6 @@ export interface DesktopDriver {
    * be replayed, and a plan could chain actions on a picture that is no longer true.
    */
   consumeObservation?(): void;
+  /** Clear driver-local action context when a task is revoked or replaced. */
+  resetActionContext?(): void;
 }

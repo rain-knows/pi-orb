@@ -3,9 +3,10 @@
 > 运行方式：
 > - `node evidence/p1-05/probe-cua-driver.mjs`（只读运行时探测：安装物、工具目录、窗口/应用发现、坐标、会话）
 > - `node evidence/p1-05/run-p1-05.mjs`（真机输入验证：点击、输入、滚动、释放、拒绝）
+> - `node evidence/p1-05/probe-reference-cancel.mjs`（当前参考 backend 的 disposable target 长按取消；需要解锁的交互式桌面）
 >
 > 原始结果：`cua-runtime-probe.json`（只读 20/20）、`input-verification.json`（输入 **27/27**）
-> 状态：**后台与前台点击、后台输入、前台滚动（到达且生效）均已实测**；向 Chromium 内容输入文本、高权限窗口、按下中途取消未验证，见 §6。
+> 状态：本文件记录的是已删除的历史 Cua 探针。后台点击、前台点击与原生文本输入曾实测；前台滚动在 2026-09-28 最新复跑未能复现（驱动称成功、目标记录 0 个 `wheel`），因此不属于当前生产能力。当前参考 backend 的点击、滚动、输入和真实取消释放证据分别见 `evidence/p1-06/`、`tests/reference-windows.test.ts` 与 `reference-cancel.json`；Chromium 文本输入、高权限窗口仍未验证。
 
 ## 1. 决策 (a) 的落地：已安装、已锁定、已验证哈希
 
@@ -106,7 +107,7 @@ P0-04 只能枚举 tarball 里的类型声明；本次驱动**实际运行**，�
 | 坐标点击 → 同一窗口（**前台**） | **可用**（目标记录到真实 `mouse-down`；驱动报 `delivery_mode:foreground`） |
 | `type_text` → Chromium 窗口类 | 拒绝：`Background delivery is not available ... (text_input)`，`errorCode=background_unavailable` |
 | `scroll` → Chromium 窗口类（后台） | 拒绝：同上，`errorCode=background_unavailable` |
-| `scroll` → Chromium 窗口类（**前台升级**） | **可用**（本次实测定论）：目标记录到真实 `wheel`（`overScroller:true`、`elementUnderPoint` 为滚动区元素），且滚动条 `scrollTop` 实际位移。驱动摘要仍不足以作为证据（见 §4.2） |
+| `scroll` → Chromium 窗口类（**前台升级**） | **不稳定，逐次核验**：历史一次运行中目标记录到真实 `wheel` 并滚动；2026-09-28 最新复跑中目标为 0 个 `wheel`、`scrollTop` 未变，尽管驱动摘要称成功。不得只按驱动摘要判通过（见 §4.2） |
 | `scroll` → Notepad（前台升级） | 驱动未拒绝；但该目标**无可读回的滚动区**，因此轮盘是否到达它在本脚本中不可观测，不计入结论（见 §4.3） |
 | `type_text` → 记事本（后台） | **可用**（已由读回文档验证） |
 | `hotkey` → 记事本 | 拒绝：XAML/UWP 目标找不到 UIA `AcceleratorKey` 或 `(Ctrl+X)` 名称提示 |
@@ -136,13 +137,13 @@ P0-04 只能枚举 tarball 里的类型声明；本次驱动**实际运行**，�
 isError=false
 ```
 
-**但同一时刻前台窗口仍然是用户的 Chrome，目标窗口一个 wheel 事件都没收到。**把目标窗口移到完全无遮挡处、且循环重试 5 次后依然如此。结论：
+**本次复跑中目标窗口一个 wheel 事件都没收到。**更早的一次运行曾由目标日志确认 wheel 到达并滚动；把两次证据合并看，前台升级受 Windows 前台切换状态影响，不能稳定复现。结论：
 
 - 驱动会在**前台切换被 OS 拒绝**时仍报成功；
 - 因此判定必须读**目标自身的事件日志**（`wheel` 事件），不能读驱动摘要；
-- 本次实测滚动物理投递**成功过一次**（目标记录 22 个 `scroll` 事件），后续多次运行为 0——即它取决于 Windows 是否愿意交出前台，属**逐次测量项**，不得写成“已支持”。
+- 历史运行中滚动物理投递**成功过一次**（目标记录 22 个 `scroll` 事件）；本次最新复跑为 0 个 `wheel`。它取决于 Windows 是否愿意交出前台，属**逐次测量项**，不得写成稳定“已支持”。
 
-**对产品的直接含义**：`background` 是唯一不抢用户前台的方式，但它在 Electron/Chromium 内容上**只支持坐标点击**；文本输入与滚动必须走 `foreground`（会切换前台）。产品现已能正确发起升级；本次带真实前台窗口的会话中实测升级**确实到达并生效**（目标 `wheel` + `scrollTop` 变化）。该结论来自目标自身事件日志，**未**采信驱动摘要。
+**对产品的直接含义**：`background` 是唯一不抢用户前台的方式，但它在 Electron/Chromium 内容上**只支持坐标点击**；文本输入与滚动必须走 `foreground`（会切换前台）。产品可按驱动要求发起升级；其动作结果需看目标自身事件日志。本轮未收到事件，历史运行曾到达并生效，**不可将驱动摘要单独当作成功证据**。
 
 ### 4.3 本轮发现的三处「测试自己制造假阴性」（已修正，记录以免重蹈）
 
@@ -172,14 +173,14 @@ isError=false
 
 | 项 | 状态 |
 |---|---|
-| **截图点 ↔ 输入点一致性（联合断言）** | **自动化部分已通过**：P1-06 闭环在同一次运行内、从截图分数取点→经产品链路点击→目标自身 JSONL 命中 `1,2` 格（39/39，新增 C7 断言）。**真实模型部分仍未验证**：需真实模型拿到真实截图后自主调用 `orb_observe`→`orb_click`，入口已就绪（`evidence/p1-06/run-real-model-c7.mjs`，隔离真实 pi-web + 真实模型），但当前**工作站已锁定**（`LockApp` 前台、输入桌面不可访问），唤醒路径无法前置丢弃式目标，故未取得结论。见 [`evidence/p1-06/README.md`](../p1-06/README.md) §5.1。 |
+| **截图点 ↔ 输入点一致性（联合断言）** | **自动化部分已通过**：P1-06 当前参考 backend 闭环在同一次运行内、从截图分数取点→经产品链路点击→目标自身 JSONL 命中 `1,2` 格（39/39）。**真实模型部分已通过**：C7 由真实模型自主调用 `orb_observe`→`orb_click`→`orb_observe`，目标日志命中 `0,0`；见 [`evidence/p1-06/README.md`](../p1-06/README.md) §5.1。 |
 | **向 Chromium/Electron 内容输入文本** | 后台投递对该窗口类不可用；前台升级路径已实现，但未在本阶段做到稳定投递。**未验证**。 |
 | 普通 vs 高权限窗口对比 | 未针对高权限窗口测试（按目标要求不自动提权）。 |
-| 按下后取消的释放 | 已用 OS 全局键态差分证明本阶段输入后**无按键残留**（§4.4）；但未构造“真实前台下按住再撤销”的场景。 |
+| 按下后取消的释放 | **已验证**：`probe-reference-cancel.mjs` 真实 native 长按取消后，目标自身日志收到 `mouse-down=1`、匹配 `mouse-up=1`，且 backend 正确报告取消；结果见 `reference-cancel.json`。 |
 | 多显示器 | 本机仅 1 个显示器。 |
 | 驱动内建“授权/权限”语义 | `getSessionState` 的 `desktopCaptureAuthorized=false`、`desktopUnlocked=false`；本阶段未使用 `escalate_session`。**产品侧的授权仍由 pi-Orb 自己的任务授权与代次绑定负责**（P1-07）。 |
 
-> 前台**点击**与前台**滚动**均已不再是未验证项：本次实测前台点击产生真实 `mouse-down`，前台滚动产生真实 `wheel` 且滚动条实际位移，两者均由目标自身事件日志判定。
+> 前台**点击**已由目标日志确认产生真实 `mouse-down`。前台滚动有一次历史成功证据，但最新复跑未重现；滚动仍须按每次目标日志判定，不能作为稳定支持能力。
 
 
 ### 人工验证步骤（需要真实前台窗口的会话）

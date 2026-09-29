@@ -8,13 +8,13 @@
 //     observation is refused;
 //   - a failed action stops the batch instead of letting a plan continue clicking;
 //   - a real click reaches a real window through the whole chain
-//     (bridge -> broker -> adapter -> locked driver -> target application);
+//     (bridge -> broker -> ReferenceWindowsDriver -> reference Windows backend -> target application);
 //   - revoking, or starting a new run generation, removes the authority.
 //
 // The chain under test is the product's own code, not a simulation:
 //   evidence/p1-05/target-app  (a real Electron window that self-reports what it received)
-//     ^ the locked Cua driver (real background click)
-//     ^ src/main/cua-adapter.ts
+//     ^ src/main/reference-windows-driver.ts
+//     ^ src/main/reference-windows/ (GDI + SendInput + clipboard)
 //     ^ src/main/desktop-broker.ts  (policy: authorization, budget, freshness, batch stop)
 //     ^ src/main/bridge-server.ts   (Windows named pipe, per-run token, generation check)
 //     ^ the handshake file the Pi extension reads
@@ -115,7 +115,8 @@ const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
 const report = {
   capturedAt: new Date().toISOString(),
   scope: {
-    chain: "target app <- locked Cua driver <- cua-adapter <- desktop-broker <- bridge-server <- handshake file",
+    chain: "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge-server <- handshake file",
+    backend: "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
     approvalPath: "real UI path over CDP (window.orb.authorizeDesktopTask)",
   },
   safety: {
@@ -368,7 +369,7 @@ try {
   // -------------------------------------------------------------------------
   // 1. Start the disposable target, which self-reports what it receives.
   // -------------------------------------------------------------------------
-  grid = spawn(electronBinary, [join(repo, "evidence/p1-05/target-app")], {
+  grid = spawn(electronBinary, [join(repo, "evidence/p1-05/target-app"), `--user-data-dir=${join(runRoot, "target-data")}`], {
     cwd: repo,
     env: { ...process.env, P1_05_TARGET_LOG: gridLogPath, P1_05_TARGET_GEOMETRY: gridGeometryPath },
     stdio: ["ignore", "pipe", "pipe"],
@@ -681,6 +682,14 @@ try {
   await evaluate(
     `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'click the highlighted cell' }).then((s) => JSON.stringify(s))`,
   );
+  const targetRestored = await evaluate(
+    `window.orb.setDesktopTarget(${JSON.stringify(gridChoice.windowId)}).then((s) => JSON.stringify(s))`,
+  );
+  check(
+    "the target is explicitly reselected after revocation",
+    JSON.parse(targetRestored)?.ok === true,
+    targetRestored,
+  );
 
   // -------------------------------------------------------------------------
   // 7. Stale observation is refused.
@@ -776,25 +785,20 @@ try {
   // -------------------------------------------------------------------------
   // 8b. Scrolling through the whole product chain.
   //
-  //     This was previously recorded as "refused in every observed mode", which turned out to be a
-  //     defect rather than a driver limit: the adapter called the typed `scroll`, whose input has no
-  //     `delivery_mode` field, so the escalation the driver asks for was unreachable. With the
-  //     background->foreground escalation implemented, a scroll issued through the orb tool path must
-  //     now reach the target. Ground truth is the target's own scroll log.
+  //     The reference backend owns focus, pointer placement and SendInput wheel delivery. Ground
+  //     truth remains the target's own wheel and scroll log; a broker acknowledgement is not enough.
   // -------------------------------------------------------------------------
   const scrollObservation = await bridgeCall({ type: "observe", sessionId, generation });
   const scrollObservationId = scrollObservation.result?.observationId;
   const scrollsBefore = readGrid().filter((event) => event.kind === "scroll").length;
+  const wheelsBefore = readGrid().filter((event) => event.kind === "wheel").length;
   const scrollPoint = geometry.scroller?.dipScreenPoint ?? { x: 60, y: 390 };
 
   // The target must be in front for a wheel event to land on it, so the test brings its OWN window
   // forward first (the same helper P1-04/P1-05 use, and only ever aimed at a window this test started).
   //
-  // Measured while building this: the driver's foreground escalation reports success even when the
-  // target was not in front and no wheel event reached it. So "the driver said it delivered" is not
-  // evidence, which is precisely why the verdict below reads the target's own scroll log. The orb does
-  // not need the test's help here — the driver is documented to activate the target itself — but this
-  // stage must not depend on that succeeding, and it records the outcome either way.
+  // The product itself must activate the target. This helper only records the pre-action state and
+  // never turns a backend acknowledgement into a delivery verdict.
   const activationForScroll = activateWindow(String(gridChoice.windowId));
   await sleep(1500);
   const scrollResponse = await bridgeCall({
@@ -823,27 +827,23 @@ try {
     wheelEvents: wheelEvents.length,
     lastObservedScrollTop: scrollEvents.at(-1)?.scrollTop ?? null,
     note:
-      "the point is in the target's own screen DIP coordinates; the adapter converts it and the driver escalates to foreground delivery when background is refused. Whether the wheel physically lands depends on Windows granting the foreground swap, which the driver reports as success either way — so the verdict reads the target's own wheel log, and delivery itself is recorded as a measurement rather than asserted.",
+      "the point is a screenshot fraction mapped by the reference backend onto the selected physical window rect; target wheel and scroll logs are the only delivery evidence.",
   };
   check(
     "a scroll issued through the orb tool path is accepted by the broker",
     scrollResponse.ok === true,
     safe(scrollResponse).slice(0, 300),
   );
-  // Delivery is recorded, not asserted. Measured: the driver answers "✅ Scrolled ... via SendInput
-  // wheel (delivery_mode:foreground)" with isError:false even when the foreground window never became
-  // the target and no wheel event arrived, because Windows' foreground lock refused the swap. That is
-  // an OS/user-intent decision outside the product's control, and it was observed to succeed on one run
-  // and fail on later ones — so asserting it would make the stage depend on luck, while asserting
-  // nothing would hide the fact that the wheel did not arrive.
-  report.checks.push({
-    name: "environment fact: the scrolled wheel event reached the target on this run",
-    ok: true,
-    detail:
-      wheelEvents.length > scrollsBefore
-        ? "yes — the target logged real wheel events"
-        : "NO — the broker accepted the scroll and the driver reported success, but no wheel event reached the target (Windows did not hand it the foreground). Scroll delivery is UNVERIFIED on this run.",
-  });
+  check(
+    "the reference backend delivered a wheel event to the target",
+    wheelEvents.length > wheelsBefore && wheelEvents.slice(wheelsBefore).some((event) => event.overScroller === true),
+    safe(wheelEvents.slice(-3)),
+  );
+  check(
+    "the target scroll position changed",
+    scrollEvents.some((event) => typeof event.scrollTop === "number" && event.scrollTop > 0),
+    safe(scrollEvents.slice(-3)),
+  );
 
   // -------------------------------------------------------------------------
   // 9. One action per observation: replaying the same observation is refused.
@@ -997,7 +997,7 @@ try {
   report.piWebLogTail = piWebLog.slice(-800);
 
   mkdirSync(import.meta.dirname, { recursive: true });
-  writeFileSync(join(import.meta.dirname, "loop-verification.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  writeFileSync(join(import.meta.dirname, "loop-verification-reference-backend.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ passed: report.passed, checks: report.checks, summary: report.summary }, null, 2));
 }
 

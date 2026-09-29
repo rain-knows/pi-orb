@@ -1,0 +1,36 @@
+{
+  "capturedAt": "2026-09-29T03:27:59.583Z",
+  "runRoot": "D:\\pi-orb-p1-runs\\p1-05-reference-cancel-1790652479583",
+  "checks": [
+    {
+      "name": "native backend enumerated the disposable target",
+      "ok": true,
+      "detail": "{\"hwnd\":11930088,\"pid\":58704,\"ownerHwnd\":0,\"className\":\"Chrome_WidgetWin_1\",\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"visible\":true,\"iconic\":false,\"cloaked\":false,\"toolWindow\":false,\"popup\":false,\"frame\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"monitor\":{\"x\":0,\"y\":0,\"width\":2560,\"height\":1600},\"monitorDpi\":144}"
+    },
+    {
+      "name": "native backend focused the disposable target",
+      "ok": true,
+      "detail": "11930088"
+    },
+    {
+      "name": "native backend reports cancellation",
+      "ok": true,
+      "detail": "Error: intentional cancellation"
+    },
+    {
+      "name": "target received the held mouse-down",
+      "ok": true,
+      "detail": "[{\"at\":1790652480287,\"kind\":\"mouse-down\"}]"
+    },
+    {
+      "name": "target received a matching mouse-up after cancellation",
+      "ok": true,
+      "detail": "{\"downs\":1,\"ups\":1}"
+    }
+  ],
+  "passed": true,
+  "events": {
+    "downs": 1,
+    "ups": 1
+  }
+}

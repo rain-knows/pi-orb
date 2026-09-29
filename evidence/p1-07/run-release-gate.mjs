@@ -233,9 +233,9 @@ check(
   `looked for ${packageJson.version}`,
 );
 check(
-  "the support matrix records the locked desktop driver version",
-  supportMatrix.includes("0.30.1"),
-  "the driver version must appear in the supported-version record",
+  "the support matrix records the reference desktop backend commit",
+  supportMatrix.includes("72f1d738458a223696685a909e806b683eff5885"),
+  "the reference backend commit must appear in the support record",
 );
 check(
   "the support matrix distinguishes verified from unverified combinations",
@@ -247,9 +247,9 @@ check(
 // not use.
 const pinned = { ...packageJson.dependencies, ...packageJson.devDependencies };
 check(
-  "the desktop driver is pinned to the locked version in package.json",
-  pinned["@trycua/cua-driver"] === "0.30.1",
-  String(pinned["@trycua/cua-driver"]),
+  "the removed Cua driver is absent from the production dependency graph",
+  !Object.prototype.hasOwnProperty.call(pinned, "@trycua/cua-driver"),
+  String(pinned["@trycua/cua-driver"] ?? "absent"),
 );
 check(
   "Electron is pinned to the version the native checks used",

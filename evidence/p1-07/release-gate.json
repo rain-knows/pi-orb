@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-28T09:02:32.258Z",
+  "capturedAt": "2026-09-29T03:34:05.792Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "8593 ms"
+      "detail": "9364 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "5080 ms"
+      "detail": "6801 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "4050 ms"
+      "detail": "5276 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "3531 ms"
+      "detail": "4730 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -55,7 +55,7 @@
     {
       "name": "the license inventory records every installed production dependency",
       "ok": true,
-      "detail": "8 installed components"
+      "detail": "6 installed components"
     },
     {
       "name": "no AGPL, GPL-3 or SSPL component is present",
@@ -88,9 +88,9 @@
       "detail": "looked for 0.1.0"
     },
     {
-      "name": "the support matrix records the locked desktop driver version",
+      "name": "the support matrix records the reference desktop backend commit",
       "ok": true,
-      "detail": "the driver version must appear in the supported-version record"
+      "detail": "the reference backend commit must appear in the support record"
     },
     {
       "name": "the support matrix distinguishes verified from unverified combinations",
@@ -98,9 +98,9 @@
       "detail": "a matrix that lists only verified rows would hide the gaps"
     },
     {
-      "name": "the desktop driver is pinned to the locked version in package.json",
+      "name": "the removed Cua driver is absent from the production dependency graph",
       "ok": true,
-      "detail": "0.30.1"
+      "detail": "absent"
     },
     {
       "name": "Electron is pinned to the version the native checks used",

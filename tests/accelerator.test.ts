@@ -57,6 +57,12 @@ describe("validateAccelerator", () => {
     expect(result.message).toContain("NotAKey");
   });
 
+  it("rejects media-key accelerators without a stable key-up mapping", () => {
+    const result = validateAccelerator("Control+VolumeUp");
+    expect(result.ok).toBe(false);
+    expect(result.message).toContain("not a recognized key");
+  });
+
   it("rejects an out-of-range function key", () => {
     expect(validateAccelerator("F25").ok).toBe(false);
     expect(validateAccelerator("F0").ok).toBe(false);

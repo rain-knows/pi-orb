@@ -43,6 +43,10 @@ describe("decideToggle", () => {
     expect(decideToggle(state({ visible: true, focused: false }))).toBe("wake");
   });
 
+  it("toggles a visible window from the tray even though the tray takes focus", () => {
+    expect(decideToggle(state({ visible: true, focused: false }), "tray")).toBe("collapse");
+  });
+
   it("collapses only a visible and focused window", () => {
     expect(decideToggle(state({ visible: true, focused: true }))).toBe("collapse");
   });
@@ -101,6 +105,17 @@ describe("WakeController", () => {
     expect(await controller.trigger("tray")).toBe("throttled");
     expect(target.wakeCalls).toBe(1);
     expect(target.collapseCalls).toBe(0);
+  });
+
+  it("lets a second tray click collapse the visible orb", async () => {
+    const target = fakeTarget(state({ visible: false }));
+    let now = 0;
+    const controller = new WakeController(target, { now: () => now });
+    expect(await controller.trigger("tray")).toBe("wake");
+    now += DEFAULT_TRIGGER_COOLDOWN_MS + 1;
+    expect(await controller.trigger("tray")).toBe("collapse");
+    expect(target.wakeCalls).toBe(1);
+    expect(target.collapseCalls).toBe(1);
   });
 
   it("does not count a throttled trigger as applied", async () => {

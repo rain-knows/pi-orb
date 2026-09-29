@@ -330,8 +330,8 @@ export default function orbExtension(pi: ExtensionAPI): void {
         { ok: false, reason: "not-configured" },
       );
     }
-    // The handshake is the authority on the current run generation; the cached value is only a
-    // fallback for the case where the bridge has not been read yet.
+    // The handshake is the authority on the current run generation; read it for every request so a
+    // workspace change cannot leave this session using an old generation.
     sessionState.generation = token.generation;
     payload.generation = token.generation;
 
@@ -381,11 +381,17 @@ export default function orbExtension(pi: ExtensionAPI): void {
  * about identity and geometry, and a bounded, labelled rendering is less error-prone than a
  * deep object. The observation_id is always included: an action cannot be issued without it.
  */
-function renderResult(result: unknown): string {
+export function renderResult(result: unknown): string {
   if (result === null || result === undefined) return "No result.";
   if (typeof result === "string") return result;
   const record = result as Record<string, unknown>;
-  if (typeof record.observationId === "string") {
+  if (
+    typeof record.observationId === "string" &&
+    typeof record.coordinateSpace === "object" &&
+    record.coordinateSpace !== null &&
+    typeof record.window === "object" &&
+    record.window !== null
+  ) {
     const observation = record as unknown as DesktopObservation;
     const rect = observation.coordinateSpace.windowRect;
     const lines = [

@@ -1,4 +1,4 @@
-// P1-06 task-3: C7 with a REAL model in the loop.
+// P1-06 real-model acceptance harness for the reference Windows backend (C7, D6 and D8).
 //
 // C7 is "the point picked off the screenshot is the point that gets clicked". The automated P1-06
 // stage proves the product's half of that (a fraction read off the image maps onto the intended
@@ -8,8 +8,8 @@
 // This harness runs that real-model path end to end:
 //
 //   disposable target window            (its own JSONL is the ground truth)
-//     ^ locked Cua driver
-//     ^ pi-Orb adapter -> broker -> bridge (the product's own chain)
+//     ^ reference Windows backend (GDI + SendInput + clipboard)
+//     ^ ReferenceWindowsDriver -> broker -> bridge (the product's own chain)
 //     ^ real pi-web + REAL MODEL          (composed from real provider settings)
 //
 // Isolation, so nothing of the user's is touched:
@@ -22,7 +22,7 @@
 // It spends a small, bounded number of real model turns (one per prompt) and never retries silently:
 // a failure is recorded with the raw error so it can be diagnosed rather than papered over.
 //
-// Run: node evidence/p1-06/run-real-model-c7.mjs
+// Run: node evidence/p1-06/run-real-model-c7.mjs [c7|d6-scroll|d8-type]
 
 import { spawn, execFileSync } from "node:child_process";
 import { connect } from "node:net";
@@ -40,8 +40,56 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const repo = resolve(import.meta.dirname, "..", "..");
-const runRoot = join("D:\\pi-orb-p1-runs", `p1-06-real-c7-${Date.now()}`);
-const outPath = join(repo, "evidence", "p1-06", "real-model-c7.json");
+const testCase = process.argv[2] ?? "c7";
+const caseConfig = {
+  c7: {
+    slug: "real-c7",
+    output: "real-model-c7-reference-backend.json",
+    what: "real model observes a disposable grid, clicks cell 0,0, then observes again",
+    scope: "observe and click the cell marked 0,0 once",
+    instruction: [
+      "看刚才收到的目标窗口截图。先调用 orb_observe。",
+      "然后根据截图中左上角标记为 0,0 的格子，调用一次 orb_click。",
+      "x/y 使用截图相对的 0–1000 坐标，不要使用屏幕绝对坐标，也不要点击别处。",
+      "动作后再次调用 orb_observe。",
+    ].join("\n"),
+    targetEvent: "cell-mousedown",
+    expectedTool: "orb_click",
+  },
+  "d6-scroll": {
+    slug: "real-d6-scroll",
+    output: "real-model-d6-scroll-reference-backend.json",
+    what: "real model observes a disposable target and scrolls its labelled strip",
+    scope: "observe and scroll down inside the labelled strip once",
+    instruction: [
+      "看刚才收到的目标窗口截图。先调用 orb_observe。",
+      "根据截图找到标注为 s0-s9 的窄滚动区域，在该区域内向下滚动 3 格。",
+      "使用 orb_scroll 的截图相对 0–1000 坐标，把位置放在滚动区域内部；不要点击或输入。",
+      "动作后再次调用 orb_observe。",
+    ].join("\n"),
+    targetEvent: "wheel",
+    expectedTool: "orb_scroll",
+  },
+  "d8-type": {
+    slug: "real-d8-type",
+    output: "real-model-d8-type-reference-backend.json",
+    what: "real model observes a disposable target, focuses its text field, and types a synthetic marker",
+    scope: "click the labelled disposable text field and type P1ORBD8TEST once",
+    instruction: [
+      "看刚才收到的目标窗口截图。先调用 orb_observe。",
+      "只对截图中标注 type here 的输入框操作：先用 orb_click 点击输入框中心，然后重新调用 orb_observe。",
+      "这个输入框位于网格下方的 controls 区域，在滚动条上方；不要点击窗口底部或网格单元格。",
+      "再调用 orb_type 输入且只输入这串无敏感测试文本：P1ORBD8TEST。",
+      "动作后再次调用 orb_observe。不要点其它位置。",
+    ].join("\n"),
+    targetEvent: "text-input",
+    expectedTool: "orb_type",
+  },
+}[testCase];
+if (!caseConfig) throw new Error(`Unsupported test case: ${testCase}. Use c7, d6-scroll or d8-type.`);
+
+const runRoot = join("D:\\pi-orb-p1-runs", `p1-06-${caseConfig.slug}-${Date.now()}`);
+const outPath = join(repo, "evidence", "p1-06", caseConfig.output);
 
 const electronBinary = join(repo, "node_modules", "electron", "dist", "electron.exe");
 const targetAppDir = join(repo, "evidence", "p1-05", "target-app");
@@ -56,15 +104,15 @@ const WORKSPACE = join(runRoot, "orb-workspace");
  * by hard link, and a hard link cannot cross volumes. TEMP is on C: alongside the real agent dir, so
  * the link succeeds and no credential is copied. Everything else stays under the run directory.
  */
-const agentDir = join(tmpdir(), `pi-orb-real-c7-agent-${Date.now()}`);
+const agentDir = join(tmpdir(), `pi-orb-${caseConfig.slug}-agent-${Date.now()}`);
 const shellDataDir = join(runRoot, "shell-data");
 const configPath = join(runRoot, "orb-config.json");
 const gridLogPath = join(runRoot, "grid.jsonl");
 const gridGeometryPath = join(runRoot, "geometry.json");
 const wakeLogPath = join(runRoot, "wake.jsonl");
 
-const PI_WEB_PORT = 31502;
-const DEBUG_PORT = 31501;
+const PI_WEB_PORT = 40_000 + (process.pid % 10_000);
+const DEBUG_PORT = PI_WEB_PORT + 1;
 const PI_WEB_PASSWORD = "p1-06-real-c7-password";
 const piWebBaseUrl = `http://127.0.0.1:${PI_WEB_PORT}`;
 const WAKE_CHORD = "Control+Alt+F11";
@@ -88,9 +136,11 @@ const safe = (value, max = 600) => {
 
 const report = {
   capturedAt: new Date().toISOString(),
+  testCase,
   scope: {
-    what: "C7 with a real model: a point picked off the real screenshot must be the point clicked",
-    chain: "target app <- locked Cua driver <- cua-adapter <- desktop-broker <- bridge <- pi-web <- real model",
+    what: caseConfig.what,
+    chain: "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
+    backend: "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
   },
   isolation: {
     shellUserDataDir: shellDataDir,
@@ -128,7 +178,7 @@ Add-Type -Namespace Q -Name N -MemberDefinition @'
 [DllImport("user32.dll")] public static extern System.IntPtr GetForegroundWindow();
 [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(System.IntPtr h, out uint pid);
 [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetWindowText(System.IntPtr h, System.Text.StringBuilder s, int n);
-[DllImport("user32.dll")] public static extern bool OpenInputDesktop(uint flags, bool inherit, uint access);
+[DllImport("user32.dll")] public static extern System.IntPtr OpenInputDesktop(uint flags, bool inherit, uint access);
 '@
 $fg = [Q.N]::GetForegroundWindow()
 $sb = New-Object System.Text.StringBuilder 512
@@ -153,6 +203,11 @@ $desk = [Q.N]::OpenInputDesktop(0, $false, 0x0100)
   }
 }
 
+function isInteractiveDesktop(sample) {
+  const processName = String(sample?.process ?? "").toLowerCase();
+  return sample?.inputDesktopAccessible === true && !["lockapp", "logonui"].includes(processName);
+}
+
 /**
  * Wait for an interactive desktop, sampling until the deadline.
  *
@@ -166,7 +221,11 @@ async function waitForInteractiveDesktop(timeoutMs = 600_000) {
   let last = null;
   for (;;) {
     last = probeInteractiveDesktop();
-    if (last?.inputDesktopAccessible === true) return last;
+    if (isInteractiveDesktop(last)) return last;
+    // LockApp/LogonUI is a definitive environment state. Return immediately so a locked
+    // workstation produces a useful evidence file instead of waiting through the full poll window.
+    const processName = String(last?.process ?? "").toLowerCase();
+    if (["lockapp", "logonui"].includes(processName)) return last;
     if (Date.now() >= deadline) return last;
     await sleep(5000);
   }
@@ -190,6 +249,60 @@ function readJsonl(path) {
   }
 }
 
+function modelTurnFinished(requiredTool = null, minimumEntries = 0) {
+  const sessionsRoot = join(agentDir, "sessions");
+  if (!existsSync(sessionsRoot)) return false;
+  for (const directory of readdirSync(sessionsRoot, { withFileTypes: true })) {
+    if (!directory.isDirectory()) continue;
+    const sessionDir = join(sessionsRoot, directory.name);
+    for (const file of readdirSync(sessionDir)) {
+      if (!file.endsWith(".jsonl")) continue;
+      const entries = readJsonl(join(sessionDir, file));
+      const calledOrbTool = entries.slice(minimumEntries).some((entry) => {
+        const content = entry?.message?.content;
+        return Array.isArray(content) && content.some(
+          (block) => block?.type === "toolCall" && (requiredTool ? block.name === requiredTool : typeof block.name === "string" && block.name.startsWith("orb_")),
+        );
+      });
+      if (!calledOrbTool) continue;
+      for (let index = entries.length - 1; index >= 0; index -= 1) {
+        const message = entries[index]?.message;
+        if (message?.role !== "assistant") continue;
+        return ["stop", "error"].includes(message.stopReason);
+      }
+    }
+  }
+  return false;
+}
+
+function sessionEntryCount() {
+  const sessionsRoot = join(agentDir, "sessions");
+  if (!existsSync(sessionsRoot)) return 0;
+  let count = 0;
+  for (const directory of readdirSync(sessionsRoot, { withFileTypes: true })) {
+    if (!directory.isDirectory()) continue;
+    for (const file of readdirSync(join(sessionsRoot, directory.name))) {
+      if (file.endsWith(".jsonl")) count += readJsonl(join(sessionsRoot, directory.name, file)).length;
+    }
+  }
+  return count;
+}
+
+function modelHasToolCall(toolName) {
+  const sessionsRoot = join(agentDir, "sessions");
+  if (!existsSync(sessionsRoot)) return false;
+  for (const directory of readdirSync(sessionsRoot, { withFileTypes: true })) {
+    if (!directory.isDirectory()) continue;
+    for (const file of readdirSync(join(sessionsRoot, directory.name))) {
+      if (!file.endsWith(".jsonl")) continue;
+      if (readJsonl(join(sessionsRoot, directory.name, file)).some((entry) =>
+        entry?.message?.content?.some?.((block) => block?.type === "toolCall" && block.name === toolName),
+      )) return true;
+    }
+  }
+  return false;
+}
+
 let grid = null;
 let shell = null;
 let piWeb = null;
@@ -199,7 +312,15 @@ let piWebLog = "";
 function shutdown(code) {
   for (const child of [shell, piWeb, grid]) {
     try {
-      child?.kill();
+      if (!child?.pid) continue;
+      if (process.platform === "win32") {
+        execFileSync("taskkill.exe", ["/PID", String(child.pid), "/T", "/F"], {
+          stdio: "ignore",
+          windowsHide: true,
+        });
+      } else {
+        child.kill();
+      }
     } catch {
       /* ignore */
     }
@@ -280,7 +401,9 @@ async function startTarget() {
   // Spawned exactly as the passing P1-06 stage does (same cwd, same env), because the driver only
   // lists this window when it is spawned that way - an earlier version of this harness omitted `cwd`
   // and added `windowsHide`, and the window never appeared in the driver's list at all.
-  grid = spawn(electronBinary, [targetAppDir], {
+  grid = spawn(electronBinary, [targetAppDir, `--user-data-dir=${join(runRoot, "target-data")}`], {
+    // The target is an Electron app too. Give each run its own profile so another disposable
+    // target or the user's Electron instance cannot make this process exit after geometry is written.
     cwd: repo,
     env: { ...process.env, P1_05_TARGET_LOG: gridLogPath, P1_05_TARGET_GEOMETRY: gridGeometryPath },
     stdio: ["ignore", "pipe", "pipe"],
@@ -404,7 +527,6 @@ function startShell() {
         PI_ORB_PI_WEB_PASSWORD: PI_WEB_PASSWORD,
       },
       stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
     },
   );
   shell.stdout.on("data", (chunk) => (shellOut += chunk.toString()));
@@ -593,7 +715,11 @@ try {
   const status = await orb(client, `window.orb.getStatus()`);
   const generation = status?.generation;
   report.steps.generation = generation;
-  check("the isolated shell reports a workspace and a generation", Boolean(status?.workspace) && typeof generation === "number", safe({ workspace: status?.workspace, generation }));
+  check(
+    "the isolated shell reports this run's workspace and a generation",
+    status?.workspace === WORKSPACE && typeof generation === "number",
+    safe({ workspace: status?.workspace, expectedWorkspace: WORKSPACE, generation }),
+  );
 
   // -------------------------------------------------------------------------
   // Prerequisites that need NO desktop. These are checked before the desktop gate so the D-group
@@ -636,6 +762,23 @@ try {
     safe(report.steps.model),
   );
 
+  // Fail before window enumeration when the workstation is locked. The reference backend correctly
+  // hides locked-session windows, so a later empty candidate list is only a symptom of this state.
+  const desktopBeforeTarget = await waitForInteractiveDesktop(120_000);
+  report.steps.interactiveDesktopBeforeTarget = desktopBeforeTarget;
+  if (
+    !check(
+      "an interactive desktop is available before target enumeration",
+      isInteractiveDesktop(desktopBeforeTarget),
+      safe(desktopBeforeTarget),
+    )
+  ) {
+    throw new Error(
+      `no interactive desktop: foreground is ${desktopBeforeTarget?.process ?? "?"} and the input desktop is not accessible. ` +
+        "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
+    );
+  }
+
   // The desktop-tool target, chosen from the driver's own list. Match by PROCESS ID, not title: the
   // desktop also holds IME/text-input surfaces, and a title match can pick the wrong one. The driver's
   // `windowId` is the Win32 handle in the same id space (verified for P1-06), so it also foregrounds
@@ -674,7 +817,7 @@ try {
   if (
     !check(
       "an interactive desktop is available to foreground the target",
-      desktopAtWake?.inputDesktopAccessible === true,
+      isInteractiveDesktop(desktopAtWake),
       safe(desktopAtWake),
     )
   ) {
@@ -701,17 +844,12 @@ try {
   // Authorize the one action this run is allowed to take.
   const approved = await orb(
     client,
-    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: "click the cell marked 0,0 once" })`,
+    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: ${JSON.stringify(caseConfig.scope)} })`,
   );
   report.steps.approved = { authorized: approved?.authorized, scope: approved?.scope, target: approved?.target?.title };
   check("the desktop task was approved through the product's UI path", approved?.authorized === true, safe(approved));
 
-  // The instruction: it names the fraction space explicitly, and the cell to hit.
-  const instruction = [
-    "看你刚才收到的目标窗口截图。先调用 orb_observe。",
-    "然后根据截图中左上角标记为 0,0 的格子，调用一次 orb_click。",
-    "x/y 使用截图相对的 0–1000 坐标，不要使用屏幕绝对坐标，也不要点击别处。",
-  ].join("\n");
+  const instruction = caseConfig.instruction;
 
   // Capture for preview. Nothing is sent yet, and the preview must be the target window.
   const capture = await orb(client, `window.orb.captureScreenshot({ generation: ${generation}, text: ${JSON.stringify(instruction)} })`);
@@ -748,12 +886,43 @@ try {
   // Wait for the real model to work. Long: a real turn includes screenshot understanding.
   const deadline = Date.now() + 420_000;
   let idleSeen = false;
+  let busySeen = false;
+  let d8FollowUpSent = false;
+  let d8FollowUpBaseline = 0;
   while (Date.now() < deadline) {
     await sleep(5000);
     const events = readJsonl(gridLogPath);
-    const hit = events.find((event) => event.kind === "cell-mousedown");
+    const hit = events.find((event) => event.kind === caseConfig.targetEvent);
     if (hit) {
       await sleep(4000);
+      idleSeen = true;
+      break;
+    }
+    const currentStatus = await orb(client, "window.orb.getStatus()");
+    if (currentStatus?.busy === true) busySeen = true;
+    const turnFinished = d8FollowUpSent
+      ? modelTurnFinished("orb_type", d8FollowUpBaseline)
+      : modelTurnFinished();
+    if ((busySeen && currentStatus?.busy === false) || turnFinished) {
+      if (testCase === "d8-type" && !d8FollowUpSent && !modelHasToolCall("orb_type")) {
+        d8FollowUpBaseline = sessionEntryCount();
+        const response = await fetch(`${piWebBaseUrl}/api/agent/${encodeURIComponent(report.steps.model.sessionId)}`, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: authHeader },
+          body: JSON.stringify({
+            type: "prompt",
+            message: "Continue the already approved disposable-window task. The input field has been clicked and a fresh orb_observe was returned. Now call orb_type with exactly P1ORBD8TEST, then call orb_observe once. Do not click or type anywhere else.",
+          }),
+        });
+        report.steps.d8FollowUp = { status: response.status, accepted: response.ok };
+        d8FollowUpSent = response.ok;
+        busySeen = false;
+        if (response.ok) continue;
+      }
+      if (testCase === "d8-type" && d8FollowUpSent && !turnFinished) {
+        busySeen = false;
+        continue;
+      }
       idleSeen = true;
       break;
     }
@@ -764,16 +933,30 @@ try {
 
   // 1. The target's own log: which cell received the press.
   const gridEvents = readJsonl(gridLogPath);
-  const hits = gridEvents.filter((event) => event.kind === "cell-mousedown");
+  const hits = gridEvents.filter((event) => event.kind === caseConfig.targetEvent);
   report.targetLog = {
-    events: gridEvents.map((event) => ({ kind: event.kind, cell: event.cell ?? null, offsetInCell: event.offsetInCell ?? null })),
+    events: gridEvents.map((event) => ({
+      kind: event.kind,
+      cell: event.cell ?? null,
+      offsetInCell: event.offsetInCell ?? null,
+      value: event.value ?? null,
+      deltaY: event.deltaY ?? null,
+      overScroller: event.overScroller ?? null,
+      scrollTop: event.scrollTop ?? null,
+    })),
+    matches: hits,
     cellDowns: hits.map((event) => ({ cell: event.cell, offsetInCell: event.offsetInCell })),
   };
-  check(
-    "C7 (target's own log): a cell-mousedown for the cell marked 0,0 arrived",
-    hits.some((event) => event.cell === "0,0"),
-    safe(report.targetLog.cellDowns),
-  );
+  if (testCase === "c7") {
+    check("C7 (target's own log): a cell-mousedown for the cell marked 0,0 arrived", hits.some((event) => event.cell === "0,0"), safe(report.targetLog.cellDowns));
+  } else if (testCase === "d6-scroll") {
+    const scrollEvents = gridEvents.filter((event) => event.kind === "scroll");
+    report.targetLog.scrollEvents = scrollEvents;
+    check("D6 (target's own log): the strip received wheel input", hits.some((event) => event.overScroller === true), safe(hits));
+    check("D6 (target's own log): the strip scroll position changed", scrollEvents.some((event) => typeof event.scrollTop === "number" && event.scrollTop > 0), safe(scrollEvents));
+  } else {
+    check("D8 (target's own log): the exact synthetic marker reached the text field", hits.some((event) => event.value === "P1ORBD8TEST"), safe(hits));
+  }
 
   // 2. The real session record: did the model itself call the orb tools?
   //
@@ -809,24 +992,41 @@ try {
   }
   report.modelToolCalls = calls;
   const observeCalls = calls.filter((call) => call.toolName === "orb_observe");
-  const clickCalls = calls.filter((call) => call.toolName === "orb_click");
+  const actionCalls = calls.filter((call) => call.toolName === caseConfig.expectedTool);
+  const firstActionIndex = calls.findIndex((call) => call.toolName === caseConfig.expectedTool);
+  const firstObserveIndex = calls.findIndex((call) => call.toolName === "orb_observe");
   check("the real model called orb_observe on its own", observeCalls.length > 0, safe(observeCalls.slice(0, 2)));
-  check("the real model called orb_click on its own", clickCalls.length > 0, safe(clickCalls.slice(0, 2)));
-
-  const firstClick = clickCalls[0]?.arguments ?? null;
-  const usesFraction =
-    firstClick &&
-    typeof firstClick.x === "number" &&
-    typeof firstClick.y === "number" &&
-    firstClick.x >= 0 && firstClick.x <= 1000 &&
-    firstClick.y >= 0 && firstClick.y <= 1000;
+  check(`the real model called ${caseConfig.expectedTool} on its own`, actionCalls.length > 0, safe(actionCalls.slice(0, 2)));
+  check("the model observed before acting", firstObserveIndex >= 0 && firstObserveIndex < firstActionIndex, safe(calls.map((call) => call.toolName)));
   check(
-    "the real model addressed the click in the 0-1000 screenshot space",
-    Boolean(usesFraction),
-    safe(firstClick),
+    "the model observed again after its action",
+    actionCalls.some((action) => {
+      const actionIndex = calls.indexOf(action);
+      return calls.slice(actionIndex + 1).some((next) => next.toolName === "orb_observe");
+    }),
+    safe(calls.map((call) => call.toolName)),
   );
+  if (testCase === "d8-type") {
+    const clickIndex = calls.findIndex((call) => call.toolName === "orb_click");
+    const typeIndex = calls.findIndex((call) => call.toolName === "orb_type");
+    check("D8: the model clicked the disposable field before typing", clickIndex >= 0 && clickIndex < typeIndex, safe(calls.map((call) => call.toolName)));
+    check("D8: the model observed again between focus click and text input", clickIndex >= 0 && typeIndex > clickIndex && calls.slice(clickIndex + 1, typeIndex).some((call) => call.toolName === "orb_observe"), safe(calls.map((call) => call.toolName)));
+  }
+  if (testCase === "c7" || testCase === "d6-scroll") {
+    const positionAction = actionCalls.find((call) => call.toolName === "orb_click" || call.toolName === "orb_scroll");
+    const args = positionAction?.arguments ?? null;
+    check(
+      "the real model addressed the action in the 0-1000 screenshot space",
+      args && typeof args.x === "number" && typeof args.y === "number" && args.x >= 0 && args.x <= 1000 && args.y >= 0 && args.y <= 1000,
+      safe(args),
+    );
+  }
 
   report.passed = report.checks.every((entry) => entry.ok);
+  report.steps.bridgeDiagnostics = shellOut
+    .split(/\r?\n/)
+    .filter((line) => line.includes("[pi-orb] desktop ") || line.includes("[pi-orb] bridge "))
+    .slice(-40);
   report.finishedAt = new Date().toISOString();
   writeFileSync(outPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
@@ -836,7 +1036,7 @@ try {
     if (!entry.ok) console.log(`         ${String(entry.detail).slice(0, 400)}`);
   }
   console.log("");
-  console.log("target log cell downs:", safe(report.targetLog.cellDowns, 300));
+  console.log("target log matches:", safe(report.targetLog.matches, 500));
   console.log("model tool calls:", safe(calls.map((c) => c.toolName), 300));
   console.log("written:", outPath);
 

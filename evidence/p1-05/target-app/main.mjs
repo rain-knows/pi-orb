@@ -234,6 +234,9 @@ app.whenReady().then(async () => {
 
   // Keep the window in front so input delivery has an unambiguous target, but do not
   // move the mouse or synthesise anything.
+  // Explicitly show after the page has loaded: on some Electron/Windows desktop sessions,
+  // `show: true` leaves the top-level HWND hidden until the ready-to-show transition completes.
+  win.show();
   win.focus();
 });
 
