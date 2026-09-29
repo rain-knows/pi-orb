@@ -54,6 +54,8 @@ export const IPC = {
   captureScreenshot: "orb:capture-screenshot",
   /** Renderer -> main: confirm or cancel the previewed screenshot. */
   resolveScreenshot: "orb:resolve-screenshot",
+  /** Renderer -> main: save the still-pending preview and copy it to the clipboard. */
+  exportScreenshot: "orb:export-screenshot",
   /** Renderer -> main: discard any pending screenshot (idempotent). */
   discardScreenshot: "orb:discard-screenshot",
   /** Renderer -> main: grant a desktop task authorization after an explicit user decision. */
@@ -265,8 +267,8 @@ export interface ImageContent {
 /**
  * Result of a screenshot capture request.
  *
- * The image is carried as base64 for display. It is never written to disk, and the
- * renderer holds it only until the user confirms or cancels.
+ * The image is carried as base64 for display. Capture itself never writes to disk; an explicit
+ * renderer export action may save this still-pending image through the main process.
  */
 export type ScreenshotCaptureResult =
   | {
@@ -300,6 +302,16 @@ export interface ScreenshotResolveRequest {
   readonly observationId: string;
   readonly confirmed: boolean;
 }
+
+/** Export the exact screenshot currently shown in the preview. */
+export interface ScreenshotExportRequest {
+  readonly generation: number;
+  readonly observationId: string;
+}
+
+export type ScreenshotExportResult =
+  | { readonly ok: true; readonly path: string; readonly clipboard: boolean }
+  | { readonly ok: false; readonly canceled: boolean; readonly message: string };
 
 /**
  * Outcome of confirming a screenshot.

@@ -24,6 +24,8 @@ import {
   type ScreenshotCaptureResult,
   type ScreenshotResolveRequest,
   type ScreenshotResolveResult,
+  type ScreenshotExportRequest,
+  type ScreenshotExportResult,
   type SetDesktopTargetResult,
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
@@ -58,6 +60,7 @@ export interface OrbBridge {
   abort(request: AbortRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
   resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
+  exportScreenshot(request: ScreenshotExportRequest): Promise<ScreenshotExportResult>;
   discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
   onDoubleAltGesture(listener: () => void): () => void;
@@ -96,6 +99,8 @@ const bridge: OrbBridge = {
     ipcRenderer.invoke(IPC.captureScreenshot, request),
   resolveScreenshot: (request: ScreenshotResolveRequest) =>
     ipcRenderer.invoke(IPC.resolveScreenshot, request),
+  exportScreenshot: (request: ScreenshotExportRequest) =>
+    ipcRenderer.invoke(IPC.exportScreenshot, request),
   discardScreenshot: () => ipcRenderer.invoke(IPC.discardScreenshot),
   onSessionEvent: (listener) => {
     const handler = (_event: unknown, payload: OrbSessionEvent) => listener(payload);

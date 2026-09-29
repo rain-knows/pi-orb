@@ -16,6 +16,8 @@
 import {
   app,
   BrowserWindow,
+  ClipboardItem,
+  clipboard,
   dialog,
   globalShortcut,
   ipcMain,
@@ -39,6 +41,7 @@ import { Win32TargetWindowReader } from "./target-window";
 import { RecordedTargetStore } from "./recorded-target";
 import { captureTargetWindow } from "./desktop-capture";
 import { ScreenshotFlow } from "./screenshot-flow";
+import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-export";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
 import { ReferenceWindowsDriver, type ReferenceWindowInfo } from "./reference-windows-driver";
@@ -51,6 +54,7 @@ import {
   type PiWebStatus,
   type ScreenshotCaptureResult,
   type ScreenshotResolveResult,
+  type ScreenshotExportResult,
   type ListDesktopWindowsResult,
   type SetDesktopTargetResult,
   type WorkspaceStatus,
@@ -59,6 +63,7 @@ import {
   type OpenSessionHistoryResult,
   type OrbSelectionContext,
 } from "@shared/ipc";
+import { writeFile } from "node:fs/promises";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 import { uIOhook } from "uiohook-napi";
 import { FLOATING_BALL_WINDOW_SIZE } from "./floating-geometry";
@@ -971,6 +976,50 @@ function registerIpc(): void {
     },
   );
 
+  ipcMain.handle(
+    IPC.exportScreenshot,
+    async (_event, request: unknown): Promise<ScreenshotExportResult> => {
+      const parsed = parseExportRequest(request);
+      if (!parsed) return { ok: false, canceled: false, message: "Malformed screenshot export request." };
+      const check = generations.check(parsed.generation);
+      if (!check.ok) return { ok: false, canceled: false, message: describeGenerationFailure(check.reason) };
+      const pending = screenshotFlow.pending;
+      if (!pending || pending.observationId !== parsed.observationId) {
+        return { ok: false, canceled: false, message: "That screenshot is no longer waiting in the preview." };
+      }
+      const extension = screenshotExportExtension(pending.image.mimeType);
+      if (!extension) return { ok: false, canceled: false, message: "This screenshot format cannot be exported." };
+      const result = await dialog.showSaveDialog({
+        title: "Save screenshot",
+        defaultPath: join(app.getPath("desktop"), `pi-orb-${Date.now()}.${extension}`),
+        filters: [{ name: "Screenshot", extensions: [extension] }],
+      });
+      if (result.canceled || !result.filePath) {
+        return { ok: false, canceled: true, message: "Screenshot export cancelled." };
+      }
+      try {
+        const bytes = screenshotExportBytes(pending.image);
+        await writeFile(result.filePath, bytes, { flag: "wx" });
+        let clipboardCopied = false;
+        try {
+          const clipboardBytes = new ArrayBuffer(bytes.byteLength);
+          new Uint8Array(clipboardBytes).set(bytes);
+          await clipboard.write([
+            new ClipboardItem({
+              [pending.image.mimeType]: new Blob([clipboardBytes], { type: pending.image.mimeType }),
+            }),
+          ]);
+          clipboardCopied = true;
+        } catch {
+          // Saving is still useful when the OS clipboard is unavailable.
+        }
+        return { ok: true, path: result.filePath, clipboard: clipboardCopied };
+      } catch (error) {
+        return { ok: false, canceled: false, message: describeError(error) };
+      }
+    },
+  );
+
   ipcMain.handle(IPC.discardScreenshot, () => {
     screenshotFlow.discard();
     return true;
@@ -1120,6 +1169,18 @@ function parseResolveRequest(
   if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
   if (typeof observationId !== "string" || observationId.length === 0) return null;
   return { generation, observationId, confirmed: record.confirmed === true };
+}
+
+function parseExportRequest(
+  value: unknown,
+): { generation: number; observationId: string } | null {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as Record<string, unknown>;
+  const generation = record.generation;
+  const observationId = record.observationId;
+  if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
+  if (typeof observationId !== "string" || observationId.length === 0) return null;
+  return { generation, observationId };
 }
 
 /**

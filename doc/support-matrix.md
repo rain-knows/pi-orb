@@ -91,7 +91,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原、hover/pin、系统主题、新会话 | 已接入（几何与 session controller 自动化通过；视觉和人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/renderer/App.tsx`、`doc/p2-01-reference-reuse.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘体验未验证） | `tests/double-alt.test.ts`、`src/main/double-alt.ts`、`src/main/index.ts`、`src/renderer/App.tsx` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/App.tsx`、`evidence/p2-03/README.md` |
-| **P2-04 桌面操作扩展**：参考项目热键、长按、同窗口拖拽与动作后回图 | 已接入（broker/schema/driver、Pi image block 和参考 backend 取消释放测试通过；真实桌面动作及目标像素仍未人工验收） | `tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/orb-extension.test.ts`、`tests/reference-windows.test.ts`、`evidence/p2-04/README.md` |
+| **P2-04 桌面操作扩展**：参考项目热键、长按、同窗口拖拽、动作后回图与显式截图导出 | 已接入（broker/schema/driver、Pi image block、截图导出字节校验和参考 backend 取消释放测试通过；真实桌面动作、目标像素、保存对话框与剪贴板仍未人工验收） | `tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows.test.ts`、`tests/screenshot-export.test.ts`、`src/main/screenshot-export.ts`、`evidence/p2-04/README.md` |
 
 ## 3. 未验证（不得宣称支持）
 

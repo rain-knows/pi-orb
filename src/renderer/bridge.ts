@@ -16,6 +16,8 @@ import type {
   ScreenshotCaptureResult,
   ScreenshotResolveRequest,
   ScreenshotResolveResult,
+  ScreenshotExportRequest,
+  ScreenshotExportResult,
   SetDesktopTargetResult,
   WorkspaceCandidateResult,
   WorkspaceStatus,
@@ -50,6 +52,7 @@ export interface OrbBridge {
   abort(request: AbortRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
   resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
+  exportScreenshot(request: ScreenshotExportRequest): Promise<ScreenshotExportResult>;
   discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
   onDoubleAltGesture(listener: () => void): () => void;

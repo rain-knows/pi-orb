@@ -123,6 +123,16 @@ export function App() {
     if (!result.sent) { if (confirmed) setNotice(result.message); return; }
     setMessages((items) => [...items, { role: "user", text: `[screenshot] ${current.targetDescription}` }]); setBusy(true);
   }, [bridge, generation, preview]);
+  const exportScreenshot = useCallback(async () => {
+    const current = preview;
+    if (!current) return;
+    const result = await bridge.exportScreenshot({ generation, observationId: current.observationId });
+    if (!result.ok) {
+      if (!result.canceled) setNotice(result.message);
+      return;
+    }
+    setNotice(result.clipboard ? `Saved ${result.path} and copied it to the clipboard.` : `Saved ${result.path}.`);
+  }, [bridge, generation, preview]);
   const loadWindows = useCallback(async () => { const result = await bridge.listDesktopWindows(); if (!result.ok) setNotice(result.message); else setWindowChoices(result.windows); }, [bridge]);
   const chooseTarget = useCallback(async (windowId: string) => { const result = await bridge.setDesktopTarget(windowId); if (!result.ok) { setNotice(result.message); return; } setWindowChoices(null); setTaskScope(""); setDesktopTask(await bridge.getDesktopTaskStatus()); }, [bridge]);
   const authorizeDesktop = useCallback(async () => { const scope = taskScope.trim(); if (!scope || generation === 0) return; const next = await bridge.authorizeDesktopTask({ generation, scope }); setDesktopTask(next); setNotice(next.authorized ? "Desktop task approved." : next.stoppedReason); }, [bridge, generation, taskScope]);
@@ -209,7 +219,7 @@ export function App() {
         </div>
       </section>
     )}
-    {preview && <section className="orb__preview"><div className="orb__preview-heading"><strong>Review screenshot</strong><button type="button" className="orb__close" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p>{preview.targetDescription}</p>{preview.targetStale && <p className="orb__notice orb__notice--error">The window changed since capture.</p>}<img className="orb__preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small>{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="orb__actions"><button type="button" className="orb__button orb__button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="orb__button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
+    {preview && <section className="orb__preview"><div className="orb__preview-heading"><strong>Review screenshot</strong><button type="button" className="orb__close" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p>{preview.targetDescription}</p>{preview.targetStale && <p className="orb__notice orb__notice--error">The window changed since capture.</p>}<img className="orb__preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small>{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="orb__actions"><button type="button" className="orb__button orb__button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="orb__button" onClick={() => void exportScreenshot()}>Save copy</button><button type="button" className="orb__button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
     {notice && <p className="orb__notice">{notice}</p>}
     {floatingState.docked && <button
       type="button"
