@@ -1,12 +1,12 @@
 {
-  "capturedAt": "2026-09-28T12:37:22.197Z",
+  "capturedAt": "2026-09-29T11:33:19.590Z",
   "isolation": {
-    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-tools-1790599042194",
-    "agentDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790599042194\\agent",
-    "homeDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790599042194\\home",
-    "normalCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790599042194\\normal-project",
-    "orbCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790599042194\\orb-workspace",
-    "configPath": "D:\\pi-orb-p1-runs\\p1-06-tools-1790599042194\\orb-config.json",
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-tools-1790681599585",
+    "agentDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790681599585\\agent",
+    "homeDir": "D:\\pi-orb-p1-runs\\p1-06-tools-1790681599585\\home",
+    "normalCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790681599585\\normal-project",
+    "orbCwd": "D:\\pi-orb-p1-runs\\p1-06-tools-1790681599585\\orb-workspace",
+    "configPath": "D:\\pi-orb-p1-runs\\p1-06-tools-1790681599585\\orb-config.json",
     "extensionPath": "D:\\workself\\pi-orb\\pi-package\\extensions\\orb.ts",
     "baseUrl": "http://127.0.0.1:31411"
   },
@@ -27,6 +27,9 @@
       "tools": [
         "bash",
         "orb_click",
+        "orb_drag",
+        "orb_hotkey",
+        "orb_long_press",
         "orb_observe",
         "orb_scroll",
         "orb_type",
@@ -34,6 +37,9 @@
       ],
       "orbTools": [
         "orb_click",
+        "orb_drag",
+        "orb_hotkey",
+        "orb_long_press",
         "orb_observe",
         "orb_scroll",
         "orb_type"
@@ -50,9 +56,9 @@
       "detail": "normal tools: [\"bash\",\"read\"]"
     },
     {
-      "name": "an Orb session is offered exactly the four Orb tools",
+      "name": "an Orb session is offered exactly the supported Orb tools",
       "ok": true,
-      "detail": "orb tools: [\"orb_click\",\"orb_observe\",\"orb_scroll\",\"orb_type\"]"
+      "detail": "orb tools: [\"orb_click\",\"orb_drag\",\"orb_hotkey\",\"orb_long_press\",\"orb_observe\",\"orb_scroll\",\"orb_type\"]"
     },
     {
       "name": "a normal session keeps pi-web's own tools and gains nothing from Orb",
@@ -97,6 +103,9 @@
     "tools": [
       "bash",
       "orb_click",
+      "orb_drag",
+      "orb_hotkey",
+      "orb_long_press",
       "orb_observe",
       "orb_scroll",
       "orb_type",
@@ -104,6 +113,9 @@
     ],
     "orbTools": [
       "orb_click",
+      "orb_drag",
+      "orb_hotkey",
+      "orb_long_press",
       "orb_observe",
       "orb_scroll",
       "orb_type"

@@ -261,6 +261,23 @@ describe("DesktopBroker one-action-one-observation", () => {
 });
 
 describe("DesktopBroker failure handling", () => {
+  it("refuses each new desktop action before reaching the driver without authorization", async () => {
+    const { broker: instance, driver } = broker();
+    const actions = [
+      { kind: "hotkey", observationId: "obs-1", keys: ["ctrl", "c"] },
+      { kind: "longPress", observationId: "obs-1", position: { x: 10, y: 20 }, durationSeconds: 2 },
+      { kind: "drag", observationId: "obs-1", startPosition: { x: 10, y: 20 }, endPosition: { x: 30, y: 40 } },
+    ];
+    for (const action of actions) {
+      await expect(instance.act(action, "sess", 1)).resolves.toMatchObject({
+        ok: false,
+        refused: true,
+        reason: "no-task-authorization",
+      });
+    }
+    expect(driver.acted).toHaveLength(0);
+  });
+
   it("stops the batch after a driver failure and says so", async () => {
     const { broker: instance } = broker({
       actFails: { ok: false, refused: true, error: "foreground_unavailable" },
@@ -352,5 +369,12 @@ describe("parseAction", () => {
     expect(parseAction({ kind: "scroll", observationId: "obs-1", direction: "down", amount: "3" })).toMatchObject({
       ok: false,
     });
+  });
+
+  it("parses the bounded P2 desktop actions", () => {
+    expect(parseAction({ kind: "hotkey", observationId: "obs-1", keys: ["ctrl", "c"] })).toMatchObject({ ok: true });
+    expect(parseAction({ kind: "longPress", observationId: "obs-1", position: { x: 20, y: 30 }, durationSeconds: 2 })).toMatchObject({ ok: true });
+    expect(parseAction({ kind: "drag", observationId: "obs-1", startPosition: { x: 20, y: 30 }, endPosition: { x: 70, y: 80 } })).toMatchObject({ ok: true });
+    expect(parseAction({ kind: "drag", observationId: "obs-1", startPosition: { x: "20", y: 30 }, endPosition: { x: 70, y: 80 } })).toMatchObject({ ok: false });
   });
 });

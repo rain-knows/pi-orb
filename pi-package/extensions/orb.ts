@@ -121,6 +121,43 @@ const SCROLL_PARAMS = Type.Object(
   { additionalProperties: false },
 );
 
+const HOTKEY_PARAMS = Type.Object(
+  {
+    observation_id: Type.String({ description: "The observation_id this key chord was decided from." }),
+    keys: Type.Array(Type.String(), {
+      minItems: 1,
+      maxItems: ORB_LIMITS.maxHotkeyKeys,
+      description: "Key names in press order, for example [\"ctrl\", \"c\"].",
+    }),
+  },
+  { additionalProperties: false },
+);
+
+const LONG_PRESS_PARAMS = Type.Object(
+  {
+    observation_id: Type.String({ description: "The observation_id this press was decided from." }),
+    x: Type.Number({ minimum: 0, maximum: 1000, description: "Horizontal screenshot fraction (0-1000)." }),
+    y: Type.Number({ minimum: 0, maximum: 1000, description: "Vertical screenshot fraction (0-1000)." }),
+    duration_seconds: Type.Number({
+      minimum: ORB_LIMITS.minLongPressSeconds,
+      maximum: ORB_LIMITS.maxLongPressSeconds,
+      description: `Hold duration in seconds (${ORB_LIMITS.minLongPressSeconds}-${ORB_LIMITS.maxLongPressSeconds}).`,
+    }),
+  },
+  { additionalProperties: false },
+);
+
+const DRAG_PARAMS = Type.Object(
+  {
+    observation_id: Type.String({ description: "The observation_id this drag was decided from." }),
+    start_x: Type.Number({ minimum: 0, maximum: 1000, description: "Start horizontal screenshot fraction." }),
+    start_y: Type.Number({ minimum: 0, maximum: 1000, description: "Start vertical screenshot fraction." }),
+    end_x: Type.Number({ minimum: 0, maximum: 1000, description: "End horizontal screenshot fraction." }),
+    end_y: Type.Number({ minimum: 0, maximum: 1000, description: "End vertical screenshot fraction." }),
+  },
+  { additionalProperties: false },
+);
+
 /** Read the Orb configuration, or `null` when it is absent, unreadable or malformed. */
 export function readOrbConfig(path: string): OrbConfig | null {
   let raw: string;
@@ -245,6 +282,59 @@ export default function orbExtension(pi: ExtensionAPI): void {
           ...(params.x !== undefined && params.y !== undefined
             ? { position: { x: params.x, y: params.y } }
             : {}),
+        };
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.hotkey,
+      label: "Orb: press hotkey",
+      description: "Press a key chord in the observed window. System screenshot shortcuts are refused.",
+      promptSnippet: "Press a key chord in the observed window",
+      promptGuidelines: ["Use only the smallest required chord. Do not use system screenshot shortcuts."],
+      parameters: HOTKEY_PARAMS,
+      async execute(_toolCallId, params, _signal, _onUpdate, toolCtx: ExtensionContext) {
+        const action: DesktopAction = {
+          kind: "hotkey",
+          observationId: params.observation_id,
+          keys: params.keys,
+        };
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.longPress,
+      label: "Orb: long press",
+      description: "Hold the left mouse button at a point in the observed window for 1-10 seconds.",
+      promptSnippet: "Hold at a point in the observed window",
+      promptGuidelines: ["Use the shortest duration that achieves the requested action."],
+      parameters: LONG_PRESS_PARAMS,
+      async execute(_toolCallId, params, _signal, _onUpdate, toolCtx: ExtensionContext) {
+        const action: DesktopAction = {
+          kind: "longPress",
+          observationId: params.observation_id,
+          position: { x: params.x, y: params.y },
+          durationSeconds: params.duration_seconds,
+        };
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.drag,
+      label: "Orb: drag",
+      description: "Drag between two points inside the observed window.",
+      promptSnippet: "Drag within the observed window",
+      promptGuidelines: ["Both points address the current observed window; cross-screen dragging is unavailable."],
+      parameters: DRAG_PARAMS,
+      async execute(_toolCallId, params, _signal, _onUpdate, toolCtx: ExtensionContext) {
+        const action: DesktopAction = {
+          kind: "drag",
+          observationId: params.observation_id,
+          startPosition: { x: params.start_x, y: params.start_y },
+          endPosition: { x: params.end_x, y: params.end_y },
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },

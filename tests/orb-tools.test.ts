@@ -47,6 +47,12 @@ describe("Orb tool naming", () => {
     const names = Object.values(ORB_TOOLS);
     expect(new Set(names).size).toBe(names.length);
   });
+
+  it("exposes the bounded reference hotkey, long-press and drag actions", () => {
+    expect(Object.values(ORB_TOOLS)).toEqual([
+      "orb_observe", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag",
+    ]);
+  });
 });
 
 describe("validateAction", () => {
@@ -177,6 +183,21 @@ describe("validateAction", () => {
       position: { x: 0, y: 0 },
     };
     expect(validateAction(ok, observation(), budget)).toBeNull();
+  });
+
+  it("validates hotkeys and rejects screenshot shortcuts", () => {
+    expect(validateAction({ kind: "hotkey", observationId: "obs-1", keys: ["ctrl", "c"] }, observation(), budget)).toBeNull();
+    expect(validateAction({ kind: "hotkey", observationId: "obs-1", keys: ["win", "shift", "4"] }, observation(), budget)).toBe("forbidden-hotkey");
+    expect(validateAction({ kind: "hotkey", observationId: "obs-1", keys: ["shift", "mystery"] }, observation(), budget)).toBe("invalid-hotkey");
+    expect(validateAction({ kind: "hotkey", observationId: "obs-1", keys: ["ctrl", "alt", "shift", "x", "y"] }, observation(), budget)).toBe("invalid-hotkey");
+  });
+
+  it("bounds long press and keeps drag endpoints inside screenshot fraction space", () => {
+    const point = { x: 250, y: 400 };
+    expect(validateAction({ kind: "longPress", observationId: "obs-1", position: point, durationSeconds: 3 }, observation(), budget)).toBeNull();
+    expect(validateAction({ kind: "longPress", observationId: "obs-1", position: point, durationSeconds: 0.5 }, observation(), budget)).toBe("invalid-long-press-duration");
+    expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 900, y: 700 } }, observation(), budget)).toBeNull();
+    expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 1001, y: 700 } }, observation(), budget)).toBe("needs-element-or-point");
   });
 });
 

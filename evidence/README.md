@@ -22,6 +22,7 @@
 | `p2-01/` | P2-01 参考 DeepSeek Orb 浮球几何与 Electron 窗口接入 | 浮球几何、拖动 IPC、贴边停靠和收起还原已接入；真实多屏人工验收未完成 |
 | `p2-02/` | P2-02 双 Alt 快捷手势 | 左右 Alt 纯状态检测器和预览触发已接入；真实键盘验收未完成 |
 | `p2-03/` | P2-03 参考 history 与选区上下文 | 复用 pi-web 公开 session summary/detail API；workspace 过滤、历史绑定、文本恢复和 Windows UI Automation 选区 chip 已接入；真实 UIA 与原生工具栏仍未验收 |
+| `p2-04/` | P2-04 参考桌面动作扩展 | 复用参考项目 Windows backend 接入热键、长按和同窗口拖拽；真实桌面动作及动作后回图仍待验收 |
 | `p1-07/CONTRACT-MATRIX.md` | P1 合同对照：N1–N8 非破坏性不变量 + §7.1 发布必测项与 P1 证据映射 | 随每个发布版本维护 |
 
 ## 复现方式

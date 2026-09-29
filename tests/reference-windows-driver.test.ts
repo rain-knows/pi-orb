@@ -45,6 +45,9 @@ function backendFake(calls: unknown[]) {
     click: async (input: unknown) => calls.push({ kind: "click", input }),
     typeText: async (input: unknown) => calls.push({ kind: "type", input }),
     scroll: async (input: unknown) => calls.push({ kind: "scroll", input }),
+    hotkey: async (input: unknown) => calls.push({ kind: "hotkey", input }),
+    longPress: async (input: unknown) => calls.push({ kind: "longPress", input }),
+    drag: async (input: unknown) => calls.push({ kind: "drag", input }),
   } as unknown as DesktopBackend;
   return backend;
 }
@@ -87,11 +90,17 @@ describe("ReferenceWindowsDriver", () => {
     expect(await driver.act({ kind: "click", observationId: observation.observationId, position: { x: 125, y: 250 } }, observation)).toMatchObject({ ok: true });
     expect(await driver.act({ kind: "scroll", observationId: observation.observationId, direction: "down", amount: 3, position: { x: 500, y: 600 } }, observation)).toMatchObject({ ok: true });
     expect(await driver.act({ kind: "type", observationId: observation.observationId, text: "hello" }, observation)).toMatchObject({ ok: true });
+    expect(await driver.act({ kind: "hotkey", observationId: observation.observationId, keys: ["ctrl", "c"] }, observation)).toMatchObject({ ok: true });
+    expect(await driver.act({ kind: "longPress", observationId: observation.observationId, position: { x: 300, y: 400 }, durationSeconds: 2 }, observation)).toMatchObject({ ok: true });
+    expect(await driver.act({ kind: "drag", observationId: observation.observationId, startPosition: { x: 100, y: 200 }, endPosition: { x: 800, y: 700 } }, observation)).toMatchObject({ ok: true });
 
     expect(calls).toEqual([
       { kind: "click", input: expect.objectContaining({ position: [125, 250] }) },
       { kind: "scroll", input: expect.objectContaining({ direction: "down", scrollLevel: 3, position: [500, 600] }) },
       { kind: "type", input: expect.objectContaining({ text: "hello", replace: false, submit: false, position: [125, 250] }) },
+      { kind: "hotkey", input: { keys: ["ctrl", "c"] } },
+      { kind: "longPress", input: expect.objectContaining({ position: [300, 400], durationSeconds: 2 }) },
+      { kind: "drag", input: expect.objectContaining({ startPosition: [100, 200], endPosition: [800, 700] }) },
     ]);
   });
 
@@ -113,6 +122,24 @@ describe("ReferenceWindowsDriver", () => {
     );
 
     expect(receivedSignal).toBe(controller.signal);
+  });
+
+  it("forwards cancellation to hotkey, long press and drag backend calls", async () => {
+    const { ops } = opsFake();
+    const received: AbortSignal[] = [];
+    const backend = backendFake([]);
+    backend.hotkey = async (_input, signal) => { if (signal) received.push(signal); };
+    backend.longPress = async (_input, signal) => { if (signal) received.push(signal); };
+    backend.drag = async (_input, signal) => { if (signal) received.push(signal); };
+    const driver = new ReferenceWindowsDriver({ ops, backend, ownProcessId: 1 });
+    const observation = (await driver.observe({ windowId: "42" })).observation!;
+    const controller = new AbortController();
+
+    await driver.act({ kind: "hotkey", observationId: observation.observationId, keys: ["ctrl", "c"] }, observation, controller.signal);
+    await driver.act({ kind: "longPress", observationId: observation.observationId, position: { x: 200, y: 300 }, durationSeconds: 1 }, observation, controller.signal);
+    await driver.act({ kind: "drag", observationId: observation.observationId, startPosition: { x: 200, y: 300 }, endPosition: { x: 600, y: 700 } }, observation, controller.signal);
+
+    expect(received).toEqual([controller.signal, controller.signal, controller.signal]);
   });
 
   it("does not expand an explicitly selected target through a model window id", async () => {

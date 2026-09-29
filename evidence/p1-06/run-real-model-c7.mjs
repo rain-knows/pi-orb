@@ -736,7 +736,7 @@ try {
   //
   // Note on the tool list: pi-web exposes no endpoint that returns a session's tools (the agent routes
   // are `new`, `[id]/events`, `[id]/lease`, `[id]/bash-output`), so this harness does not invent one.
-  // The four Orb tools being offered is evidenced instead by the real session's own `toolCall` blocks
+  // The P1 baseline's four Orb tools being offered is evidenced instead by the real session's own `toolCall` blocks
   // in the verdict below: a model cannot call a tool it was never offered. The provider-side schema
   // check is the separate stage `run-p1-06-tools.mjs` (7/7), which records what the provider receives.
   const models = await fetch(`${piWebBaseUrl}/api/models?cwd=${encodeURIComponent(WORKSPACE)}`, {

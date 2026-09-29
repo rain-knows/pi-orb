@@ -71,8 +71,8 @@ describe("reference Windows backend", () => {
     expect(calls).toContain("clipboard:previous");
   });
 
-  it("releases a held mouse button when click or drag is cancelled", async () => {
-    for (const action of ["click", "drag"] as const) {
+  it("releases a held mouse button when click, long press or drag is cancelled", async () => {
+    for (const action of ["click", "longPress", "drag"] as const) {
       const calls: string[] = [];
       const controller = new AbortController();
       const ops = fakeOps(calls);
@@ -85,7 +85,9 @@ describe("reference Windows backend", () => {
       const screen = { index: 0, bounds, scale: 1, windowId: 42 };
       const run = action === "click"
         ? backend.click({ screen, position: [500, 250], button: "left", count: 1 }, controller.signal)
-        : backend.drag({ startScreen: screen, startPosition: [500, 250], endScreen: screen, endPosition: [700, 400] }, controller.signal);
+        : action === "longPress"
+          ? backend.longPress({ screen, position: [500, 250], durationSeconds: 3 }, controller.signal)
+          : backend.drag({ startScreen: screen, startPosition: [500, 250], endScreen: screen, endPosition: [700, 400] }, controller.signal);
 
       await expect(run).rejects.toThrow("test cancellation");
       expect(calls.filter((call) => call === "left:down")).toHaveLength(1);

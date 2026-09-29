@@ -284,6 +284,13 @@ export function parseAction(value: unknown): ParseResult {
     return { x: position.x, y: position.y };
   };
   const elementToken = typeof record.elementToken === "string" && record.elementToken.length > 0 ? record.elementToken : undefined;
+  const readPositionField = (field: string): { x: number; y: number } | undefined => {
+    const value = record[field];
+    if (typeof value !== "object" || value === null) return undefined;
+    const position = value as { x?: unknown; y?: unknown };
+    if (typeof position.x !== "number" || typeof position.y !== "number") return undefined;
+    return { x: position.x, y: position.y };
+  };
 
   if (kind === "click") {
     const position = readPosition();
@@ -320,6 +327,32 @@ export function parseAction(value: unknown): ParseResult {
         ...(position ? { position } : {}),
       },
     };
+  }
+
+  if (kind === "hotkey") {
+    const keys = record.keys;
+    if (!Array.isArray(keys) || !keys.every((key) => typeof key === "string")) {
+      return { ok: false, message: "A hotkey action needs an array of key names." };
+    }
+    return { ok: true, action: { kind: "hotkey", observationId, keys } };
+  }
+
+  if (kind === "longPress") {
+    const position = readPositionField("position");
+    const durationSeconds = record.durationSeconds;
+    if (!position || typeof durationSeconds !== "number") {
+      return { ok: false, message: "A long press needs a position and numeric duration." };
+    }
+    return { ok: true, action: { kind: "longPress", observationId, position, durationSeconds } };
+  }
+
+  if (kind === "drag") {
+    const startPosition = readPositionField("startPosition");
+    const endPosition = readPositionField("endPosition");
+    if (!startPosition || !endPosition) {
+      return { ok: false, message: "A drag needs start and end positions." };
+    }
+    return { ok: true, action: { kind: "drag", observationId, startPosition, endPosition } };
   }
 
   return { ok: false, message: `Unknown action kind: ${String(kind)}` };

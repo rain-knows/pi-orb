@@ -163,6 +163,27 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           await this.#options.backend.typeText({ screen, position: this.#lastInputPosition, text: action.text, replace: false, submit: false }, signal);
           return;
         }
+        if (action.kind === "hotkey") {
+          await this.#options.backend.hotkey({ keys: action.keys }, signal);
+          return;
+        }
+        if (action.kind === "longPress") {
+          await this.#options.backend.longPress({
+            screen,
+            position: positionOf(action.position),
+            durationSeconds: action.durationSeconds,
+          }, signal);
+          return;
+        }
+        if (action.kind === "drag") {
+          await this.#options.backend.drag({
+            startScreen: screen,
+            startPosition: positionOf(action.startPosition),
+            endScreen: screen,
+            endPosition: positionOf(action.endPosition),
+          }, signal);
+          return;
+        }
         if (action.direction === "left" || action.direction === "right") {
           throw new Error("The Windows backend supports vertical scrolling only.");
         }

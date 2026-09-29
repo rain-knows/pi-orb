@@ -1,7 +1,7 @@
-// P1-06: the Orb desktop tools must exist only in Orb mode.
+// N3 regression: the Orb desktop tools must exist only in Orb mode.
 //
 // Answers the P1-06/P0-02 invariant N3 question for the real tool set: a normal session gains no
-// model-visible desktop capability, and an Orb session gains exactly the four tools.
+// model-visible desktop capability, and an Orb session gains exactly the supported tools.
 //
 // Method: the real fixed-HEAD pi-web snapshot, with the shipped extension loaded, and a local fake
 // provider that records the tool schemas it actually receives. The verdict therefore comes from
@@ -221,7 +221,7 @@ try {
   // -------------------------------------------------------------------------
   // Assertions, judged from the tool schemas the provider actually received.
   // -------------------------------------------------------------------------
-  const expectedOrbTools = ["orb_click", "orb_observe", "orb_scroll", "orb_type"];
+  const expectedOrbTools = ["orb_click", "orb_drag", "orb_hotkey", "orb_long_press", "orb_observe", "orb_scroll", "orb_type"];
 
   check(
     "a normal session is offered no Orb tool",
@@ -229,7 +229,7 @@ try {
     `normal tools: ${JSON.stringify(normalRequest?.tools ?? null)}`,
   );
   check(
-    "an Orb session is offered exactly the four Orb tools",
+    "an Orb session is offered exactly the supported Orb tools",
     JSON.stringify(orbRequest?.orbTools ?? null) === JSON.stringify(expectedOrbTools),
     `orb tools: ${JSON.stringify(orbRequest?.orbTools ?? null)}`,
   );

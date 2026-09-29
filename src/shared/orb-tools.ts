@@ -30,6 +30,9 @@ export const ORB_TOOLS = {
   click: "orb_click",
   type: "orb_type",
   scroll: "orb_scroll",
+  hotkey: "orb_hotkey",
+  longPress: "orb_long_press",
+  drag: "orb_drag",
 } as const;
 
 export type OrbToolName = (typeof ORB_TOOLS)[keyof typeof ORB_TOOLS];
@@ -134,7 +137,27 @@ export interface ScrollAction {
   readonly position?: ScreenshotPosition;
 }
 
-export type DesktopAction = ClickAction | TypeAction | ScrollAction;
+export interface HotkeyAction {
+  readonly kind: "hotkey";
+  readonly observationId: string;
+  readonly keys: readonly string[];
+}
+
+export interface LongPressAction {
+  readonly kind: "longPress";
+  readonly observationId: string;
+  readonly position: ScreenshotPosition;
+  readonly durationSeconds: number;
+}
+
+export interface DragAction {
+  readonly kind: "drag";
+  readonly observationId: string;
+  readonly startPosition: ScreenshotPosition;
+  readonly endPosition: ScreenshotPosition;
+}
+
+export type DesktopAction = ClickAction | TypeAction | ScrollAction | HotkeyAction | LongPressAction | DragAction;
 
 /** Hard limits. Never "unlimited": a desktop task must be bounded. */
 export const ORB_LIMITS = {
@@ -146,6 +169,11 @@ export const ORB_LIMITS = {
   maxTypedCharacters: 200,
   /** Maximum scroll ticks in one action. */
   maxScrollAmount: 10,
+  /** Long press follows the reference tool's 1-10 second range. */
+  minLongPressSeconds: 1,
+  maxLongPressSeconds: 10,
+  /** Maximum key chord length accepted from the model. */
+  maxHotkeyKeys: 4,
   /** Maximum elements returned in one observation, to bound model context. */
   maxElementsPerObservation: 60,
   /** Maximum characters of an element label kept in an observation. */
@@ -166,6 +194,9 @@ export type ActionRefusal =
   | "text-too-long"
   | "scroll-amount-out-of-range"
   | "unsupported-direction"
+  | "invalid-hotkey"
+  | "forbidden-hotkey"
+  | "invalid-long-press-duration"
   | "observation-unknown"
   | "busy";
 
@@ -186,6 +217,9 @@ const REFUSAL_MESSAGES: Record<ActionRefusal, string> = {
   "text-too-long": `Text is limited to ${ORB_LIMITS.maxTypedCharacters} characters per action.`,
   "scroll-amount-out-of-range": `Scroll amount must be between 1 and ${ORB_LIMITS.maxScrollAmount}.`,
   "unsupported-direction": "Direction must be up, down, left or right.",
+  "invalid-hotkey": "Provide a supported key chord with one to four keys, including a non-modifier key.",
+  "forbidden-hotkey": "System screenshot shortcuts are not allowed.",
+  "invalid-long-press-duration": `Long press duration must be between ${ORB_LIMITS.minLongPressSeconds} and ${ORB_LIMITS.maxLongPressSeconds} seconds.`,
   "observation-unknown": "That observation is not known to this session. Observe the window first.",
   busy: "Orb is already running a task. Wait for it to finish or stop it first.",
 };
@@ -229,7 +263,46 @@ export function validateAction(
     return validateTarget(action.elementToken, action.position);
   }
 
+  if (action.kind === "hotkey") return validateHotkey(action.keys);
+
+  if (action.kind === "longPress") {
+    if (
+      !Number.isFinite(action.durationSeconds) ||
+      action.durationSeconds < ORB_LIMITS.minLongPressSeconds ||
+      action.durationSeconds > ORB_LIMITS.maxLongPressSeconds
+    ) return "invalid-long-press-duration";
+    return isUsablePosition(action.position) ? null : "needs-element-or-point";
+  }
+
+  if (action.kind === "drag") {
+    if (!isUsablePosition(action.startPosition) || !isUsablePosition(action.endPosition)) {
+      return "needs-element-or-point";
+    }
+    return null;
+  }
+
   return validateTarget(action.elementToken, action.position);
+}
+
+const HOTKEY_MODIFIERS = new Set(["ctrl", "control", "alt", "option", "shift", "win", "windows", "meta", "cmd", "command", "super"]);
+const HOTKEY_NAMED_KEYS = new Set([
+  ...HOTKEY_MODIFIERS,
+  "enter", "return", "tab", "escape", "esc", "space", "backspace", "delete", "del",
+  "up", "down", "left", "right", "home", "end", "pageup", "pagedown", "insert",
+]);
+
+function validateHotkey(keys: readonly string[]): ActionRefusal | null {
+  if (keys.length < 1 || keys.length > ORB_LIMITS.maxHotkeyKeys) return "invalid-hotkey";
+  const normalized = keys.map((key) => key.trim().toLowerCase());
+  const valid = normalized.every((key) =>
+    HOTKEY_NAMED_KEYS.has(key) || /^[a-z0-9]$/u.test(key) || /^f(?:[1-9]|1[0-2])$/u.test(key),
+  );
+  if (!valid || normalized.every((key) => HOTKEY_MODIFIERS.has(key))) return "invalid-hotkey";
+  const hasMeta = normalized.some((key) => ["win", "windows", "meta", "cmd", "command", "super"].includes(key));
+  const hasShift = normalized.includes("shift");
+  const hasScreenshotKey = normalized.some((key) => ["3", "4", "5"].includes(key));
+  if (hasMeta && hasShift && hasScreenshotKey) return "forbidden-hotkey";
+  return null;
 }
 
 /**

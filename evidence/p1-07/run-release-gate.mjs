@@ -274,6 +274,7 @@ const requiredEvidence = [
   { path: "evidence/p1-05/input-verification.json", what: "real-machine input acceptance" },
   { path: "evidence/p1-06/loop-verification.json", what: "desktop tool loop" },
   { path: "evidence/p1-06/tool-exposure.json", what: "Orb tool exposure" },
+  { path: "evidence/p2-04/README.md", what: "P2-04 action scope and unverified image-return boundary" },
   { path: "evidence/p1-07/lifecycle-regression.json", what: "collapse, stop and generation lifecycle" },
   { path: "evidence/p1-07/license-inventory.json", what: "third-party license inventory" },
   { path: "evidence/p1-07/CONTRACT-MATRIX.md", what: "N1-N8 and §7.1 contract cross-check" },

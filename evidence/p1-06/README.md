@@ -31,13 +31,13 @@
 | 断言 | 实测 |
 |---|---|
 | 普通会话**没有**任何 Orb 工具 | 通过（`orbTools=[]`） |
-| Orb 会话恰好获得四个工具 | `orb_click, orb_observe, orb_scroll, orb_type` |
+| Orb 会话恰好获得当前支持的七个工具 | `orb_click, orb_drag, orb_hotkey, orb_long_press, orb_observe, orb_scroll, orb_type` |
 | 普通会话只保留 pi-web 自身工具 | `bash, read`（与 P0-02/P1-01 的基线一致） |
 | Orb 提示段只出现在 Orb 模式 | `orb=true normal=false` |
 | 提示段包含"一动作一观察" | 通过（`observe again`） |
 | 提示段声明屏幕内容为不可信输入 | 通过（`untrusted input`） |
 
-这直接满足 N3：普通会话不因安装扩展而新增模型可见的 GUI 能力。
+此脚本现作为 N3 回归门禁，验证普通会话不因安装扩展而新增模型可见的 GUI 能力，Orb 会话则只获得当前支持的工具。P1 初始工具集合为四个；P2-04 加入热键、长按和拖拽后扩展为七个。
 
 ## 3. 历史产品侧闭环（迁移前 Cua，38/38）
 
@@ -189,7 +189,7 @@ node evidence/p1-06/run-real-model-c7.mjs
 | D4 | 目标窗口报告**命中预期位置** | **通过** | 目标自身日志命中 `cell=0,0` |
 | D5 | 桌面任务面板显示状态且能 **Revoke**；撤销后不再执行 | **通过**（自动化 100% 覆盖该语义） | 真实 UI 路径 `revokeDesktopTask()` → 后续动作被拒 `no-task-authorization`：`loop-verification-reference-backend.json`；`tests/desktop-task.test.ts`。**人工点击**“Revoke”按钮的体验未验证 |
 | D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` | **通过** | `real-model-d6-scroll-reference-backend.json`：目标日志收到 `wheel` 且 `scrollTop` 改变 |
-| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；Orb 会话恰好四个：`tool-exposure.json`（7/7，判据是 provider **实收** schema，不是 UI 标签） |
+| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；当前 Orb 会话恰好七个：`tool-exposure.json`（7/7，判据是 provider **实收** schema，不是 UI 标签） |
 | D8 | 让模型输入非敏感文本（`orb_type`） | **通过** | `real-model-d8-type-reference-backend.json`：目标日志读回 `P1ORBD8TEST` |
 
 小结：D1–D8 中当前范围内的 C7、D6、D8 以及 D5、D7 均已通过；证据均来自当前参考 backend，旧 Cua JSON 仅用于迁移对照。

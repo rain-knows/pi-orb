@@ -12,7 +12,7 @@ P0 已就同一组不变量给出结论（见 [`../p0-01/README.md`](../p0-01/RE
 |---|---|---|---|
 | **N1** 普通非 Orb cwd 会话的工具、系统提示、模型默认值、资源加载与命令行为不被 Orb 主动改变 | 安装前后对比**有效工具/提示**，不只看按钮 | `../p1-06/tool-exposure.json`：普通 cwd 的 provider 实际收到 `tools=["bash","read"]` 且无 orb 工具；`../p1-01/result.json`：普通目录请求无 `orb_mode` section，且与安装扩展前的基线一致 | **通过**（本 P1 测试面） |
 | **N2** 不静默改写全局 defaultTools、模型默认值、凭据、用户主题、现有插件配置 | 配置 diff | Orb 只写自己的数据目录（`src/main/config-store.ts`、`bridge-server.ts`）；`evidence/p1-07/release-gate.json` 的写入面审计证明写入仅限三个模块且不指向 pi-web/node_modules；所有测试使用隔离 `PI_CODING_AGENT_DIR` / `HOME` | **通过**（本 P1 测试面） |
-| **N3** 普通会话不会因 Orb 扩展静态注册工具而意外新增模型可见 GUI 能力 | 检模型看到的 schema | `../p1-06/tool-exposure.json`：普通会话 `orbTools=[]`；Orb 会话恰好 `orb_click/orb_observe/orb_scroll/orb_type`；`before_agent_start` 只在精确匹配时写 section | **通过** |
+| **N3** 普通会话不会因 Orb 扩展静态注册工具而意外新增模型可见 GUI 能力 | 检模型看到的 schema | `../p1-06/tool-exposure.json`：普通会话 `orbTools=[]`；当前 Orb 会话只获得七个受支持工具；`before_agent_start` 只在精确匹配时写 section | **通过** |
 | **N4** 悬浮窗/网页共用后端；连接别人的已有 pi-web 不得擅自重启、升级或关闭它 | 连接/退出/崩溃/重复启动流程与进程归属 | `../p0-03/result.json`：壳退出后服务存活、会话仍可访问；P1 壳启动只探测与认证，无任何启动/停止服务的代码路径（`src/main/pi-web-client.ts` 仅有 probe/authenticate/会话命令） | **通过** |
 | **N5** 不让两个运行时同时写同一会话文件；控制任务只由一个入口持有 | 双客户端与重连测试 | `../p0-03/result.json`：双客户端同 sessionId、reload 后 sessionId 稳定、旧代次被拒；P1 新增运行代次与单任务锁（`src/main/generations.ts`，`tests/generations.test.ts`） | **通过**（本 P1 测试面） |
 | **N6** 安装/关闭/卸载不删除用户工作区文件或历史；不把用户已有源码改动纳入本项目 | 写入清单与源码 diff | `../p0-01/verify-baseline.mjs` 每次门禁重跑：pi-web HEAD 与 6 个既有改动文件哈希不变；写入面审计（见 N2） | **通过** |

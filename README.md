@@ -53,6 +53,7 @@ P2 is being delivered as separately reviewable reference-reuse stages:
 | P2-01 — reference floating shell, geometry and interactions | **Implemented; real multi-display, DPI and manual drag acceptance remains unverified** |
 | P2-02 — double-Alt screenshot gesture | **Implemented; real keyboard, AltGr and non-US layout acceptance remains unverified** |
 | P2-03 — pi-web history and selection context | **History and Windows UI Automation selection chip implemented; real UIA, multi-display/DPI and native selection toolbar remain unverified** |
+| P2-04 — reference desktop actions | **Hotkey, long press and same-window drag implemented; real desktop actions and post-action visual verification remain unverified** |
 
 So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
 must not be described as done. They are listed one by one in
