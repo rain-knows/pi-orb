@@ -86,6 +86,7 @@ export function App() {
     if (!result.ok) { setNotice(result.message); return; }
     setPreview({ observationId: result.observationId, dataUrl: `data:${result.mimeType};base64,${result.data}`, width: result.width, height: result.height, bytes: result.bytes, targetDescription: result.targetDescription, targetStale: result.targetStale });
   }, [bridge, busy, draft, generation]);
+  useEffect(() => bridge.onDoubleAltGesture(() => { void screenshot(); }), [bridge, screenshot]);
   const resolveScreenshot = useCallback(async (confirmed: boolean) => {
     const current = preview; setPreview(null); if (!current) return;
     const result = await bridge.resolveScreenshot({ generation, observationId: current.observationId, confirmed });

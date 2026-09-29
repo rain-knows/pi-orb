@@ -47,6 +47,7 @@ export interface OrbBridge {
   resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
   discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
+  onDoubleAltGesture(listener: () => void): () => void;
 }
 
 declare global {

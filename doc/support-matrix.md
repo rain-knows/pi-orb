@@ -89,6 +89,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性 | 已验证（且五次反向对照可证伪） | `evidence/p1-07/release-gate.json`（32/32） |
 | **生命周期**：折叠/停止/turn 完成或失败撤权与丢弃记录、不结束会话、不改代次、断连撤权 | 已验证 | `evidence/p1-07/lifecycle-regression.json`（10/10）与 `src/main/index.ts` 的统一撤权出口 |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原、hover/pin、系统主题、新会话 | 已接入（几何与 session controller 自动化通过；视觉和人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/renderer/App.tsx`、`doc/p2-01-reference-reuse.md` |
+| **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘体验未验证） | `tests/double-alt.test.ts`、`src/main/double-alt.ts`、`src/main/index.ts`、`src/renderer/App.tsx` |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -114,7 +115,8 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | pi-web 原地生产构建 | 该 `node_modules` 不完整（缺 `@next/env`），且原地构建 OOM | 属环境限制；测试使用固定 HEAD 快照内独立安装 |
 | pi-web 其它版本 / 其它 Pi SDK 版本组合 | 只测试了 §1 中的单一组合 | 未测试的组合统称「未验证」 |
 | 上游更新后的兼容性 | 未对任何上游新版本跑过接入合同 | 按 §7.2 流程在独立环境验证后才发布新组合 |
-| 双 Alt 手势、选区上下文 | 属 P2，且用户交互尚未确认 | 不阻塞 v0.1；不得当作已实现 |
+| 双 Alt 的真实键盘体验 | detector 逻辑已实现；未在真实键盘上覆盖左右顺序、长按、AltGr、焦点变化及锁屏／休眠恢复 | 自动化状态测试不证明 OS hook 的实际键盘事件稳定性 |
+| 选区上下文 | 属后续 P2 能力；尚未实现 | 不阻塞 v0.1；不得当作已实现 |
 | **完整 v0.1 发布** | 上表仍有未验证项（多显示器、高权限窗口、向 Chromium 内容输入文本） | **未完成**；当前交付物不得声明为完整 v0.1 |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）

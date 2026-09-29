@@ -19,7 +19,7 @@ pi-orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi
 | pi-web 接入 | 小型 HTTP/SSE 客户端适配层 | 复用会话创建、消息、图片、事件和停止行为；不访问私有 registry 或 hook 私有方法 |
 | 本机桥接 | 认证的 loopback 连接、named pipe 或 Unix socket 之一 | 需要 P0-03 选择；不以关闭认证、wildcard CORS 或暴露 Node 给 renderer 代替桥接 |
 | 桌面能力 | 直接复用 DeepSeek Orb 的 Windows 原生 backend（`koffi`/GDI/`SendInput`/clipboard）；由 `reference-windows-driver.ts` 接入 Orb 授权 | Cua 仅用于独立探针和历史证据，不进入生产 action path |
-| 截图与快捷键 | Electron `desktopCapturer`、`globalShortcut` + `uiohook-napi` key-up edge guard；双 Alt 单独评估 | Electron 负责注册和冲突诊断，hook 只补充普通组合键的 key-up 边沿；当前窗口截图、DPI、真实长按、双 Alt 均需实测 |
+| 截图与快捷键 | Electron `desktopCapturer`、`globalShortcut` + `uiohook-napi` key-up edge guard / 左右 Alt 手势 | Electron 负责普通组合键注册和冲突诊断；hook 提供 key-up 边沿及 P2-02 左右 Alt 手势；双 Alt 仅打开既有预览，不自动上传；真实键盘、AltGr、DPI 和锁屏恢复需人工验收 |
 | Orb 自有配置 | Electron `app.getPath('userData')` 下的独立配置 | 只保存工作区、窗口、快捷键等 Orb 配置；不改写 Pi 全局默认值 |
 | 测试 | TypeScript 类型检查、单元/协议测试、Electron 集成测试、Windows 真机 smoke | 推荐分层；mock 不能替代原生输入取消与释放测试 |
 | 打包 | Electron Forge 作为首选候选，Windows x64 优先 | 需通过干净机器安装、卸载和许可检查后才能锁定 |
@@ -146,7 +146,7 @@ P0 和大部分 P1 已完成。当前产品已启用显式授权的桌面工具�
 - 不复制 Pi 的模型调用循环、模型管理、插件市场、会话引擎或 DeepSeek Orb 的整个后端。
 - 不把 FFF、LSP、MCP 搜索工具作为 pi-orb 运行时依赖；它们只属于可选开发工作流，原有评估见 [`pi-fff-lsp-necessity.md`](./pi-fff-lsp-necessity.md)。
 - 不引入通用多租户权限系统、cwd 强隔离、远程桌面控制、全桌面常驻录制或完整后台调度中心。
-- 不依赖双 Alt 才能启动 MVP，不推测 Codex 的内部实现，也不自动上传截图。
+- 不依赖双 Alt 才能启动 MVP，不推测 Codex 或参考项目没有公开的内部实现，也不自动上传截图。
 - 不在首版预设多个平台后端、多个 LSP/FFF 实现、多个包管理器或多个 renderer 框架。
 - 不以提示词、cwd、Electron UI 标签或工具名称冒充 OS 安全授权。
 

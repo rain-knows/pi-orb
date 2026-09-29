@@ -64,6 +64,8 @@ export const IPC = {
   setDesktopTarget: "orb:set-desktop-target",
   /** Main -> renderer: streaming session events. */
   sessionEvent: "orb:session-event",
+  /** Main -> renderer: the physical double-Alt gesture entered screenshot preview. */
+  doubleAltGesture: "orb:double-alt-gesture",
 } as const;
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC];

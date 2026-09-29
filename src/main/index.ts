@@ -30,6 +30,7 @@ import { validateWorkspace, createWorkspace } from "./workspace";
 import { RunGenerations } from "./generations";
 import { ShortcutRegistry } from "./shortcut";
 import { ShortcutEdgeGuard } from "./shortcut-edge-guard";
+import { DoubleAltDetector } from "./double-alt";
 import { WakeController } from "./window-toggle";
 import { OrbWindowLifecycle } from "./window-lifecycle";
 import { OrbSessionController } from "./orb-session";
@@ -69,6 +70,7 @@ import {
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
 const shortcutEdgeGuard = new ShortcutEdgeGuard(uIOhook);
+const doubleAltDetector = new DoubleAltDetector(uIOhook, () => { void triggerDoubleAlt(); });
 const targetWindowReader = new Win32TargetWindowReader();
 
 /**
@@ -515,6 +517,15 @@ function registerShortcut(): void {
 
 function onShortcutTrigger(): void {
   if (shortcutEdgeGuard.accept()) void wake?.trigger("shortcut");
+}
+
+/**
+ * Double Alt is a gesture, not a second upload path: record the target before the Orb takes focus,
+ * then ask the renderer to open the existing one-shot screenshot preview.
+ */
+async function triggerDoubleAlt(): Promise<void> {
+  await showOrb();
+  if (window && !window.isDestroyed()) window.webContents.send(IPC.doubleAltGesture);
 }
 
 /**
@@ -1076,6 +1087,7 @@ function debounce(action: () => void, delayMs: number): () => void {
 
 function quit(): void {
   isQuitting = true;
+  doubleAltDetector.stop();
   shortcutEdgeGuard.stop();
   shortcuts.releaseAll();
   // Shutdown must not leave an image waiting to be sent, nor a task grant a later run could inherit.
@@ -1117,6 +1129,8 @@ void app.whenReady().then(async () => {
   attachWakeController(window);
   if (!shortcutEdgeGuard.start()) {
     console.warn(`[pi-orb] ${shortcutEdgeGuard.error ?? "Keyboard edge detection is unavailable."}`);
+  } else {
+    doubleAltDetector.start();
   }
   registerShortcut();
 
@@ -1213,6 +1227,7 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => {
   isQuitting = true;
+  doubleAltDetector.stop();
   shortcuts.releaseAll();
   revokeDesktopOperations("the shell is quitting");
   void bridge?.close();

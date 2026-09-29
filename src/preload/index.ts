@@ -55,6 +55,7 @@ export interface OrbBridge {
   resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
   discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
+  onDoubleAltGesture(listener: () => void): () => void;
 }
 
 const bridge: OrbBridge = {
@@ -91,6 +92,13 @@ const bridge: OrbBridge = {
     ipcRenderer.on(IPC.sessionEvent, handler);
     return () => {
       ipcRenderer.removeListener(IPC.sessionEvent, handler);
+    };
+  },
+  onDoubleAltGesture: (listener) => {
+    const handler = () => listener();
+    ipcRenderer.on(IPC.doubleAltGesture, handler);
+    return () => {
+      ipcRenderer.removeListener(IPC.doubleAltGesture, handler);
     };
   },
 };

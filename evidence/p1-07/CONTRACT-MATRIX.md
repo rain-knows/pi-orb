@@ -40,11 +40,11 @@ Pi 无条件加载**用户级** `$HOME/.agents/skills`，`HOME` 在运行时解�
 | **工具选择** | `../p1-06/tool-exposure.json`（模型实际收到的 schema）；`../p0-02/result.json`（W1 自动追加、reload、chat-only）；`tests/desktop-broker.test.ts`（终止同批后续动作）；`../p1-06/real-model-c7-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json` | 通过（模型看到的 schema 为准，非 UI 标签）；当前参考 backend 已取得真实模型 C7、D6、D8 的目标日志证据 |
 | **图像** | `../p1-04/result.json`（41/41：目标记录、句柄匹配、尺寸与真实像素测量、遮罩排除、丢弃零上传、确认字节与 provider 收到字节 hash 一致）；`tests/screenshot-flow.test.ts` | 通过（含正向截图→预览→确认发送）。**未**验证：多屏、被遮挡窗口、高权限窗口、截图前窗口被关闭/句柄复用 |
 | **原生输入** | `../p1-05/input-verification.json`（历史 Cua 基线）；`tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/desktop-broker.test.ts`；`../p1-06/loop-verification-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json` | **部分**：当前参考 backend 的滚动/输入目标日志已验证，撤权到 native action 的取消链由竞态测试覆盖；高权限窗口对比、真实前台中途撤销时序仍未验证。历史 Cua 适配器测试已删除，不能作为当前生产证据。 |
-| **快捷键** | `../p1-03/result.json`、`../p1-03/edge-guard-integration.json`（真实 Electron + native hook，合成 F24 长按）、`../p1-03/README.md`；`tests/shortcut-edge-guard.test.ts` | OS 注册链路和合成长按集成通过；真实长按仍需运行中人工复测。托盘逻辑已修复并有单测，但需运行中人工复测。AltGr/非 US 布局、锁屏恢复未验证；双 Alt 属 P2，未启用 |
+| **快捷键** | `../p1-03/result.json`、`../p1-03/edge-guard-integration.json`（真实 Electron + native hook，合成 F24 长按）、`../p1-03/README.md`；`tests/shortcut-edge-guard.test.ts`、`../p2-02/README.md` | OS 注册链路和合成长按集成通过；P2-02 双 Alt detector 的纯状态测试通过；真实长按、双 Alt、AltGr/非 US 布局、锁屏恢复仍需运行中人工复测。托盘逻辑已修复并有单测，但需运行中人工复测 |
 | **进程与认证** | `../p0-03/result.json`（401/403/伪造 Host、壳退出不杀服务、旧代次拒绝）；`tests/bridge-server.test.ts`（令牌、浏览器来源、代次、策略拒绝上抛） | 通过。**未**验证 LAN 请求与真实 Electron 跨 origin cookie/SameSite 细节 |
 | **打包／卸载** | `THIRD_PARTY_NOTICES.md`、`../p1-07/license-inventory.json`、门禁的写入面审计（N6） | **部分**：许可与写入面已审计；**未**构建真实安装包，**未**做安装/卸载实测 |
 
-图例：**通过** = 对应能力在本机可复现验证；**部分** = 部分用例已验证、其余明确未验证；未列出的 P2 能力（双 Alt、选区、额外平台）本版本未启用，不阻塞。
+图例：**通过** = 对应能力在本机可复现验证；**部分** = 部分用例已验证、其余明确未验证。P2-02 已在开发分支接入但不作为 v0.1 的完整发布声明；选区、额外平台等未接入 P2 能力不阻塞。
 
 ## 3. 本版本的能力声明（不得超范围宣称）
 
