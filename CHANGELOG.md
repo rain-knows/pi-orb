@@ -69,6 +69,51 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   authority for a behaviour it does not have. The playbook audit that found this is described under
   *Added*.
 
+### Fixed
+
+- **The floating shell's front end was not actually reusing the reference, and the documents said it
+  was.** Comparing `src/renderer/styles.css` against the pinned reference's `floating.css` found the
+  renderer had **zero** shared class names, **0 of 18** reference design tokens, **no** element ids,
+  its own palette and radii, and none of the reference's signature reveal. The reuse record called
+  this "converged on the reference shell's structure"; it was a rewrite, and the wording made it look
+  like a port. This is the reuse rule the project is built on (AGENTS.md: port rather than rewrite an
+  equivalent), so the front end is now an actual port:
+
+  - the 18 reference tokens under their own names — `--ball: 72px`, `--chrome: 12px`,
+    `--panel-radius: 36px`, `--composer-height: var(--ball)`, `--prompt-line/-pad`, `--composer-max`,
+    `--selection-chip: 28px`, the `--black/--white/--input-bg/--border/--pin/--error` palette, both
+    shadows, and `--origin-x/--origin-y`;
+  - the same layout state vocabulary driven from `body` — `expanded`, `pinned`, `running`,
+    `has-selection-chip`, `docked`, `docked-left/right`, `expand-up/down/left/right` — with one
+    mechanism per state (an earlier draft in this change had put `expanded`/`pinned` on `<html>` data
+    attributes, and the new test caught it);
+  - the reference ids for the shell elements (`#panel`, `#ball`, `#composer`, `#dock-tab`, `#prompt`,
+    `#selection-chip`, `#history`, `#new-conversation`, `#transcript`, `#send`), with `#panel`
+    mounted unconditionally and toggled by `hidden`, as the reference does;
+  - the panel reveal itself: `opacity` plus `scale(0.18) -> scale(1)` over 300ms from
+    `transform-origin: var(--origin-x) var(--origin-y)`, with each expand direction setting its
+    origin, and the reference's ordering (unhide then add `expanded`; on collapse remove the class,
+    then hide after the transition) so the animation is not cut short;
+  - hover expansion wired on `document.body`, because the ball and panel are siblings and the
+    pointer crosses the gap between them;
+  - dark mode switched from a `prefers-color-scheme` media query to the reference's
+    `html[data-ds-dark-theme]`, which the host can drive from an explicit choice rather than a guess.
+
+  What is deliberately still not ported is now listed with reasons in
+  `doc/p2-01-reference-reuse.md`: the reference's `#question*` question cards, `#tcc-*` macOS
+  permission gate, `#ball-gif` avatar, update/welcome frames and selection toolbar have no pi-orb
+  counterpart (the project does not invent product concepts the reference does not have), the
+  transcript is pi-orb's own React tree rather than the reference's iframe, the native observation
+  frame has no lifecycle contract yet, and no composer is rendered while the workspace is
+  unconfigured because Orb mode cannot exist before a workspace does.
+
+  Guarded so it cannot drift back: `tests/renderer-reference-parity.test.ts` (11 cases) pins the
+  token names, the state vocabulary, the reference ids and the absence of the abandoned `orb__*`
+  scheme, and the packaged probe gained four checks that read *computed* values from the running
+  packaged app — the shell elements mounted, the tokens resolved to `72px`/`12px`/`36px`, and the
+  ball rendering at `72px` with a `50%` radius. Reading computed style is the difference between "the
+  stylesheet loaded" and "the ported system is in effect", which is what the rule is about.
+
 ### Added
 
 - **Continuous integration** (`.github/workflows/ci.yml`): a pull-request and `main`-push workflow on

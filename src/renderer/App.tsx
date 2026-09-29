@@ -80,6 +80,23 @@ export function App() {
       void setExpandedState(false);
     }, 480);
   }, [busy, clearCollapseTimer, controlsOpen, historyOpen, pinned, preview, setExpandedState]);
+  // Hover drives expansion at the window edge, the way the reference wires it: the listeners sit on
+  // `document.body` because the panel and the ball are siblings and the pointer crosses the gap
+  // between them while the panel animates open.
+  useEffect(() => {
+    const onEnter = () => {
+      clearCollapseTimer();
+      if (!floatingState.docked && !expanded) void setExpandedState(true);
+    };
+    const onLeave = () => scheduleCollapse();
+    document.body.addEventListener("pointerenter", onEnter);
+    document.body.addEventListener("pointerleave", onLeave);
+    return () => {
+      document.body.removeEventListener("pointerenter", onEnter);
+      document.body.removeEventListener("pointerleave", onLeave);
+    };
+  }, [clearCollapseTimer, expanded, floatingState.docked, scheduleCollapse, setExpandedState]);
+
   const chooseWorkspace = useCallback(async () => { const picked = await bridge.chooseWorkspace(); if (!picked.ok) { if (picked.message) setNotice(picked.message); return; } const next = await bridge.setWorkspace(picked.resolved ?? "", false); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
   const newConversation = useCallback(async () => {
     if (busy) return;
@@ -151,99 +168,145 @@ export function App() {
 
   useEffect(() => () => clearCollapseTimer(), [clearCollapseTimer]);
 
-  const floatingClasses = [
-    "orb",
-    expanded ? "orb--expanded" : "orb--collapsed",
-    selectionContext ? "orb--has-selection" : "",
-    pinned ? "orb--pinned" : "",
-    `orb--expand-${floatingState.horizontal}`,
-    `orb--expand-${floatingState.vertical}`,
-    floatingState.docked ? `orb--docked-${floatingState.docked}` : "",
-  ].filter(Boolean).join(" ");
+  // Layout state is expressed on `body`, the way the reference does it, so the stylesheet owns
+  // placement and React owns only the state. There is one mechanism for one state model: every state
+  // below is a body class, and `tests/renderer-reference-parity.test.ts` fails if a selector the
+  // shell can emit has no rule.
+  useEffect(() => {
+    const classes = [
+      expanded ? "expanded" : "",
+      pinned ? "pinned" : "",
+      busy ? "running" : "",
+      selectionContext ? "has-selection-chip" : "",
+      draft.length > 120 ? "composer-capped" : "",
+      floatingState.docked ? "docked" : "",
+      `expand-${floatingState.horizontal}`,
+      `expand-${floatingState.vertical}`,
+      floatingState.docked ? `docked-${floatingState.docked}` : "",
+    ].filter(Boolean);
+    document.body.className = classes.join(" ");
+  }, [expanded, pinned, busy, selectionContext, draft, floatingState]);
 
-  return <div
-    className={floatingClasses}
-    onPointerEnter={() => {
-      clearCollapseTimer();
-      if (!floatingState.docked && !expanded) void setExpandedState(true);
-    }}
-    onPointerLeave={() => scheduleCollapse()}
-  >
-    <header className="orb__header">
-      <button type="button" className="orb__round-button" onClick={() => void loadHistory()} title="Conversation history" aria-label="Conversation history">◷</button>
-      <button type="button" className="orb__permission" onClick={() => { setHistoryOpen(false); setControlsOpen((open) => !open); }} aria-expanded={controlsOpen} title="Open Orb controls"><span className={`orb__status-dot ${status?.piWeb.reachable ? "orb__status-dot--live" : ""}`} />{desktopTask?.authorized ? "Desktop access" : "Orb access"}<span className="orb__chevron">⌄</span></button>
-      <button type="button" className="orb__round-button" onClick={() => void newConversation()} title="New conversation" aria-label="New conversation" disabled={busy}>+</button>
-    </header>
+  // The shell reports the resolved OS theme; the reference states it in the DOM rather than asking
+  // CSS to guess, so a user's explicit choice can be expressed later without changing this contract.
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () => {
+      if (media.matches) document.documentElement.setAttribute("data-ds-dark-theme", "");
+      else document.documentElement.removeAttribute("data-ds-dark-theme");
+    };
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
 
-    {!status?.configured ? <section className="orb__setup"><img src={avatarUrl} alt="" className="orb__setup-avatar" /><h1>Choose a workspace</h1><p>Give pi-orb its own folder to start a private desktop conversation.</p><button type="button" className="orb__button orb__button--primary" onClick={() => void chooseWorkspace()}>Choose folder</button></section> : <>
-      <main className="orb__messages">
-        {messages.length === 0 && <div className="orb__empty"><img src={avatarUrl} alt="" className="orb__empty-avatar" /><p>Ask me anything about the window you're working in.</p><div className="orb__suggestions"><button type="button" onClick={() => setDraft("Summarize what is on screen")}>Summarize this screen</button><button type="button" onClick={() => setDraft("Help me with this task")}>Help me with this task</button></div></div>}
-        {messages.map((message, index) => <article key={index} className={`orb__message orb__message--${message.role}`}><span className="orb__message-role">{message.role === "user" ? "You" : message.role === "error" ? "Error" : "Orb"}</span><div>{message.text}</div></article>)}
-        {busy && <div className="orb__thinking"><span /><span /><span /> <em>Thinking</em></div>}
-      </main>
-      <form className={`orb__composer${selectionContext ? " orb__composer--has-selection" : ""}`} onSubmit={(event) => { event.preventDefault(); void send(); }}>
-        {selectionContext && <div className="orb__selection-chip" title={selectionContext.text}><span className="orb__selection-copy"><strong>Selected text</strong><small>{selectionContext.sourceLabel ?? "Another application"} · {selectionSummary(selectionContext.text)}</small></span><button type="button" className="orb__selection-remove" onClick={() => { void bridge.clearSelectionContext(); setSelectionContext(null); }} aria-label="Remove selected text" title="Remove selected text">×</button></div>}
-        <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={selectionContext ? "Ask about the selected text" : "Ask anything"} rows={2} />
-        <div className="orb__composer-footer"><button type="button" className="orb__text-button" onClick={() => void screenshot()} disabled={busy}>Add context</button><span className="orb__composer-spacer" />{busy && <button type="button" className="orb__text-button orb__text-button--danger" onClick={() => void stop()}>Stop</button>}<button type="submit" className="orb__send" disabled={busy || (!draft.trim() && !selectionContext)} aria-label="Send">↑</button></div>
+  // The reference keeps `#panel` in the DOM and toggles it with `hidden`; the CSS transition on
+  // #panel is what animates the reveal, so the element must exist before the state flips. The shell
+  // therefore mounts the panel unconditionally and drives visibility through `hidden` plus the body
+  // state classes below — the same split the reference uses.
+  const panelContent = !status?.configured ? (
+    <section className="empty-state">
+      <img src={avatarUrl} alt="" />
+      <h1>Choose a workspace</h1>
+      <p>Give pi-orb its own folder to start a private desktop conversation.</p>
+      <button type="button" className="pill-button pill-button--primary" onClick={() => void chooseWorkspace()}>Choose folder</button>
+    </section>
+  ) : (
+    <>
+      <div id="transcript" role="log" aria-live="polite">
+        {messages.length === 0 && <div className="empty-state"><img src={avatarUrl} alt="" /><p>Ask me anything about the window you're working in.</p></div>}
+        {messages.map((message, index) => <article key={index} className={`message message--${message.role}`}><span className="message-role">{message.role === "user" ? "You" : message.role === "error" ? "Error" : "Orb"}</span><div>{message.text}</div></article>)}
+        {busy && <div className="thinking"><span /><span /><span /> <em>Thinking</em></div>}
+      </div>
+      <form id="composer" onSubmit={(event) => { event.preventDefault(); void send(); }}>
+        <label id="input-label" htmlFor="prompt">Message</label>
+        <textarea id="prompt" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={selectionContext ? "Ask about the selected text" : "Ask anything"} />
+        <div id="composer-actions"><button type="button" className="text-button" onClick={() => void screenshot()} disabled={busy}>Add context</button><span className="composer-spacer" />{busy && <button type="button" className="text-button text-button--danger" onClick={() => void stop()}>Stop</button>}<button id="send" type="submit" disabled={busy || (!draft.trim() && !selectionContext)} aria-label="Send">↑</button></div>
       </form>
-    </>}
+      <div id="selection-chip" hidden={!selectionContext} title={selectionContext?.text}>
+        <span id="selection-chip-text">{selectionContext ? `${selectionContext.sourceLabel ?? "Another application"} · ${selectionSummary(selectionContext.text)}` : ""}</span>
+        <button id="selection-chip-dismiss" type="button" onClick={() => { void bridge.clearSelectionContext(); setSelectionContext(null); }} aria-label="Remove selected text" title="Remove selected text">×</button>
+      </div>
+      {historyOpen && <section className="sheet" aria-label="Conversation history">{historyLoading ? <p className="history-empty">Loading…</p> : historyItems.length === 0 ? <p className="history-empty">No saved conversations.</p> : <div id="history-list" role="listbox">{historyItems.map((item) => <button type="button" key={item.sessionId} className="history-row" onClick={() => void openHistory(item.sessionId)}><strong>{item.name || item.firstMessage || "Untitled conversation"}</strong><small>{item.messageCount} messages · {formatHistoryDate(item.modified)}</small></button>)}</div>}</section>}
+      {controlsOpen && (
+        <section className="sheet" aria-label="Orb controls">
+          <div className="sheet-heading">
+            <strong>Orb controls</strong>
+            <button type="button" className="icon-button" onClick={() => setControlsOpen(false)} aria-label="Close controls">×</button>
+          </div>
+          <div className="sheet-section">
+            <span className="sheet-eyebrow">DESKTOP TASK</span>
+            <strong>{desktopTask?.target?.title ?? "No target selected"}</strong>
+            <small>{desktopTask?.authorized ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions` : "Locked until you approve a task"}</small>
+            <small>After approval, successful actions send a fresh target-window image to the model.</small>
+            <button type="button" className="pill-button" onClick={() => void loadWindows()}>Choose target</button>
+            {windowChoices && (
+              <div className="sheet-list" role="listbox">
+                {windowChoices.map((choice) => (
+                  <button key={choice.windowId} type="button" aria-selected={choice.windowId === desktopTask?.target?.windowId} onClick={() => void chooseTarget(choice.windowId)}>
+                    <strong>{choice.title || choice.appName}</strong>
+                    <small>{choice.appName}</small>
+                  </button>
+                ))}
+              </div>
+            )}
+            <form className="sheet-form" onSubmit={(event) => { event.preventDefault(); void authorizeDesktop(); }}>
+              <input value={taskScope} onChange={(event) => setTaskScope(event.target.value)} placeholder="What may Orb do?" aria-label="Desktop task scope" />
+            </form>
+            <div className="sheet-actions">
+              <button type="button" className="pill-button pill-button--primary" disabled={!taskScope.trim()} onClick={() => void authorizeDesktop()}>Approve</button>
+              <button type="button" className="pill-button" onClick={() => void revokeDesktop()} disabled={!desktopTask?.authorized}>Revoke</button>
+            </div>
+          </div>
+          <div className="sheet-section">
+            <span className="sheet-eyebrow">SHORTCUT</span>
+            <small>Wake or hide the orb from anywhere.</small>
+            <form className="sheet-form" onSubmit={(event) => { event.preventDefault(); void saveShortcut(); }}>
+              <input value={shortcutDraft} onChange={(event) => setShortcutDraft(event.target.value)} placeholder={status.shortcut} aria-label="Wake shortcut" />
+              <button type="submit" className="pill-button" disabled={!shortcutDraft.trim()}>Apply</button>
+            </form>
+          </div>
+        </section>
+      )}
+      {preview && <section className="sheet"><div className="sheet-heading"><strong>Review screenshot</strong><button type="button" className="icon-button" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p className="notice">{preview.targetDescription}</p>{preview.targetStale && <p className="notice notice--error">The window changed since capture.</p>}<img id="preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small className="notice">{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="sheet-actions"><button type="button" className="pill-button pill-button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="pill-button" onClick={() => void exportScreenshot()}>Save copy</button><button type="button" className="pill-button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
+      {notice && <p id="status" className="notice" role="status">{notice}</p>}
+    </>
+  );
 
-    {historyOpen && status?.configured && <section className="orb__history" aria-label="Conversation history"><div className="orb__control-heading"><strong>History</strong><button type="button" className="orb__close" onClick={() => setHistoryOpen(false)} aria-label="Close history">×</button></div>{historyLoading ? <p className="orb__history-empty">Loading…</p> : historyItems.length === 0 ? <p className="orb__history-empty">No saved conversations.</p> : <div className="orb__history-list">{historyItems.map((item) => <button type="button" key={item.sessionId} className="orb__history-row" onClick={() => void openHistory(item.sessionId)}><strong>{item.name || item.firstMessage || "Untitled conversation"}</strong><small>{item.messageCount} messages · {formatHistoryDate(item.modified)}</small></button>)}</div>}</section>}
-    {controlsOpen && status?.configured && (
-      <section className="orb__controls" aria-label="Orb controls">
-        <div className="orb__control-heading">
-          <strong>Orb controls</strong>
-          <button type="button" className="orb__close" onClick={() => setControlsOpen(false)} aria-label="Close controls">×</button>
-        </div>
-        <div className="orb__control-section">
-          <span className="orb__eyebrow">DESKTOP TASK</span>
-          <strong>{desktopTask?.target?.title ?? "No target selected"}</strong>
-          <small>{desktopTask?.authorized ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions` : "Locked until you approve a task"}</small>
-          <small>After approval, successful actions send a fresh target-window image to the model.</small>
-          <button type="button" className="orb__button" onClick={() => void loadWindows()}>Choose target</button>
-          {windowChoices && (
-            <div className="orb__window-list">
-              {windowChoices.map((choice) => (
-                <button key={choice.windowId} type="button" onClick={() => void chooseTarget(choice.windowId)}>
-                  <strong>{choice.title || choice.appName}</strong>
-                  <small>{choice.appName}</small>
-                </button>
-              ))}
-            </div>
-          )}
-          <form onSubmit={(event) => { event.preventDefault(); void authorizeDesktop(); }}>
-            <input value={taskScope} onChange={(event) => setTaskScope(event.target.value)} placeholder="What may Orb do?" aria-label="Desktop task scope" />
-            <div className="orb__actions">
-              <button type="submit" className="orb__button orb__button--primary" disabled={!taskScope.trim()}>Approve</button>
-              <button type="button" className="orb__button" onClick={() => void revokeDesktop()} disabled={!desktopTask?.authorized}>Revoke</button>
-            </div>
-          </form>
-        </div>
-        <div className="orb__control-section">
-          <span className="orb__eyebrow">SHORTCUT</span>
-          <small>Wake or hide the orb from anywhere.</small>
-          <form className="orb__shortcut-form" onSubmit={(event) => { event.preventDefault(); void saveShortcut(); }}>
-            <input value={shortcutDraft} onChange={(event) => setShortcutDraft(event.target.value)} placeholder={status.shortcut} aria-label="Wake shortcut" />
-            <button type="submit" className="orb__button" disabled={!shortcutDraft.trim()}>Apply</button>
-          </form>
-        </div>
-      </section>
-    )}
-    {preview && <section className="orb__preview"><div className="orb__preview-heading"><strong>Review screenshot</strong><button type="button" className="orb__close" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p>{preview.targetDescription}</p>{preview.targetStale && <p className="orb__notice orb__notice--error">The window changed since capture.</p>}<img className="orb__preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small>{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="orb__actions"><button type="button" className="orb__button orb__button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="orb__button" onClick={() => void exportScreenshot()}>Save copy</button><button type="button" className="orb__button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
-    {notice && <p className="orb__notice">{notice}</p>}
-    {floatingState.docked && <button
-      type="button"
-      className="orb__dock-tab"
-      onClick={() => {
-        void bridge.unsnapFloatingBall()
-          .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
-          .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
-      }}
-      aria-label="Pull orb out of the screen edge"
-    />}
+  // The reference reveals the panel by unhiding it and *then* adding `expanded`, so the 300ms
+  // opacity/scale transition actually runs; on collapse it removes `expanded` first and only hides
+  // the element after the transition. Deriving `hidden` straight from the expanded flag would cut
+  // the animation, so the delay is part of the port.
+  const [panelHidden, setPanelHidden] = useState(true);
+  useEffect(() => {
+    if (expanded) {
+      setPanelHidden(false);
+      return;
+    }
+    const timer = setTimeout(() => setPanelHidden(true), 300);
+    return () => clearTimeout(timer);
+  }, [expanded]);
+
+  return <>
+    <section
+      id="panel"
+      hidden={panelHidden}
+      onPointerEnter={() => clearCollapseTimer()}
+    >
+      <button id="history" type="button" onClick={() => void loadHistory()} title="Conversation history" aria-label="Conversation history">◷</button>
+      <div id="permission">
+        <button id="permission-button" type="button" onClick={() => { setHistoryOpen(false); setControlsOpen((open) => !open); }} aria-haspopup="dialog" aria-expanded={controlsOpen} title="Open Orb controls">
+          <span id="permission-dot" data-live={status?.piWeb.reachable ? "" : undefined} />
+          <span id="permission-label">{desktopTask?.authorized ? "Desktop access" : "Orb access"}</span>
+          <span id="permission-chevron">⌄</span>
+        </button>
+      </div>
+      <button id="new-conversation" type="button" onClick={() => void newConversation()} title="New conversation" aria-label="New conversation" disabled={busy}>+</button>
+      {panelContent}
+    </section>
     <button
+      id="ball"
       type="button"
-      className="orb__ball"
       onClick={() => {
         if (drag.current?.moved) { drag.current = null; return; }
         if (pinned) {
@@ -299,7 +362,19 @@ export function App() {
       }}
       aria-label={expanded ? "Collapse orb" : "Expand orb"}
     ><img src={avatarUrl} alt="" /></button>
-  </div>;
+    <button
+      id="dock-tab"
+      type="button"
+      hidden={!floatingState.docked}
+      onClick={() => {
+        void bridge.unsnapFloatingBall()
+          .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
+          .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
+      }}
+      aria-hidden={!floatingState.docked}
+      aria-label="Pull orb out of the screen edge"
+    />
+  </>;
 }
 
 function withStreaming(current: ChatMessage[], text: string): ChatMessage[] { const copy = [...current]; const last = copy[copy.length - 1]; if (last?.role === "assistant") copy[copy.length - 1] = { role: "assistant", text }; else copy.push({ role: "assistant", text }); return copy; }

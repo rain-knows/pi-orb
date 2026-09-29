@@ -363,6 +363,30 @@ check(
   ),
   "dropping a section would turn the playbook into prose instead of a working index",
 );
+// The renderer is the surface where the reuse rule was quietly broken once already: the stylesheet
+// had been rewritten with its own naming and the documents still described it as converged on the
+// reference. The stylesheet is checked here for the reference's own vocabulary, and the parity test
+// that pins it must exist.
+const rendererCss = existsSync(join(repo, "src/renderer/styles.css"))
+  ? readFileSync(join(repo, "src/renderer/styles.css"), "utf8")
+  : "";
+check(
+  "the floating shell stylesheet keeps the reference design tokens and state model",
+  ["--ball:", "--chrome:", "--panel-radius:", "--composer-height:", "--origin-x", "html[data-ds-dark-theme]"].every(
+    (fragment) => rendererCss.includes(fragment),
+  ) && /body\.expanded\b/.test(rendererCss) && /body\.expand-left\b/.test(rendererCss),
+  "a renderer that stops speaking the reference's vocabulary is no longer a port",
+);
+check(
+  "the floating shell stylesheet has no leftover second design system",
+  !/\.orb__/.test(rendererCss) && !/\.orb--/.test(rendererCss),
+  "the abandoned orb__* scheme must not come back alongside the ported one",
+);
+check(
+  "the renderer parity test exists",
+  existsSync(join(repo, "tests/renderer-reference-parity.test.ts")),
+  "the tokens, state vocabulary and ids need a regression net, not just a convention",
+);
 const agentInstructions = readFileSync(join(repo, "AGENTS.md"), "utf8");
 check(
   "the agent instructions record the local reference checkout and the playbook entry point",

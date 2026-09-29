@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-29T15:45:20.968Z",
+  "capturedAt": "2026-09-29T16:29:08.474Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790696720968",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790699348474",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -36,7 +36,22 @@
     {
       "name": "the built renderer bundle and its assets load from the archive",
       "ok": true,
-      "detail": "{\"rootChildren\":1,\"orbNodes\":10,\"avatarLoaded\":true,\"avatarSrc\":\"file:///D:/workself/pi-orb/release/0.1.0/win-unpacked/resources/app.asar/out/renderer/assets/orb-avatar-BIleFNQm.png,file:///D:/workself/pi-orb/release/0.1.0/win-unpacked/reso"
+      "detail": "{\"rootChildren\":3,\"ball\":true,\"avatarLoaded\":true,\"styleSheets\":1}"
+    },
+    {
+      "name": "the ported reference shell is mounted, not just its stylesheet",
+      "ok": true,
+      "detail": "{\"panel\":true,\"dockTab\":true,\"composer\":false,\"configured\":false,\"bodyClasses\":\"expand-right expand-down\"}"
+    },
+    {
+      "name": "the reference design tokens resolve to the reference values",
+      "ok": true,
+      "detail": "{\"ball\":\"72px\",\"chrome\":\"12px\",\"panelRadius\":\"36px\",\"composerHeight\":\"72px\"}"
+    },
+    {
+      "name": "the ball renders at the reference size and shape",
+      "ok": true,
+      "detail": "{\"ballSize\":\"72px\",\"ballRadius\":\"50%\"}"
     },
     {
       "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
@@ -55,6 +70,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-20772\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/ecea4bdf-881b-45f2-8c8c-3ce8f5315edc"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-27440\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/01404edd-af83-4114-b274-b9db3cba7f57"
 }

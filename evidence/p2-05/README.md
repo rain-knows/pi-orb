@@ -38,7 +38,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 `app.asar` 9 291 054 B、解包原生二进制合计 2 658 109 B、asar 条目 135。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
 
-## 2. 启动探测：`packaged-smoke.json`（10/10 通过）
+## 2. 启动探测：`packaged-smoke.json`（13/13 通过）
 
 以真实 `release/<version>/win-unpacked/pi-orb.exe` 启动，独立 `--user-data-dir` 与
 `PI_ORB_CONFIG`，指向一个未使用的 pi-web 端口，通过 Chrome DevTools Protocol 驱动 renderer。
@@ -52,11 +52,18 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | renderer 仍然没有 Node 权限（`require`/`process`/`module` 均 `undefined`） | 通过 |
 | IPC 状态往返可用 | 通过 |
 | 隔离的未配置初始态（`configured=false`、pi-web 不可达） | 通过 |
-| 构建后的 renderer 与其素材从 asar 加载（root 已挂载、`orb__` 节点 10 个、头像 `naturalWidth > 0`、样式表已加载） | 通过 |
-| **`orb:list-desktop-windows` 返回真实窗口列表**（koffi 从 `app.asar.unpacked` 加载成功） | 通过（本次运行 7–8 个窗口） |
+| 构建后的 renderer 与其素材从 asar 加载（root 已挂载、球元素存在、头像 `naturalWidth > 0`、样式表已加载） | 通过 |
+| **参考壳层已挂载**（`#panel`、`#ball`、`#dock-tab` 存在，`body` 带参考状态类） | 通过 |
+| **参考设计令牌解析为参考值**（`--ball: 72px`、`--chrome: 12px`、`--panel-radius: 36px`、`--composer-height` 解析为 `72px`） | 通过 |
+| **球按参考尺寸与形状渲染**（`72px`、`border-radius: 50%`） | 通过 |
+| **`orb:list-desktop-windows` 返回真实窗口列表**（koffi 从 `app.asar.unpacked` 加载成功） | 通过（本次运行 8–11 个窗口） |
 | 启动日志中没有 `desktop driver unavailable` | 通过 |
 | 没有模块解析错误 | 通过 |
 
+> 中间三条读的是**计算后的样式**与**真实 DOM**，而不是「样式表已加载」：这正是区分
+> 「CSS 文件下载成功」与「移植的参考设计系统真的生效」的地方，也是本书开头那次前端漂移
+> （自称复用参考、实为自创 `orb__*` 样式）能被发现的原因。
+>
 > 最后三项中的窗口枚举是这一阶段唯一能**从外部观测**「打包后原生模块仍然可用」的手段：
 > `koffi` 由主进程懒加载，因此只有真的调用一次桌面枚举才能证明 asar 解包路径正确。
 >

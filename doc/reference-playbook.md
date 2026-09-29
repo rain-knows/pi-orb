@@ -151,9 +151,9 @@ D:\workself\pi-orb\
 | 参考文件 | 作用 | pi-orb 对应 | 状态 |
 |---|---|---|---|
 | `apps/desktop/src/floating-window.ts` | 浮球窗口几何、停靠、拖动、多屏、overlay guard | `src/main/floating-geometry.ts`、`floating-window-controller.ts` | 已移植几何子集 |
-| `apps/desktop/renderer/floating.html` | 浮球/面板 DOM 结构 | `src/renderer/App.tsx` | 已按结构收敛 |
-| `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/styles.css` | 已按规格移植 |
-| `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/App.tsx` | 视觉与状态约定移植；宿主调用未搬 |
+| `apps/desktop/renderer/floating.html` | 浮球/面板 DOM 结构 | `src/renderer/App.tsx` | 已移植：参考 id（`#panel`/`#ball`/`#composer`/`#dock-tab`/`#prompt`/`#selection-chip`/`#transcript` 等）与「`#panel` 常驻、`hidden` 切换」的结构一致；参考专有界面面（`#question*`/`#tcc-*`/`#ball-gif`）无对应物 |
+| `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/styles.css` | 已移植：18 个同名设计令牌、`body.<state>` 布局状态词表、origin-based 展开动画、`html[data-ds-dark-theme]` 暗色；由 `tests/renderer-reference-parity.test.ts` 钉住 |
+| `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/App.tsx` | 视觉与状态约定移植（body 级 `pointerenter`/`pointerleave`、展开/收起时序）；宿主调用未搬 |
 | `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | 未移植 | 待评估：pi-orb 无 dsh 设置页，只保留可用项 |
 | `apps/desktop/src/orb-permission.ts` | 浮球权限模型（只读/编辑/完全访问） | 未移植 | 不适用：pi-orb 用 pi-web 自身权限与会话模型 |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
@@ -197,7 +197,10 @@ D:\workself\pi-orb\
 | 会话/列表轮询 | `1500ms` | `floating.js:1445` |
 | 事件重连退避 | `500 → 8000ms` | `floating.js:327`、`:1074-1075` |
 | CSS `--ball` / `--chrome` / `--panel-radius` | `72px` / `12px` / `36px` | `floating.css:4`、`:9`、`:10` |
-| `#panel` 过渡 | `300ms ease-in-out` | `floating.css:59` |
+| `#panel` 过渡 | `300ms ease-in-out`，`transform: scale(0.18→1)`，`transform-origin: var(--origin-x) var(--origin-y)` | `floating.css:37-59` |
+| 展开方向原点 | `body.expand-left/right/up/down` 各自设置 `--origin-x`/`--origin-y` | `floating.css:64-80` |
+| 面板常驻与切换 | `#panel` 始终在 DOM；展开先 `hidden=false` 再加 `body.expanded`，收起先移除类、动画后再 `hidden` | `floating.html:11`、`floating.js` 的 `applyExpanded` |
+| 暗色主题 | `html[data-ds-dark-theme]`（宿主决定并写入，**不是** `prefers-color-scheme`） | `floating.css:22-34` |
 | 停靠 tab 呼吸动画 | `1800ms`，`prefers-reduced-motion` 时关闭 | `floating.css:715`、`:723-728` |
 
 ### 5.4 球的窗口标志（必须一致，`floating-window.ts:641-666`）
@@ -420,18 +423,16 @@ D:\workself\pi-orb\
 | `tools.spec.ts`（26） | 13 个工具的往返、`postActionWaitMs` 结算、GUI turn 包裹范围、截图落盘与剪贴板 | `tests/desktop-broker.test.ts`、`orb-tools.test.ts`、`reference-windows-driver.test.ts`、`screenshot-export.test.ts`、`reference-windows-open-app.test.ts`（open-app 的前置检查／激活／前台验证三步）；**缺** 结算时序、GUI turn 范围、Desktop 落盘/剪贴板 |
 | `observe.spec.ts`（9） | 观察信封与前台标签、`settleMs`、`persistCapture` 过滤、abort 重抛 | `tests/screenshot-flow.test.ts`；**缺** 信封/标签格式与 `requireScreen` 越界文案 |
 | `overlay-guard.spec.ts`（17） | 包裹范围、overlay id 传递、观察框显示/隐藏与 abort、turn 结束收起 | 无；`withGuiTurn` 的窗口隐藏也未测 |
-| `windows-foreground.spec.ts`（10） | 壳类/瞬态过滤、owner 链、同监视器并集、监视器分离 | 仅 1 条经 `tests/reference-windows.test.ts:130-135` 间接覆盖；**9 条未测**（最高优先补） |
-| `windows.spec.ts`（13） | 键名映射、扩展键、剪贴板恢复、焦点恢复时序、UIPI 拒绝、截图失败包装 | `tests/reference-windows.test.ts` 覆盖部分；**缺** `windowsVirtualKey`/`windowsKeyIsExtended`、`ELEVATED_WINDOW`、Explorer 文件夹、空标题省略 |
+| `windows-foreground.spec.ts`（10） | 壳类/瞬态过滤、owner 链、同监视器并集、监视器分离 | `tests/reference-windows-foreground.test.ts`（10/10，逐条对应） |
+| `windows.spec.ts`（13） | 键名映射、扩展键、剪贴板恢复、焦点恢复时序、UIPI 拒绝、截图失败包装 | `tests/reference-windows-input.test.ts`（13/13，逐条对应） |
 | `wait.spec.ts`（5）、`wait-args.spec.ts`（2） | `delay` 的取消语义与等待取值 | 无（`wait.ts` 已移植但无测试、无工具） |
 | `raster.spec.ts`（3）、`screenshot.spec.ts`（11） | 栅格可用性、Desktop 落盘命名与去重 | 无（对应模块未移植） |
-| `open.spec.ts`（6） | 长按时长、URL 校验、路径黑名单 | 无（对应模块未移植） |
+| `open.spec.ts`（6） | 长按时长、URL 校验、路径黑名单 | 部分：`orb_open_app` 的 name 校验与激活规则见 `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`；URL/path 模块未移植 |
 | `unsupported.spec.ts`（4）、`loader-composition.spec.ts`（3）、`preset*.spec.ts`、`macos.spec.ts`（40） | 平台回退、Cordis 装配、preset 目录、macOS | 不适用 |
 | `code-agent.spec.ts`（28）、`pre-step.spec.ts`（4） | 后台代理编排、自动前置观察 | 不适用（pi-orb 不自动观察、无 code_agent） |
-| `apps/desktop/tests/floating-window.spec.ts` | 停靠、拖动、多屏、展开几何；并断言 CSS `--chrome:12px` 与 tab `6px/72px/#75757F` 与主进程常量一致 | `tests/floating-geometry.test.ts` |
-| `apps/desktop/tests/floating-renderer.spec.ts`（104 KB） | renderer DOM 状态机与交互（JSDOM 跑真实 `floating.html`+`floating.js`，只 fake `fetch` 与 `window.dshDesktop`） | 无（pi-orb 用 React + 人工验收） |
+| `apps/desktop/tests/floating-window.spec.ts` | 停靠、拖动、多屏、展开几何；并断言 CSS `--chrome:12px` 与 tab `6px/72px/#75757F` 与主进程常量一致 | `tests/floating-geometry.test.ts`；**CSS 与主进程常量的一致性**由 `tests/renderer-reference-parity.test.ts` 补上 |
+| `apps/desktop/tests/floating-renderer.spec.ts`（104 KB） | renderer DOM 状态机与交互（JSDOM 跑真实 `floating.html`+`floating.js`，只 fake `fetch` 与 `window.dshDesktop`） | 部分：`tests/renderer-reference-parity.test.ts` 钉住令牌/状态/id 与参考一致；**交互时序本身**仍靠打包探测（`evidence/p2-05/packaged-smoke.json`）与人工验收，没有 JSDOM 状态机测试 |
 | `apps/desktop/tests/observation-frame-window.spec.ts` | 观察框 CSS 不得含 `animation`/`@keyframes`，stroke/glow 回退值同步 | 不适用（无观察框） |
-| `apps/desktop/tests/selection-*.spec.ts`、`windows-selection.spec.ts` | 选区读取与工具栏行为 | `tests/windows-selection.test.ts`（读取路径） |
-| `apps/desktop/tests/floating-renderer.spec.ts`（104 KB） | renderer DOM 状态机与交互 | 无（pi-orb 用 React + 人工验收） |
 | `apps/desktop/tests/selection-*.spec.ts`、`windows-selection.spec.ts` | 选区读取与工具栏行为 | `tests/windows-selection.test.ts`（读取路径） |
 
 移植测试时保留参考项目的**判定依据**（目标自身日志、栅格尺寸、事件序列），不要退化成
@@ -608,6 +609,7 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 - [ ] 能直接移植的部分是否真的移植了（而不是重写）？
 - [ ] 适配差异是否落在 §3.1 允许的 5 类内，并在阶段文档写明？
 - [ ] 常量、schema、DOM/CSS、状态机是否与参考一致；不一致处是否有测量或产品理由？
+- [ ] 若改动 renderer：是否仍通过 `tests/renderer-reference-parity.test.ts`（令牌名、`body.<state>` 词表、参考 id、无残留 `orb__*`），以及打包探测里的「参考壳层已挂载／令牌解析为参考值」两条？
 - [ ] 是否误引入了 §3.2 的不可搬内容（Cordis/dsh 会话/自动观察/自动审批）？
 - [ ] 目标窗口授权、截图授权、撤权路径是否仍然成立？
 - [ ] 测试是否覆盖拒绝路径与取消路径？真机项是否登记到 `manual-acceptance.md`？

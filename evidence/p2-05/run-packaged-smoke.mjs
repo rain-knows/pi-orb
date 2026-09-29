@@ -182,15 +182,37 @@ try {
     );
 
     // The orb starts collapsed to the ball, so the setup panel's text is not in the layout; what
-    // proves the built renderer really rendered is a mounted root, a loaded stylesheet and the
-    // product avatar decoding out of the archive.
-    const renderExpression = `JSON.stringify({
-      rootChildren: document.getElementById('root')?.childElementCount ?? 0,
-      orbNodes: document.querySelectorAll('[class^="orb__"]').length,
-      avatarLoaded: [...document.images].some((image) => image.complete && image.naturalWidth > 0),
-      avatarSrc: [...document.images].map((image) => image.currentSrc || image.src).join(','),
-      styleSheets: document.styleSheets.length,
-    })`;
+    // proves the built renderer really rendered is a mounted root, a loaded stylesheet, the product
+    // avatar decoding out of the archive, and the ported reference shell actually being present:
+    // the ball/panel/composer ids and the custom properties the ported stylesheet resolves. Reading
+    // computed values is the difference between "the CSS file was loaded" and "the ported design
+    // system is in effect", which is the property the reference-reuse rule is about.
+    const renderExpression = `JSON.stringify((() => {
+      const root = document.documentElement;
+      const style = getComputedStyle(root);
+      const ball = document.getElementById('ball');
+      const ballStyle = ball ? getComputedStyle(ball) : null;
+      return {
+        rootChildren: document.getElementById('root')?.childElementCount ?? 0,
+        ball: ball !== null,
+        panel: document.getElementById('panel') !== null,
+        composer: document.getElementById('composer') !== null,
+        dockTab: document.getElementById('dock-tab') !== null,
+        configured: !document.querySelector('.empty-state h1'),
+        tokens: {
+          ball: style.getPropertyValue('--ball').trim(),
+          chrome: style.getPropertyValue('--chrome').trim(),
+          panelRadius: style.getPropertyValue('--panel-radius').trim(),
+          composerHeight: style.getPropertyValue('--composer-height').trim(),
+        },
+        ballSize: ballStyle ? ballStyle.width : null,
+        ballRadius: ballStyle ? ballStyle.borderRadius : null,
+        bodyClasses: document.body.className,
+        avatarLoaded: [...document.images].some((image) => image.complete && image.naturalWidth > 0),
+        avatarSrc: [...document.images].map((image) => image.currentSrc || image.src).join(','),
+        styleSheets: document.styleSheets.length,
+      };
+    })())`;
     const render = JSON.parse(
       await waitForValue(
         client,
@@ -198,7 +220,7 @@ try {
         (raw) => {
           try {
             const value = JSON.parse(raw);
-            return value.rootChildren > 0 && value.orbNodes > 0;
+            return value.rootChildren > 0 && value.ball === true;
           } catch {
             return false;
           }
@@ -207,8 +229,32 @@ try {
     );
     check(
       "the built renderer bundle and its assets load from the archive",
-      render.rootChildren > 0 && render.orbNodes > 0 && render.avatarLoaded && render.styleSheets > 0,
-      JSON.stringify(render).slice(0, 240),
+      render.rootChildren > 0 && render.ball && render.avatarLoaded && render.styleSheets > 0,
+      JSON.stringify({ rootChildren: render.rootChildren, ball: render.ball, avatarLoaded: render.avatarLoaded, styleSheets: render.styleSheets }).slice(0, 240),
+    );
+    check(
+      "the ported reference shell is mounted, not just its stylesheet",
+      // `#panel`, `#ball` and `#dock-tab` exist regardless of state, as in the reference. `#composer`
+      // is absent only while the workspace is unconfigured: pi-orb replaces the transcript with the
+      // "choose a workspace" step, and offering an input before Orb mode can exist would be a false
+      // affordance. The probe runs unconfigured, so it asserts the reference structure minus that
+      // one state-dependent element.
+      render.panel && render.dockTab && (!render.composer || render.configured === false),
+      JSON.stringify({ panel: render.panel, dockTab: render.dockTab, composer: render.composer, configured: render.configured, bodyClasses: render.bodyClasses }).slice(0, 240),
+    );
+    check(
+      "the reference design tokens resolve to the reference values",
+      // `--composer-height: var(--ball)` must resolve, not be echoed verbatim.
+      render.tokens.ball === "72px" &&
+        render.tokens.chrome === "12px" &&
+        render.tokens.panelRadius === "36px" &&
+        render.tokens.composerHeight === "72px",
+      JSON.stringify(render.tokens),
+    );
+    check(
+      "the ball renders at the reference size and shape",
+      render.ballSize === "72px" && render.ballRadius === "50%",
+      JSON.stringify({ ballSize: render.ballSize, ballRadius: render.ballRadius }),
     );
 
     // The decisive native check: this call runs `koffi` out of `app.asar.unpacked` and enumerates
