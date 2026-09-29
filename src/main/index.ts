@@ -57,6 +57,7 @@ import {
   type FloatingWindowState,
   type ListSessionHistoryResult,
   type OpenSessionHistoryResult,
+  type OrbSelectionContext,
 } from "@shared/ipc";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 import { uIOhook } from "uiohook-napi";
@@ -68,6 +69,7 @@ import {
   setFloatingExpanded,
   unsnapDockedBall,
 } from "./floating-window-controller";
+import { startSelectionMonitor, type SelectionMonitor } from "./selection-monitor";
 
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
@@ -127,6 +129,8 @@ let lifecycle: OrbWindowLifecycle | null = null;
 let lastWorkspaceProblem: string | null = null;
 let lastShortcutProblem: string | null = null;
 let lastDesktopProblem: string | null = null;
+let selectionMonitor: SelectionMonitor | undefined;
+let selectionContext: OrbSelectionContext | null = null;
 let isQuitting = false;
 const piWebBaseUrl = process.env.PI_ORB_PI_WEB_URL ?? "http://127.0.0.1:30141";
 const piWebPassword = process.env.PI_ORB_PI_WEB_PASSWORD;
@@ -277,6 +281,42 @@ function desktopTaskStatus(): DesktopTaskStatus {
     };
   }
   return { ...desktopBroker.status(), bridgeReady: bridge !== null, target: desktopTarget };
+}
+
+/** Best-effort visible label for the process that owns a native text selection. */
+function selectionSourceLabel(pid: number | null): string | null {
+  if (pid === null) return null;
+  try {
+    const match = referenceDriver?.listWindows().find((candidate) => candidate.pid === pid);
+    if (match) return match.title || match.appName || `Process ${pid}`;
+  } catch {
+    // Source labels are advisory and must never make selection capture fail.
+  }
+  return `Process ${pid}`;
+}
+
+async function startNativeSelectionMonitor(): Promise<void> {
+  if (!config.orbWorkspace || !validateWorkspace(config.orbWorkspace).ok) return;
+  selectionMonitor = await startSelectionMonitor({
+    onSelection: (event) => {
+      selectionContext = {
+        text: event.text,
+        pid: event.pid,
+        sourceLabel: selectionSourceLabel(event.pid),
+        bounds: event.bounds,
+        capturedAt: Date.now(),
+      };
+      if (window && !window.isDestroyed()) {
+        window.webContents.send(IPC.selectionContext, selectionContext);
+      }
+    },
+  });
+  selectionMonitor?.setExcludePids([process.pid]);
+}
+
+function clearSelectionContext(): void {
+  selectionContext = null;
+  if (window && !window.isDestroyed()) window.webContents.send(IPC.selectionContext, null);
 }
 
 /**
@@ -651,6 +691,11 @@ function createTrayIcon(): NativeImage {
 
 function registerIpc(): void {
   ipcMain.handle(IPC.getStatus, () => currentStatus());
+  ipcMain.handle(IPC.getSelectionContext, () => selectionContext);
+  ipcMain.handle(IPC.clearSelectionContext, () => {
+    clearSelectionContext();
+    return true;
+  });
 
   // Re-probe on demand so the user can start pi-web and refresh without
   // restarting the shell.
@@ -783,6 +828,8 @@ function registerIpc(): void {
       // screenshot and any desktop authorization belong to the previous run and must not
       // survive it either.
       revokeDesktopOperations("the workspace changed");
+      clearSelectionContext();
+      if (!selectionMonitor) await startNativeSelectionMonitor();
       const generation = generations.begin();
       session.beginGeneration(generation);
       // The extension must learn the new generation, or its next request would be refused as stale.
@@ -823,6 +870,7 @@ function registerIpc(): void {
       throw new Error("Finish or stop the current conversation before starting a new one.");
     }
     revokeDesktopOperations("a new conversation started");
+    clearSelectionContext();
     try {
       return await session.newConversation(validation.resolved);
     } catch (error) {
@@ -1127,6 +1175,9 @@ function debounce(action: () => void, delayMs: number): () => void {
 
 function quit(): void {
   isQuitting = true;
+  selectionMonitor?.stop();
+  selectionMonitor = undefined;
+  clearSelectionContext();
   doubleAltDetector.stop();
   shortcutEdgeGuard.stop();
   shortcuts.releaseAll();
@@ -1166,6 +1217,7 @@ void app.whenReady().then(async () => {
   registerIpc();
   createTray();
   window = createWindow();
+  await startNativeSelectionMonitor();
   attachWakeController(window);
   if (!shortcutEdgeGuard.start()) {
     console.warn(`[pi-orb] ${shortcutEdgeGuard.error ?? "Keyboard edge detection is unavailable."}`);
@@ -1267,6 +1319,9 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => {
   isQuitting = true;
+  selectionMonitor?.stop();
+  selectionMonitor = undefined;
+  clearSelectionContext();
   doubleAltDetector.stop();
   shortcuts.releaseAll();
   revokeDesktopOperations("the shell is quitting");

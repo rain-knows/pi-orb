@@ -30,6 +30,7 @@ import {
   type FloatingWindowState,
   type ListSessionHistoryResult,
   type OpenSessionHistoryResult,
+  type OrbSelectionContext,
 } from "@shared/ipc";
 
 export interface OrbBridge {
@@ -60,6 +61,9 @@ export interface OrbBridge {
   discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
   onDoubleAltGesture(listener: () => void): () => void;
+  getSelectionContext(): Promise<OrbSelectionContext | null>;
+  clearSelectionContext(): Promise<boolean>;
+  onSelectionContext(listener: (context: OrbSelectionContext | null) => void): () => void;
 }
 
 const bridge: OrbBridge = {
@@ -105,6 +109,15 @@ const bridge: OrbBridge = {
     ipcRenderer.on(IPC.doubleAltGesture, handler);
     return () => {
       ipcRenderer.removeListener(IPC.doubleAltGesture, handler);
+    };
+  },
+  getSelectionContext: () => ipcRenderer.invoke(IPC.getSelectionContext),
+  clearSelectionContext: () => ipcRenderer.invoke(IPC.clearSelectionContext),
+  onSelectionContext: (listener) => {
+    const handler = (_event: unknown, payload: OrbSelectionContext | null) => listener(payload);
+    ipcRenderer.on(IPC.selectionContext, handler);
+    return () => {
+      ipcRenderer.removeListener(IPC.selectionContext, handler);
     };
   },
 };

@@ -70,6 +70,12 @@ export const IPC = {
   sessionEvent: "orb:session-event",
   /** Main -> renderer: the physical double-Alt gesture entered screenshot preview. */
   doubleAltGesture: "orb:double-alt-gesture",
+  /** Main -> renderer: the foreground application's selected text changed. */
+  selectionContext: "orb:selection-context",
+  /** Renderer -> main: read the latest native selection snapshot. */
+  getSelectionContext: "orb:get-selection-context",
+  /** Renderer -> main: discard the latest native selection snapshot. */
+  clearSelectionContext: "orb:clear-selection-context",
 } as const;
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC];
@@ -188,6 +194,17 @@ export interface PiWebStatus {
   readonly reachable: boolean;
   /** Set when the shell could not authenticate or reach the service. */
   readonly problem: string | null;
+}
+
+/** Text selected in another application through the native accessibility API. */
+export interface OrbSelectionContext {
+  readonly text: string;
+  /** The source process id is an observation label, not an authorization token. */
+  readonly pid: number | null;
+  /** Best-effort visible source label; full paths and clipboard contents are never read. */
+  readonly sourceLabel: string | null;
+  readonly bounds: { readonly x: number; readonly y: number; readonly width: number; readonly height: number } | null;
+  readonly capturedAt: number;
 }
 
 export interface WorkspaceCandidateResult {

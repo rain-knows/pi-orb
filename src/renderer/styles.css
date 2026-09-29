@@ -39,6 +39,12 @@ button { cursor: pointer; }
 .orb__thinking span:nth-child(2) { animation-delay: .14s; }.orb__thinking span:nth-child(3) { animation-delay: .28s; }.orb__thinking em { margin-left: 4px; font-style: normal; }
 @keyframes orb-pulse { 0%,100% { opacity: .35; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-2px); } }
 .orb__composer { flex: none; padding: 10px 11px 9px; border: 1px solid #dedee1; border-radius: 15px; background: #f6f6f7; }
+.orb__selection-chip { display: flex; align-items: center; gap: 8px; min-height: 28px; margin: -2px 0 5px; padding: 4px 7px; border: 1px solid #c6d4f5; border-radius: 9px; color: #3d5da7; background: #edf2ff; }
+.orb__selection-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 1px; }
+.orb__selection-copy strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.orb__selection-copy small { overflow: hidden; color: #7180a7; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.orb__selection-remove { width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; color: #7180a7; background: transparent; font-size: 16px; line-height: 1; }
+.orb__selection-remove:hover { color: #3d5da7; background: #dce6ff; }
 .orb__composer textarea { display: block; width: 100%; min-height: 42px; padding: 2px 2px 8px; resize: none; border: 0; outline: none; color: #202125; background: transparent; font-size: 14px; line-height: 1.45; }
 .orb__composer textarea::placeholder { color: #a2a3a8; }
 .orb__composer-footer { display: flex; align-items: center; min-height: 28px; }
@@ -73,7 +79,9 @@ button { cursor: pointer; }
 .orb--collapsed .orb__ball { right: 12px; bottom: 12px; }
 .orb--expanded .orb__messages { padding: 24px 0 10px; }
 .orb--expanded .orb__composer { position: absolute; z-index: 7; right: 16px; bottom: 16px; left: 16px; height: 72px; padding: 0 12px; border: 0; border-radius: 36px; background: #eee; }
+.orb--expanded .orb__composer--has-selection { height: 100px; border-radius: 24px; }
 .orb--expanded .orb__composer textarea { height: 100%; padding: 12px 80px 12px 8px; }
+.orb--expanded .orb__composer--has-selection textarea { height: 62px; padding-top: 5px; }
 .orb--expanded .orb__composer-footer { position: absolute; right: 12px; bottom: 21px; left: 12px; }
 .orb--expanded .orb__composer-spacer { display: none; }
 .orb--expanded .orb__text-button { margin-right: auto; }
@@ -104,6 +112,9 @@ button { cursor: pointer; }
   .orb__round-button:hover, .orb__close:hover, .orb__permission:hover, .orb__suggestions button:hover { background: #303033; }
   .orb__message, .orb__composer textarea, .orb__setup h1, .orb__control-section strong { color: #f9fafb; }
   .orb__message--user { background: #27365a; }
+  .orb__selection-chip { color: #d7e3ff; background: #27365a; border-color: #4d659f; }
+  .orb__selection-copy small, .orb__selection-remove { color: #aebee7; }
+  .orb__selection-remove:hover { color: #fff; background: #3a4c78; }
   .orb__button, .orb__window-list button, .orb__control-section input, .orb__shortcut-form input { color: #f9fafb; background: #202023; border-color: rgb(255 255 255 / 16%); }
   .orb__button:hover:not(:disabled), .orb__window-list button:hover { border-color: #7997df; background: #29334d; }
   .orb__button--primary { color: #fff; background: #4777d9; }

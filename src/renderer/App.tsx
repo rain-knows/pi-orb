@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { DesktopTaskStatus, DesktopWindowChoice, FloatingWindowState, OrbSessionEvent, OrbHistoryMessage, OrbSessionHistoryItem, WorkspaceStatus } from "@shared/ipc";
+import type { DesktopTaskStatus, DesktopWindowChoice, FloatingWindowState, OrbSessionEvent, OrbHistoryMessage, OrbSessionHistoryItem, OrbSelectionContext, WorkspaceStatus } from "@shared/ipc";
 import { formatBytes } from "@shared/screenshot";
 import { getBridge } from "./bridge";
 import avatarUrl from "./orb-avatar.png";
@@ -26,6 +26,7 @@ export function App() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyItems, setHistoryItems] = useState<readonly OrbSessionHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [selectionContext, setSelectionContext] = useState<OrbSelectionContext | null>(null);
   const drag = useRef<{ pointerId: number; startX: number; startY: number; offsetX: number; offsetY: number; moved: boolean } | null>(null);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const streaming = useRef("");
@@ -40,6 +41,11 @@ export function App() {
       else if (event.type === "idle") setBusy(false);
       else if (event.type === "session") setNotice(`Session ${event.sessionId.slice(0, 8)} ready.`);
     });
+  }, [bridge]);
+
+  useEffect(() => {
+    void bridge.getSelectionContext().then(setSelectionContext);
+    return bridge.onSelectionContext(setSelectionContext);
   }, [bridge]);
 
   const clearCollapseTimer = useCallback(() => {
@@ -94,11 +100,15 @@ export function App() {
     setBusy(false);
   }, [bridge]);
   const send = useCallback(async () => {
-    const text = draft.trim(); if (!text || busy || generation === 0) return;
+    const instruction = draft.trim();
+    if ((!instruction && !selectionContext) || busy || generation === 0) return;
+    const text = selectionContext
+      ? `${instruction || "Please help me understand this selected text."}\n\n[Selected text from ${selectionContext.sourceLabel ?? "another application"}]\n${selectionContext.text}`
+      : instruction;
     setDraft(""); setNotice(null); streaming.current = ""; setMessages((current) => [...current, { role: "user", text }]); setBusy(true);
-    try { await bridge.ensureSession(); await bridge.sendPrompt({ generation, text }); }
+    try { await bridge.ensureSession(); await bridge.sendPrompt({ generation, text }); await bridge.clearSelectionContext(); setSelectionContext(null); }
     catch (error) { setBusy(false); setMessages((current) => [...current, { role: "error", text: error instanceof Error ? error.message : String(error) }]); }
-  }, [bridge, busy, draft, generation]);
+  }, [bridge, busy, draft, generation, selectionContext]);
   const stop = useCallback(async () => { try { await bridge.abort({ generation }); } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); } finally { setBusy(false); } }, [bridge, generation]);
   const screenshot = useCallback(async () => {
     if (busy || generation === 0) return; const result = await bridge.captureScreenshot({ generation, text: draft.trim() });
@@ -149,7 +159,11 @@ export function App() {
         {messages.map((message, index) => <article key={index} className={`orb__message orb__message--${message.role}`}><span className="orb__message-role">{message.role === "user" ? "You" : message.role === "error" ? "Error" : "Orb"}</span><div>{message.text}</div></article>)}
         {busy && <div className="orb__thinking"><span /><span /><span /> <em>Thinking</em></div>}
       </main>
-      <form className="orb__composer" onSubmit={(event) => { event.preventDefault(); void send(); }}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Ask anything" rows={2} /><div className="orb__composer-footer"><button type="button" className="orb__text-button" onClick={() => void screenshot()} disabled={busy}>Add context</button><span className="orb__composer-spacer" />{busy && <button type="button" className="orb__text-button orb__text-button--danger" onClick={() => void stop()}>Stop</button>}<button type="submit" className="orb__send" disabled={busy || !draft.trim()} aria-label="Send">↑</button></div></form>
+      <form className={`orb__composer${selectionContext ? " orb__composer--has-selection" : ""}`} onSubmit={(event) => { event.preventDefault(); void send(); }}>
+        {selectionContext && <div className="orb__selection-chip" title={selectionContext.text}><span className="orb__selection-copy"><strong>Selected text</strong><small>{selectionContext.sourceLabel ?? "Another application"} · {selectionSummary(selectionContext.text)}</small></span><button type="button" className="orb__selection-remove" onClick={() => { void bridge.clearSelectionContext(); setSelectionContext(null); }} aria-label="Remove selected text" title="Remove selected text">×</button></div>}
+        <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={selectionContext ? "Ask about the selected text" : "Ask anything"} rows={2} />
+        <div className="orb__composer-footer"><button type="button" className="orb__text-button" onClick={() => void screenshot()} disabled={busy}>Add context</button><span className="orb__composer-spacer" />{busy && <button type="button" className="orb__text-button orb__text-button--danger" onClick={() => void stop()}>Stop</button>}<button type="submit" className="orb__send" disabled={busy || (!draft.trim() && !selectionContext)} aria-label="Send">↑</button></div>
+      </form>
     </>}
 
     <img src={avatarUrl} alt="pi-orb" className="orb__avatar" />
@@ -234,4 +248,9 @@ function withCompleted(current: ChatMessage[], text: string): ChatMessage[] { re
 function formatHistoryDate(value: string): string {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function selectionSummary(text: string): string {
+  const compact = text.replace(/\s+/g, " ").trim();
+  return compact.length > 72 ? `${compact.slice(0, 69)}...` : compact;
 }

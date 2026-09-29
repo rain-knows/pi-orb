@@ -22,6 +22,7 @@ import type {
   FloatingWindowState,
   ListSessionHistoryResult,
   OpenSessionHistoryResult,
+  OrbSelectionContext,
 } from "@shared/ipc";
 
 export interface OrbBridge {
@@ -52,6 +53,9 @@ export interface OrbBridge {
   discardScreenshot(): Promise<boolean>;
   onSessionEvent(listener: (event: OrbSessionEvent) => void): () => void;
   onDoubleAltGesture(listener: () => void): () => void;
+  getSelectionContext(): Promise<OrbSelectionContext | null>;
+  clearSelectionContext(): Promise<boolean>;
+  onSelectionContext(listener: (context: OrbSelectionContext | null) => void): () => void;
 }
 
 declare global {

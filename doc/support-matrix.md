@@ -90,7 +90,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **生命周期**：折叠/停止/turn 完成或失败撤权与丢弃记录、不结束会话、不改代次、断连撤权 | 已验证 | `evidence/p1-07/lifecycle-regression.json`（10/10）与 `src/main/index.ts` 的统一撤权出口 |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原、hover/pin、系统主题、新会话 | 已接入（几何与 session controller 自动化通过；视觉和人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/renderer/App.tsx`、`doc/p2-01-reference-reuse.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘体验未验证） | `tests/double-alt.test.ts`、`src/main/double-alt.ts`、`src/main/index.ts`、`src/renderer/App.tsx` |
-| **P2-03 history 会话入口**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复 | 已接入（公开 API adapter、workspace 过滤和自动化测试通过；人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`src/main/pi-web-client.ts`、`src/main/index.ts`、`src/renderer/App.tsx`、`evidence/p2-03/README.md` |
+| **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/App.tsx`、`evidence/p2-03/README.md` |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -118,7 +118,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 上游更新后的兼容性 | 未对任何上游新版本跑过接入合同 | 按 §7.2 流程在独立环境验证后才发布新组合 |
 | 双 Alt 的真实键盘体验 | detector 逻辑已实现；未在真实键盘上覆盖左右顺序、长按、AltGr、焦点变化及锁屏／休眠恢复 | 自动化状态测试不证明 OS hook 的实际键盘事件稳定性 |
 | 选区上下文 | 属后续 P2 能力；尚未实现 | 不阻塞 v0.1；不得当作已实现 |
-| P2-03 选区／辅助功能文本 | 本阶段只接入公开 history summary/detail；未实现选区遮罩、选中文字和来源标记 | 不读取剪贴板，不把 history 恢复误称为选区能力 |
+| P2-03 选区／辅助功能文本 | Windows UI Automation 读取与 chip 已接入；真实 UIA、选区 bounds、macOS 辅助功能和原生工具栏仍未验收 | 不读取剪贴板，不模拟 Ctrl+C，不把来源标签当作授权 |
 | **完整 v0.1 发布** | 上表仍有未验证项（多显示器、高权限窗口、向 Chromium 内容输入文本） | **未完成**；当前交付物不得声明为完整 v0.1 |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）
