@@ -56,7 +56,7 @@
 |---|---|
 | 质量门禁 | typecheck、lint、单测、生产构建 |
 | 非破坏性 | pi-web HEAD 与其 6 个既有改动文件未被触碰 |
-| 凭据与像素 | 交付树内无密钥材料、无截图/原生二进制/归档、无色 `auth.json`/`.env` |
+| 凭据与像素 | 交付树内无密钥材料、无测试截图/原生二进制/归档；`src/renderer/orb-avatar.png` 是唯一按路径批准的产品 UI 资产；无 `auth.json`/`.env` |
 | 忽略规则 | `node_modules/`、`out/` 被忽略；无构建产物被暂存 |
 | 许可 | 清单存在、无 AGPL/GPL-3/SSPL、每个已安装生产依赖都声明许可、MPL 组件与源码路径被点名、项目自带 LICENSE |
 | 版本维护 | 版本/changelog/支持矩阵三者一致；驱动、Electron、Pi SDK 版本与实测一致 |

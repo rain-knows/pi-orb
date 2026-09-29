@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-29T03:34:05.792Z",
+  "capturedAt": "2026-09-29T11:09:35.540Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "9364 ms"
+      "detail": "10001 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "6801 ms"
+      "detail": "7239 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "5276 ms"
+      "detail": "5476 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4730 ms"
+      "detail": "4670 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -33,7 +33,7 @@
       "detail": "[]"
     },
     {
-      "name": "no screenshot, native binary or archive is committed",
+      "name": "no unapproved screenshot, native binary or archive is committed",
       "ok": true,
       "detail": "[]"
     },

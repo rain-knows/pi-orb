@@ -127,10 +127,13 @@ for (const file of ["README.md", "CHANGELOG.md", "LICENSE", "THIRD_PARTY_NOTICES
 const secretHits = [];
 const binaryHits = [];
 const binaryExtensions = [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".dll", ".node", ".exe", ".tgz", ".key", ".pem", ".pfx"];
+// Product UI assets are allowed only by exact path. Test screenshots and native binaries remain rejected.
+const approvedProductAssets = new Set(["src/renderer/orb-avatar.png"]);
 for (const file of shipFiles) {
   const name = file.toLowerCase();
   if (binaryExtensions.some((extension) => name.endsWith(extension))) {
-    binaryHits.push(relative(repo, file));
+    const relativePath = relative(repo, file).split("\\").join("/");
+    if (!approvedProductAssets.has(relativePath)) binaryHits.push(relativePath);
     continue;
   }
   if (!textExtensions.has(name.slice(name.lastIndexOf("."))) && !name.endsWith("license")) continue;
@@ -142,7 +145,7 @@ for (const file of shipFiles) {
 
 check("no credential or key material is present in the shipped tree", secretHits.length === 0, JSON.stringify(secretHits.slice(0, 10)));
 check(
-  "no screenshot, native binary or archive is committed",
+  "no unapproved screenshot, native binary or archive is committed",
   binaryHits.length === 0,
   JSON.stringify(binaryHits.slice(0, 10)),
 );
