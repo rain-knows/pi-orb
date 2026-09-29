@@ -74,7 +74,7 @@ const modelServer = createServer(async (req, res) => {
     containsOrbModeSection: serialized.includes("orb_mode"),
     // The prompt must state the rules the executor enforces, or the model is told one thing and
     // judged by another.
-    mentionsOneActionPerObservation: /observe again/i.test(serialized),
+    mentionsOneActionPerObservation: /fresh observation|observe again/i.test(serialized),
     mentionsUntrustedScreenContent: /untrusted input/i.test(serialized),
   });
 

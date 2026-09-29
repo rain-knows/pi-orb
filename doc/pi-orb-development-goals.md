@@ -206,7 +206,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | P2-01 Orb 风格体验 | M1；输入共存需 M3 | 贴边吸附、悬停展开、钉住、观察边框、主题；D1/overlay guard | 多屏／DPI／工作区切换保持可找回；overlay 不挡操作、不进入截图；关闭与收起语义清楚 | 不复制第三方品牌资产；不让视觉层拥有系统输入权限 |
 | P2-02 双 Alt 快捷手势 | P1-03 | 复用 `uiohook-napi` 物理左右 Alt keycode；双 Alt 触发后唤醒 Orb 并进入已有截图预览；D1/E1 | 区分左右 Alt；同步按、先后按、长按、重复、AltGr、焦点变化、锁屏／休眠恢复无卡键；不吞其他正常快捷键；同一按压只触发一次；退出卸载 hook | `deepseek-harness-orb` 没有双 Alt 产品手势，本项按本项目目标做最小适配，不宣称复刻 Codex 或参考项目内部行为；不全量记录按键；不自动上传截图 |
 | P2-03 选区与附加上下文 | M2、用户确认范围 | 已接入参考 history 会话入口（公开 session summary/detail）和参考项目同类 Windows UI Automation `TextPattern` 选区读取；选区结果以 composer chip 附加 | 历史按钮可列出当前 Orb workspace 会话并恢复 user/assistant transcript；选区文本只在用户发送时附加，并显示来源标签；真实 UIA、多屏/DPI、Esc/工具栏和其它平台仍需验收 | 不用模拟 Ctrl+C 静默覆盖用户剪贴板；应用标题不等于完整路径／URL；不 OCR 出文件路径再当可信 cwd |
-| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽；打开应用、截图导出仍待需求与边界评估 | 新动作复用任务授权和一动作一观察；broker/schema/driver 测试通过，native backend 取消释放有测试；真实动作和动作后视觉回图仍待 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；截图导出须定义明确保存位置和剪贴板语义 |
+| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽及授权后的动作后回图；打开应用、截图导出仍待需求与边界评估 | 新动作复用任务授权和一动作一观察；broker/schema/driver、Pi image block 和 native backend 取消释放测试通过；真实动作及目标像素仍待 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；截图导出须定义明确保存位置和剪贴板语义 |
 | P2-05 额外平台与分发 | P1-07、确认平台 | macOS 签名／TCC 归属、Windows 安装包；按需求扩展 Linux | 干净目标机安装、权限拒绝／撤销、升级、卸载可复现；声明支持矩阵 | 不用 Windows 通过推断 macOS/Linux 可用；不照搬 Electron 身份到 Node helper |
 | P2-06 原工具菜单上游集成 | P0-02 结论＋用户明确要求 | 通用可扩展模式接口的提案／可选 PR；W2/W3 | 关闭接口时普通行为不变；模式注册、工具校验、恢复／显示一致；合并与版本支持有记录 | 不是首版前提；上游不接受时不静默维护私有整仓 fork |
 | P2-07 后台任务衔接（可选） | v0.1、用户确认需求 | 复用已有 Pi 子代理／独立会话机制，结果通知回 Orb | 父子任务归属、独立停止、完成只通知一次、不得自动替用户批准问题 | 不将前期 DeepSeek 双轨当本项目刚性范围，不再造任务调度系统 |
@@ -295,7 +295,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | 两参考项目、MIT、第三方许可 | §3.1、P1-07 |
 | 细优先级、依赖、验收 | §5、§7.1 |
 
-截至 2026-09-29，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、授权 broker 和参考项目 Windows native backend 已接入；C7、D6、D8 已由真实模型和 disposable target 自身日志验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。P2-02 已复用现有 `uiohook-napi` 左右 Alt keycode，双 Alt 只唤醒并打开原有截图预览，纯状态测试通过；真实键盘、AltGr、锁屏恢复和人工体验仍未验证。P2-03 已复用 pi-web 公开 session summary/detail API 实现当前 Orb workspace 的 history 列表和 transcript 恢复；选区真实 UIA、多屏/DPI 和原生工具栏仍未验收。P2-04 已从固定参考提交接入 Windows 热键、长按和同窗口拖拽；自动化取消释放通过，真实桌面动作及动作后回图待验收。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md) 及 `evidence/` 为准。
+截至 2026-09-29，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、授权 broker 和参考项目 Windows native backend 已接入；C7、D6、D8 已由真实模型和 disposable target 自身日志验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。P2-02 已复用现有 `uiohook-napi` 左右 Alt keycode，双 Alt 只唤醒并打开原有截图预览，纯状态测试通过；真实键盘、AltGr、锁屏恢复和人工体验仍未验证。P2-03 已复用 pi-web 公开 session summary/detail API 实现当前 Orb workspace 的 history 列表和 transcript 恢复；选区真实 UIA、多屏/DPI 和原生工具栏仍未验收。P2-04 已从固定参考提交接入 Windows 热键、长按、同窗口拖拽和授权后的动作后 image block；自动化取消释放、授权边界和回图链路通过，真实桌面动作及目标像素待验收。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md) 及 `evidence/` 为准。
 
 文档完成标准：全文回读；核对引用路径和固定提交；需求覆盖无遗漏；调用 Advisor 复核，有实质意见时落实修订。开发完成标准由各阶段验收决定，二者不得混淆。当前仍未完成的发布门槛是多显示器、高权限窗口、Chromium 内容输入、安装包安装／卸载和部分人工交互体验。取消信号已接入 broker、driver 与 native backend，并由自动化竞态测试和真实 disposable target 日志验证。
 

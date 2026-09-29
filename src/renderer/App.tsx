@@ -169,7 +169,46 @@ export function App() {
 
     <img src={avatarUrl} alt="pi-orb" className="orb__avatar" />
     {historyOpen && status?.configured && <section className="orb__history" aria-label="Conversation history"><div className="orb__control-heading"><strong>History</strong><button type="button" className="orb__close" onClick={() => setHistoryOpen(false)} aria-label="Close history">×</button></div>{historyLoading ? <p className="orb__history-empty">Loading…</p> : historyItems.length === 0 ? <p className="orb__history-empty">No saved conversations.</p> : <div className="orb__history-list">{historyItems.map((item) => <button type="button" key={item.sessionId} className="orb__history-row" onClick={() => void openHistory(item.sessionId)}><strong>{item.name || item.firstMessage || "Untitled conversation"}</strong><small>{item.messageCount} messages · {formatHistoryDate(item.modified)}</small></button>)}</div>}</section>}
-    {controlsOpen && status?.configured && <section className="orb__controls" aria-label="Orb controls"><div className="orb__control-heading"><strong>Orb controls</strong><button type="button" className="orb__close" onClick={() => setControlsOpen(false)} aria-label="Close controls">×</button></div><div className="orb__control-section"><span className="orb__eyebrow">DESKTOP TASK</span><strong>{desktopTask?.target?.title ?? "No target selected"}</strong><small>{desktopTask?.authorized ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions` : "Locked until you approve a task"}</small><button type="button" className="orb__button" onClick={() => void loadWindows()}>Choose target</button>{windowChoices && <div className="orb__window-list">{windowChoices.map((choice) => <button key={choice.windowId} type="button" onClick={() => void chooseTarget(choice.windowId)}><strong>{choice.title || choice.appName}</strong><small>{choice.appName}</small></button>)}</div>}<form onSubmit={(event) => { event.preventDefault(); void authorizeDesktop(); }}><input value={taskScope} onChange={(event) => setTaskScope(event.target.value)} placeholder="What may Orb do?" aria-label="Desktop task scope" /><div className="orb__actions"><button type="submit" className="orb__button orb__button--primary" disabled={!taskScope.trim()}>Approve</button><button type="button" className="orb__button" onClick={() => void revokeDesktop()} disabled={!desktopTask?.authorized}>Revoke</button></div></form></div><div className="orb__control-section"><span className="orb__eyebrow">SHORTCUT</span><small>Wake or hide the orb from anywhere.</small><form className="orb__shortcut-form" onSubmit={(event) => { event.preventDefault(); void saveShortcut(); }}><input value={shortcutDraft} onChange={(event) => setShortcutDraft(event.target.value)} placeholder={status.shortcut} aria-label="Wake shortcut" /><button type="submit" className="orb__button" disabled={!shortcutDraft.trim()}>Apply</button></form></div></section>}
+    {controlsOpen && status?.configured && (
+      <section className="orb__controls" aria-label="Orb controls">
+        <div className="orb__control-heading">
+          <strong>Orb controls</strong>
+          <button type="button" className="orb__close" onClick={() => setControlsOpen(false)} aria-label="Close controls">×</button>
+        </div>
+        <div className="orb__control-section">
+          <span className="orb__eyebrow">DESKTOP TASK</span>
+          <strong>{desktopTask?.target?.title ?? "No target selected"}</strong>
+          <small>{desktopTask?.authorized ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions` : "Locked until you approve a task"}</small>
+          <small>After approval, successful actions send a fresh target-window image to the model.</small>
+          <button type="button" className="orb__button" onClick={() => void loadWindows()}>Choose target</button>
+          {windowChoices && (
+            <div className="orb__window-list">
+              {windowChoices.map((choice) => (
+                <button key={choice.windowId} type="button" onClick={() => void chooseTarget(choice.windowId)}>
+                  <strong>{choice.title || choice.appName}</strong>
+                  <small>{choice.appName}</small>
+                </button>
+              ))}
+            </div>
+          )}
+          <form onSubmit={(event) => { event.preventDefault(); void authorizeDesktop(); }}>
+            <input value={taskScope} onChange={(event) => setTaskScope(event.target.value)} placeholder="What may Orb do?" aria-label="Desktop task scope" />
+            <div className="orb__actions">
+              <button type="submit" className="orb__button orb__button--primary" disabled={!taskScope.trim()}>Approve</button>
+              <button type="button" className="orb__button" onClick={() => void revokeDesktop()} disabled={!desktopTask?.authorized}>Revoke</button>
+            </div>
+          </form>
+        </div>
+        <div className="orb__control-section">
+          <span className="orb__eyebrow">SHORTCUT</span>
+          <small>Wake or hide the orb from anywhere.</small>
+          <form className="orb__shortcut-form" onSubmit={(event) => { event.preventDefault(); void saveShortcut(); }}>
+            <input value={shortcutDraft} onChange={(event) => setShortcutDraft(event.target.value)} placeholder={status.shortcut} aria-label="Wake shortcut" />
+            <button type="submit" className="orb__button" disabled={!shortcutDraft.trim()}>Apply</button>
+          </form>
+        </div>
+      </section>
+    )}
     {preview && <section className="orb__preview"><div className="orb__preview-heading"><strong>Review screenshot</strong><button type="button" className="orb__close" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p>{preview.targetDescription}</p>{preview.targetStale && <p className="orb__notice orb__notice--error">The window changed since capture.</p>}<img className="orb__preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small>{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="orb__actions"><button type="button" className="orb__button orb__button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="orb__button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
     {notice && <p className="orb__notice">{notice}</p>}
     {floatingState.docked && <button

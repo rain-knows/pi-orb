@@ -74,6 +74,20 @@ describe("ReferenceWindowsDriver", () => {
     expect(explicitSameTarget.ok).toBe(true);
   });
 
+  it("keeps unauthorised observations metadata-only and returns a fresh image after acting", async () => {
+    const { ops } = opsFake();
+    const driver = new ReferenceWindowsDriver({ ops, backend: backendFake([]), ownProcessId: 1 });
+    const privateObservation = (await driver.observe({ windowId: "42" })).observation!;
+    expect(privateObservation.image).toBeUndefined();
+
+    const sharedObservation = (await driver.observe({ windowId: "42", includeImage: true })).observation!;
+    expect(sharedObservation.image).toMatchObject({ data: "AQ==", mimeType: "image/png", width: 800, height: 600 });
+    const acted = await driver.act({ kind: "click", observationId: sharedObservation.observationId, position: { x: 400, y: 300 } }, sharedObservation);
+    expect(acted.observation?.observationId).not.toBe(sharedObservation.observationId);
+    expect(acted.observation?.image).toMatchObject({ mimeType: "image/png", width: 800, height: 600 });
+    expect(driver.lastObservation?.observationId).toBe(acted.observation?.observationId);
+  });
+
   it("passes reference backend millifraction coordinates and action amounts", async () => {
     const { ops } = opsFake();
     const calls: unknown[] = [];

@@ -262,7 +262,7 @@ describe("describeOrbModeSection", () => {
   });
 
   it("states the one-action-one-observation rule", () => {
-    expect(section).toMatch(/observe again/i);
+    expect(section).toMatch(/fresh observation/i);
     expect(section).toMatch(/superseded/i);
   });
 

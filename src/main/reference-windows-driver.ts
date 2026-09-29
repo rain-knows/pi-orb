@@ -3,9 +3,10 @@ import type {
   DesktopObservation,
   ScreenshotPosition,
 } from "@shared/orb-tools";
+import { validateCapture, type ScreenshotImage } from "@shared/screenshot";
 import { SCREENSHOT_CENTRE } from "@shared/orb-tools";
 import type { ActResult, DesktopDriver, ObserveResult } from "./desktop-task";
-import type { DesktopBackend, ScreenInfo } from "./reference-windows/backend";
+import type { CapturedScreen, DesktopBackend, ScreenInfo } from "./reference-windows/backend";
 import type { WindowsDesktopOps } from "./reference-windows/windows";
 
 export interface ReferenceWindowInfo {
@@ -87,7 +88,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       .filter((window) => window.pid !== this.#options.ownProcessId && window.isOnScreen);
   }
 
-  async observe(input: { readonly windowId?: string }): Promise<ObserveResult> {
+  async observe(input: { readonly windowId?: string; readonly includeImage?: boolean }): Promise<ObserveResult> {
     const target = this.#findTarget(input.windowId);
     if (!target) {
       return {
@@ -106,28 +107,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         if (!screen || screen.windowId !== target.windowId) {
           throw new Error("The reference backend did not select the recorded target window.");
         }
-        // Force the same capture path used by the reference tool. The image is intentionally not
-        // forwarded here because pi-orb's screenshot consent flow owns model attachments.
-        await this.#options.backend.capture(screen);
-        const observation: DesktopObservation = {
-          observationId: `obs-${Date.now().toString(36)}-${++observationCounter}`,
-          at: Date.now(),
-          window: {
-            id: String(target.windowId),
-            pid: target.pid,
-            title: target.title,
-            appName: target.appName,
-            bounds: target.bounds,
-          },
-          coordinateSpace: {
-            action: "screenshot-fraction",
-            space: 1000,
-            windowRect: { x: 0, y: 0, width: screen.bounds.width, height: screen.bounds.height },
-          },
-          elements: [],
-          elementsUnavailable: true,
-          degraded: false,
-        };
+        const captured = await this.#options.backend.capture(screen);
+        const observation = this.#makeObservation(target, screen, captured, input.includeImage === true);
         this.#target = target;
         this.#screen = screen;
         this.#observation = observation;
@@ -147,7 +128,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       return { ok: false, refused: true, error: "The observation target is no longer available." };
     }
     try {
-      await this.#withGuiTurn(async () => {
+      const observationAfterAction = await this.#withGuiTurn(async () => {
         if (!this.#options.ops.focusWindow(target.windowId)) {
           throw new Error("The target window could not be brought to the foreground.");
         }
@@ -156,45 +137,41 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           if (!action.position) throw new Error("A click needs a screenshot position.");
           this.#lastInputPosition = positionOf(action.position);
           await this.#options.backend.click({ screen, position: this.#lastInputPosition, button: "left", count: 1 }, signal);
-          return;
-        }
-        if (action.kind === "type") {
+        } else if (action.kind === "type") {
           if (action.elementToken) throw new Error("Element-addressed typing is unavailable in the Windows backend; click the field first.");
           await this.#options.backend.typeText({ screen, position: this.#lastInputPosition, text: action.text, replace: false, submit: false }, signal);
-          return;
-        }
-        if (action.kind === "hotkey") {
+        } else if (action.kind === "hotkey") {
           await this.#options.backend.hotkey({ keys: action.keys }, signal);
-          return;
-        }
-        if (action.kind === "longPress") {
+        } else if (action.kind === "longPress") {
           await this.#options.backend.longPress({
             screen,
             position: positionOf(action.position),
             durationSeconds: action.durationSeconds,
           }, signal);
-          return;
-        }
-        if (action.kind === "drag") {
+        } else if (action.kind === "drag") {
           await this.#options.backend.drag({
             startScreen: screen,
             startPosition: positionOf(action.startPosition),
             endScreen: screen,
             endPosition: positionOf(action.endPosition),
           }, signal);
-          return;
+        } else {
+          if (action.direction === "left" || action.direction === "right") {
+            throw new Error("The Windows backend supports vertical scrolling only.");
+          }
+          await this.#options.backend.scroll({
+            screen,
+            position: positionOf(action.position),
+            direction: action.direction,
+            scrollLevel: action.amount,
+          }, signal);
         }
-        if (action.direction === "left" || action.direction === "right") {
-          throw new Error("The Windows backend supports vertical scrolling only.");
-        }
-        await this.#options.backend.scroll({
-          screen,
-          position: positionOf(action.position),
-          direction: action.direction,
-          scrollLevel: action.amount,
-        }, signal);
+        const captured = await this.#options.backend.capture(screen, signal);
+        const nextObservation = this.#makeObservation(target, screen, captured, true);
+        this.#observation = nextObservation;
+        return nextObservation;
       });
-      return { ok: true, refused: false, error: null };
+      return { ok: true, refused: false, error: null, observation: observationAfterAction };
     } catch (error) {
       return { ok: false, refused: false, error: message(error) };
     }
@@ -212,6 +189,45 @@ export class ReferenceWindowsDriver implements DesktopDriver {
 
   get lastObservation(): DesktopObservation | null {
     return this.#observation;
+  }
+
+  #makeObservation(
+    target: TargetWindow,
+    screen: ScreenInfo,
+    captured: CapturedScreen,
+    includeImage: boolean,
+  ): DesktopObservation {
+    let image: ScreenshotImage | undefined;
+    if (includeImage) {
+      image = {
+        data: Buffer.from(captured.data).toString("base64"),
+        mimeType: captured.mediaType,
+        width: Math.round(screen.bounds.width),
+        height: Math.round(screen.bounds.height),
+      };
+      const validation = validateCapture(image);
+      if (!validation.ok) throw new Error(validation.message);
+    }
+    return {
+      observationId: `obs-${Date.now().toString(36)}-${++observationCounter}`,
+      at: Date.now(),
+      window: {
+        id: String(target.windowId),
+        pid: target.pid,
+        title: target.title,
+        appName: target.appName,
+        bounds: target.bounds,
+      },
+      coordinateSpace: {
+        action: "screenshot-fraction",
+        space: 1000,
+        windowRect: { x: 0, y: 0, width: screen.bounds.width, height: screen.bounds.height },
+      },
+      elements: [],
+      ...(image ? { image } : {}),
+      elementsUnavailable: true,
+      degraded: false,
+    };
   }
 
   #findTarget(windowId?: string): TargetWindow | null {

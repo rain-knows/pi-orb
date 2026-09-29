@@ -3,7 +3,7 @@ import { DesktopBroker, parseAction } from "../src/main/desktop-broker";
 import type { ActResult, DesktopDriver, ObserveResult } from "../src/main/desktop-task";
 import type { DesktopAction, DesktopObservation } from "@shared/orb-tools";
 
-function observation(id = "obs-1"): DesktopObservation {
+function observation(id = "obs-1", withImage = false): DesktopObservation {
   return {
     observationId: id,
     at: Date.now(),
@@ -20,6 +20,7 @@ function observation(id = "obs-1"): DesktopObservation {
       windowRect: { x: 0, y: 0, width: 1200, height: 800 },
     },
     elements: [{ token: "s1:0", role: "Button", label: "OK", actions: ["invoke"] }],
+    ...(withImage ? { image: { data: "AQID", mimeType: "image/png", width: 1, height: 1 } } : {}),
     elementsUnavailable: false,
     degraded: false,
   };
@@ -29,6 +30,7 @@ function observation(id = "obs-1"): DesktopObservation {
 interface DriverDouble extends DesktopDriver {
   readonly observed: number;
   readonly acted: DesktopAction[];
+  readonly observeInputs: { readonly windowId?: string; readonly includeImage?: boolean }[];
   readonly consumed: number;
   readonly lastObservation: DesktopObservation | null;
 }
@@ -39,9 +41,11 @@ function fakeDriver(
     readonly observeFails?: string;
     readonly actFails?: ActResult;
     readonly actWait?: (signal: AbortSignal) => Promise<ActResult>;
+    readonly actObservation?: boolean;
   } = {},
 ): DriverDouble {
   const acted: DesktopAction[] = [];
+  const observeInputs: { readonly windowId?: string; readonly includeImage?: boolean }[] = [];
   let observed = 0;
   let consumed = 0;
   let current: DesktopObservation | null = null;
@@ -55,22 +59,30 @@ function fakeDriver(
     get acted() {
       return acted;
     },
+    get observeInputs() {
+      return observeInputs;
+    },
     get consumed() {
       return consumed;
     },
     get lastObservation() {
       return current;
     },
-    async observe(): Promise<ObserveResult> {
+    async observe(input): Promise<ObserveResult> {
+      observeInputs.push(input);
       observed += 1;
       if (options.observeFails) return { ok: false, observation: null, error: options.observeFails };
-      current = observation(`obs-${observed}`);
+      current = observation(`obs-${observed}`, input.includeImage === true);
       return { ok: true, observation: current, error: null };
     },
     async act(action, _observation, signal): Promise<ActResult> {
       acted.push(action);
       if (options.actWait && signal) return options.actWait(signal);
       if (options.actFails) return options.actFails;
+      if (options.actObservation) {
+        current = observation(`obs-after-${acted.length}`, true);
+        return { ok: true, refused: false, error: null, observation: current };
+      }
       return { ok: true, refused: false, error: null };
     },
     consumeObservation(): void {
@@ -192,6 +204,18 @@ describe("DesktopBroker authorization", () => {
 });
 
 describe("DesktopBroker observation", () => {
+  it("shares an observation image only for the exact authorized task", async () => {
+    const { broker: instance, driver } = broker();
+    const beforeGrant = await instance.observe("sess", 1) as Record<string, unknown>;
+    expect(beforeGrant.image).toBeUndefined();
+    expect(driver.observeInputs[0]).toEqual({});
+
+    instance.authorize({ sessionId: "sess", generation: 1, scope: "inspect and operate the selected test window" });
+    const authorized = await instance.observe("sess", 1) as Record<string, unknown>;
+    expect(authorized.image).toMatchObject({ mimeType: "image/png" });
+    expect(driver.observeInputs[1]).toEqual({ includeImage: true });
+  });
+
   it("returns the observation and records it", async () => {
     const { broker: instance } = broker();
     const result = (await instance.observe("sess", 1)) as Record<string, unknown>;
@@ -217,6 +241,21 @@ describe("DesktopBroker observation", () => {
 });
 
 describe("DesktopBroker one-action-one-observation", () => {
+  it("returns a fresh image observation after each successful authorized action", async () => {
+    const { broker: instance, driver } = broker({ actObservation: true });
+    instance.authorize({ sessionId: "sess", generation: 1, scope: "operate the selected test window" });
+    const first = await instance.observe("sess", 1) as Record<string, unknown>;
+    const result = await instance.act(click(String(first.observationId)), "sess", 1) as Record<string, unknown>;
+
+    expect(result.observation).toMatchObject({ observationId: "obs-after-1", image: { data: "AQID" } });
+    expect(instance.status().lastObservationId).toBe("obs-after-1");
+    expect(driver.consumed).toBe(0);
+
+    const second = await instance.act(click("obs-after-1"), "sess", 1) as Record<string, unknown>;
+    expect(second.ok).toBe(true);
+    expect(driver.acted).toHaveLength(2);
+  });
+
   it("refuses an action whose observation is stale", async () => {
     const { broker: instance, driver } = broker();
     instance.authorize({ sessionId: "sess", generation: 1, scope: "x" });

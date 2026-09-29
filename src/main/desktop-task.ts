@@ -208,6 +208,8 @@ export interface ActResult {
   readonly error: string | null;
   /** True when the action was refused by policy rather than failing in the driver. */
   readonly refused: boolean;
+  /** Fresh post-action state, captured from the same target window after a successful action. */
+  readonly observation?: DesktopObservation;
 }
 
 /**
@@ -217,9 +219,9 @@ export interface ActResult {
  * be tested without a real desktop and so P1-07 can swap or stub the driver.
  */
 export interface DesktopDriver {
-  /** Observe one window and return the current element list. */
-  observe(input: { readonly windowId?: string }): Promise<ObserveResult>;
-  /** Deliver exactly one action against an observed window. */
+  /** Observe one window; include an image only when the caller has an exact live task grant. */
+  observe(input: { readonly windowId?: string; readonly includeImage?: boolean }): Promise<ObserveResult>;
+  /** Deliver one action and, on success, return the fresh post-action state from that window. */
   act(action: DesktopAction, observation: DesktopObservation, signal?: AbortSignal): Promise<ActResult>;
   /**
    * Drop the current observation after an action ran.

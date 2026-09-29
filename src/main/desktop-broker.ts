@@ -110,8 +110,16 @@ export class DesktopBroker {
   }
 
   /** The bridge executor entry point for an observation. */
-  async observe(sessionId: string, _generation: number, windowId?: string): Promise<unknown> {
-    const result = await this.#options.driver.observe(windowId ? { windowId } : {});
+  async observe(sessionId: string, generation: number, windowId?: string): Promise<unknown> {
+    const authorization = this.#controller.state.authorization;
+    const includeImage =
+      this.#controller.isAuthorizedAt(Date.now()) &&
+      authorization?.sessionId === sessionId &&
+      authorization.generation === generation;
+    const result = await this.#options.driver.observe({
+      ...(windowId ? { windowId } : {}),
+      ...(includeImage ? { includeImage: true } : {}),
+    });
     if (!result.ok || !result.observation) {
       this.#consumeObservation();
       this.#controller.clearObservation();
@@ -198,11 +206,9 @@ export class DesktopBroker {
       return refusal("no-task-authorization");
     }
     this.#controller.recordOutcome(result.ok, result.error);
-    // The observation is spent either way. A failed action must not be retried from the same
-    // picture, and a successful one must be followed by a fresh look.
-    this.#consumeObservation();
-
     if (!result.ok) {
+      // A failed action spends its input observation and cannot be retried from that picture.
+      this.#consumeObservation();
       // A failure stops the batch; the message says so, because the model must not retry
       // blindly from the same observation.
       const suffix = result.refused ? " The driver refused the action." : "";
@@ -215,15 +221,25 @@ export class DesktopBroker {
       };
     }
 
+    const nextObservation = result.observation;
+    if (nextObservation) {
+      this.#controller.observe(nextObservation.observationId);
+      this.#observationTaskId = taskId;
+    } else {
+      // Drivers without post-action observations must force an explicit fresh observe call.
+      this.#consumeObservation();
+    }
+
     this.#log({ event: "act", kind: parsed.action.kind, observationId: parsed.action.observationId });
     return {
       ok: true,
       action: parsed.action.kind,
       observationId: parsed.action.observationId,
       actionsUsed: this.#controller.state.actionsUsed,
-      // The rule is stated in the result so the model is reminded to re-observe rather than
-      // chaining actions on the picture it just acted on.
-      next: "Observe the window again before the next action.",
+      ...(nextObservation ? { observation: nextObservation } : {}),
+      next: nextObservation
+        ? "Use this fresh observation for the next action."
+        : "Observe the window again before the next action.",
     };
   }
 

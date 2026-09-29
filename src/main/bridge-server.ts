@@ -23,6 +23,10 @@ import {
   type BridgeRefusal,
   type BridgeResponse,
 } from "@shared/bridge-protocol";
+import { MAX_SCREENSHOT_BYTES } from "@shared/screenshot";
+
+/** JSON/base64 overhead requires headroom over the per-image byte ceiling. */
+export const MAX_BRIDGE_FRAME_BYTES = Math.ceil(MAX_SCREENSHOT_BYTES * 1.5) + 256 * 1024;
 
 export interface BridgeExecutor {
   /** Perform an observation. Returns a JSON-serializable result. */
@@ -83,7 +87,7 @@ export class BridgeServer {
           if (newline === -1) {
             // A request must be a single newline-terminated JSON object. Refusing an
             // oversized frame keeps a misbehaving client from growing this buffer forever.
-            if (buffer.length > 4 * 1024 * 1024) {
+            if (buffer.length > MAX_BRIDGE_FRAME_BYTES) {
               socket.end(`${JSON.stringify(refuse("malformed", "Request frame too large."))}\n`);
             }
             return;

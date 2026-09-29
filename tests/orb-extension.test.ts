@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderResult } from "../pi-package/extensions/orb";
+import { formatToolResult, renderResult } from "../pi-package/extensions/orb";
 
 describe("Orb extension result rendering", () => {
   it("renders an action result with an observation id as action JSON", () => {
@@ -30,5 +30,29 @@ describe("Orb extension result rendering", () => {
 
     expect(renderResult(result)).toContain("observation_id: obs-1");
     expect(renderResult(result)).toContain("800x600 px");
+  });
+
+  it("returns a fresh action observation as a Pi image block without duplicating base64 in details", () => {
+    const image = { data: "AQID", mimeType: "image/png", width: 1, height: 1 };
+    const result = formatToolResult({
+      ok: true,
+      action: "drag",
+      actionsUsed: 1,
+      observation: {
+        observationId: "obs-after-action",
+        window: { id: "42", pid: 24, title: "Target", appName: "target.exe" },
+        coordinateSpace: { action: "screenshot-fraction", space: 1000, windowRect: { x: 0, y: 0, width: 1, height: 1 } },
+        elements: [],
+        elementsUnavailable: true,
+        degraded: false,
+        image,
+      },
+    });
+
+    expect(result.content).toEqual([
+      { type: "text", text: expect.stringContaining("observation_id: obs-after-action") },
+      { type: "image", data: "AQID", mimeType: "image/png" },
+    ]);
+    expect(JSON.stringify(result.details)).not.toContain("AQID");
   });
 });

@@ -91,7 +91,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原、hover/pin、系统主题、新会话 | 已接入（几何与 session controller 自动化通过；视觉和人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/renderer/App.tsx`、`doc/p2-01-reference-reuse.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘体验未验证） | `tests/double-alt.test.ts`、`src/main/double-alt.ts`、`src/main/index.ts`、`src/renderer/App.tsx` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/App.tsx`、`evidence/p2-03/README.md` |
-| **P2-04 桌面操作扩展**：参考项目热键、长按、同窗口拖拽 | 已接入（broker/schema/driver 自动化通过；参考 backend 取消释放测试通过；真实桌面动作及动作后视觉回图尚未人工验收） | `tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows.test.ts`、`evidence/p2-04/README.md` |
+| **P2-04 桌面操作扩展**：参考项目热键、长按、同窗口拖拽与动作后回图 | 已接入（broker/schema/driver、Pi image block 和参考 backend 取消释放测试通过；真实桌面动作及目标像素仍未人工验收） | `tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/orb-extension.test.ts`、`tests/reference-windows.test.ts`、`evidence/p2-04/README.md` |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -108,7 +108,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 驱动内建授权语义（`desktopCaptureAuthorized`、`desktopUnlocked`、`escalate_session`） | 本阶段未使用；状态实测均为 false | **未验证**；产品侧授权仍由 pi-orb 自己的任务授权与代次绑定负责 |
 | 窗口拖动/置顶/展开收起的人工体验 | P2-01 已接入参考几何和 IPC；真实 Electron 拖动、多显示器、DPI、停靠动画和置顶体验尚未人工复测 | 属人工确认；不得据自动断言宣称交互体验已验收 |
 | **快捷键的按键人工体验** | OS 注册、冲突诊断与释放已验证；真实 Electron + native hook 集成探针通过，但探针使用合成 F24 输入；真实键盘、AltGr/非 US 布局、锁屏/休眠恢复仍未复测 | 属人工确认；步骤见 `evidence/p1-03/README.md` |
-| **P2-04 真机动作与动作后回图** | 新动作通过 broker/driver 和 native cancellation 自动化测试；尚未在 disposable target 上验证真实热键、拖拽、长按落点及每次动作后重新观察到的目标画面 | 目前不得宣称真实桌面已验收；需按 `evidence/p2-04/README.md` 补做交互式桌面验收 |
+| **P2-04 真机动作与目标像素** | 新动作和动作后 Pi image block 已通过自动化；尚未在 disposable target 上验证真实热键、拖拽、长按落点及回图像素 | 目前不得宣称真实桌面已验收；需按 `evidence/p2-04/README.md` 补做交互式桌面验收 |
 | 窗口位置的**跨启动**恢复 | 防抖保存已实现，但未做「移动→退出→重启→恢复」实测 | 未验证；不得宣称已支持 |
 | **「存在但不可访问」的工作区**（`no-read-access` / `no-write-access`） | 本机以当前账户无法构造该状态而不改动 ACL（属对用户环境的破坏性操作） | 分支有单测，未真机构造；不得据此宣称已覆盖 |
 | 网络驱动器（UNC）路径的实际访问 | 只测了归一化，未做真机访问 | 不得宣称支持网络路径工作区 |

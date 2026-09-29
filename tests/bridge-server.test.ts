@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { connect, type Server } from "node:net";
-import { BridgeServer, createBridgeToken, createPipePath } from "../src/main/bridge-server";
+import { BridgeServer, createBridgeToken, createPipePath, MAX_BRIDGE_FRAME_BYTES } from "../src/main/bridge-server";
 import { BRIDGE_PROTOCOL_VERSION, looksBrowserOriginated, tokensMatch } from "@shared/bridge-protocol";
 
 /** A minimal executor so the transport and admission rules can be tested without a driver. */
@@ -72,6 +72,9 @@ afterEach(async () => {
 });
 
 describe("bridge admission rules", () => {
+  it("keeps the transport ceiling above the validated screenshot payload", () => {
+    expect(MAX_BRIDGE_FRAME_BYTES).toBeGreaterThan(10 * 1024 * 1024);
+  });
   it("serves a hello handshake without a session", async () => {
     const { pipePath, token } = await start();
     const response = await send(pipePath, { type: "hello", version: BRIDGE_PROTOCOL_VERSION, token });
