@@ -114,6 +114,45 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   ball rendering at `72px` with a `50%` radius. Reading computed style is the difference between "the
   stylesheet loaded" and "the ported system is in effect", which is what the rule is about.
 
+### Fixed
+
+- **The dock gesture jumped instead of sliding, and the reference's animation was never ported.** The
+  floating window is docked by dragging the ball past a screen edge; the reference animates that
+  (a 250ms `easeInOutCubic` slide off-screen, then the dock tab takes the ball's place, and a 300ms
+  `easeOutCubic` slide back on unsnap, moving the window with `setBounds(lerpRect(...))` every frame).
+  pi-orb called `setBounds` once per transition, so the ball vanished at the pointer and reappeared at
+  the tab — the gesture read as a jump. Ported from `floating-window.ts:407-441`, with the three
+  guards the reference applies: no animation under test, no animation once the window is destroyed,
+  and none when the OS asks for reduced motion (`systemPreferences.getAnimationSettings()
+  .prefersReducedMotion`). `easeInOutCubic`, `easeOutCubic`, `lerpRect`, `FLOATING_DOCK_SLIDE_OFF_MS`
+  (250), `FLOATING_DOCK_SLIDE_IN_MS` (300), `FLOATING_DOCK_TAB_FILL` (`#75757F`) and the
+  `FloatingDockState`/`FloatingExpandState` types keep their reference names.
+
+  The order matters and is the reference's: docking slides the ball *off* the edge first and only then
+  places the tab, and unsnapping puts the window at the tab's off-screen position before sliding it
+  back — placing the tab first would make the ball disappear at the pointer rather than travel past
+  the edge. `clampFloatingWindow` and `unsnapDockedBall` are therefore `async` now, and the two IPC
+  handlers await the slide so the renderer receives the settled state rather than a frame mid-flight.
+
+  Observed end to end rather than asserted: driving the packaged app — drag the ball past the edge,
+  dock, and sample the window position every 16ms — records **9 distinct frames** sliding from `x=-52`
+  off-screen to the settled tab at `x=0, width=34`. Falsified by forcing the animation's guard to
+  always snap: the same probe then sees 2 distinct frames and fails.
+
+  Reading the reference export by export also corrected a claim: **30 of its 48 exports** in
+  `floating-window.ts` are in pi-orb under the reference name with the pinned geometry constants all
+  matching, so this module was a genuine port — unlike the stylesheet, which was not. The remaining
+  18 are the overlay guard (pi-orb uses `withGuiTurn`), the context menu, the observation frame and
+  `createFloatingWindow`, each with a recorded reason.
+
+- **The theme attribute was set the wrong way.** The renderer now matches the reference's
+  `applyColorScheme` (`floating.js:42-47`) exactly: `toggleAttribute` rather than
+  `setAttribute`/`removeAttribute`, and `documentElement.style.colorScheme` set alongside it so the
+  browser's own widgets (scrollbars, form controls) follow the theme instead of only our palette. The
+  previous comment also mis-described the source — the reference *does* seed the value from
+  `matchMedia`, which is what pi-orb does; the corrected comment says which part the reference drives
+  from its host and why pi-orb has no equivalent channel.
+
 ### Added
 
 - **Continuous integration** (`.github/workflows/ci.yml`): a pull-request and `main`-push workflow on

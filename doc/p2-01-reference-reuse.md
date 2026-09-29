@@ -30,11 +30,29 @@
 
 ## 当前复用（核对后）
 
-### 主进程（窗口几何，未变）
+### 主进程（窗口几何与停靠动画）
 
 沿用参考 `floating-window.ts` 的几何与状态机，落在 `src/main/floating-geometry.ts` 与
 `src/main/floating-window-controller.ts`：72px 球、344×444 含 chrome 的展开窗口、工作区方向选择、
 拖动释放后的左右边缘停靠、多显示器最近显示器计算。窗口收起先还原为 96×96 球，配置只保存球位置。
+
+**停靠是滑动，不是瞬移**（本轮补齐）：参考 `animateOverlayBounds`（`floating-window.ts:407-441`）
+把窗口从当前位置缓动到目标位置——滑出用 `FLOATING_DOCK_SLIDE_OFF_MS = 250` + `easeInOutCubic`，
+滑回用 `FLOATING_DOCK_SLIDE_IN_MS = 300` + `easeOutCubic`，每帧 `setBounds(lerpRect(...))`，
+并在窗口销毁、`VITEST` 测试模式、或系统「减少动效」时直接落位。这三处守卫一并移植：
+
+- `easeInOutCubic` / `easeOutCubic` / `lerpRect` 与两个时长常量移入 `floating-geometry.ts`，与参考同名；
+- `prefersReducedMotion()` 读 `systemPreferences.getAnimationSettings?.().prefersReducedMotion`；
+- 新增 `FLOATING_DOCK_TAB_FILL`（`#75757F`）与 `FloatingDockState` / `FloatingExpandState` 类型，
+  与参考同名。
+
+因此 `clampFloatingWindow` 与 `unsnapDockedBall` 现在是 `async`：dock 先把球滑出屏幕边缘
+（`offScreenBallOrigin`）再放 tab，unsnap 先把窗口放到 tab 所在的屏外位置再滑回来——**先放 tab 再滑
+会让球在指针处凭空消失**，这正是参考的顺序。IPC 两个 handler 相应改为等待滑动结束，renderer 拿到的
+状态描述的是停下后的窗口，而不是动画途中的某一帧。
+
+核对方式：把参考 48 个导出与 pi-orb 逐名比对，30 个保持参考名，几何常量全部一致；差异项
+（overlay guard、右键菜单、观察框、`createFloatingWindow`）与未移植原因见本文件末节。
 
 ### renderer（本次改为真移植）
 
@@ -91,9 +109,14 @@
 | 项 | 证据 |
 |---|---|
 | 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（11 条） |
-| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（13/13，含本节新增 4 条） |
+| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（15/15，含本节新增 4 条） |
+| **停靠滑动真的在动**（拖动到边缘后 dock，采样到 9 帧不同位置，从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 同上，`the dock gesture slides the window off the edge instead of snapping it` |
+| 缓动曲线、时长常量、矩形插值取整 | `tests/floating-dock-animation.test.ts`（4 条） |
 | 主进程几何 | `tests/floating-geometry.test.ts` |
 | 真实多显示器、DPI、锁屏恢复、人工拖动、观察框 overlay | **未验证**（支持矩阵 §3；人工步骤见 `manual-acceptance.md`） |
+
+停靠滑动做过反向对照：把 `animateBounds` 的守卫改成恒真（即强制瞬移）后重新构建，打包探测里的
+`distinctFrames` 从 9 掉到 2 并判定失败，恢复后重新通过——所以「在滑动」是被观测的性质，不是注释。
 
 本记录不把「视觉相似」当作参考功能完成证明。前端的复用程度现在由上面的测试与打包探测断言，
 不由文档措辞决定——这正是本节开头那次更正留下的教训。

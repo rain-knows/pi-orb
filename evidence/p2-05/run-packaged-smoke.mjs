@@ -257,6 +257,51 @@ try {
       JSON.stringify({ ballSize: render.ballSize, ballRadius: render.ballRadius }),
     );
 
+    // The ported dock gesture: drag the ball past the edge, then let go, and confirm the window
+    // *slides* off rather than snapping. Docking only happens once the ball is past an edge, so the
+    // probe reproduces that pre-condition first; without it the call is a no-op and a snap and a
+    // slide are indistinguishable. The window position is read through the renderer's own
+    // `screenX`/`outerWidth`, which track the OS window, so observing motion needs no product API.
+    const slide = await evaluate(
+      client,
+      `(async () => {
+        // Drag hard against the left edge, as a user dragging the ball there would.
+        await window.orb.moveFloatingBall(-40, 500);
+        await new Promise((done) => setTimeout(done, 200));
+        const before = { x: window.screenX, width: window.outerWidth };
+        const samples = [];
+        const settled = window.orb.clampFloatingBall();
+        for (let i = 0; i < 30; i += 1) {
+          samples.push({ x: window.screenX, width: window.outerWidth });
+          await new Promise((done) => setTimeout(done, 16));
+        }
+        const state = await settled;
+        return JSON.stringify({ state, before, samples });
+      })()`,
+    );
+    const slideValue = JSON.parse(slide);
+    const frames = slideValue.samples.map((entry) => `${entry.x}:${entry.width}`);
+    const distinct = new Set(frames).size;
+    check(
+      "the dock gesture slides the window off the edge instead of snapping it",
+      // The reference's 250ms slide at ~16ms frames produces several intermediate positions; a bare
+      // `setBounds` would produce one or two.
+      slideValue.state?.docked !== undefined && distinct >= 4,
+      JSON.stringify({ docked: slideValue.state?.docked, before: slideValue.before, distinctFrames: distinct, settled: frames[frames.length - 1] }),
+    );
+
+    // Unsnapping must slide back, and the tab must give way to the ball.
+    const unsnap = await evaluate(
+      client,
+      "window.orb.unsnapFloatingBall().then((s) => JSON.stringify(s)).catch((e) => 'ERR:' + e.message)",
+    );
+    const unsnapValue = unsnap.startsWith("ERR:") ? null : JSON.parse(unsnap);
+    check(
+      "unsnapping the docked orb restores the ball and clears the dock state",
+      unsnapValue !== null && unsnapValue.docked === undefined && unsnapValue.expanded === false,
+      String(unsnap).slice(0, 200),
+    );
+
     // The decisive native check: this call runs `koffi` out of `app.asar.unpacked` and enumerates
     // real top-level windows through Win32.
     const windows = await evaluate(

@@ -187,13 +187,16 @@ export function App() {
     document.body.className = classes.join(" ");
   }, [expanded, pinned, busy, selectionContext, draft, floatingState]);
 
-  // The shell reports the resolved OS theme; the reference states it in the DOM rather than asking
-  // CSS to guess, so a user's explicit choice can be expressed later without changing this contract.
+  // Theme, ported from the reference's `applyColorScheme` (floating.js:42-47): the initial value is
+  // the OS preference, the attribute is toggled rather than set/removed, and `color-scheme` is set
+  // too so the browser's own widgets (scrollbars, focus rings) follow instead of only our palette.
+  // The reference also accepts a later `dsh.overlay.theme` message from its host; pi-orb has no such
+  // channel because the shell and this renderer are one process, so the media query stays the source.
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
-      if (media.matches) document.documentElement.setAttribute("data-ds-dark-theme", "");
-      else document.documentElement.removeAttribute("data-ds-dark-theme");
+      document.documentElement.style.colorScheme = media.matches ? "dark" : "light";
+      document.documentElement.toggleAttribute("data-ds-dark-theme", media.matches);
     };
     apply();
     media.addEventListener("change", apply);

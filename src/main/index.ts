@@ -791,11 +791,13 @@ function registerIpc(): void {
     }
     return moveFloatingBall(window, x, y);
   });
-  ipcMain.handle(IPC.clampFloatingBall, (): FloatingWindowState => {
+  // Both dock operations now resolve after their slide completes, so the renderer's returned state
+  // describes the settled window rather than a position the animation is still passing through.
+  ipcMain.handle(IPC.clampFloatingBall, async (): Promise<FloatingWindowState> => {
     if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
     return clampFloatingWindow(window);
   });
-  ipcMain.handle(IPC.unsnapFloatingBall, (): FloatingWindowState => {
+  ipcMain.handle(IPC.unsnapFloatingBall, async (): Promise<FloatingWindowState> => {
     if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
     return unsnapDockedBall(window);
   });

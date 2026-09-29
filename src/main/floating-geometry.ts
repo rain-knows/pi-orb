@@ -26,6 +26,12 @@ export const FLOATING_DOCK_HIT_WIDTH = FLOATING_DOCK_TAB_WIDTH + FLOATING_DOCK_G
 export const FLOATING_DOCK_HIT_HEIGHT = FLOATING_DOCK_TAB_HEIGHT + 2 * FLOATING_DOCK_GLOW;
 export const FLOATING_DOCK_OFF_GAP = 2;
 export const FLOATING_DOCK_IN_PAD = 5;
+/** Slide-off duration before the dock tab takes the ball's place. */
+export const FLOATING_DOCK_SLIDE_OFF_MS = 250;
+/** Slide-in duration after unsnapping. */
+export const FLOATING_DOCK_SLIDE_IN_MS = 300;
+/** Painted dock-tab fill. The reference matches its CoView `PALETTE["scrollbar"]`. */
+export const FLOATING_DOCK_TAB_FILL = "#75757F";
 
 export type FloatingHorizontalExpand = "left" | "right";
 export type FloatingVerticalExpand = "up" | "down";
@@ -34,6 +40,35 @@ export type FloatingDockSide = "left" | "right";
 export interface FloatingRect { readonly x: number; readonly y: number; readonly width: number; readonly height: number }
 export interface FloatingDisplay { readonly bounds: FloatingRect; readonly workArea: FloatingRect }
 export interface FloatingDirection { readonly horizontal: FloatingHorizontalExpand; readonly vertical: FloatingVerticalExpand }
+
+/** Docked tab after a clamp, or undocked after an unsnap. */
+export interface FloatingDockState { readonly docked: FloatingDockSide | undefined }
+/** Overlay size and growth after an expand or collapse. */
+export interface FloatingExpandState extends FloatingDockState {
+  readonly expanded: boolean;
+  readonly horizontal: FloatingHorizontalExpand;
+  readonly vertical: FloatingVerticalExpand;
+}
+
+/** Easing for the slide off the screen edge (reference `easeInOutCubic`). */
+export function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2;
+}
+
+/** Easing for the slide back in after unsnapping (reference `easeOutCubic`). */
+export function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
+}
+
+/** Interpolate two rects, rounding each edge the way the reference does. */
+export function lerpRect(start: FloatingRect, end: FloatingRect, t: number): FloatingRect {
+  return {
+    x: Math.round(start.x + (end.x - start.x) * t),
+    y: Math.round(start.y + (end.y - start.y) * t),
+    width: Math.round(start.width + (end.width - start.width) * t),
+    height: Math.round(start.height + (end.height - start.height) * t),
+  };
+}
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), Math.max(min, max));

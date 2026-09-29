@@ -38,7 +38,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 `app.asar` 9 291 054 B、解包原生二进制合计 2 658 109 B、asar 条目 135。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
 
-## 2. 启动探测：`packaged-smoke.json`（13/13 通过）
+## 2. 启动探测：`packaged-smoke.json`（15/15 通过）
 
 以真实 `release/<version>/win-unpacked/pi-orb.exe` 启动，独立 `--user-data-dir` 与
 `PI_ORB_CONFIG`，指向一个未使用的 pi-web 端口，通过 Chrome DevTools Protocol 驱动 renderer。
@@ -56,11 +56,17 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | **参考壳层已挂载**（`#panel`、`#ball`、`#dock-tab` 存在，`body` 带参考状态类） | 通过 |
 | **参考设计令牌解析为参考值**（`--ball: 72px`、`--chrome: 12px`、`--panel-radius: 36px`、`--composer-height` 解析为 `72px`） | 通过 |
 | **球按参考尺寸与形状渲染**（`72px`、`border-radius: 50%`） | 通过 |
+| **停靠滑动真的在动**（拖到边缘后 dock，采样到 9 帧不同位置：从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 通过（强制瞬移的反向对照下 2 帧即失败） |
+| **取消停靠恢复球并清除 dock 状态** | 通过 |
 | **`orb:list-desktop-windows` 返回真实窗口列表**（koffi 从 `app.asar.unpacked` 加载成功） | 通过（本次运行 8–11 个窗口） |
 | 启动日志中没有 `desktop driver unavailable` | 通过 |
 | 没有模块解析错误 | 通过 |
 
-> 中间三条读的是**计算后的样式**与**真实 DOM**，而不是「样式表已加载」：这正是区分
+> 滑动那条采样的是 renderer 自己的 `screenX`/`outerWidth`（跟随 OS 窗口），并且**先**把球拖到屏幕
+> 边缘——不停靠时 `clampFloatingBall` 是空操作，瞬移与滑动在那时无从区分。第一次写这条检查时正是
+> 漏了这个前置条件，于是采到 1 帧、误报失败；记录在此以免重犯。
+>
+> 中间几条读的是**计算后的样式**与**真实 DOM**，而不是「样式表已加载」：这正是区分
 > 「CSS 文件下载成功」与「移植的参考设计系统真的生效」的地方，也是本书开头那次前端漂移
 > （自称复用参考、实为自创 `orb__*` 样式）能被发现的原因。
 >

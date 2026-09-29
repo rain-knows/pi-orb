@@ -150,7 +150,7 @@ D:\workself\pi-orb\
 
 | 参考文件 | 作用 | pi-orb 对应 | 状态 |
 |---|---|---|---|
-| `apps/desktop/src/floating-window.ts` | 浮球窗口几何、停靠、拖动、多屏、overlay guard | `src/main/floating-geometry.ts`、`floating-window-controller.ts` | 已移植几何子集 |
+| `apps/desktop/src/floating-window.ts` | 浮球窗口几何、停靠、拖动、多屏、overlay guard | `src/main/floating-geometry.ts`、`floating-window-controller.ts` | 已移植几何子集 **+ 停靠滑动动画**（250/300ms 缓动、`prefersReducedMotion`、动画取消）；48 个导出中 30 个保持参考名，未移植项见文件头的 overlay guard / 菜单 / 观察框 |
 | `apps/desktop/renderer/floating.html` | 浮球/面板 DOM 结构 | `src/renderer/App.tsx` | 已移植：参考 id（`#panel`/`#ball`/`#composer`/`#dock-tab`/`#prompt`/`#selection-chip`/`#transcript` 等）与「`#panel` 常驻、`hidden` 切换」的结构一致；参考专有界面面（`#question*`/`#tcc-*`/`#ball-gif`）无对应物 |
 | `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/styles.css` | 已移植：18 个同名设计令牌、`body.<state>` 布局状态词表、origin-based 展开动画、`html[data-ds-dark-theme]` 暗色；由 `tests/renderer-reference-parity.test.ts` 钉住 |
 | `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/App.tsx` | 视觉与状态约定移植（body 级 `pointerenter`/`pointerleave`、展开/收起时序）；宿主调用未搬 |
@@ -202,6 +202,8 @@ D:\workself\pi-orb\
 | 面板常驻与切换 | `#panel` 始终在 DOM；展开先 `hidden=false` 再加 `body.expanded`，收起先移除类、动画后再 `hidden` | `floating.html:11`、`floating.js` 的 `applyExpanded` |
 | 暗色主题 | `html[data-ds-dark-theme]`（宿主决定并写入，**不是** `prefers-color-scheme`） | `floating.css:22-34` |
 | 停靠 tab 呼吸动画 | `1800ms`，`prefers-reduced-motion` 时关闭 | `floating.css:715`、`:723-728` |
+| 停靠滑出／滑回时长 | 滑出 `FLOATING_DOCK_SLIDE_OFF_MS = 250` + `easeInOutCubic`；滑回 `FLOATING_DOCK_SLIDE_IN_MS = 300` + `easeOutCubic` | `floating-window.ts:207-213`、`:461-471`、`:836-845` |
+| 减少动效 | `systemPreferences.getAnimationSettings().prefersReducedMotion`；测试模式（`VITEST`）与窗口已销毁时同样直接落位 | `floating-window.ts:376-381`、`:407-420` |
 
 ### 5.4 球的窗口标志（必须一致，`floating-window.ts:641-666`）
 
