@@ -13,7 +13,7 @@
 body { margin: 0; background: transparent; }
 button, input, textarea { font: inherit; }
 button { cursor: pointer; }
-.orb { position: relative; display: flex; flex-direction: column; height: 100vh; min-height: 420px; padding: 12px 15px 15px; overflow: hidden; background: #fff; border: 1px solid #d7d7d9; border-radius: 24px; box-shadow: 0 14px 35px rgb(20 28 45 / 18%); }
+.orb { position: relative; display: flex; flex-direction: column; height: 100vh; min-height: 0; padding: 12px 15px 15px; overflow: hidden; background: #fff; border: 1px solid #d7d7d9; border-radius: 24px; box-shadow: 0 14px 35px rgb(20 28 45 / 18%); }
 .orb__header { display: grid; grid-template-columns: 34px 1fr 34px; align-items: center; gap: 10px; min-height: 38px; -webkit-app-region: drag; }
 .orb__header button { -webkit-app-region: no-drag; }
 .orb__round-button, .orb__close { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; color: #1b1c1f; background: #f4f4f5; font-size: 20px; line-height: 1; }
@@ -65,11 +65,16 @@ button { cursor: pointer; }
 .orb__notice { flex: none; margin: 7px 2px 0; color: #707176; font-size: 11px; line-height: 1.4; }.orb__notice--error { color: #b33f46; }
 @media (prefers-reduced-motion: reduce) { .orb__thinking span { animation: none; } }
 
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--orb-blue);
+  outline-offset: 2px;
+}
+
 /* Reference shell parity: deepseek-harness-orb/apps/desktop/renderer/floating.css
    (72px ball, 12px chrome, 36px panel radius, input pill and three top controls). */
 .orb { --orb-ball: 72px; --orb-chrome: 12px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .orb--expanded { margin: var(--orb-chrome); height: calc(100vh - 2 * var(--orb-chrome)); padding: 20px 20px 82px; background: #fff; border: 1px solid #8a8a93; border-radius: 36px; box-shadow: 0 4px 8px rgb(17 17 17 / 22%); }
-.orb--collapsed { pointer-events: none; }
+.orb--collapsed { min-height: 0; height: 100%; padding: 0; pointer-events: none; }
 .orb--collapsed > *:not(.orb__ball) { display: none; }
 .orb__header { flex: none; grid-template-columns: 28px 1fr 28px; min-height: 28px; gap: 0; }
 .orb__round-button { width: 28px; height: 28px; background: #eee; font-size: 17px; }
@@ -114,6 +119,7 @@ button { cursor: pointer; }
   .orb__round-button, .orb__close, .orb__permission, .orb--expanded .orb__composer, .orb__suggestions button { color: #f9fafb; background: #232324; }
   .orb__round-button:hover, .orb__close:hover, .orb__permission:hover, .orb__suggestions button:hover { background: #303033; }
   .orb__message, .orb__composer textarea, .orb__setup h1, .orb__control-section strong { color: #f9fafb; }
+  .orb__empty p, .orb__message-role, .orb__thinking, .orb__notice, .orb__text-button, .orb__composer textarea::placeholder { color: #a3a3ad; }
   .orb__message--user { background: #27365a; }
   .orb__selection-chip { color: #d7e3ff; background: #27365a; border-color: #4d659f; }
   .orb__selection-copy small, .orb__selection-remove { color: #aebee7; }

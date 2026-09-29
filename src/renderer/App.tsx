@@ -64,12 +64,12 @@ export function App() {
   }, [bridge, clearCollapseTimer]);
   const scheduleCollapse = useCallback((allowPinned = false) => {
     clearCollapseTimer();
-    if ((!allowPinned && pinned) || busy || controlsOpen || preview) return;
+    if ((!allowPinned && pinned) || busy || controlsOpen || historyOpen || preview) return;
     collapseTimer.current = setTimeout(() => {
       collapseTimer.current = null;
       void setExpandedState(false);
     }, 480);
-  }, [busy, clearCollapseTimer, controlsOpen, pinned, preview, setExpandedState]);
+  }, [busy, clearCollapseTimer, controlsOpen, historyOpen, pinned, preview, setExpandedState]);
   const chooseWorkspace = useCallback(async () => { const picked = await bridge.chooseWorkspace(); if (!picked.ok) { if (picked.message) setNotice(picked.message); return; } const next = await bridge.setWorkspace(picked.resolved ?? "", false); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
   const newConversation = useCallback(async () => {
     if (busy) return;
@@ -83,6 +83,7 @@ export function App() {
     } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); }
   }, [bridge, busy]);
   const loadHistory = useCallback(async () => {
+    setControlsOpen(false);
     setHistoryOpen(true);
     setHistoryLoading(true);
     const result = await bridge.listSessionHistory();
@@ -150,7 +151,7 @@ export function App() {
   >
     <header className="orb__header">
       <button type="button" className="orb__round-button" onClick={() => void loadHistory()} title="Conversation history" aria-label="Conversation history">◷</button>
-      <button type="button" className="orb__permission" onClick={() => setControlsOpen((open) => !open)} aria-expanded={controlsOpen} title="Open Orb controls"><span className={`orb__status-dot ${status?.piWeb.reachable ? "orb__status-dot--live" : ""}`} />{desktopTask?.authorized ? "Desktop access" : "Orb access"}<span className="orb__chevron">⌄</span></button>
+      <button type="button" className="orb__permission" onClick={() => { setHistoryOpen(false); setControlsOpen((open) => !open); }} aria-expanded={controlsOpen} title="Open Orb controls"><span className={`orb__status-dot ${status?.piWeb.reachable ? "orb__status-dot--live" : ""}`} />{desktopTask?.authorized ? "Desktop access" : "Orb access"}<span className="orb__chevron">⌄</span></button>
       <button type="button" className="orb__round-button" onClick={() => void newConversation()} title="New conversation" aria-label="New conversation" disabled={busy}>+</button>
     </header>
 
@@ -167,7 +168,6 @@ export function App() {
       </form>
     </>}
 
-    <img src={avatarUrl} alt="pi-orb" className="orb__avatar" />
     {historyOpen && status?.configured && <section className="orb__history" aria-label="Conversation history"><div className="orb__control-heading"><strong>History</strong><button type="button" className="orb__close" onClick={() => setHistoryOpen(false)} aria-label="Close history">×</button></div>{historyLoading ? <p className="orb__history-empty">Loading…</p> : historyItems.length === 0 ? <p className="orb__history-empty">No saved conversations.</p> : <div className="orb__history-list">{historyItems.map((item) => <button type="button" key={item.sessionId} className="orb__history-row" onClick={() => void openHistory(item.sessionId)}><strong>{item.name || item.firstMessage || "Untitled conversation"}</strong><small>{item.messageCount} messages · {formatHistoryDate(item.modified)}</small></button>)}</div>}</section>}
     {controlsOpen && status?.configured && (
       <section className="orb__controls" aria-label="Orb controls">

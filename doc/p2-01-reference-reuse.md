@@ -21,6 +21,17 @@ pi-orb 的 React renderer 保留 Pi 会话和授权 IPC，但按参考 shell 的
 6. 主进程已接入参考项目的浮球几何：72px 球、344x444 含 chrome 的展开窗口、工作区方向选择、拖动释放后的左右边缘停靠 tab，以及多显示器最近显示器计算。
 7. renderer 已复用参考项目的 hover 展开／离开收起、点击 pin 保持展开、系统深色主题和 dock tab 拉回；顶部 `+` 通过 Pi session adapter 创建真实新会话。
 
+## 前端收口修正
+
+在同一固定提交的 `floating.css` 与 `floating.html` 对照检查后，补齐了几项影响实际使用的细节：
+
+- 收起态显式清零 `min-height`、`height` 和 `padding`，使 Electron 的 96x96 球形窗口不会继承展开面板的高度约束。
+- 移除 React 树中未参与参考浮球结构的重复头像节点，头像只由 72px 浮球入口渲染。
+- 历史和 Orb 控制浮层互斥；历史浮层打开时不会被根节点的离开收起计时器误关掉。
+- 增加键盘 `:focus-visible` 轮廓，并补齐暗色主题中的空状态、提示和输入占位文本颜色。
+
+这些改动仍只调整 renderer 的参考壳层，不改变 pi-web 会话、Pi 插件、截图授权或桌面任务状态机。
+
 ## 未直接复制及原因
 
 - `floating.js` 依赖 dsh Host RPC、独立 overlay Session、`dsh-app://` 协议和 iframe ChatView，不能直接运行在 pi-web 的 Electron bridge 中；当前只移植其 DOM 状态和 CSS 约定，Pi 会话继续走本仓库 `OrbSessionController`。
