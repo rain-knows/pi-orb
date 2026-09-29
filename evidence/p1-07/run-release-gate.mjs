@@ -464,6 +464,42 @@ check(
   /different window or application/i.test(security) && /left held/i.test(security),
   "these are the two defect classes this product exists to avoid",
 );
+
+// Preview release path. A published binary is the most public thing this project produces, so the
+// workflow that writes it is held to four properties: it is a deliberate act, it re-verifies the
+// artifact it publishes instead of trusting the author's committed records, it publishes as a
+// prerelease because the gate for a complete v0.1 is not satisfied, and it cannot drop the
+// unverified list from the notes.
+const releasePath = join(repo, ".github/workflows/release-preview.yml");
+const release = existsSync(releasePath) ? readFileSync(releasePath, "utf8") : "";
+check(
+  "the release workflow exists and is manually triggered",
+  release.includes("workflow_dispatch"),
+  "a release is a decision; it must not happen automatically on every push",
+);
+check(
+  "the release workflow re-verifies the artifact on the release machine",
+  release.includes("run-p2-05.mjs") && release.includes("package-audit") && release.includes("packaged-smoke"),
+  "the committed P2-05 records describe the author's machine, not the published build",
+);
+check(
+  "the release workflow publishes a prerelease and cannot drop the unverified list",
+  /--prerelease/.test(release) && /未验证/.test(release) && /single source of truth/.test(release),
+  "the notes must say this is not a complete v0.1 and point at the list that says what is missing",
+);
+check(
+  "the release workflow gates on the release gate and requires an explicit unsigned confirmation",
+  release.includes("run-release-gate.mjs") && /confirm_unsigned/.test(release),
+  "never publish from a tree that fails its own gate, and publishing an unsigned binary must be deliberate",
+);
+const releaseDocPath = join(repo, "doc/release-process.md");
+check(
+  "the release process is documented where a maintainer will find it",
+  existsSync(releaseDocPath) &&
+    /重新验证/.test(readFileSync(releaseDocPath, "utf8")) &&
+    /未签名/.test(readFileSync(releaseDocPath, "utf8")),
+  "the reasoning for re-verifying on the release machine and the unsigned status must be written down",
+);
 check(
   "the packaging scripts run the build before packing",
   /"package:win":\s*"npm run build && electron-builder/.test(readFileSync(join(repo, "package.json"), "utf8")) &&

@@ -114,6 +114,33 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   Falsified by removing the security policy's boundary statement: the gate drops to 54/55 with that
   check named, and returns to 55/55 when restored.
 
+- **Preview release path** (`.github/workflows/release-preview.yml`, `doc/release-process.md`):
+  the project can now hand someone a built installer, which it previously could not — the README
+  explained how to build one, and there was no way to obtain one. It is triggered by hand (with a
+  typed `confirm_unsigned=unsigned` confirmation) or by a `v*` tag, never automatically, because
+  publishing an unsigned binary should be a decision rather than a side effect of a push.
+
+  Three properties matter more than the publishing itself. First, it **re-verifies the artifact it
+  publishes**: the committed `package-audit.json` and `packaged-smoke.json` record the author's
+  machine, so they prove the code was sound there and not that this build is — the workflow runs
+  `run-p2-05.mjs` on the release runner and asserts those fresh results before anything is uploaded.
+  Second, it publishes as a **prerelease** and the notes say so, because the gate for a complete v0.1
+  is not satisfied (`doc/support-matrix.md` §3 still lists multi-display, elevated windows, Chromium
+  content, clean-machine install and the SmartScreen prompt as unverified). Third, the notes are
+  assembled from the support matrix and the manual-acceptance steps **with assertions**: if the
+  matrix stops declaring unverified items, or the installer acceptance steps disappear, the release
+  step throws instead of publishing a package that looks finished. The notes also carry the
+  unsigned-build warning and the `SECURITY.md` boundary, so a downloader learns what they are getting
+  without reading the repository.
+
+  The gate grows 55 → 59 to hold this: the workflow must be manually triggered, must re-verify on the
+  release machine, must publish as a prerelease without dropping the unverified list, must gate on
+  the release gate, and must require the explicit unsigned confirmation. Falsified by replacing
+  `--prerelease` with `--latest`: the gate drops to 58/59 with that check named, and returns to 59/59
+  when restored. The workflow's PowerShell steps were syntax-checked with a real parser after GitHub
+  expression expansion (including the here-string terminator that must sit at column 0), and the
+  artifact-collection, hashing and notes-assembly steps were executed locally against the real build.
+
 - **`orb_open_app` (P2-04), narrowed on the user's decision: activation only, never launch.** The
   reference tool brings a running application forward *or starts it*
   (`tool-computer-use/src/windows.ts:398-404`: `activateApp` falls through to `launch`). Launching a

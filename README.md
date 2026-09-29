@@ -138,6 +138,14 @@ npm run package:win       # release/<version>/pi-orb-<version>-win-x64.exe (per-
 node evidence/p2-05/run-p2-05.mjs   # build + audit the contents + start the packaged app
 ```
 
+Prebuilt installers are published as **unsigned preview releases** (never as a complete v0.1, and
+every one is a GitHub *prerelease* whose notes list what is still unverified). They are built by
+[`.github/workflows/release-preview.yml`](./.github/workflows/release-preview.yml), which is
+triggered by hand or by a `v*` tag, re-verifies the artifact on the release runner rather than
+trusting the records committed here, and refuses to publish if the support matrix stops declaring its
+unverified items. The process and its reasoning are in
+[`doc/release-process.md`](./doc/release-process.md).
+
 The packaging posture — electron-builder, per-user NSIS with elevation disabled, `asarUnpack` for
 native modules, no update feed — follows the reference project's
 [`apps/desktop/scripts/electron-builder-config.mjs`](https://github.com/rain-knows/deepseek-harness-orb)

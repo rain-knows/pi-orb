@@ -1,0 +1,195 @@
+# Preview release of the Windows installer.
+#
+# This publishes an **unsigned preview build**, not a complete v0.1. The distinction is not
+# decoration: `doc/support-matrix.md` lists what is still unverified (multi-display, elevated
+# windows, typing into Chromium content, clean-machine install/uninstall/upgrade, and the
+# unsigned installer's SmartScreen prompt), and the project's own release gate is not satisfied for a
+# complete release. The workflow therefore marks every GitHub release it creates as a **prerelease**
+# and attaches the unverified list to the release notes, so nobody has to read the repository to
+# learn what they are getting.
+#
+# It is manually triggered on purpose. A release is a decision, and a decision that happens on every
+# push is not one. A tag push also triggers it, for the case where the tag itself is the decision.
+#
+# Order of operations, and why:
+#
+#   1. run the release gate — no artifact is published from a tree that fails its own gate;
+#   2. run the P2-05 stage runner *on this machine* — the committed `package-audit.json` and
+#      `packaged-smoke.json` are records of the author's machine, so they prove the code was sound
+#      there, not that this build is. The audit is re-run against the artifact being published;
+#   3. publish the installer as a prerelease, with the unverified list in the notes.
+#
+# The packaged-application probe (`run-packaged-smoke.mjs`) starts a real Electron window and
+# enumerates real desktop windows. It is part of the stage runner, and it is the reason this job must
+# run on a Windows runner with an interactive-enough session; if the runner cannot provide one, the
+# probe fails loudly rather than silently skipping.
+
+name: Preview release (Windows x64)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_unsigned:
+        description: 'Type "unsigned" to confirm you are publishing an unsigned preview build'
+        required: true
+        default: ''
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    name: build, verify and publish a preview installer
+    runs-on: windows-latest
+    timeout-minutes: 60
+    # Publishing writes a release, so the write permission lives on this job only, not at the
+    # workflow level.
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Refuse to publish without the explicit confirmation
+        if: github.event_name == 'workflow_dispatch' && inputs.confirm_unsigned != 'unsigned'
+        run: |
+          echo "::error::This publishes an UNSIGNED build. Re-run with confirm_unsigned=unsigned to proceed."
+          exit 1
+
+      - name: Use Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 1: the gate. A preview release is still a release of this tree, so it has to pass the
+      # same checks a change does. A skipped check (the pi-web baseline needs a developer-local
+      # checkout) is reported in the summary and is not counted as passed.
+      - name: Release gate
+        run: node evidence/p1-07/run-release-gate.mjs
+
+      # Step 2: build the artifact and re-verify *this* build. The stage runner writes
+      # evidence/p2-05/{package-audit,packaged-smoke,stage-result}.json from the run that just
+      # happened, which is what makes the published binary's contents a measured fact rather than an
+      # inherited one.
+      - name: Build and verify the packaged artifact on this machine
+        run: node evidence/p2-05/run-p2-05.mjs
+
+      - name: Assert the fresh audit and probe both passed
+        run: |
+          node -e "
+          const fs = require('node:fs');
+          const read = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
+          const audit = read('evidence/p2-05/package-audit.json');
+          const smoke = read('evidence/p2-05/packaged-smoke.json');
+          const stage = read('evidence/p2-05/stage-result.json');
+          console.log('package audit:', audit.checks.filter((c) => c.ok).length + '/' + audit.checks.length);
+          console.log('packaged smoke:', smoke.checks.filter((c) => c.ok).length + '/' + smoke.checks.length);
+          if (!audit.passed || !smoke.passed || !stage.passed) {
+            console.error('::error::the fresh P2-05 verification did not pass; refusing to publish');
+            process.exit(1);
+          }
+          "
+
+      - name: Build the installer
+        run: npm run package:win
+
+      # A published release must be traceable to the evidence it was built from, so the records that
+      # were just produced travel with the artifact instead of staying in a log.
+      - name: Collect the release evidence
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $dir = "release/$version"
+          New-Item -ItemType Directory -Force -Path dist-evidence | Out-Null
+          Copy-Item "$dir/pi-orb-$version-win-x64.exe" dist-evidence/
+          Copy-Item "$dir/pi-orb-$version-win-x64.exe.blockmap" dist-evidence/ -ErrorAction SilentlyContinue
+          Copy-Item evidence/p2-05/package-audit.json dist-evidence/
+          Copy-Item evidence/p2-05/packaged-smoke.json dist-evidence/
+          Copy-Item evidence/p2-05/stage-result.json dist-evidence/
+          Copy-Item evidence/p1-07/release-gate.json dist-evidence/
+          Get-ChildItem dist-evidence | Select-Object Name, Length
+
+      - name: Compute the artifact hashes
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $name = "pi-orb-$version-win-x64.exe"
+          $hash = (Get-FileHash "dist-evidence/$name" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $name" | Out-File -Encoding ascii dist-evidence/SHA256SUMS.txt
+          Get-Content dist-evidence/SHA256SUMS.txt
+
+      # The unverified list is assembled from the documents that own it, so the release notes cannot
+      # drift from the support matrix. Both files are required to exist and to still carry their
+      # unverified content.
+      - name: Assemble the release notes
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $matrix = Get-Content doc/support-matrix.md -Raw
+          if ($matrix -notmatch '未验证') { throw 'the support matrix no longer records unverified items' }
+          $manual = Get-Content doc/manual-acceptance.md -Raw
+          if ($manual -notmatch 'E 组') { throw 'the installer acceptance steps are missing' }
+
+          $notes = @"
+          ## pi-orb $version — Windows x64 preview (unsigned)
+
+          This is a **preview build, not a complete v0.1 release.** It is unsigned, so Windows will
+          warn about an unknown publisher on first run. That is expected here and is recorded in
+          ``doc/manual-acceptance.md`` §9 (E9); do not disable your security settings to silence it.
+
+          ### What this build has not been verified to do
+
+          The full list lives in ``doc/support-matrix.md`` §3 and is the single source of truth. It
+          currently includes:
+
+          - multi-display setups (only one display was tested)
+          - elevated / high-privilege windows
+          - typing into Chromium-based content
+          - clean-machine install, uninstall and upgrade, and the SmartScreen experience
+          - the real desktop effect of ``orb_open_app`` (application switching)
+
+          Anything not in that document's verified section is unverified, and no capability in this
+          build is advertised beyond what it says.
+
+          ### Verification attached to this release
+
+          The installer in this release was built and re-verified on the release runner, not on the
+          author's machine: ``package-audit.json`` (what is inside the artifact) and
+          ``packaged-smoke.json`` (the packaged app starts, its bridge works, and it really enumerates
+          desktop windows) are the records of *this* build. ``release-gate.json`` is the gate run that
+          permitted it.
+
+          The Orb drives real mouse and keyboard input once you approve a desktop task. Read
+          ``SECURITY.md`` before approving one: the workspace is not a filesystem sandbox, and screen
+          content is untrusted input. Prefer a disposable target window.
+          "@
+          $notes | Out-File -Encoding utf8 dist-evidence/release-notes.md
+
+      - name: Create the prerelease
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $tag = if ('${{ github.ref_type }}' -eq 'tag') { '${{ github.ref_name }}' } else { "v$version-preview.${{ github.run_number }}" }
+          if (gh release view $tag 2>$null) { throw "release $tag already exists" }
+          gh release create $tag `
+            --title "pi-orb $version — Windows x64 preview (unsigned)" `
+            --notes-file dist-evidence/release-notes.md `
+            --prerelease `
+            --target '${{ github.sha }}' `
+            dist-evidence/*
+          echo "published $tag"

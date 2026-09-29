@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-29T15:17:55.335Z",
+  "capturedAt": "2026-09-29T15:41:23.982Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "9229 ms"
+      "detail": "13699 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "5357 ms"
+      "detail": "8617 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "5382 ms"
+      "detail": "6280 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "3720 ms"
+      "detail": "4363 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -223,6 +223,31 @@
       "detail": "these are the two defect classes this product exists to avoid"
     },
     {
+      "name": "the release workflow exists and is manually triggered",
+      "ok": true,
+      "detail": "a release is a decision; it must not happen automatically on every push"
+    },
+    {
+      "name": "the release workflow re-verifies the artifact on the release machine",
+      "ok": true,
+      "detail": "the committed P2-05 records describe the author's machine, not the published build"
+    },
+    {
+      "name": "the release workflow publishes a prerelease and cannot drop the unverified list",
+      "ok": true,
+      "detail": "the notes must say this is not a complete v0.1 and point at the list that says what is missing"
+    },
+    {
+      "name": "the release workflow gates on the release gate and requires an explicit unsigned confirmation",
+      "ok": true,
+      "detail": "never publish from a tree that fails its own gate, and publishing an unsigned binary must be deliberate"
+    },
+    {
+      "name": "the release process is documented where a maintainer will find it",
+      "ok": true,
+      "detail": "the reasoning for re-verifying on the release machine and the unsigned status must be written down"
+    },
+    {
       "name": "the packaging scripts run the build before packing",
       "ok": true,
       "detail": "packing a stale out/ directory would ship code that was never built"
@@ -289,7 +314,7 @@
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 55,
+    "passed": 60,
     "skipped": 0,
     "failed": 0,
     "version": "0.1.0",
