@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-29T14:11:42.223Z",
+  "capturedAt": "2026-09-29T14:52:14.780Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
@@ -41,7 +41,7 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 9291103,
+    "asarBytes": 9297604,
     "unpackedNativeBytes": 2658109,
     "archiveEntryCount": 135
   },
@@ -154,7 +154,7 @@
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "25952 bytes"
+      "detail": "27745 bytes"
     },
     {
       "name": "the shipped manifest carries the project version",

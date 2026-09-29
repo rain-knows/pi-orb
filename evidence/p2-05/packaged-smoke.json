@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-29T14:11:42.404Z",
+  "capturedAt": "2026-09-29T14:52:14.946Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790691102404",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790693534946",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -55,6 +55,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-70760\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/212e3986-bb69-4765-b99e-bf687e640738"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-71676\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/48655314-05a5-44c8-88bb-d3776dcf39b1"
 }
