@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { DesktopTaskStatus, DesktopWindowChoice, OrbSessionEvent, WorkspaceStatus } from "@shared/ipc";
+import type { DesktopTaskStatus, DesktopWindowChoice, FloatingWindowState, OrbSessionEvent, WorkspaceStatus } from "@shared/ipc";
 import { formatBytes } from "@shared/screenshot";
 import { getBridge } from "./bridge";
 import avatarUrl from "./orb-avatar.png";
@@ -20,7 +20,9 @@ export function App() {
   const [taskScope, setTaskScope] = useState("");
   const [desktopTask, setDesktopTask] = useState<DesktopTaskStatus | null>(null);
   const [windowChoices, setWindowChoices] = useState<readonly DesktopWindowChoice[] | null>(null);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const [floatingState, setFloatingState] = useState<FloatingWindowState>({ expanded: false, horizontal: "right", vertical: "down", docked: undefined });
+  const drag = useRef<{ pointerId: number; startX: number; startY: number; offsetX: number; offsetY: number; moved: boolean } | null>(null);
   const streaming = useRef("");
   const generation = status?.generation ?? 0;
 
@@ -36,6 +38,13 @@ export function App() {
   }, [bridge]);
 
   const refresh = useCallback(async () => { const next = await bridge.refreshConnection(); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
+  const setExpandedState = useCallback(async (next: boolean) => {
+    try {
+      const state = await bridge.setFloatingExpanded(next);
+      setFloatingState(state);
+      setExpanded(state.expanded);
+    } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); }
+  }, [bridge]);
   const chooseWorkspace = useCallback(async () => { const picked = await bridge.chooseWorkspace(); if (!picked.ok) { if (picked.message) setNotice(picked.message); return; } const next = await bridge.setWorkspace(picked.resolved ?? "", false); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
   const send = useCallback(async () => {
     const text = draft.trim(); if (!text || busy || generation === 0) return;
@@ -61,7 +70,15 @@ export function App() {
   const revokeDesktop = useCallback(async () => { setDesktopTask(await bridge.revokeDesktopTask()); setNotice("Desktop authorization revoked."); }, [bridge]);
   const saveShortcut = useCallback(async () => { const candidate = shortcutDraft.trim(); if (!candidate) return; const next = await bridge.setShortcut(candidate); setStatus(next); setShortcutDraft(""); setNotice(next.shortcutRegistered ? `Wake shortcut set to ${next.shortcut}.` : next.shortcutProblem); }, [bridge, shortcutDraft]);
 
-  return <div className={`orb ${expanded ? "orb--expanded" : "orb--collapsed"}`} onPointerEnter={() => setExpanded(true)}>
+  const floatingClasses = [
+    "orb",
+    expanded ? "orb--expanded" : "orb--collapsed",
+    `orb--expand-${floatingState.horizontal}`,
+    `orb--expand-${floatingState.vertical}`,
+    floatingState.docked ? `orb--docked-${floatingState.docked}` : "",
+  ].filter(Boolean).join(" ");
+
+  return <div className={floatingClasses} onPointerEnter={() => void setExpandedState(true)}>
     <header className="orb__header">
       <button type="button" className="orb__round-button" onClick={() => void refresh()} title="Refresh connection" aria-label="Refresh connection">◷</button>
       <button type="button" className="orb__permission" onClick={() => setControlsOpen((open) => !open)} aria-expanded={controlsOpen} title="Open Orb controls"><span className={`orb__status-dot ${status?.piWeb.reachable ? "orb__status-dot--live" : ""}`} />{desktopTask?.authorized ? "Desktop access" : "Orb access"}<span className="orb__chevron">⌄</span></button>
@@ -81,7 +98,63 @@ export function App() {
     {controlsOpen && status?.configured && <section className="orb__controls" aria-label="Orb controls"><div className="orb__control-heading"><strong>Orb controls</strong><button type="button" className="orb__close" onClick={() => setControlsOpen(false)} aria-label="Close controls">×</button></div><div className="orb__control-section"><span className="orb__eyebrow">DESKTOP TASK</span><strong>{desktopTask?.target?.title ?? "No target selected"}</strong><small>{desktopTask?.authorized ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions` : "Locked until you approve a task"}</small><button type="button" className="orb__button" onClick={() => void loadWindows()}>Choose target</button>{windowChoices && <div className="orb__window-list">{windowChoices.map((choice) => <button key={choice.windowId} type="button" onClick={() => void chooseTarget(choice.windowId)}><strong>{choice.title || choice.appName}</strong><small>{choice.appName}</small></button>)}</div>}<form onSubmit={(event) => { event.preventDefault(); void authorizeDesktop(); }}><input value={taskScope} onChange={(event) => setTaskScope(event.target.value)} placeholder="What may Orb do?" aria-label="Desktop task scope" /><div className="orb__actions"><button type="submit" className="orb__button orb__button--primary" disabled={!taskScope.trim()}>Approve</button><button type="button" className="orb__button" onClick={() => void revokeDesktop()} disabled={!desktopTask?.authorized}>Revoke</button></div></form></div><div className="orb__control-section"><span className="orb__eyebrow">SHORTCUT</span><small>Wake or hide the orb from anywhere.</small><form className="orb__shortcut-form" onSubmit={(event) => { event.preventDefault(); void saveShortcut(); }}><input value={shortcutDraft} onChange={(event) => setShortcutDraft(event.target.value)} placeholder={status.shortcut} aria-label="Wake shortcut" /><button type="submit" className="orb__button" disabled={!shortcutDraft.trim()}>Apply</button></form></div></section>}
     {preview && <section className="orb__preview"><div className="orb__preview-heading"><strong>Review screenshot</strong><button type="button" className="orb__close" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p>{preview.targetDescription}</p>{preview.targetStale && <p className="orb__notice orb__notice--error">The window changed since capture.</p>}<img className="orb__preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small>{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="orb__actions"><button type="button" className="orb__button orb__button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="orb__button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
     {notice && <p className="orb__notice">{notice}</p>}
-    <button type="button" className="orb__ball" onClick={() => setExpanded((open) => !open)} aria-label={expanded ? "Collapse orb" : "Expand orb"}><img src={avatarUrl} alt="" /></button>
+    {floatingState.docked && <button
+      type="button"
+      className="orb__dock-tab"
+      onClick={() => {
+        void bridge.unsnapFloatingBall()
+          .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
+          .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
+      }}
+      aria-label="Pull orb out of the screen edge"
+    />}
+    <button
+      type="button"
+      className="orb__ball"
+      onClick={() => {
+        if (drag.current?.moved) { drag.current = null; return; }
+        void setExpandedState(!expanded);
+      }}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        const bounds = event.currentTarget.getBoundingClientRect();
+        drag.current = {
+          pointerId: event.pointerId,
+          startX: event.screenX,
+          startY: event.screenY,
+          offsetX: event.clientX - bounds.left,
+          offsetY: event.clientY - bounds.top,
+          moved: false,
+        };
+      }}
+      onPointerMove={(event) => {
+        const current = drag.current;
+        if (!current || current.pointerId !== event.pointerId) return;
+        if (!current.moved && Math.hypot(event.screenX - current.startX, event.screenY - current.startY) <= 4) return;
+        const wasMoved = current.moved;
+        current.moved = true;
+        if (!wasMoved && expanded) void setExpandedState(false);
+        void bridge.moveFloatingBall(event.screenX - current.offsetX, event.screenY - current.offsetY)
+          .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
+          .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
+      }}
+      onPointerUp={(event) => {
+        if (drag.current?.pointerId !== event.pointerId) return;
+        if (drag.current.moved) {
+          void bridge.clampFloatingBall()
+            .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
+            .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
+        }
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }}
+      onPointerCancel={() => {
+        drag.current = null;
+        void bridge.clampFloatingBall()
+          .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
+          .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
+      }}
+      aria-label={expanded ? "Collapse orb" : "Expand orb"}
+    ><img src={avatarUrl} alt="" /></button>
   </div>;
 }
 

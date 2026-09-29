@@ -53,9 +53,18 @@ import {
   type ListDesktopWindowsResult,
   type SetDesktopTargetResult,
   type WorkspaceStatus,
+  type FloatingWindowState,
 } from "@shared/ipc";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 import { uIOhook } from "uiohook-napi";
+import { FLOATING_BALL_WINDOW_SIZE } from "./floating-geometry";
+import {
+  clampFloatingWindow,
+  initialFloatingBounds,
+  moveFloatingBall,
+  setFloatingExpanded,
+  unsnapDockedBall,
+} from "./floating-window-controller";
 
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
@@ -155,16 +164,20 @@ function emit(event: OrbSessionEvent): void {
 }
 
 function createWindow(): BrowserWindow {
+  const initial = initialFloatingBounds();
+  const savedBallBounds = config.window.width <= 96 && config.window.height <= 96;
   const win = new BrowserWindow({
-    width: config.window.width,
-    height: config.window.height,
-    ...(config.window.x !== null ? { x: config.window.x } : {}),
-    ...(config.window.y !== null ? { y: config.window.y } : {}),
+    width: initial.width,
+    height: initial.height,
+    ...(savedBallBounds && config.window.x !== null ? { x: config.window.x } : { x: initial.x }),
+    ...(savedBallBounds && config.window.y !== null ? { y: config.window.y } : { y: initial.y }),
     show: false,
     frame: false,
-    resizable: true,
+    transparent: true,
+    resizable: false,
+    hasShadow: false,
     alwaysOnTop: config.window.alwaysOnTop,
-    skipTaskbar: false,
+    skipTaskbar: true,
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
@@ -193,6 +206,9 @@ function createWindow(): BrowserWindow {
   const saveBounds = debounce(() => {
     if (win.isDestroyed()) return;
     const bounds = win.getBounds();
+    // The reference shell persists the ball position, not the transient panel bounds. Dock tabs
+    // are also transient and intentionally snap back to the last visible ball on restart.
+    if (bounds.width !== FLOATING_BALL_WINDOW_SIZE || bounds.height !== FLOATING_BALL_WINDOW_SIZE) return;
     config = { ...config, window: { ...config.window, ...bounds } };
     try {
       saveOrbConfig(configPath, config);
@@ -520,6 +536,10 @@ function attachWakeController(win: BrowserWindow): void {
   lifecycle = new OrbWindowLifecycle(
     {
       hide: () => {
+        // Hiding is a lifecycle transition, so collapse the BrowserWindow before it becomes
+        // invisible. This keeps wake-up geometry at the reference 96x96 ball instead of retaining
+        // a transparent 344x444 panel around the next ball.
+        if (!win.isDestroyed()) setFloatingExpanded(win, false);
         if (!win.isDestroyed()) win.hide();
       },
       isDestroyed: () => win.isDestroyed(),
@@ -665,6 +685,28 @@ function registerIpc(): void {
     config = { ...config, shortcut: result.accelerator };
     saveOrbConfig(configPath, config);
     return currentStatus();
+  });
+
+  ipcMain.handle(IPC.setFloatingExpanded, (_event, expanded: unknown): FloatingWindowState => {
+    if (typeof expanded !== "boolean" || !window || window.isDestroyed()) {
+      return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
+    }
+    const state = setFloatingExpanded(window, expanded);
+    return state;
+  });
+  ipcMain.handle(IPC.moveFloatingBall, (_event, x: unknown, y: unknown): FloatingWindowState => {
+    if (typeof x !== "number" || !Number.isFinite(x) || typeof y !== "number" || !Number.isFinite(y) || !window || window.isDestroyed()) {
+      throw new Error("Malformed floating ball position.");
+    }
+    return moveFloatingBall(window, x, y);
+  });
+  ipcMain.handle(IPC.clampFloatingBall, (): FloatingWindowState => {
+    if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
+    return clampFloatingWindow(window);
+  });
+  ipcMain.handle(IPC.unsnapFloatingBall, (): FloatingWindowState => {
+    if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
+    return unsnapDockedBall(window);
   });
 
   ipcMain.handle(IPC.validateWorkspace, (_event, candidate: unknown) => {

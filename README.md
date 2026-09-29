@@ -32,10 +32,10 @@ not a runtime dependency. See [`AGENTS.md`](./AGENTS.md) for the reuse-first rul
 **P1 feature-complete; not a complete v0.1 release.** All seven P1 tasks (`P1-01` … `P1-07`) are
 implemented and each has a reproducible record under [`evidence/`](./evidence/README.md).
 
-P2 work is now being delivered in small reference-reuse stages. P2-01's renderer shape follows
-the pinned DeepSeek Orb shell source and is recorded in [`doc/p2-01-reference-reuse.md`](./doc/p2-01-reference-reuse.md);
-the native drag, docking and multi-display acceptance remains explicitly unverified until its
-Electron window lifecycle is ported and tested.
+P2 work is now being delivered in small reference-reuse stages. P2-01's renderer shape and
+Electron floating-window geometry follow the pinned DeepSeek Orb shell source and are recorded in
+[`doc/p2-01-reference-reuse.md`](./doc/p2-01-reference-reuse.md); real multi-display, DPI and
+manual drag acceptance remains explicitly unverified.
 
 v0.1 is defined as M1 + M2 + M3 + P1-07:
 

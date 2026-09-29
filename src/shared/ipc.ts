@@ -14,6 +14,14 @@ export const IPC = {
   refreshConnection: "orb:refresh-connection",
   /** Renderer -> main: change the global wake shortcut. */
   setShortcut: "orb:set-shortcut",
+  /** Renderer -> main: change the reference-style floating ball/panel geometry. */
+  setFloatingExpanded: "orb:set-floating-expanded",
+  /** Renderer -> main: move the collapsed ball while dragging. */
+  moveFloatingBall: "orb:move-floating-ball",
+  /** Renderer -> main: commit a drag and clamp or dock the ball. */
+  clampFloatingBall: "orb:clamp-floating-ball",
+  /** Renderer -> main: pull a docked tab back into the display. */
+  unsnapFloatingBall: "orb:unsnap-floating-ball",
   /**
    * Renderer -> main: collapse the orb.
    *
@@ -57,6 +65,13 @@ export const IPC = {
 } as const;
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC];
+
+export interface FloatingWindowState {
+  readonly expanded: boolean;
+  readonly horizontal: "left" | "right";
+  readonly vertical: "up" | "down";
+  readonly docked: "left" | "right" | undefined;
+}
 
 export interface WorkspaceStatus {
   readonly configured: boolean;

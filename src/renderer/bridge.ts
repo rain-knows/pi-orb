@@ -19,12 +19,17 @@ import type {
   SetDesktopTargetResult,
   WorkspaceCandidateResult,
   WorkspaceStatus,
+  FloatingWindowState,
 } from "@shared/ipc";
 
 export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
+  setFloatingExpanded(expanded: boolean): Promise<FloatingWindowState>;
+  moveFloatingBall(x: number, y: number): Promise<FloatingWindowState>;
+  clampFloatingBall(): Promise<FloatingWindowState>;
+  unsnapFloatingBall(): Promise<FloatingWindowState>;
   collapseOrb(): Promise<DesktopTaskStatus>;
   authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
   revokeDesktopTask(): Promise<DesktopTaskStatus>;

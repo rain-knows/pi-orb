@@ -73,3 +73,18 @@ button { cursor: pointer; }
 .orb--expanded .orb__text-button { margin-right: auto; }
 .orb--expanded .orb__empty { padding-bottom: 40px; }
 .orb--expanded .orb__controls, .orb--expanded .orb__preview { inset: 0; border-radius: 36px; }
+.orb--expanded.orb--expand-left .orb__ball { right: 12px; left: auto; }
+.orb--expanded.orb--expand-right .orb__ball { right: auto; left: 12px; }
+.orb--expanded.orb--expand-up .orb__ball { top: auto; bottom: 12px; }
+.orb--expanded.orb--expand-down .orb__ball { top: 12px; bottom: auto; }
+.orb--expanded.orb--expand-down .orb__composer { top: 16px; bottom: auto; }
+.orb--expanded.orb--expand-down .orb__composer-footer { top: 21px; bottom: auto; }
+.orb--expanded.orb--expand-down .orb__messages { padding-top: 86px; padding-bottom: 10px; }
+.orb--expanded.orb--expand-up .orb__messages { padding-top: 24px; padding-bottom: 86px; }
+.orb__dock-tab { display: none; position: absolute; z-index: 9; top: 8px; width: 6px; height: 72px; padding: 0; border: 0; border-radius: 999px; background: #75757f; box-shadow: 0 0 0 6px rgb(117 117 127 / 7%), 0 0 0 4px rgb(117 117 127 / 13%), 0 0 0 2px rgb(117 117 127 / 20%); cursor: pointer; }
+.orb--docked-left .orb__dock-tab { left: 0; display: block; }
+.orb--docked-right .orb__dock-tab { right: 0; display: block; }
+.orb--docked-left .orb__ball, .orb--docked-right .orb__ball { visibility: hidden; pointer-events: none; }
+.orb--collapsed.orb--docked-left > .orb__dock-tab, .orb--collapsed.orb--docked-right > .orb__dock-tab { display: block; }
+@media (prefers-reduced-motion: no-preference) { .orb__dock-tab { animation: orb-dock-breath 1.8s ease-in-out infinite alternate; } }
+@keyframes orb-dock-breath { from { opacity: .5; } to { opacity: 1; } }

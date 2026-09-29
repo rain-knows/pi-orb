@@ -18,11 +18,14 @@ pi-orb 的 React renderer 保留 Pi 会话和授权 IPC，但按参考 shell 的
 3. 头像资源作为打包静态资源，不改变 Pi 会话边界。
 4. 桌面授权、快捷键和窗口选择放在权限入口的轻量浮层中，不增加主导航或独立设置页。
 5. 截图仍保留 pi-orb 的预览确认和代次校验，这是 Pi 接入所需的安全边界。
+6. 主进程已接入参考项目的浮球几何：72px 球、344x444 含 chrome 的展开窗口、工作区方向选择、拖动释放后的左右边缘停靠 tab，以及多显示器最近显示器计算。
 
 ## 未直接复制及原因
 
 - `floating.js` 依赖 dsh Host RPC、独立 overlay Session、`dsh-app://` 协议和 iframe ChatView，不能直接运行在 pi-web 的 Electron bridge 中；当前只移植其 DOM 状态和 CSS 约定，Pi 会话继续走本仓库 `OrbSessionController`。
-- `floating-window.ts` 的拖拽、贴边停靠和动态 BrowserWindow 尺寸仍需接入 pi-orb 主进程；本阶段先完成 renderer 形态，未宣称 P2-01 的多屏拖拽验收完成。
+- `floating-window.ts` 的拖拽、贴边停靠和动态 BrowserWindow 尺寸已通过 `floating-geometry.ts` 与
+  `floating-window-controller.ts` 接入 pi-orb 主进程；窗口收起会先还原为 96x96 球，配置只保存球位置。
+- 真实多显示器、DPI、锁屏恢复与人工拖动验收仍未完成，因此支持矩阵仍标记为未验证。
 - 参考项目的自定义 avatar 持久化和菜单模型依赖 Desktop profile；当前使用仓库静态 avatar，不扩展 Pi 配置写入。
 
 本记录不把“视觉相似”当作参考项目功能完成证明；未复用项必须在对应 P2 任务接入真实边界后单独验收。

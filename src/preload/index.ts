@@ -27,12 +27,17 @@ import {
   type SetDesktopTargetResult,
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
+  type FloatingWindowState,
 } from "@shared/ipc";
 
 export interface OrbBridge {
   getStatus(): Promise<WorkspaceStatus>;
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
+  setFloatingExpanded(expanded: boolean): Promise<FloatingWindowState>;
+  moveFloatingBall(x: number, y: number): Promise<FloatingWindowState>;
+  clampFloatingBall(): Promise<FloatingWindowState>;
+  unsnapFloatingBall(): Promise<FloatingWindowState>;
   collapseOrb(): Promise<DesktopTaskStatus>;
   authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
   revokeDesktopTask(): Promise<DesktopTaskStatus>;
@@ -55,6 +60,10 @@ const bridge: OrbBridge = {
   getStatus: () => ipcRenderer.invoke(IPC.getStatus),
   refreshConnection: () => ipcRenderer.invoke(IPC.refreshConnection),
   setShortcut: (accelerator: string) => ipcRenderer.invoke(IPC.setShortcut, accelerator),
+  setFloatingExpanded: (expanded: boolean) => ipcRenderer.invoke(IPC.setFloatingExpanded, expanded),
+  moveFloatingBall: (x: number, y: number) => ipcRenderer.invoke(IPC.moveFloatingBall, x, y),
+  clampFloatingBall: () => ipcRenderer.invoke(IPC.clampFloatingBall),
+  unsnapFloatingBall: () => ipcRenderer.invoke(IPC.unsnapFloatingBall),
   collapseOrb: () => ipcRenderer.invoke(IPC.collapseOrb),
   authorizeDesktopTask: (request: AuthorizeDesktopTaskRequest) =>
     ipcRenderer.invoke(IPC.authorizeDesktopTask, request),
