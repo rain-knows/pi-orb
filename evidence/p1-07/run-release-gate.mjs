@@ -34,8 +34,16 @@ const gate = {
   passed: false,
 };
 
-function check(name, ok, detail) {
-  gate.checks.push({ name, ok: Boolean(ok), detail });
+/**
+ * Record one gate result.
+ *
+ * `skipped` marks a check that could not be performed in this environment (for example the pi-web
+ * baseline, which needs a developer-local checkout). A skipped check does not fail the gate, but it
+ * is counted and printed separately so a reader can never mistake "not checked here" for "passed".
+ */
+function check(name, ok, detail, options = {}) {
+  const skipped = options.skipped === true;
+  gate.checks.push({ name, ok: Boolean(ok), detail, ...(skipped ? { skipped: true } : {}) });
   return Boolean(ok);
 }
 
@@ -72,6 +80,11 @@ run("production build succeeds", "npx", ["electron-vite", "build"]);
 
 // ---------------------------------------------------------------------------
 // 2. Non-destructive baseline: pi-web untouched.
+//
+// The comparison runs against a developer-local pi-web checkout. Where none exists (another
+// contributor, a CI runner) it is reported as *skipped with a reason* and shown in the output, never
+// counted as a satisfied check — "we could not look" and "we looked and it was fine" are different
+// facts, and a release gate that conflates them is worse than one without the check.
 // ---------------------------------------------------------------------------
 try {
   const output = execFileSync("node", ["evidence/p0-01/verify-baseline.mjs"], {
@@ -80,11 +93,20 @@ try {
     encoding: "utf8",
   });
   const baseline = JSON.parse(output);
-  check(
-    "pi-web HEAD and its six pre-existing user changes are untouched",
-    baseline.passed === true,
-    `headUnchanged=${String(baseline.headUnchanged)} files=${String(baseline.checkedCount)} failures=${JSON.stringify(baseline.failures ?? [])}`,
-  );
+  if (baseline.skipped === true) {
+    check(
+      "pi-web HEAD and its six pre-existing user changes are untouched",
+      true,
+      `skipped: ${String(baseline.reason)}`,
+      { skipped: true },
+    );
+  } else {
+    check(
+      "pi-web HEAD and its six pre-existing user changes are untouched",
+      baseline.passed === true,
+      `headUnchanged=${String(baseline.headUnchanged)} files=${String(baseline.checkedCount)} failures=${JSON.stringify(baseline.failures ?? [])}`,
+    );
+  }
 } catch (error) {
   check(
     "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -389,6 +411,59 @@ check(
   /^release\/$/m.test(readFileSync(join(repo, ".gitignore"), "utf8")),
   "installers and unpacked trees must stay out of the repository",
 );
+
+// Continuous integration. A workflow that names the wrong commands, drops the release gate, or
+// quietly stops reproducing the documented local gates is worse than no workflow, because the green
+// badge would then stand for something nobody can reproduce.
+const ciPath = join(repo, ".github/workflows/ci.yml");
+const ci = existsSync(ciPath) ? readFileSync(ciPath, "utf8") : "";
+check(
+  "continuous integration exists and runs the documented gates",
+  ["npm run typecheck", "npm run lint", "npm test", "run-release-gate.mjs"].every((command) => ci.includes(command)),
+  "the workflow must run the same gates a contributor runs locally",
+);
+check(
+  "continuous integration is scoped to read-only permissions and does not persist credentials",
+  /permissions:\s*\n\s*contents:\s*read/.test(ci) && /persist-credentials:\s*false/.test(ci),
+  "a pull-request workflow needs no write token and must not leave one in the checkout",
+);
+check(
+  "continuous integration does not promise a platform the product does not support",
+  /runs-on:\s*windows-latest/.test(ci),
+  "Windows is the only supported platform, so a Linux run would not verify the shipped product",
+);
+
+// Contributor-facing documents. A public project needs a stated contribution contract and a stated
+// security boundary; both are also where the non-destructive rules and the "not a sandbox" limits are
+// written down for someone who has not read the goals document.
+const contributing = existsSync(join(repo, "CONTRIBUTING.md")) ? readFileSync(join(repo, "CONTRIBUTING.md"), "utf8") : "";
+const contributingZh = existsSync(join(repo, "CONTRIBUTING.zh.md")) ? readFileSync(join(repo, "CONTRIBUTING.zh.md"), "utf8") : "";
+check(
+  "the contribution contract exists and points contributors at the reuse rules",
+  contributing.includes("reference-playbook.md") && contributing.includes("support-matrix.md"),
+  "a contributor must be sent to the playbook and the single support source before writing code",
+);
+check(
+  "the contribution contract keeps the no-weakened-assertions rule and the unverified rule",
+  /weaken an assertion/i.test(contributing) && /unverified/i.test(contributing),
+  "these two rules are what keep the evidence honest",
+);
+check(
+  "the contribution contract is available in the repository's primary documentation language",
+  contributingZh.length > 0 && contributingZh.includes("reference-playbook.md"),
+  "the project's own docs are Chinese-first, so the guide is bilingual like the reference project's",
+);
+const security = existsSync(join(repo, "SECURITY.md")) ? readFileSync(join(repo, "SECURITY.md"), "utf8") : "";
+check(
+  "the security policy states the boundary rather than only a contact route",
+  /not a filesystem sandbox/i.test(security) && /untrusted input/i.test(security) && /advisories\/new/.test(security),
+  "a policy that only says 'email us' would hide the limits the product actually has",
+);
+check(
+  "the security policy lists the wrong-target and stuck-key classes as in scope",
+  /different window or application/i.test(security) && /left held/i.test(security),
+  "these are the two defect classes this product exists to avoid",
+);
 check(
   "the packaging scripts run the build before packing",
   /"package:win":\s*"npm run build && electron-builder/.test(readFileSync(join(repo, "package.json"), "utf8")) &&
@@ -535,14 +610,26 @@ gate.writeSurface = {
 
 gate.passed = gate.checks.every((entry) => entry.ok);
 gate.summary = {
-  passed: gate.checks.filter((entry) => entry.ok).length,
+  passed: gate.checks.filter((entry) => entry.ok && entry.skipped !== true).length,
+  skipped: gate.checks.filter((entry) => entry.skipped === true).length,
   failed: gate.checks.filter((entry) => !entry.ok).length,
   version: packageJson.version,
-  note: "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files",
+  note: "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files. `skipped` counts checks that could not run in this environment and are explicitly NOT counted as passed",
 };
 
 mkdirSync(import.meta.dirname, { recursive: true });
 writeFileSync(join(import.meta.dirname, "release-gate.json"), `${JSON.stringify(gate, null, 2)}\n`, "utf8");
-console.log(JSON.stringify({ passed: gate.passed, summary: gate.summary, failed: gate.checks.filter((entry) => !entry.ok) }, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      passed: gate.passed,
+      summary: gate.summary,
+      failed: gate.checks.filter((entry) => !entry.ok),
+      skipped: gate.checks.filter((entry) => entry.skipped === true).map((entry) => `${entry.name} — ${entry.detail}`),
+    },
+    null,
+    2,
+  ),
+);
 
 process.exit(gate.passed ? 0 : 1);

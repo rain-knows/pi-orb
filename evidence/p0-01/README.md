@@ -29,7 +29,7 @@
 | `changed-files.sha256` | 6 个文件的工作区 SHA-256（`sha256sum` 格式） |
 | `changed-files-baseline.json` | 路径、git 状态、工作区 SHA-256、`HEAD` blob SHA-1、字节数、`HEAD` 提交 |
 | `record-baseline.mjs` | 重新生成上述基线 |
-| `verify-baseline.mjs` | 重算并比对；发现任何差异（含新增的已修改文件或 HEAD 变动）则非零退出 |
+| `verify-baseline.mjs` | 重算并比对；发现任何差异（含新增的已修改文件或 HEAD 变动）则非零退出。**本机没有该 pi-web 检出时**输出 `skipped: true` 与原因并以 0 退出——比较确实没有发生，绝不能报成 `passed` |
 
 用法：
 
@@ -39,6 +39,12 @@ node evidence/p0-01/verify-baseline.mjs
 ```
 
 记录时结果：`passed=true`，6/6 文件哈希同值，`HEAD` 未变。
+
+**这台机器之外的行为**：被比较的 pi-web 检出属于**开发机本地状态**，不是本仓库的性质。路径取自
+`changed-files-baseline.json` 的 `piWebRepo`，可用 `PI_ORB_P0_PI_WEB` 覆盖。其它贡献者的克隆或 CI
+runner 上没有该检出时，脚本报告「跳过 + 原因」；发布门禁把它记为 `skipped`（在输出里列名、在
+`summary.skipped` 单独计数），**不**计入 `passed`。要真正跑这次比较，把 `PI_ORB_P0_PI_WEB` 指向
+记录提交对应的 pi-web 检出即可。
 
 > 工具自证：首版记录脚本用 `.trim()` 处理 `git status --porcelain` 时丢掉了首行前导状态空格，把 `app/endfield.css` 写成 `pp/endfield.css`。**校验脚本立即报错并阻止了假基线落盘**——这正是“用可执行校验代替文字声明”的价值。
 

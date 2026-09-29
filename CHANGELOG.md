@@ -71,6 +71,49 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- **Continuous integration** (`.github/workflows/ci.yml`): a pull-request and `main`-push workflow on
+  a Windows runner with a read-only token, running the same gates a contributor runs locally —
+  typecheck, lint, unit tests and the release gate — and uploading the gate record. Its shape
+  (trigger, `contents: read`, concurrency cancel, `persist-credentials: false`, pinned Node) is taken
+  from the reference project's `.github/workflows/ci.yml`; its enterprise machinery (self-hosted and
+  Blacksmith runner failover, telemetry switches, monorepo gate fan-out, issue-lifecycle and
+  weighted-approval workflows) is deliberately not copied. It runs on Windows because Windows is the
+  only supported platform — a green Linux run would verify nothing about the shipped product.
+- **`CONTRIBUTING.md` / `CONTRIBUTING.zh.md`**: the contribution contract in one place — the
+  reuse-first rule (port from the reference rather than rewriting an equivalent, and attribute it
+  correctly in both directions), the non-destructive N1–N8 rules, the setup notes that actually cost
+  time (npm 11 blocking Electron's install script), and the table of which evidence a change must
+  carry in the same commit. It states the two rules that keep the evidence honest: never weaken an
+  assertion to make a check pass, and never move a row out of the unverified table without
+  reproducible evidence. Bilingual because this repository's own documents are Chinese-first.
+- **`SECURITY.md`**: what counts as a security report here and what counts as a safety defect. The
+  in-scope list is specific to this product: authority that outlives its grant, a path from a non-Orb
+  session to a desktop capability, credentials reaching an artifact, and — as safety defects — an
+  action landing on a different window than the user authorized and a key or button left held after a
+  cancellation. It also states the boundaries rather than only a contact route, because they are part
+  of the product: the Orb workspace is **not** a filesystem sandbox, an approved task is a real grant
+  of input authority, and captured screen content is untrusted data that can never extend authority.
+
+### Changed
+
+- **The release gate is now usable by someone who is not on the author's machine.** The pi-web
+  baseline comparison runs against a developer-local checkout at an absolute path recorded in
+  `evidence/p0-01/changed-files-baseline.json`, so on any other machine — a contributor's clone, a CI
+  runner — it threw and was reported as a **failed** check, and the gate could never go green for
+  anyone else. `verify-baseline.mjs` now reports `skipped: true` with a reason and exits 0 when no
+  checkout is present (still doing the real comparison when one is), and the gate records that as a
+  *skipped* check: shown in the output and counted separately, never as passed. `passed` and
+  `skipped` are different facts and the summary now keeps them apart. On this machine the check still
+  performs the real comparison (6 files, HEAD unchanged); with the path unset the gate reports 46
+  passed + 1 skipped instead of failing. The `PI_ORB_P0_PI_WEB` override and the recorded path are
+  both honoured.
+- The gate grows 47 → 55 checks: it now also holds the CI workflow to running the documented gates
+  with read-only permissions on a supported platform, and requires the contribution and security
+  documents to keep their load-bearing content (the playbook pointer, the no-weakened-assertions and
+  unverified rules, the stated boundary, and the two defect classes this product exists to avoid).
+  Falsified by removing the security policy's boundary statement: the gate drops to 54/55 with that
+  check named, and returns to 55/55 when restored.
+
 - **`orb_open_app` (P2-04), narrowed on the user's decision: activation only, never launch.** The
   reference tool brings a running application forward *or starts it*
   (`tool-computer-use/src/windows.ts:398-404`: `activateApp` falls through to `launch`). Launching a

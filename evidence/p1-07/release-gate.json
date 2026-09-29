@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-29T14:49:07.967Z",
+  "capturedAt": "2026-09-29T15:17:55.335Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "10368 ms"
+      "detail": "9229 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "7418 ms"
+      "detail": "5357 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "6409 ms"
+      "detail": "5382 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4767 ms"
+      "detail": "3720 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -183,6 +183,46 @@
       "detail": "installers and unpacked trees must stay out of the repository"
     },
     {
+      "name": "continuous integration exists and runs the documented gates",
+      "ok": true,
+      "detail": "the workflow must run the same gates a contributor runs locally"
+    },
+    {
+      "name": "continuous integration is scoped to read-only permissions and does not persist credentials",
+      "ok": true,
+      "detail": "a pull-request workflow needs no write token and must not leave one in the checkout"
+    },
+    {
+      "name": "continuous integration does not promise a platform the product does not support",
+      "ok": true,
+      "detail": "Windows is the only supported platform, so a Linux run would not verify the shipped product"
+    },
+    {
+      "name": "the contribution contract exists and points contributors at the reuse rules",
+      "ok": true,
+      "detail": "a contributor must be sent to the playbook and the single support source before writing code"
+    },
+    {
+      "name": "the contribution contract keeps the no-weakened-assertions rule and the unverified rule",
+      "ok": true,
+      "detail": "these two rules are what keep the evidence honest"
+    },
+    {
+      "name": "the contribution contract is available in the repository's primary documentation language",
+      "ok": true,
+      "detail": "the project's own docs are Chinese-first, so the guide is bilingual like the reference project's"
+    },
+    {
+      "name": "the security policy states the boundary rather than only a contact route",
+      "ok": true,
+      "detail": "a policy that only says 'email us' would hide the limits the product actually has"
+    },
+    {
+      "name": "the security policy lists the wrong-target and stuck-key classes as in scope",
+      "ok": true,
+      "detail": "these are the two defect classes this product exists to avoid"
+    },
+    {
       "name": "the packaging scripts run the build before packing",
       "ok": true,
       "detail": "packing a stale out/ directory would ship code that was never built"
@@ -249,9 +289,10 @@
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 47,
+    "passed": 55,
+    "skipped": 0,
     "failed": 0,
     "version": "0.1.0",
-    "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files"
+    "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files. `skipped` counts checks that could not run in this environment and are explicitly NOT counted as passed"
   }
 }

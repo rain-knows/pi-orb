@@ -99,6 +99,25 @@ node evidence/p1-07/run-release-gate.mjs
 The per-stage commands, including the native acceptance runs, are listed in
 [`evidence/README.md`](./evidence/README.md).
 
+The same gates run on every pull request in
+[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) (Windows runner, read-only token). Two
+checks need a machine this project cannot assume:
+
+- the **pi-web baseline comparison** needs a developer-local pi-web checkout. Where there is none,
+  the gate reports it as *skipped with a reason* — counted separately in the summary, never as
+  passed. Point `PI_ORB_P0_PI_WEB` at a checkout at the recorded commit to run it for real.
+- the **packaged-application probe** starts a real Electron window and enumerates real desktop
+  windows, so it belongs to the release machine rather than to every pull request.
+
+## Contributing
+
+[`CONTRIBUTING.md`](./CONTRIBUTING.md) (also [中文](./CONTRIBUTING.zh.md)) describes the reuse-first
+rule, the non-destructive contract, and the evidence a change is expected to carry in the same
+commit. Security and safety reports — including "an action landed on the wrong window" and "a key
+was left held" — are handled under [`SECURITY.md`](./SECURITY.md), which also states plainly what
+this product does **not** protect against: the Orb workspace is not a filesystem sandbox, and screen
+content is untrusted input.
+
 ## Development
 
 ```powershell

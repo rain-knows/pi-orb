@@ -6,6 +6,13 @@
 //
 // Exits non-zero when: a file's bytes changed, a file disappeared, a new modified
 // tracked file appeared, or pi-web HEAD moved.
+//
+// This check is about a **developer-local** pi-web checkout, whose path is recorded in
+// `changed-files-baseline.json` and overridable with `PI_ORB_P0_PI_WEB`. It is not a property of
+// this repository, so on a machine that has no such checkout (another contributor, a CI runner) it
+// reports `skipped: true` with a reason and exits 0 — the comparison genuinely did not happen.
+// It must never report `passed: true` for a comparison it could not run; the release gate prints
+// the skipped state instead of counting it as a satisfied check.
 
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -13,14 +20,39 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const repo = resolve(import.meta.dirname, "..", "..");
-const piWebRepo = process.env.PI_ORB_P0_PI_WEB ?? "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web";
 const baselinePath = join(repo, "evidence", "p0-01", "changed-files-baseline.json");
+const baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
+const piWebRepo = process.env.PI_ORB_P0_PI_WEB ?? baseline.piWebRepo;
+
+function skip(reason) {
+  console.log(
+    JSON.stringify(
+      {
+        verifiedAt: new Date().toISOString(),
+        piWebRepo,
+        skipped: true,
+        reason,
+        passed: false,
+        hint: "set PI_ORB_P0_PI_WEB to a pi-web checkout at the recorded commit to run this comparison",
+      },
+      null,
+      2,
+    ),
+  );
+  process.exit(0);
+}
+
+if (!piWebRepo) {
+  skip("no pi-web checkout path is recorded or configured");
+}
+if (!existsSync(join(piWebRepo, ".git"))) {
+  skip(`no git checkout of pi-web at ${piWebRepo}`);
+}
 
 const git = (...args) => execFileSync("git", ["-C", piWebRepo, ...args], { encoding: "utf8" });
 const gitTrim = (...args) => git(...args).trim();
 const sha256 = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
 
-const baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
 const failures = [];
 const checked = [];
 
@@ -60,6 +92,7 @@ if (unexpected.length > 0) {
 const report = {
   verifiedAt: new Date().toISOString(),
   piWebRepo,
+  skipped: false,
   head: headNow,
   headUnchanged: headNow === baseline.head,
   checkedFiles: checked,

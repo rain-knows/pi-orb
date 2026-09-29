@@ -23,19 +23,22 @@
 | 文件 | 用途 |
 |---|---|
 | [`../README.md`](../README.md) | 项目说明、仓库结构、开发命令与依赖 |
+| [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | 贡献流程：复用优先规则、非破坏性合同、验证与证据要求、阶段提交约定（[中文](../CONTRIBUTING.zh.md)） |
+| [`../SECURITY.md`](../SECURITY.md) | 安全与安全缺陷报告范围、产品边界（工作区不是沙箱、截图内容是未受信输入） |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | 版本历史与版本号策略 |
 | [`../THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) | 第三方组件许可、MPL 归属核实与源码获取路径 |
 | [`../LICENSE`](../LICENSE) | 项目自身 MIT 许可 |
 | [`../evidence/README.md`](../evidence/README.md) | 可复现的验证证据索引 |
+| [`../.github/workflows/ci.yml`](../.github/workflows/ci.yml) | 持续集成：在 Windows runner 上跑与本地一致的质量门禁与发布门禁 |
 
 ## 阅读顺序
 
-1. 要写代码前先读 [`reference-playbook.md`](./reference-playbook.md)，确定这块能力在参考项目里对应哪个文件、什么语义。
+1. 要写代码前先读 [`reference-playbook.md`](./reference-playbook.md)，确定这块能力在参考项目里对应哪个文件、什么语义；贡献流程见 [`../CONTRIBUTING.md`](../CONTRIBUTING.md)。
 2. 再读开发目标，了解产品范围和不可破坏的不变量。
-2. 再读技术栈文档，区分已确定方向、推荐选型和实施前验证项。
-3. 需要版本兼容性或“这个组合能不能用”的判断时，只读支持矩阵。
-4. 需要在真实桌面上做人工验收（真实按键、多屏、高权限窗口、真实模型在环）时，只读 [`manual-acceptance.md`](./manual-acceptance.md)。
-5. 需要评估代码搜索或语义开发辅助时，再读 FFF/LSP 报告。
+3. 再读技术栈文档，区分已确定方向、推荐选型和实施前验证项。
+4. 需要版本兼容性或“这个组合能不能用”的判断时，只读支持矩阵。
+5. 需要在真实桌面上做人工验收（真实按键、多屏、高权限窗口、真实模型在环、干净机安装）时，只读 [`manual-acceptance.md`](./manual-acceptance.md)。
+6. 需要评估代码搜索或语义开发辅助时，再读 FFF/LSP 报告。
 
 ## 文档维护约定
 
