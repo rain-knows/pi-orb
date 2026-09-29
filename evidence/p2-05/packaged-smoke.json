@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-29T14:52:14.946Z",
+  "capturedAt": "2026-09-29T15:45:20.968Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790693534946",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790696720968",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -41,7 +41,7 @@
     {
       "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
       "ok": true,
-      "detail": "7 windows, first=\"\""
+      "detail": "10 windows, first=\"\""
     },
     {
       "name": "no desktop-driver failure was reported at startup",
@@ -55,6 +55,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-71676\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/48655314-05a5-44c8-88bb-d3776dcf39b1"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-20772\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/ecea4bdf-881b-45f2-8c8c-3ce8f5315edc"
 }

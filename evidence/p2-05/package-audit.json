@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-29T14:52:14.780Z",
+  "capturedAt": "2026-09-29T15:45:20.830Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
@@ -154,7 +154,7 @@
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "27745 bytes"
+      "detail": "33790 bytes"
     },
     {
       "name": "the shipped manifest carries the project version",
