@@ -40,6 +40,8 @@ export const IPC = {
   setWorkspace: "orb:set-workspace",
   /** Renderer -> main: create/resume the Orb session for the current workspace. */
   ensureSession: "orb:ensure-session",
+  /** Renderer -> main: start a fresh Pi session in the current workspace. */
+  newConversation: "orb:new-conversation",
   /** Renderer -> main: send a prompt into the Orb session. */
   sendPrompt: "orb:send-prompt",
   /** Renderer -> main: stop the running turn. */

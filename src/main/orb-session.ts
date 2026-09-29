@@ -103,6 +103,17 @@ export class OrbSessionController {
     return sessionId;
   }
 
+  /** Start a fresh session without changing the configured workspace or run generation. */
+  async newConversation(workspace: string): Promise<string> {
+    if (this.#running) throw new Error("The current conversation is still running.");
+    this.#closeStream?.();
+    this.#closeStream = null;
+    this.#sessionId = null;
+    this.#workspace = null;
+    this.#accumulator = null;
+    return this.ensureSession(workspace);
+  }
+
   /**
    * Send a prompt, subscribing to the event stream first.
    *

@@ -75,6 +75,24 @@ describe("OrbSessionController", () => {
     expect(client.createSession).toHaveBeenLastCalledWith("C:\\work\\orb-b");
   });
 
+  it("starts a fresh conversation in the same workspace and closes the old stream", async () => {
+    const { client, controller } = setup();
+    const first = await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("hello");
+    client.delivered[0]!(agentEnd());
+    const second = await controller.newConversation("C:\\work\\orb");
+    expect(second).not.toBe(first);
+    expect(client.createSession).toHaveBeenCalledTimes(2);
+    expect(client.closed).toBeGreaterThan(0);
+  });
+
+  it("does not replace a conversation while a turn is running", async () => {
+    const { controller } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("hello");
+    await expect(controller.newConversation("C:\\work\\orb")).rejects.toThrow(/running/i);
+  });
+
   it("refuses a prompt before any workspace session exists", async () => {
     const { controller } = setup();
     await expect(controller.prompt("hello")).rejects.toThrow(/workspace/i);

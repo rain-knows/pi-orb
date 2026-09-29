@@ -88,7 +88,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
 | **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性 | 已验证（且五次反向对照可证伪） | `evidence/p1-07/release-gate.json`（32/32） |
 | **生命周期**：折叠/停止/turn 完成或失败撤权与丢弃记录、不结束会话、不改代次、断连撤权 | 已验证 | `evidence/p1-07/lifecycle-regression.json`（10/10）与 `src/main/index.ts` 的统一撤权出口 |
-| **P2-01 参考浮球几何**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原 | 已验证（纯几何与类型链路） | `tests/floating-geometry.test.ts`、`src/main/floating-window-controller.ts`、`src/main/index.ts`、`doc/p2-01-reference-reuse.md` |
+| **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab、拖动 IPC、收起还原、hover/pin、系统主题、新会话 | 已接入（几何与 session controller 自动化通过；视觉和人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/renderer/App.tsx`、`doc/p2-01-reference-reuse.md` |
 
 ## 3. 未验证（不得宣称支持）
 

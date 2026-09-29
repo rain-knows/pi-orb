@@ -40,6 +40,7 @@ export interface OrbBridge {
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
   ensureSession(): Promise<string>;
+  newConversation(): Promise<string>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;

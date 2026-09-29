@@ -21,8 +21,10 @@ export function App() {
   const [desktopTask, setDesktopTask] = useState<DesktopTaskStatus | null>(null);
   const [windowChoices, setWindowChoices] = useState<readonly DesktopWindowChoice[] | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [pinned, setPinned] = useState(false);
   const [floatingState, setFloatingState] = useState<FloatingWindowState>({ expanded: false, horizontal: "right", vertical: "down", docked: undefined });
   const drag = useRef<{ pointerId: number; startX: number; startY: number; offsetX: number; offsetY: number; moved: boolean } | null>(null);
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const streaming = useRef("");
   const generation = status?.generation ?? 0;
 
@@ -37,15 +39,41 @@ export function App() {
     });
   }, [bridge]);
 
+  const clearCollapseTimer = useCallback(() => {
+    if (collapseTimer.current !== null) {
+      clearTimeout(collapseTimer.current);
+      collapseTimer.current = null;
+    }
+  }, []);
   const refresh = useCallback(async () => { const next = await bridge.refreshConnection(); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
   const setExpandedState = useCallback(async (next: boolean) => {
+    if (next) clearCollapseTimer();
     try {
       const state = await bridge.setFloatingExpanded(next);
       setFloatingState(state);
       setExpanded(state.expanded);
     } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); }
-  }, [bridge]);
+  }, [bridge, clearCollapseTimer]);
+  const scheduleCollapse = useCallback((allowPinned = false) => {
+    clearCollapseTimer();
+    if ((!allowPinned && pinned) || busy || controlsOpen || preview) return;
+    collapseTimer.current = setTimeout(() => {
+      collapseTimer.current = null;
+      void setExpandedState(false);
+    }, 480);
+  }, [busy, clearCollapseTimer, controlsOpen, pinned, preview, setExpandedState]);
   const chooseWorkspace = useCallback(async () => { const picked = await bridge.chooseWorkspace(); if (!picked.ok) { if (picked.message) setNotice(picked.message); return; } const next = await bridge.setWorkspace(picked.resolved ?? "", false); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
+  const newConversation = useCallback(async () => {
+    if (busy) return;
+    try {
+      await bridge.newConversation();
+      setMessages([]);
+      setDraft("");
+      setNotice(null);
+      streaming.current = "";
+      setBusy(false);
+    } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); }
+  }, [bridge, busy]);
   const send = useCallback(async () => {
     const text = draft.trim(); if (!text || busy || generation === 0) return;
     setDraft(""); setNotice(null); streaming.current = ""; setMessages((current) => [...current, { role: "user", text }]); setBusy(true);
@@ -70,19 +98,29 @@ export function App() {
   const revokeDesktop = useCallback(async () => { setDesktopTask(await bridge.revokeDesktopTask()); setNotice("Desktop authorization revoked."); }, [bridge]);
   const saveShortcut = useCallback(async () => { const candidate = shortcutDraft.trim(); if (!candidate) return; const next = await bridge.setShortcut(candidate); setStatus(next); setShortcutDraft(""); setNotice(next.shortcutRegistered ? `Wake shortcut set to ${next.shortcut}.` : next.shortcutProblem); }, [bridge, shortcutDraft]);
 
+  useEffect(() => () => clearCollapseTimer(), [clearCollapseTimer]);
+
   const floatingClasses = [
     "orb",
     expanded ? "orb--expanded" : "orb--collapsed",
+    pinned ? "orb--pinned" : "",
     `orb--expand-${floatingState.horizontal}`,
     `orb--expand-${floatingState.vertical}`,
     floatingState.docked ? `orb--docked-${floatingState.docked}` : "",
   ].filter(Boolean).join(" ");
 
-  return <div className={floatingClasses} onPointerEnter={() => void setExpandedState(true)}>
+  return <div
+    className={floatingClasses}
+    onPointerEnter={() => {
+      clearCollapseTimer();
+      if (!floatingState.docked && !expanded) void setExpandedState(true);
+    }}
+    onPointerLeave={() => scheduleCollapse()}
+  >
     <header className="orb__header">
       <button type="button" className="orb__round-button" onClick={() => void refresh()} title="Refresh connection" aria-label="Refresh connection">◷</button>
       <button type="button" className="orb__permission" onClick={() => setControlsOpen((open) => !open)} aria-expanded={controlsOpen} title="Open Orb controls"><span className={`orb__status-dot ${status?.piWeb.reachable ? "orb__status-dot--live" : ""}`} />{desktopTask?.authorized ? "Desktop access" : "Orb access"}<span className="orb__chevron">⌄</span></button>
-      <button type="button" className="orb__round-button" onClick={() => setControlsOpen((open) => !open)} title="Open controls" aria-label="Open controls">+</button>
+      <button type="button" className="orb__round-button" onClick={() => void newConversation()} title="New conversation" aria-label="New conversation" disabled={busy}>+</button>
     </header>
 
     {!status?.configured ? <section className="orb__setup"><img src={avatarUrl} alt="" className="orb__setup-avatar" /><h1>Choose a workspace</h1><p>Give pi-orb its own folder to start a private desktop conversation.</p><button type="button" className="orb__button orb__button--primary" onClick={() => void chooseWorkspace()}>Choose folder</button></section> : <>
@@ -113,9 +151,17 @@ export function App() {
       className="orb__ball"
       onClick={() => {
         if (drag.current?.moved) { drag.current = null; return; }
-        void setExpandedState(!expanded);
+        if (pinned) {
+          setPinned(false);
+          scheduleCollapse(true);
+        } else {
+          setPinned(true);
+          clearCollapseTimer();
+          void setExpandedState(true);
+        }
       }}
       onPointerDown={(event) => {
+        clearCollapseTimer();
         event.currentTarget.setPointerCapture(event.pointerId);
         const bounds = event.currentTarget.getBoundingClientRect();
         drag.current = {
@@ -133,7 +179,10 @@ export function App() {
         if (!current.moved && Math.hypot(event.screenX - current.startX, event.screenY - current.startY) <= 4) return;
         const wasMoved = current.moved;
         current.moved = true;
-        if (!wasMoved && expanded) void setExpandedState(false);
+        if (!wasMoved) {
+          setPinned(false);
+          if (expanded) void setExpandedState(false);
+        }
         void bridge.moveFloatingBall(event.screenX - current.offsetX, event.screenY - current.offsetY)
           .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
           .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));

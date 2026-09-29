@@ -798,6 +798,25 @@ function registerIpc(): void {
     }
   });
 
+  ipcMain.handle(IPC.newConversation, async () => {
+    const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
+    if (!validation?.ok || !validation.resolved) {
+      throw new Error("Select a usable Orb workspace first.");
+    }
+    if (!isOrbWorkspace(validation.resolved, config.orbWorkspace)) {
+      throw new Error("The configured workspace no longer matches its resolved path.");
+    }
+    if (generations.busy || session.running) {
+      throw new Error("Finish or stop the current conversation before starting a new one.");
+    }
+    revokeDesktopOperations("a new conversation started");
+    try {
+      return await session.newConversation(validation.resolved);
+    } catch (error) {
+      throw new Error(describeError(error));
+    }
+  });
+
   ipcMain.handle(IPC.sendPrompt, async (_event, request: unknown) => {
     const parsed = parseGenerationRequest(request);
     if (!parsed) throw new Error("Malformed prompt request.");

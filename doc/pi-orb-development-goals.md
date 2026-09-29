@@ -295,7 +295,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | 两参考项目、MIT、第三方许可 | §3.1、P1-07 |
 | 细优先级、依赖、验收 | §5、§7.1 |
 
-截至 2026-09-29，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、授权 broker 和参考项目 Windows native backend 已接入；C7、D6、D8 已由真实模型和 disposable target 自身日志验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠和收起还原；多显示器、DPI、锁屏恢复及人工拖动体验仍未验证。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md) 及 `evidence/` 为准。
+截至 2026-09-29，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、授权 broker 和参考项目 Windows native backend 已接入；C7、D6、D8 已由真实模型和 disposable target 自身日志验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md) 及 `evidence/` 为准。
 
 文档完成标准：全文回读；核对引用路径和固定提交；需求覆盖无遗漏；调用 Advisor 复核，有实质意见时落实修订。开发完成标准由各阶段验收决定，二者不得混淆。当前仍未完成的发布门槛是多显示器、高权限窗口、Chromium 内容输入、安装包安装／卸载和部分人工交互体验。取消信号已接入 broker、driver 与 native backend，并由自动化竞态测试和真实 disposable target 日志验证。
 

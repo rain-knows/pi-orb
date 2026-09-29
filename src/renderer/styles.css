@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
   color: #1b1c1f;
   background: transparent;
@@ -73,6 +73,7 @@ button { cursor: pointer; }
 .orb--expanded .orb__text-button { margin-right: auto; }
 .orb--expanded .orb__empty { padding-bottom: 40px; }
 .orb--expanded .orb__controls, .orb--expanded .orb__preview { inset: 0; border-radius: 36px; }
+.orb--pinned.orb--expanded { border-color: #5c5c66; box-shadow: 0 0 0 3px #5c5c66; }
 .orb--expanded.orb--expand-left .orb__ball { right: 12px; left: auto; }
 .orb--expanded.orb--expand-right .orb__ball { right: auto; left: 12px; }
 .orb--expanded.orb--expand-up .orb__ball { top: auto; bottom: 12px; }
@@ -88,3 +89,16 @@ button { cursor: pointer; }
 .orb--collapsed.orb--docked-left > .orb__dock-tab, .orb--collapsed.orb--docked-right > .orb__dock-tab { display: block; }
 @media (prefers-reduced-motion: no-preference) { .orb__dock-tab { animation: orb-dock-breath 1.8s ease-in-out infinite alternate; } }
 @keyframes orb-dock-breath { from { opacity: .5; } to { opacity: 1; } }
+
+@media (prefers-color-scheme: dark) {
+  :root { --orb-line: rgb(255 255 255 / 16%); --orb-muted: #a3a3ad; --orb-panel: rgb(21 21 23 / 96%); color: #f9fafb; }
+  .orb--expanded { color: #f9fafb; background: #151517; border-color: rgb(255 255 255 / 16%); box-shadow: 0 4px 8px rgb(0 0 0 / 45%); }
+  .orb__round-button, .orb__close, .orb__permission, .orb--expanded .orb__composer, .orb__suggestions button { color: #f9fafb; background: #232324; }
+  .orb__round-button:hover, .orb__close:hover, .orb__permission:hover, .orb__suggestions button:hover { background: #303033; }
+  .orb__message, .orb__composer textarea, .orb__setup h1, .orb__control-section strong { color: #f9fafb; }
+  .orb__message--user { background: #27365a; }
+  .orb__button, .orb__window-list button, .orb__control-section input, .orb__shortcut-form input { color: #f9fafb; background: #202023; border-color: rgb(255 255 255 / 16%); }
+  .orb__button:hover:not(:disabled), .orb__window-list button:hover { border-color: #7997df; background: #29334d; }
+  .orb__button--primary { color: #fff; background: #4777d9; }
+  .orb__preview-image { background: #202023; border-color: rgb(255 255 255 / 16%); }
+}

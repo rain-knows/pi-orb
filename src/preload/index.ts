@@ -48,6 +48,7 @@ export interface OrbBridge {
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
   ensureSession(): Promise<string>;
+  newConversation(): Promise<string>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
@@ -77,6 +78,7 @@ const bridge: OrbBridge = {
   setWorkspace: (candidate: string, createConfirmed: boolean) =>
     ipcRenderer.invoke(IPC.setWorkspace, candidate, createConfirmed),
   ensureSession: () => ipcRenderer.invoke(IPC.ensureSession),
+  newConversation: () => ipcRenderer.invoke(IPC.newConversation),
   sendPrompt: (request: PromptRequest) => ipcRenderer.invoke(IPC.sendPrompt, request),
   abort: (request: AbortRequest) => ipcRenderer.invoke(IPC.abort, request),
   captureScreenshot: (request: CaptureRequest) =>
