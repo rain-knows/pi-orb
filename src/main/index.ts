@@ -55,6 +55,8 @@ import {
   type SetDesktopTargetResult,
   type WorkspaceStatus,
   type FloatingWindowState,
+  type ListSessionHistoryResult,
+  type OpenSessionHistoryResult,
 } from "@shared/ipc";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
 import { uIOhook } from "uiohook-napi";
@@ -825,6 +827,44 @@ function registerIpc(): void {
       return await session.newConversation(validation.resolved);
     } catch (error) {
       throw new Error(describeError(error));
+    }
+  });
+
+  ipcMain.handle(IPC.listSessionHistory, async (): Promise<ListSessionHistoryResult> => {
+    const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
+    if (!validation?.ok || !validation.resolved) return { ok: false, message: "Select a usable Orb workspace first." };
+    try {
+      const sessions = await client.listSessions();
+      return {
+        ok: true,
+        sessions: sessions
+          .filter((item) => isOrbWorkspace(item.cwd, validation.resolved))
+          .map((item) => ({
+            sessionId: item.id,
+            name: item.name ?? null,
+            modified: item.modified,
+            firstMessage: item.firstMessage,
+            messageCount: item.messageCount,
+          })),
+      };
+    } catch (error) {
+      return { ok: false, message: describeError(error) };
+    }
+  });
+
+  ipcMain.handle(IPC.openSessionHistory, async (_event, sessionId: unknown): Promise<OpenSessionHistoryResult> => {
+    if (typeof sessionId !== "string" || sessionId.length === 0) return { ok: false, message: "Malformed session id." };
+    const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
+    if (!validation?.ok || !validation.resolved) return { ok: false, message: "Select a usable Orb workspace first." };
+    if (generations.busy || session.running) return { ok: false, message: "Finish or stop the current conversation before opening history." };
+    try {
+      const snapshot = await client.getSessionHistory(sessionId);
+      if (!isOrbWorkspace(snapshot.cwd, validation.resolved)) return { ok: false, message: "That session is outside the Orb workspace." };
+      revokeDesktopOperations("a history session was opened");
+      await session.openExistingSession(validation.resolved, sessionId);
+      return { ok: true, sessionId, messages: snapshot.messages };
+    } catch (error) {
+      return { ok: false, message: describeError(error) };
     }
   });
 

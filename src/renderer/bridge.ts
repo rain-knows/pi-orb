@@ -20,6 +20,8 @@ import type {
   WorkspaceCandidateResult,
   WorkspaceStatus,
   FloatingWindowState,
+  ListSessionHistoryResult,
+  OpenSessionHistoryResult,
 } from "@shared/ipc";
 
 export interface OrbBridge {
@@ -41,6 +43,8 @@ export interface OrbBridge {
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
   ensureSession(): Promise<string>;
   newConversation(): Promise<string>;
+  listSessionHistory(): Promise<ListSessionHistoryResult>;
+  openSessionHistory(sessionId: string): Promise<OpenSessionHistoryResult>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;

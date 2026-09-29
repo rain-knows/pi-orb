@@ -93,6 +93,16 @@ describe("OrbSessionController", () => {
     await expect(controller.newConversation("C:\\work\\orb")).rejects.toThrow(/running/i);
   });
 
+  it("attaches an existing session without changing its workspace", async () => {
+    const { controller, events } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    const opened = await controller.openExistingSession("C:\\work\\orb", "persisted-session");
+    expect(opened).toBe("persisted-session");
+    expect(controller.sessionId).toBe("persisted-session");
+    expect(controller.workspace).toBe("C:\\work\\orb");
+    expect(events.at(-1)).toEqual({ type: "session", sessionId: "persisted-session", generation: 1 });
+  });
+
   it("refuses a prompt before any workspace session exists", async () => {
     const { controller } = setup();
     await expect(controller.prompt("hello")).rejects.toThrow(/workspace/i);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { DesktopTaskStatus, DesktopWindowChoice, FloatingWindowState, OrbSessionEvent, WorkspaceStatus } from "@shared/ipc";
+import type { DesktopTaskStatus, DesktopWindowChoice, FloatingWindowState, OrbSessionEvent, OrbHistoryMessage, OrbSessionHistoryItem, WorkspaceStatus } from "@shared/ipc";
 import { formatBytes } from "@shared/screenshot";
 import { getBridge } from "./bridge";
 import avatarUrl from "./orb-avatar.png";
@@ -23,6 +23,9 @@ export function App() {
   const [expanded, setExpanded] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [floatingState, setFloatingState] = useState<FloatingWindowState>({ expanded: false, horizontal: "right", vertical: "down", docked: undefined });
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyItems, setHistoryItems] = useState<readonly OrbSessionHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const drag = useRef<{ pointerId: number; startX: number; startY: number; offsetX: number; offsetY: number; moved: boolean } | null>(null);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const streaming = useRef("");
@@ -45,7 +48,6 @@ export function App() {
       collapseTimer.current = null;
     }
   }, []);
-  const refresh = useCallback(async () => { const next = await bridge.refreshConnection(); setStatus(next); setDesktopTask(next.desktopTask); }, [bridge]);
   const setExpandedState = useCallback(async (next: boolean) => {
     if (next) clearCollapseTimer();
     try {
@@ -74,6 +76,23 @@ export function App() {
       setBusy(false);
     } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); }
   }, [bridge, busy]);
+  const loadHistory = useCallback(async () => {
+    setHistoryOpen(true);
+    setHistoryLoading(true);
+    const result = await bridge.listSessionHistory();
+    setHistoryLoading(false);
+    if (!result.ok) { setNotice(result.message); return; }
+    setHistoryItems(result.sessions);
+  }, [bridge]);
+  const openHistory = useCallback(async (sessionId: string) => {
+    const result = await bridge.openSessionHistory(sessionId);
+    if (!result.ok) { setNotice(result.message); return; }
+    setMessages(result.messages.map((message: OrbHistoryMessage) => ({ role: message.role, text: message.text })));
+    setHistoryOpen(false);
+    setNotice(null);
+    streaming.current = "";
+    setBusy(false);
+  }, [bridge]);
   const send = useCallback(async () => {
     const text = draft.trim(); if (!text || busy || generation === 0) return;
     setDraft(""); setNotice(null); streaming.current = ""; setMessages((current) => [...current, { role: "user", text }]); setBusy(true);
@@ -119,7 +138,7 @@ export function App() {
     onPointerLeave={() => scheduleCollapse()}
   >
     <header className="orb__header">
-      <button type="button" className="orb__round-button" onClick={() => void refresh()} title="Refresh connection" aria-label="Refresh connection">◷</button>
+      <button type="button" className="orb__round-button" onClick={() => void loadHistory()} title="Conversation history" aria-label="Conversation history">◷</button>
       <button type="button" className="orb__permission" onClick={() => setControlsOpen((open) => !open)} aria-expanded={controlsOpen} title="Open Orb controls"><span className={`orb__status-dot ${status?.piWeb.reachable ? "orb__status-dot--live" : ""}`} />{desktopTask?.authorized ? "Desktop access" : "Orb access"}<span className="orb__chevron">⌄</span></button>
       <button type="button" className="orb__round-button" onClick={() => void newConversation()} title="New conversation" aria-label="New conversation" disabled={busy}>+</button>
     </header>
@@ -134,6 +153,7 @@ export function App() {
     </>}
 
     <img src={avatarUrl} alt="pi-orb" className="orb__avatar" />
+    {historyOpen && status?.configured && <section className="orb__history" aria-label="Conversation history"><div className="orb__control-heading"><strong>History</strong><button type="button" className="orb__close" onClick={() => setHistoryOpen(false)} aria-label="Close history">×</button></div>{historyLoading ? <p className="orb__history-empty">Loading…</p> : historyItems.length === 0 ? <p className="orb__history-empty">No saved conversations.</p> : <div className="orb__history-list">{historyItems.map((item) => <button type="button" key={item.sessionId} className="orb__history-row" onClick={() => void openHistory(item.sessionId)}><strong>{item.name || item.firstMessage || "Untitled conversation"}</strong><small>{item.messageCount} messages · {formatHistoryDate(item.modified)}</small></button>)}</div>}</section>}
     {controlsOpen && status?.configured && <section className="orb__controls" aria-label="Orb controls"><div className="orb__control-heading"><strong>Orb controls</strong><button type="button" className="orb__close" onClick={() => setControlsOpen(false)} aria-label="Close controls">×</button></div><div className="orb__control-section"><span className="orb__eyebrow">DESKTOP TASK</span><strong>{desktopTask?.target?.title ?? "No target selected"}</strong><small>{desktopTask?.authorized ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions` : "Locked until you approve a task"}</small><button type="button" className="orb__button" onClick={() => void loadWindows()}>Choose target</button>{windowChoices && <div className="orb__window-list">{windowChoices.map((choice) => <button key={choice.windowId} type="button" onClick={() => void chooseTarget(choice.windowId)}><strong>{choice.title || choice.appName}</strong><small>{choice.appName}</small></button>)}</div>}<form onSubmit={(event) => { event.preventDefault(); void authorizeDesktop(); }}><input value={taskScope} onChange={(event) => setTaskScope(event.target.value)} placeholder="What may Orb do?" aria-label="Desktop task scope" /><div className="orb__actions"><button type="submit" className="orb__button orb__button--primary" disabled={!taskScope.trim()}>Approve</button><button type="button" className="orb__button" onClick={() => void revokeDesktop()} disabled={!desktopTask?.authorized}>Revoke</button></div></form></div><div className="orb__control-section"><span className="orb__eyebrow">SHORTCUT</span><small>Wake or hide the orb from anywhere.</small><form className="orb__shortcut-form" onSubmit={(event) => { event.preventDefault(); void saveShortcut(); }}><input value={shortcutDraft} onChange={(event) => setShortcutDraft(event.target.value)} placeholder={status.shortcut} aria-label="Wake shortcut" /><button type="submit" className="orb__button" disabled={!shortcutDraft.trim()}>Apply</button></form></div></section>}
     {preview && <section className="orb__preview"><div className="orb__preview-heading"><strong>Review screenshot</strong><button type="button" className="orb__close" onClick={() => void resolveScreenshot(false)} aria-label="Close preview">×</button></div><p>{preview.targetDescription}</p>{preview.targetStale && <p className="orb__notice orb__notice--error">The window changed since capture.</p>}<img className="orb__preview-image" src={preview.dataUrl} alt="Screenshot preview" width={preview.width} height={preview.height} /><small>{preview.width}x{preview.height} · {formatBytes(preview.bytes)} · not sent yet</small><div className="orb__actions"><button type="button" className="orb__button orb__button--primary" onClick={() => void resolveScreenshot(true)}>Send</button><button type="button" className="orb__button" onClick={() => void resolveScreenshot(false)}>Discard</button></div></section>}
     {notice && <p className="orb__notice">{notice}</p>}
@@ -210,3 +230,8 @@ export function App() {
 
 function withStreaming(current: ChatMessage[], text: string): ChatMessage[] { const copy = [...current]; const last = copy[copy.length - 1]; if (last?.role === "assistant") copy[copy.length - 1] = { role: "assistant", text }; else copy.push({ role: "assistant", text }); return copy; }
 function withCompleted(current: ChatMessage[], text: string): ChatMessage[] { return withStreaming(current, text); }
+
+function formatHistoryDate(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}

@@ -28,6 +28,7 @@ pi-orb 的 React renderer 保留 Pi 会话和授权 IPC，但按参考 shell 的
   `floating-window-controller.ts` 接入 pi-orb 主进程；窗口收起会先还原为 96x96 球，配置只保存球位置。
 - 真实多显示器、DPI、锁屏恢复与人工拖动验收仍未完成，因此支持矩阵仍标记为未验证。
 - 参考 `floating.js` 的历史列表依赖 DSH overlay session/history RPC；pi-web adapter 当前只公开当前会话的创建、提示和 SSE，不能伪造跨会话历史，因此首阶段保留 transcript，不增加第二套 history store。
+- P2-03 已改为直接复用 pi-web 的公开 `/api/sessions?summary=1` 与 `/api/sessions/:id`，主进程只暴露精确 Orb workspace 的摘要和 user/assistant 文本；不读取 Pi session 文件，也不复制 pi-web 的 history store。
 - 参考 `observation-frame-window.ts` 是独立的 click-through 原生 overlay；pi-orb 当前没有公开的观察框生命周期契约，本阶段不在 renderer 里画会挡截图的假边框。
 - 参考项目的自定义 avatar 持久化和菜单模型依赖 Desktop profile；当前使用仓库静态 avatar，不扩展 Pi 配置写入。
 

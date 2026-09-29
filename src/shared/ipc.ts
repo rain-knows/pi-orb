@@ -42,6 +42,10 @@ export const IPC = {
   ensureSession: "orb:ensure-session",
   /** Renderer -> main: start a fresh Pi session in the current workspace. */
   newConversation: "orb:new-conversation",
+  /** Renderer -> main: list persisted sessions for the Orb workspace. */
+  listSessionHistory: "orb:list-session-history",
+  /** Renderer -> main: attach the Orb shell to one persisted session. */
+  openSessionHistory: "orb:open-session-history",
   /** Renderer -> main: send a prompt into the Orb session. */
   sendPrompt: "orb:send-prompt",
   /** Renderer -> main: stop the running turn. */
@@ -191,6 +195,27 @@ export interface WorkspaceCandidateResult {
   readonly message: string;
   readonly resolved: string | null;
 }
+
+export interface OrbSessionHistoryItem {
+  readonly sessionId: string;
+  readonly name: string | null;
+  readonly modified: string;
+  readonly firstMessage: string;
+  readonly messageCount: number;
+}
+
+export type ListSessionHistoryResult =
+  | { readonly ok: true; readonly sessions: readonly OrbSessionHistoryItem[] }
+  | { readonly ok: false; readonly message: string };
+
+export interface OrbHistoryMessage {
+  readonly role: "user" | "assistant";
+  readonly text: string;
+}
+
+export type OpenSessionHistoryResult =
+  | { readonly ok: true; readonly sessionId: string; readonly messages: readonly OrbHistoryMessage[] }
+  | { readonly ok: false; readonly message: string };
 
 export const SESSION_EVENT_CHANNEL_NAME = "orb:session-event";
 

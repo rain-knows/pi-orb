@@ -37,6 +37,20 @@ export interface AgentState {
   readonly thinkingLevel: string | null;
 }
 
+export interface PiWebSessionSummary {
+  readonly id: string;
+  readonly cwd: string;
+  readonly name?: string;
+  readonly modified: string;
+  readonly firstMessage: string;
+  readonly messageCount: number;
+}
+
+export interface PiWebHistoryMessage {
+  readonly role: "user" | "assistant";
+  readonly text: string;
+}
+
 export class PiWebError extends Error {
   readonly status: number;
   readonly code?: string;
@@ -129,6 +143,27 @@ export class PiWebClient {
       throw new PiWebError("pi-web did not return a session id.", response.status);
     }
     return sessionId;
+  }
+
+  async listSessions(): Promise<readonly PiWebSessionSummary[]> {
+    const response = await this.#request("/api/sessions?summary=1", { method: "GET" });
+    if (!response.ok) throw new PiWebError("Could not load pi-web session history.", response.status);
+    const body = (await response.json().catch(() => ({}))) as { sessions?: unknown };
+    if (!Array.isArray(body.sessions)) return [];
+    return body.sessions.flatMap((value) => parseSessionSummary(value));
+  }
+
+  async getSessionHistory(sessionId: string): Promise<{ readonly cwd: string; readonly messages: readonly PiWebHistoryMessage[] }> {
+    const response = await this.#request(`/api/sessions/${encodeURIComponent(sessionId)}?tail=80`, { method: "GET" });
+    const body = (await response.json().catch(() => ({}))) as { info?: unknown; context?: unknown; error?: string };
+    if (!response.ok || typeof body.info !== "object" || body.info === null) {
+      throw new PiWebError(body.error ?? "Could not load the selected pi-web session.", response.status);
+    }
+    const info = body.info as Record<string, unknown>;
+    const cwd = typeof info.cwd === "string" ? info.cwd : "";
+    const context = typeof body.context === "object" && body.context !== null ? body.context as Record<string, unknown> : {};
+    const messages = Array.isArray(context.messages) ? context.messages.flatMap((value) => parseHistoryMessage(value)) : [];
+    return { cwd, messages };
   }
 
   async prompt(sessionId: string, text: string, images?: readonly ImageContent[], cwd?: string): Promise<void> {
@@ -281,6 +316,33 @@ export class PiWebClient {
     }
     return headers;
   }
+}
+
+function parseSessionSummary(value: unknown): PiWebSessionSummary[] {
+  if (typeof value !== "object" || value === null) return [];
+  const record = value as Record<string, unknown>;
+  if (typeof record.id !== "string" || typeof record.cwd !== "string" || typeof record.modified !== "string") return [];
+  return [{
+    id: record.id,
+    cwd: record.cwd,
+    ...(typeof record.name === "string" ? { name: record.name } : {}),
+    modified: record.modified,
+    firstMessage: typeof record.firstMessage === "string" ? record.firstMessage : "(no messages)",
+    messageCount: typeof record.messageCount === "number" && Number.isFinite(record.messageCount) ? record.messageCount : 0,
+  }];
+}
+
+function parseHistoryMessage(value: unknown): PiWebHistoryMessage[] {
+  if (typeof value !== "object" || value === null) return [];
+  const record = value as Record<string, unknown>;
+  if (record.role !== "user" && record.role !== "assistant") return [];
+  const content = record.content;
+  const text = typeof content === "string"
+    ? content
+    : Array.isArray(content)
+      ? content.map((part) => typeof part === "object" && part !== null && typeof (part as { text?: unknown }).text === "string" ? (part as { text: string }).text : "").join("")
+      : "";
+  return text.length > 0 ? [{ role: record.role, text }] : [];
 }
 
 /**

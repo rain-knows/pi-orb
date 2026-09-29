@@ -28,6 +28,8 @@ import {
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
   type FloatingWindowState,
+  type ListSessionHistoryResult,
+  type OpenSessionHistoryResult,
 } from "@shared/ipc";
 
 export interface OrbBridge {
@@ -49,6 +51,8 @@ export interface OrbBridge {
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
   ensureSession(): Promise<string>;
   newConversation(): Promise<string>;
+  listSessionHistory(): Promise<ListSessionHistoryResult>;
+  openSessionHistory(sessionId: string): Promise<OpenSessionHistoryResult>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
@@ -80,6 +84,8 @@ const bridge: OrbBridge = {
     ipcRenderer.invoke(IPC.setWorkspace, candidate, createConfirmed),
   ensureSession: () => ipcRenderer.invoke(IPC.ensureSession),
   newConversation: () => ipcRenderer.invoke(IPC.newConversation),
+  listSessionHistory: () => ipcRenderer.invoke(IPC.listSessionHistory),
+  openSessionHistory: (sessionId: string) => ipcRenderer.invoke(IPC.openSessionHistory, sessionId),
   sendPrompt: (request: PromptRequest) => ipcRenderer.invoke(IPC.sendPrompt, request),
   abort: (request: AbortRequest) => ipcRenderer.invoke(IPC.abort, request),
   captureScreenshot: (request: CaptureRequest) =>

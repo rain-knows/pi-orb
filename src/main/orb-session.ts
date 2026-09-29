@@ -114,6 +114,18 @@ export class OrbSessionController {
     return this.ensureSession(workspace);
   }
 
+  /** Attach to an existing persisted Pi session in the same workspace. */
+  async openExistingSession(workspace: string, sessionId: string): Promise<string> {
+    if (this.#running) throw new Error("The current conversation is still running.");
+    this.#closeStream?.();
+    this.#closeStream = null;
+    this.#sessionId = sessionId;
+    this.#workspace = workspace;
+    this.#accumulator = null;
+    this.#deps.emit({ type: "session", sessionId, generation: this.#generation });
+    return sessionId;
+  }
+
   /**
    * Send a prompt, subscribing to the event stream first.
    *
