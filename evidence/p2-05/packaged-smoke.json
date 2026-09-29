@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-29T17:20:11.533Z",
+  "capturedAt": "2026-09-29T23:50:47.755Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790702411533",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790725847755",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -56,7 +56,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -66,7 +66,7 @@
     {
       "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
       "ok": true,
-      "detail": "10 windows, first=\"\""
+      "detail": "9 windows, first=\"\""
     },
     {
       "name": "no desktop-driver failure was reported at startup",
@@ -80,6 +80,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-68156\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/bd23632f-eef1-4015-b567-8333ed83ade5"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-17272\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/21e91874-ed2b-45fe-a5c1-85dc61897afa"
 }

@@ -193,6 +193,10 @@ D:\workself\pi-orb\
 | `DOCK_HOVER_DELAY_MS` | `800` | `floating.js:5` |
 | `DOCK_DRAG_OFF_PX` | `24`（与主进程 `FLOATING_DOCK_DRAG_OFF` 一致） | `floating.js:6` |
 | 拖动判定阈值 | `4px` | `floating.js:1181` |
+| 收起守卫集合 | 命中任一则**不排**收起定时器：`pinned \|\| running \|\| asking() \|\| gatingTcc() \|\| dragging \|\| hasSelectionChip()`；`setExpanded(false)` 另有一份少 `dragging` 的同集，并接受 `force` 绕过 | `floating.js:528`、`:504` |
+| 展开保持集合 | `play = expanded \|\| running \|\| asking() \|\| gatingTcc() \|\| hasSelectionChip()`（头像动效只在此时播） | `floating.js:397` |
+| 停靠 tab 悬停 | `DOCK_HOVER_DELAY_MS` 后才 unsnap，指针离开即取消——扫过 tab 不会把球拉出来 | `floating.js:440-455` |
+| 收起时序 | 指针离开后等 `COLLAPSE_MS` 才收起；面板真正 `hidden` 再等 `ANIMATION_MS` | `floating.js:509-528` |
 | composer 高度 | `72 + 20×3 = 132px` | `floating.js:158-161` |
 | 会话/列表轮询 | `1500ms` | `floating.js:1445` |
 | 事件重连退避 | `500 → 8000ms` | `floating.js:327`、`:1074-1075` |

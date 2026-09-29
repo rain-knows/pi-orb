@@ -152,3 +152,51 @@ describe("ported shell stays free of the abandoned naming", () => {
     expect(app).not.toMatch(/orb--/u);
   });
 });
+
+describe("ported interaction timings and guards", () => {
+  // The reference's `floating.js` opens with four timing constants (:3-6) that its state machine
+  // reads. They are what the gesture feels like, so a value drifting here is a product change, not a
+  // detail — pi-orb had the collapse delay at 480ms against the reference's 180ms.
+  it("keeps the reference interaction timings", () => {
+    expect(app).toMatch(/const COLLAPSE_MS = 180;/u);
+    expect(app).toMatch(/const ANIMATION_MS = 300;/u);
+    expect(app).toMatch(/const DOCK_HOVER_DELAY_MS = 800;/u);
+  });
+
+  it("uses the timing constants instead of repeating the numbers", () => {
+    // A bare 300 or 800 next to the constants would mean one call site was missed.
+    expect(app).toMatch(/setTimeout\(\(\) => setPanelHidden\(true\), ANIMATION_MS\)/u);
+    expect(app).toMatch(/\}, COLLAPSE_MS\)/u);
+    expect(app).toMatch(/\}, DOCK_HOVER_DELAY_MS\)/u);
+  });
+
+  it("keeps the reference's collapse guard states", () => {
+    // `scheduleCollapse` must refuse to schedule while these hold (floating.js:528). pi-orb adds its
+    // own overlays, which the reference expresses through its own surfaces.
+    const guard = app.slice(app.indexOf("const scheduleCollapse"), app.indexOf("const scheduleCollapse") + 1400);
+    for (const state of ["pinned", "busy", "dragging", "selectionContext", "controlsOpen", "historyOpen", "preview"]) {
+      expect(guard, state).toMatch(new RegExp(String.raw`\b${state}\b`, "u"));
+    }
+  });
+
+  it("tracks dragging as state, not only as a ref", () => {
+    // The guard reads it during render, so a ref alone would let a hover-leave collapse the panel
+    // mid-drag without React ever re-evaluating the guard.
+    expect(app).toMatch(/const \[dragging, setDragging\] = useState\(false\)/u);
+    expect(app).toMatch(/setDragging\(true\)/u);
+    expect(app).toMatch(/setDragging\(false\)/u);
+  });
+
+  it("arms the dock tab on a hover delay and cancels it on leave", () => {
+    // The reference only unsnaps if the pointer is still on the tab when the timer fires.
+    expect(app).toMatch(/onPointerEnter=\{\(\) => \{\s*dockHoverTimer\.current = setTimeout/u);
+    expect(app).toMatch(/onPointerLeave=\{\(\) => \{[\s\S]{0,200}clearTimeout\(dockHoverTimer\.current\)/u);
+  });
+
+  it("sets the theme attribute the way the reference does", () => {
+    // `applyColorScheme` (floating.js:42-47): toggle the attribute and set colorScheme, so the
+    // browser's own widgets follow the theme and not only our palette.
+    expect(app).toMatch(/toggleAttribute\("data-ds-dark-theme", media\.matches\)/u);
+    expect(app).toMatch(/documentElement\.style\.colorScheme/u);
+  });
+});

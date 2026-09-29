@@ -81,6 +81,17 @@
    `hidden` 语义取自参考。
 7. **输入胶囊**：`#composer` 固定 `var(--composer-height)`、圆角 `calc(var(--ball)/2)`、
    四方向偏移、`#prompt` 的 `--prompt-pad`/`--prompt-line`、`body.running` 时隐藏，均取自参考。
+8. **交互时序与收起守卫**（本轮补齐）：
+   - 时序常量改用参考名与参考值：`COLLAPSE_MS = 180`、`ANIMATION_MS = 300`、
+     `DOCK_HOVER_DELAY_MS = 800`（`floating.js:3-6`）。此前收起延时被硬编码为 `480`，
+     慢了约 2.7 倍——这是手感差异，不是无关细节；面板 `hidden` 也改为在 `ANIMATION_MS` 之后。
+   - 收起守卫补上参考的 `dragging` 与 `hasSelectionChip()`（`floating.js:528`）：
+     拖动球的过程中指针离开不得收起面板，面板里还挂着选区上下文时也不得收起。
+     `dragging` 因此必须是 render state 而非仅 ref，否则守卫在渲染期读不到它。
+   - 停靠 tab 增加 `DOCK_HOVER_DELAY_MS` 悬停延时（`floating.js:440-455`）：指针只是扫过 tab
+     不会把球拉出来，停够 800ms 才 unsnap，离开即取消；点击仍然立即生效。
+   - 两个定时器都在卸载时清理：一个挂起的收体会调用已销毁的 bridge，挂起的 unsnap 会去移动
+     渲染进程已不再拥有的窗口。
 
 ## 未直接复用及原因（逐条）
 
@@ -108,7 +119,7 @@
 
 | 项 | 证据 |
 |---|---|
-| 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（11 条） |
+| 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（17 条，含时序常量与收起守卫集合） |
 | 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（15/15，含本节新增 4 条） |
 | **停靠滑动真的在动**（拖动到边缘后 dock，采样到 9 帧不同位置，从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 同上，`the dock gesture slides the window off the edge instead of snapping it` |
 | 缓动曲线、时长常量、矩形插值取整 | `tests/floating-dock-animation.test.ts`（4 条） |

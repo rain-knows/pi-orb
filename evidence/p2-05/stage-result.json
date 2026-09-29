@@ -1,28 +1,28 @@
 {
-  "capturedAt": "2026-09-29T17:19:48.542Z",
+  "capturedAt": "2026-09-29T23:50:20.119Z",
   "steps": [
     {
       "name": "build and package the unpacked Windows app",
       "ok": true,
-      "ms": 22700,
+      "ms": 27304,
       "output": "  • downloaded electron zip extracted successfully  output=D:\\workself\\pi-orb\\release\\0.1.0\\win-unpacked |   • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • updating asar integrity executable resource  executablePath=release\\0.1.0\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0\\win-unpacked\\pi-orb.exe"
     },
     {
       "name": "audit the packaged artifact",
       "ok": true,
-      "ms": 200,
+      "ms": 231,
       "output": "  }, |   \"failed\": [], |   \"passedCount\": 25 | }"
     },
     {
       "name": "start the packaged application and drive its renderer",
       "ok": true,
-      "ms": 3704,
+      "ms": 3780,
       "output": "      \"detail\": \"none\" |     } |   ] | }"
     }
   ],
   "passed": true,
   "artifactAudit": {
-    "capturedAt": "2026-09-29T17:20:11.400Z",
+    "capturedAt": "2026-09-29T23:50:47.597Z",
     "version": "0.1.0",
     "appRoot": "release/0.1.0/win-unpacked",
     "entries": {
@@ -64,7 +64,7 @@
     ],
     "sizes": {
       "executableBytes": 246090752,
-      "asarBytes": 9303985,
+      "asarBytes": 9305109,
       "unpackedNativeBytes": 2658109,
       "archiveEntryCount": 135
     },
@@ -102,7 +102,7 @@
       {
         "name": "the archive contains the built renderer assets",
         "ok": true,
-        "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-D-Mn2T8e.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
+        "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-SPBuL9wt.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
       },
       {
         "name": "the archive ships no src/ files",
@@ -198,9 +198,9 @@
     "passed": true
   },
   "packagedSmoke": {
-    "capturedAt": "2026-09-29T17:20:11.533Z",
+    "capturedAt": "2026-09-29T23:50:47.755Z",
     "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790702411533",
+    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790725847755",
     "checks": [
       {
         "name": "the packaged application stays alive",
@@ -255,7 +255,7 @@
       {
         "name": "the dock gesture slides the window off the edge instead of snapping it",
         "ok": true,
-        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
+        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
       },
       {
         "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -265,7 +265,7 @@
       {
         "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
         "ok": true,
-        "detail": "10 windows, first=\"\""
+        "detail": "9 windows, first=\"\""
       },
       {
         "name": "no desktop-driver failure was reported at startup",
@@ -279,8 +279,8 @@
       }
     ],
     "passed": true,
-    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-68156\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/bd23632f-eef1-4015-b567-8333ed83ade5"
+    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-17272\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/21e91874-ed2b-45fe-a5c1-85dc61897afa"
   },
   "installer": "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
 }

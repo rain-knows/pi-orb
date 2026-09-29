@@ -12,6 +12,34 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ### Fixed
 
+- **Three interaction behaviours in the floating shell had drifted from the reference's state
+  machine**, found by comparing the renderer against `floating.js` the way the stylesheet and the
+  window geometry were compared:
+
+  - **The collapse delay was 480ms; the reference's is 180ms** (`COLLAPSE_MS`, `floating.js:3`). A
+    pointer leaving the panel took almost three times as long to close it, which reads as the panel
+    sticking open. The timings now live under the reference's names — `COLLAPSE_MS` (180),
+    `ANIMATION_MS` (300), `DOCK_HOVER_DELAY_MS` (800) — and the panel's `hidden` is applied after
+    `ANIMATION_MS` rather than a repeated literal.
+  - **Two of the reference's collapse guards were missing** (`floating.js:528`:
+    `pinned || running || asking() || gatingTcc() || dragging || hasSelectionChip()`). pi-orb had
+    `pinned`/`busy` but not `dragging` or the selection chip's, so a pointer leaving during a drag
+    could collapse the panel under the pointer, and a panel holding attached context could close
+    while the user was reviewing it. `dragging` is now render state rather than only a ref, because
+    the guard is evaluated during render.
+  - **The dock tab had no hover delay.** The reference waits `DOCK_HOVER_DELAY_MS` on the tab and
+    only unsnaps if the pointer is still there when it fires (`floating.js:440-455`), so a pointer
+    crossing the tab does not pull the orb back out. Clicking the tab remains immediate.
+
+  Both timers are now cleared on unmount: a pending collapse would call into a disposed bridge, and
+  a pending unsnap would move a window the renderer no longer owns.
+
+  Guarded by extending `tests/renderer-reference-parity.test.ts` to 17 cases, which pin the three
+  timing constants, that they are *used* rather than restated, the full guard set, that `dragging` is
+  state, the dock hover arm/cancel pair, and the theme attribute's `toggleAttribute` + `colorScheme`
+  form. Falsified by setting `COLLAPSE_MS` back to the previous 480 — the check fails and passes
+  again when restored.
+
 Defects found by driving the real product instead of the internal APIs, with a real foreground window
 available:
 

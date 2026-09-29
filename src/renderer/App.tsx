@@ -17,6 +17,20 @@ import avatarUrl from "./orb-avatar.png";
 interface ChatMessage { readonly role: "user" | "assistant" | "error"; readonly text: string }
 interface PreviewState { readonly observationId: string; readonly dataUrl: string; readonly width: number; readonly height: number; readonly bytes: number; readonly targetDescription: string; readonly targetStale: boolean }
 
+/**
+ * Renderer interaction timings, under the reference's own names
+ * (`deepseek-harness-orb` commit 72f1d73, `apps/desktop/renderer/floating.js:3-6`).
+ *
+ * `COLLAPSE_MS` is how long the panel waits after a pointer leaves before it collapses; pi-orb had
+ * this hardcoded at 480ms, which is slower enough to change the feel. `ANIMATION_MS` is the panel's
+ * reveal duration and must match the `transition` in `styles.css`. `DOCK_HOVER_DELAY_MS` is how long
+ * the pointer must rest on the dock tab before it pulls the ball back out, so a pointer merely
+ * crossing the tab does not unsnap it.
+ */
+const COLLAPSE_MS = 180;
+const ANIMATION_MS = 300;
+const DOCK_HOVER_DELAY_MS = 800;
+
 export function App() {
   const bridge = useMemo(() => getBridge(), []);
   const [status, setStatus] = useState<WorkspaceStatus | null>(null);
@@ -37,8 +51,12 @@ export function App() {
   const [historyItems, setHistoryItems] = useState<readonly OrbSessionHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [selectionContext, setSelectionContext] = useState<OrbSelectionContext | null>(null);
+  // Whether the ball is mid-drag. The reference keeps this in a `dragging` flag its collapse guard
+  // reads (floating.js:528), so it has to be render state rather than only the drag ref below.
+  const [dragging, setDragging] = useState(false);
   const drag = useRef<{ pointerId: number; startX: number; startY: number; offsetX: number; offsetY: number; moved: boolean } | null>(null);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dockHoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const streaming = useRef("");
   const generation = status?.generation ?? 0;
 
@@ -74,12 +92,21 @@ export function App() {
   }, [bridge, clearCollapseTimer]);
   const scheduleCollapse = useCallback((allowPinned = false) => {
     clearCollapseTimer();
-    if ((!allowPinned && pinned) || busy || controlsOpen || historyOpen || preview) return;
+    // The reference's guard set (floating.js:528) is `pinned || running || asking() || gatingTcc()
+    // || dragging || hasSelectionChip()`. Mapped to pi-orb: `pinned`/`busy` are the same states,
+    // `asking()`/`gatingTcc()` are the reference's question card and macOS permission gate (no pi-orb
+    // counterpart), and the two that were missing are ported here —
+    //   - `dragging`: a hover-leave while the ball is being dragged must not collapse the panel
+    //     mid-gesture, and
+    //   - `hasSelectionChip()`: a panel holding attached context stays open while the user reviews it.
+    // pi-orb also holds the panel open for its own overlays (controls/history/preview), which the
+    // reference expresses through its own surfaces.
+    if ((!allowPinned && pinned) || busy || dragging || selectionContext || controlsOpen || historyOpen || preview) return;
     collapseTimer.current = setTimeout(() => {
       collapseTimer.current = null;
       void setExpandedState(false);
-    }, 480);
-  }, [busy, clearCollapseTimer, controlsOpen, historyOpen, pinned, preview, setExpandedState]);
+    }, COLLAPSE_MS);
+  }, [busy, clearCollapseTimer, controlsOpen, dragging, historyOpen, pinned, preview, selectionContext, setExpandedState]);
   // Hover drives expansion at the window edge, the way the reference wires it: the listeners sit on
   // `document.body` because the panel and the ball are siblings and the pointer crosses the gap
   // between them while the panel animates open.
@@ -166,7 +193,15 @@ export function App() {
   const revokeDesktop = useCallback(async () => { setDesktopTask(await bridge.revokeDesktopTask()); setNotice("Desktop authorization revoked."); }, [bridge]);
   const saveShortcut = useCallback(async () => { const candidate = shortcutDraft.trim(); if (!candidate) return; const next = await bridge.setShortcut(candidate); setStatus(next); setShortcutDraft(""); setNotice(next.shortcutRegistered ? `Wake shortcut set to ${next.shortcut}.` : next.shortcutProblem); }, [bridge, shortcutDraft]);
 
-  useEffect(() => () => clearCollapseTimer(), [clearCollapseTimer]);
+  // Both timers outlive a pointer gesture, so neither may survive unmount: a pending collapse would
+  // call into a disposed bridge, and a pending unsnap would move a window the renderer no longer owns.
+  useEffect(() => () => {
+    clearCollapseTimer();
+    if (dockHoverTimer.current !== null) {
+      clearTimeout(dockHoverTimer.current);
+      dockHoverTimer.current = null;
+    }
+  }, [clearCollapseTimer]);
 
   // Layout state is expressed on `body`, the way the reference does it, so the stylesheet owns
   // placement and React owns only the state. There is one mechanism for one state model: every state
@@ -276,17 +311,17 @@ export function App() {
     </>
   );
 
-  // The reference reveals the panel by unhiding it and *then* adding `expanded`, so the 300ms
-  // opacity/scale transition actually runs; on collapse it removes `expanded` first and only hides
-  // the element after the transition. Deriving `hidden` straight from the expanded flag would cut
-  // the animation, so the delay is part of the port.
+  // The reference reveals the panel by unhiding it and *then* adding `expanded`, so the reveal
+  // transition actually runs; on collapse it removes `expanded` first and only hides the element
+  // after `ANIMATION_MS` (floating.js:509-520). Deriving `hidden` straight from the expanded flag
+  // would cut the animation, so the delay is part of the port.
   const [panelHidden, setPanelHidden] = useState(true);
   useEffect(() => {
     if (expanded) {
       setPanelHidden(false);
       return;
     }
-    const timer = setTimeout(() => setPanelHidden(true), 300);
+    const timer = setTimeout(() => setPanelHidden(true), ANIMATION_MS);
     return () => clearTimeout(timer);
   }, [expanded]);
 
@@ -323,6 +358,9 @@ export function App() {
       }}
       onPointerDown={(event) => {
         clearCollapseTimer();
+        // The reference sets `dragging = true` here and clears it on release; its collapse guard
+        // reads that flag, so a hover-leave mid-drag cannot collapse the panel under the pointer.
+        setDragging(true);
         event.currentTarget.setPointerCapture(event.pointerId);
         const bounds = event.currentTarget.getBoundingClientRect();
         drag.current = {
@@ -349,6 +387,7 @@ export function App() {
           .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
       }}
       onPointerUp={(event) => {
+        setDragging(false);
         if (drag.current?.pointerId !== event.pointerId) return;
         if (drag.current.moved) {
           void bridge.clampFloatingBall()
@@ -358,6 +397,7 @@ export function App() {
         event.currentTarget.releasePointerCapture(event.pointerId);
       }}
       onPointerCancel={() => {
+        setDragging(false);
         drag.current = null;
         void bridge.clampFloatingBall()
           .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
@@ -369,6 +409,23 @@ export function App() {
       id="dock-tab"
       type="button"
       hidden={!floatingState.docked}
+      // The reference arms a `DOCK_HOVER_DELAY_MS` timer on the tab and only unsnaps when it fires
+      // (floating.js:440-455), so a pointer merely crossing the tab does not pull the orb back out.
+      // Clicking stays immediate.
+      onPointerEnter={() => {
+        dockHoverTimer.current = setTimeout(() => {
+          dockHoverTimer.current = null;
+          void bridge.unsnapFloatingBall()
+            .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
+            .catch((error: unknown) => setNotice(error instanceof Error ? error.message : String(error)));
+        }, DOCK_HOVER_DELAY_MS);
+      }}
+      onPointerLeave={() => {
+        if (dockHoverTimer.current !== null) {
+          clearTimeout(dockHoverTimer.current);
+          dockHoverTimer.current = null;
+        }
+      }}
       onClick={() => {
         void bridge.unsnapFloatingBall()
           .then((state) => { setFloatingState(state); setExpanded(state.expanded); })
