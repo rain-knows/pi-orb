@@ -539,12 +539,26 @@ body.expand-down #history-list {
   box-shadow: var(--ball-shadow);
 }
 
+/* The reference sets its headings explicitly (`#question-title` 14px/600, `#tcc-title` 15px/600);
+   an unstyled h1 would fall back to the browser's 2em, which is what it did here. */
+.empty-state h1 {
+  margin: 18px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--black);
+}
+
 .empty-state p {
   max-width: 240px;
-  margin: 15px 0 0;
+  margin: 10px 0 0;
   font-size: 13px;
   line-height: 1.55;
   color: var(--pin);
+}
+
+.empty-state .pill-button {
+  margin-top: 18px;
 }
 
 /* ----------------------------------------------------------------------------------------------

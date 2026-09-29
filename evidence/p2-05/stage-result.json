@@ -1,28 +1,28 @@
 {
-  "capturedAt": "2026-09-29T16:28:45.753Z",
+  "capturedAt": "2026-09-29T16:48:46.723Z",
   "steps": [
     {
       "name": "build and package the unpacked Windows app",
       "ok": true,
-      "ms": 22449,
+      "ms": 22012,
       "output": "  • downloaded electron zip extracted successfully  output=D:\\workself\\pi-orb\\release\\0.1.0\\win-unpacked |   • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • updating asar integrity executable resource  executablePath=release\\0.1.0\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0\\win-unpacked\\pi-orb.exe"
     },
     {
       "name": "audit the packaged artifact",
       "ok": true,
-      "ms": 179,
+      "ms": 177,
       "output": "  }, |   \"failed\": [], |   \"passedCount\": 25 | }"
     },
     {
       "name": "start the packaged application and drive its renderer",
       "ok": true,
-      "ms": 2670,
+      "ms": 2660,
       "output": "      \"detail\": \"none\" |     } |   ] | }"
     }
   ],
   "passed": true,
   "artifactAudit": {
-    "capturedAt": "2026-09-29T16:29:08.338Z",
+    "capturedAt": "2026-09-29T16:49:08.871Z",
     "version": "0.1.0",
     "appRoot": "release/0.1.0/win-unpacked",
     "entries": {
@@ -64,7 +64,7 @@
     ],
     "sizes": {
       "executableBytes": 246090752,
-      "asarBytes": 9300827,
+      "asarBytes": 9301187,
       "unpackedNativeBytes": 2658109,
       "archiveEntryCount": 135
     },
@@ -102,7 +102,7 @@
       {
         "name": "the archive contains the built renderer assets",
         "ok": true,
-        "detail": "out/renderer/assets/index-C15JR72u.css, out/renderer/assets/index-CaBNKp92.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
+        "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-cOYs_6mu.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
       },
       {
         "name": "the archive ships no src/ files",
@@ -198,9 +198,9 @@
     "passed": true
   },
   "packagedSmoke": {
-    "capturedAt": "2026-09-29T16:29:08.474Z",
+    "capturedAt": "2026-09-29T16:49:09.001Z",
     "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790699348474",
+    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790700549001",
     "checks": [
       {
         "name": "the packaged application stays alive",
@@ -269,8 +269,8 @@
       }
     ],
     "passed": true,
-    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-27440\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/01404edd-af83-4114-b274-b9db3cba7f57"
+    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-68672\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/a1435dd7-7c87-4f40-80e0-6b12b07c413d"
   },
   "installer": "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
 }

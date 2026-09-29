@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-29T16:29:08.338Z",
+  "capturedAt": "2026-09-29T16:49:08.871Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
@@ -41,7 +41,7 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 9300827,
+    "asarBytes": 9301187,
     "unpackedNativeBytes": 2658109,
     "archiveEntryCount": 135
   },
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/index-C15JR72u.css, out/renderer/assets/index-CaBNKp92.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
+      "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-cOYs_6mu.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
     },
     {
       "name": "the archive ships no src/ files",
