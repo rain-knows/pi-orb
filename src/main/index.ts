@@ -124,6 +124,17 @@ const recordedTarget = new RecordedTargetStore({
  */
 let desktopTarget: DesktopWindowChoice | null = null;
 
+/**
+ * The target `orb_open_app` moved the task to, when the model switched applications.
+ *
+ * Kept apart from {@link desktopTarget} so "the window the user recorded" and "the window the model
+ * switched to" stay distinguishable: the recorded target is restored as soon as the user picks or
+ * records another window, and both are dropped together when desktop authority is revoked. Only an
+ * application the user already had running can set this; see
+ * `ReferenceWindowsDriver#openApp` and the P2-04 rule in `doc/pi-orb-development-goals.md` §5.
+ */
+let openAppTarget: ReferenceWindowInfo | null = null;
+
 let configPath = "";
 let config: OrbConfig;
 let window: BrowserWindow | null = null;
@@ -343,6 +354,13 @@ async function startDesktop(): Promise<void> {
       backend: createWindowsDesktopBackend(ops),
       ownProcessId: process.pid,
       resolveRecordedTarget: () => {
+        if (openAppTarget) {
+          return {
+            handle: String(openAppTarget.windowId),
+            pid: openAppTarget.pid,
+            title: openAppTarget.title,
+          };
+        }
         if (desktopTarget) {
           return {
             handle: desktopTarget.windowId,
@@ -354,6 +372,15 @@ async function startDesktop(): Promise<void> {
         return target
           ? { handle: target.handle, pid: target.processId, title: target.title }
           : undefined;
+      },
+      onTargetChanged: (target) => {
+        // Reported, not silent: the panel shows the window the next action will land on, and the
+        // user can revoke. `openAppTarget` outranks the recorded window until the user picks one.
+        openAppTarget = target;
+        desktopTarget = toWindowChoice(target);
+        console.log(
+          `[pi-orb] desktop target moved to "${target.title}" (${target.appName}) by an open-app action`,
+        );
       },
       withGuiTurn: async <T>(run: () => Promise<T>): Promise<T> => {
         const current = window;
@@ -658,6 +685,7 @@ function revokeDesktopOperations(reason: string): void {
   // silently reuse a window the user has moved on from. A fresh wake records a fresh target.
   recordedTarget.clear();
   desktopTarget = null;
+  openAppTarget = null;
   if (hadAuthority || hadCapture) {
     console.log(`[pi-orb] desktop operations revoked: ${reason}`);
   }
@@ -1060,6 +1088,8 @@ function registerIpc(): void {
       // Authority is bound to a window, so changing the window cannot keep it.
       desktopBroker?.revoke();
     }
+    // An explicit user choice supersedes whatever an open-app action had switched to.
+    openAppTarget = null;
     desktopTarget = toWindowChoice(match);
     return { ok: true, target: desktopTarget };
   });
@@ -1328,6 +1358,8 @@ async function showOrb(): Promise<void> {
 async function syncDesktopTargetFromRecord(): Promise<void> {
   const snapshot = recordedTarget.snapshot;
   if (!snapshot || !referenceDriver) return;
+  // A window the user records is the user's choice, so it replaces an open-app switch.
+  openAppTarget = null;
   const windows = referenceDriver.listWindows();
   const match = windows.find(
     (window) => window.pid === snapshot.target.processId && window.title === snapshot.target.title,
@@ -1360,6 +1392,7 @@ async function recordDesktopTarget(): Promise<void> {
 
 /** Convert a driver window record into the shape the window shows the user. */
 function toWindowChoice(window: ReferenceWindowInfo): DesktopWindowChoice {
+  const recorded = recordedTarget.snapshot?.target;
   return {
     windowId: String(window.windowId),
     pid: window.pid ?? -1,
@@ -1367,10 +1400,13 @@ function toWindowChoice(window: ReferenceWindowInfo): DesktopWindowChoice {
     title: window.title,
     bounds: window.bounds,
     zIndex: window.zIndex === undefined ? null : String(window.zIndex),
+    // "Recorded" keeps its exact meaning — the window the user recorded before the Orb took
+    // focus. A window the model switched to carries the target without being recorded, so the
+    // picker must not claim the user chose it.
     isRecorded:
-      desktopTarget !== null &&
-      desktopTarget.pid === window.pid &&
-      desktopTarget.title === window.title,
+      recorded !== undefined &&
+      recorded.processId === window.pid &&
+      recorded.title === window.title,
   };
 }
 

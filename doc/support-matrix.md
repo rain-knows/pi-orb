@@ -79,7 +79,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **历史 Cua 拒绝结果解析**：驱动拒绝不能被适配器误报为成功 | 历史探针已验证；当前 broker/参考 backend 有独立拒绝合同 | `tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts` |
 | **按键/鼠标无残留** | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
 | **C6：真实 native 按下中途取消释放** | 已验证；disposable target 自身日志收到 `mouse-down=1`、匹配 `mouse-up=1`，取消错误也正确上报 | `evidence/p1-05/reference-cancel.json`（5/5） |
-| **Orb 工具仅限 Orb 模式**：普通会话无 Orb 工具、Orb 会话恰好七个 | 已验证（provider 实际收到 schema；包含 P2-04 新增动作） | `evidence/p1-06/tool-exposure.json` |
+| **Orb 工具仅限 Orb 模式**：普通会话无 Orb 工具、Orb 会话恰好八个（含 `orb_open_app`） | 已验证（provider 实际收到 schema；包含 P2-04 新增动作） | `evidence/p1-06/tool-exposure.json` |
 | **桌面工具闭环**：授权/预算/新鲜度、拒绝零副作用、真实点击落点为目标格心 | **已验证（当前参考 backend）**；目标枚举、观察、授权、点击、滚动、撤权均由 disposable 目标与壳日志证明 | `evidence/p1-06/loop-verification-reference-backend.json` |
 | 桥准入：无会话/错误令牌/浏览器来源/旧代次均被拒 | 已验证 | `evidence/p1-06/` + `tests/bridge-server.test.ts` |
 | Orb 扩展仅凭握手文件连接壳的命名管道：无需额外设置 `PI_ORB_BRIDGE_PIPE` | 已验证（隔离管道测试 + 当前壳只读探针） | `tests/bridge-client.test.ts`；2026-09-28 `hello.ok=true`，无效会话返回 `unknown-session` |
@@ -96,6 +96,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留 | 已验证（25/25） | `evidence/p2-05/package-audit.json` |
 | **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、`orb:list-desktop-windows` 返回真实窗口（koffi 从 `app.asar.unpacked` 加载） | 已验证（10/10，并做过删除原生二进制后必须失败的反向对照） | `evidence/p2-05/packaged-smoke.json` |
 | **参考项目 Windows 后端自带的规格测试已移植**：窗口选择 10 条不变量 + 输入 13 条（键映射、UIPI 拒绝、剪贴板顺序、滚轮档位、PNG 头等） | 已验证（23/23，逐条对应参考 spec） | `tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts` |
+| **`orb_open_app` 的收窄语义**：只激活已在运行的应用、不启动进程；`name` 拒绝路径／参数片段／shell 元字符；激活后必须验证前台窗口确属该应用才重绑定 | 已验证（自动化：前置检查失败、前台不匹配、`launch` 不可达三条失败路径均有断言） | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`evidence/p1-06/tool-exposure.json` |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -130,6 +131,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **未签名安装包的 SmartScreen 提示与绕过体验** | v0.1 不做代码签名；提示文案与用户侧行为需真实环境 | 未验证；不得宣称"可直接分发" |
 | **卸载后的用户数据与工作区保留** | 需要一次真实的安装→使用→卸载流程 | 未验证；代码侧写入面已由发布门禁审计（只写 Orb userData 与用户确认的工作区） |
 | **安装后的浮球观感、真实按键、多屏、DPI** | 属 P2-01/P1 人工项，打包不改变其状态 | 未验证 |
+| **`orb_open_app` 的真实桌面效果** | 切换应用、新目标窗口的前台验证与面板显示需要在 disposable target 上真机确认 | 未验证；步骤见 `doc/manual-acceptance.md` §10（F 组） |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）
 

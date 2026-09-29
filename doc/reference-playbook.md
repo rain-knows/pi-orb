@@ -13,7 +13,7 @@
 | 我要做的事 | 先看本文件 | 主要参考文件 | 主要落点 |
 |---|---|---|---|
 | 改浮球／面板的尺寸、停靠、hover、拖动 | §5.2–§5.5 | `apps/desktop/src/floating-window.ts`、`renderer/floating.{html,css,js}` | `src/main/floating-*.ts`、`src/renderer/*` |
-| 新增或修改桌面工具 | §7.1–§7.3、§10.2 | `tool-computer-use/src/plugin.ts`（同名工具） | `src/shared/orb-tools.ts`、`pi-package/extensions/orb.ts`、`src/main/desktop-*.ts` |
+| 新增或修改桌面工具 | §7.1–§7.3、§7.5、§10.2 | `tool-computer-use/src/plugin.ts`（同名工具） | `src/shared/orb-tools.ts`、`pi-package/extensions/orb.ts`、`src/main/desktop-*.ts` |
 | 改坐标、DPI、滚轮/点击落点 | §6.3、§7.4、§10.3 | `coordinates.ts`、`coordinate-mode.ts`、`windows-native.ts` | `reference-windows-driver.ts`、`reference-windows/*` |
 | 接入参考后端的未用方法或像素编码 | §6.2 | `backend.ts`、`coordinate-mode.ts`、`observe.ts` | `reference-windows-driver.ts`、`orb-tools.ts` |
 | 改授权、撤权、取消、生命周期 | §8、§10.4 | `plugin.ts`（turn/end）、`overlay-guard.ts` | `src/main/index.ts`、`window-lifecycle.ts`、`desktop-broker.ts` |
@@ -308,8 +308,8 @@ D:\workself\pi-orb\
 | `drag` | `start/end position`（可跨屏） | `orb_drag`（同窗口） | pi-orb 明确不支持跨屏；保持现状并在 schema 描述中写明 |
 | `wait` | 无参数，固定 1 秒后重新观察 | 无 | **建议移植**：等待后必须给新观察，是“一动作一观察”的组成部分 |
 | `long_wait` | `wait_seconds ∈ {10,30,60,120}` | 无 | **建议移植**：给长耗时可见任务一个受限等待面 |
-| `list_apps` | 无参数 | 无 | 可选；pi-orb 目标由用户指定，价值取决于 P2 是否开放 `open_app` |
-| `open_app` | `name` | 无 | 已在 `pi-orb-development-goals.md` P2-04 标注“目标重绑定规则确定前不开放” |
+| `list_apps` | 无参数 | 无 | 可选；pi-orb 的驱动器内部用 `ops.listWindowApps()` 做 open-app 的运行前置检查，不单独暴露工具 |
+| `open_app` | `name`（参考：显示名或 bundle id；**激活或启动**） | `orb_open_app`（`name`；**只激活**） | **已开放，但按用户决定收窄**：参考的 `activateApp` 失败后会 `launch`，pi-orb 只保留前半段。规则见 §7.5 |
 | `open_in_browser` | 可选 `url`（仅 http(s)） | 无 | 可选；移植时必须保留 URL 校验 |
 | `open_in_finder` | `path`、`reveal_only` | `orb` 无；仅有 `screenshot-export.ts` 的保存对话框 | Windows 对应 `open_in_explorer`；移植时必须保留路径解析与 realpath 校验 |
 | `screenshot` | 保存到 Desktop + 写剪贴板，返回路径 | `src/main/screenshot-export.ts`（显式用户导出） | pi-orb 的产品规则是“用户确认后导出”，**不照搬自动写桌面+剪贴板**；仅复用其文件命名/像素校验思路 |
@@ -369,6 +369,28 @@ D:\workself\pi-orb\
 
 未移植但已具备实现条件的（按需要取用）：`raster.ts`（头部校验）、`screenshot.ts`（`Desktop/Screenshot YYYY-MM-DD at HH.MM.SS.png`，冲突后缀 2–100 后报错）、`open.ts`（URL/路径校验）、`wait-args.ts`（等待取值）。
 
+### 7.5 `orb_open_app` 的目标重绑定规则（pi-orb 收窄，非参考语义）
+
+参考工具的语义是“把正在运行的应用前置，**或者启动它**”（`<REF>/src/windows.ts:398-404`：
+`activateApp` 失败即 `launch`）。pi-orb 只保留前半段：当用户记录了一个窗口并授权一次任务时，
+“启动一个新进程”是用户没有授予的原生权限，因此这条路径上 `launch` 必须不可达。
+
+判定顺序（三步全过才重绑定，任一步失败都保留原目标并使动作失败）：
+
+1. **运行前置检查**：`ops.listWindowApps()` 里必须出现匹配项。比较是**基名相等**（
+   `Notepad` == `notepad.exe`，忽略大小写与 `.exe` 后缀），**不是子串匹配**——子串会让
+   “标题里含 notepad 的浏览器窗口”被选中，正是本项目禁止的错目标类型。
+2. **激活**：调用 `ops.activateApp(match)`（返回 `false` 不启动任何东西，与 `backend.openApp`
+   不同）。失败即动作失败。
+3. **前台验证**：激活后前台窗口的应用必须仍等于请求的应用；否则说明前置的不是它，
+   动作失败且**不采纳**前台窗口——驱动绝不“顺手采用当前前台”，那是被禁止的驱动自选目标。
+
+通过后的行为：adopted 窗口成为该任务的新目标，并通过 `onTargetChanged` 上报壳层，面板显示
+新目标标题，用户可随时 Revoke；用户重新选择或记录窗口、以及任何撤权路径都会清掉这个覆盖。
+模型侧 `name` 参数在 `validateAction` 里已拒绝路径、参数样片段、shell 元字符与控制字符，
+`src/main/reference-windows-driver.ts` 的 `#openApp` 是唯一实现点，单测为
+`tests/reference-windows-open-app.test.ts`（含“未运行必须失败且不调用 launch”）。
+
 ## 8. D 面：授权与生命周期
 
 | 参考机制 | 参考位置 | pi-orb 的处理 |
@@ -395,7 +417,7 @@ D:\workself\pi-orb\
 |---|---|---|
 | `coordinates.spec.ts`（10） | 坐标校验、两种编码等价、禁用快捷键、点击修饰键别名与去重 | `tests/coordinate-mapping.test.ts`、`tests/orb-tools.test.ts`；**缺** pixel 模式与 `requireClickModifiers` 别名用例 |
 | `coordinate-mode.spec.ts`（9） | 两种编码切换、栅格缓存与日志重建、pixel 工具描述改写、投影折叠 | 无（像素模式未接入） |
-| `tools.spec.ts`（26） | 13 个工具的往返、`postActionWaitMs` 结算、GUI turn 包裹范围、截图落盘与剪贴板 | `tests/desktop-broker.test.ts`、`orb-tools.test.ts`、`reference-windows-driver.test.ts`、`screenshot-export.test.ts`；**缺** 结算时序、GUI turn 范围、Desktop 落盘/剪贴板 |
+| `tools.spec.ts`（26） | 13 个工具的往返、`postActionWaitMs` 结算、GUI turn 包裹范围、截图落盘与剪贴板 | `tests/desktop-broker.test.ts`、`orb-tools.test.ts`、`reference-windows-driver.test.ts`、`screenshot-export.test.ts`、`reference-windows-open-app.test.ts`（open-app 的前置检查／激活／前台验证三步）；**缺** 结算时序、GUI turn 范围、Desktop 落盘/剪贴板 |
 | `observe.spec.ts`（9） | 观察信封与前台标签、`settleMs`、`persistCapture` 过滤、abort 重抛 | `tests/screenshot-flow.test.ts`；**缺** 信封/标签格式与 `requireScreen` 越界文案 |
 | `overlay-guard.spec.ts`（17） | 包裹范围、overlay id 传递、观察框显示/隐藏与 abort、turn 结束收起 | 无；`withGuiTurn` 的窗口隐藏也未测 |
 | `windows-foreground.spec.ts`（10） | 壳类/瞬态过滤、owner 链、同监视器并集、监视器分离 | 仅 1 条经 `tests/reference-windows.test.ts:130-135` 间接覆盖；**9 条未测**（最高优先补） |

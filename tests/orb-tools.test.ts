@@ -48,9 +48,9 @@ describe("Orb tool naming", () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it("exposes the bounded reference hotkey, long-press and drag actions", () => {
+  it("exposes the bounded reference hotkey, long-press, drag and open-app actions", () => {
     expect(Object.values(ORB_TOOLS)).toEqual([
-      "orb_observe", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag",
+      "orb_observe", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app",
     ]);
   });
 });
@@ -198,6 +198,51 @@ describe("validateAction", () => {
     expect(validateAction({ kind: "longPress", observationId: "obs-1", position: point, durationSeconds: 0.5 }, observation(), budget)).toBe("invalid-long-press-duration");
     expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 900, y: 700 } }, observation(), budget)).toBeNull();
     expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 1001, y: 700 } }, observation(), budget)).toBe("needs-element-or-point");
+  });
+});
+
+describe("validateAction: open app", () => {
+  const openApp = (name: string): DesktopAction => ({ kind: "openApp", observationId: "obs-1", name });
+
+  it("accepts a display name or an executable base name", () => {
+    expect(validateAction(openApp("Notepad"), observation(), budget)).toBeNull();
+    expect(validateAction(openApp("notepad.exe"), observation(), budget)).toBeNull();
+    expect(validateAction(openApp("  Explorer  "), observation(), budget)).toBeNull();
+    expect(validateAction(openApp("Microsoft Excel"), observation(), budget)).toBeNull();
+  });
+
+  it("refuses anything that could carry a path, arguments or a command line", () => {
+    // The whole point of the rule: an activation request must not be able to become an execution
+    // request. Every one of these would let a model name a file, add switches or start a shell.
+    for (const name of [
+      "C:\\Windows\\notepad.exe",
+      "..\\..\\notepad.exe",
+      "notepad.exe /A secret.txt",
+      "cmd /c calc",
+      "powershell -Command whoami",
+      "\"notepad\"",
+      "note;pad",
+      "note&pad",
+      "note|pad",
+      "note<pad",
+      "--headless",
+      "-a",
+    ]) {
+      expect(validateAction(openApp(name), observation(), budget)).toBe("invalid-app-name");
+    }
+  });
+
+  it("refuses an empty, whitespace-only or over-long name, and control characters", () => {
+    expect(validateAction(openApp(""), observation(), budget)).toBe("invalid-app-name");
+    expect(validateAction(openApp("   "), observation(), budget)).toBe("invalid-app-name");
+    expect(validateAction(openApp("a".repeat(ORB_LIMITS.maxAppNameLength + 1)), observation(), budget)).toBe("invalid-app-name");
+    expect(validateAction(openApp("note\u0000pad"), observation(), budget)).toBe("invalid-app-name");
+    expect(validateAction(openApp("note\npad"), observation(), budget)).toBe("invalid-app-name");
+  });
+
+  it("still requires a live observation, like every other action", () => {
+    expect(validateAction(openApp("Notepad"), null, budget)).toBe("observation-unknown");
+    expect(validateAction({ kind: "openApp", observationId: "obs-old", name: "Notepad" }, observation(), budget)).toBe("stale-observation");
   });
 });
 

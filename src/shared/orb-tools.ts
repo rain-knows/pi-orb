@@ -33,6 +33,7 @@ export const ORB_TOOLS = {
   hotkey: "orb_hotkey",
   longPress: "orb_long_press",
   drag: "orb_drag",
+  openApp: "orb_open_app",
 } as const;
 
 export type OrbToolName = (typeof ORB_TOOLS)[keyof typeof ORB_TOOLS];
@@ -159,7 +160,21 @@ export interface DragAction {
   readonly endPosition: ScreenshotPosition;
 }
 
-export type DesktopAction = ClickAction | TypeAction | ScrollAction | HotkeyAction | LongPressAction | DragAction;
+/**
+ * Bring an already running application to the foreground and continue against its window.
+ *
+ * pi-orb narrows the reference `open_app` to activation only: launching a process is new native
+ * authority the user never granted, so the driver refuses to start anything and fails when the
+ * application is not already running. See `doc/pi-orb-development-goals.md` §5 (P2-04).
+ */
+export interface OpenAppAction {
+  readonly kind: "openApp";
+  readonly observationId: string;
+  /** Display name or executable base name of an application that is already running. */
+  readonly name: string;
+}
+
+export type DesktopAction = ClickAction | TypeAction | ScrollAction | HotkeyAction | LongPressAction | DragAction | OpenAppAction;
 
 /** Hard limits. Never "unlimited": a desktop task must be bounded. */
 export const ORB_LIMITS = {
@@ -180,6 +195,8 @@ export const ORB_LIMITS = {
   maxElementsPerObservation: 60,
   /** Maximum characters of an element label kept in an observation. */
   maxElementLabelLength: 80,
+  /** Maximum application label accepted by `orb_open_app`. */
+  maxAppNameLength: 80,
 } as const;
 
 /** Why an action was refused. Every value is a distinct, reportable reason. */
@@ -199,6 +216,7 @@ export type ActionRefusal =
   | "invalid-hotkey"
   | "forbidden-hotkey"
   | "invalid-long-press-duration"
+  | "invalid-app-name"
   | "observation-unknown"
   | "busy";
 
@@ -222,6 +240,8 @@ const REFUSAL_MESSAGES: Record<ActionRefusal, string> = {
   "invalid-hotkey": "Provide a supported key chord with one to four keys, including a non-modifier key.",
   "forbidden-hotkey": "System screenshot shortcuts are not allowed.",
   "invalid-long-press-duration": `Long press duration must be between ${ORB_LIMITS.minLongPressSeconds} and ${ORB_LIMITS.maxLongPressSeconds} seconds.`,
+  "invalid-app-name":
+    "Provide an application display name or executable base name, without a path, arguments or control characters.",
   "observation-unknown": "That observation is not known to this session. Observe the window first.",
   busy: "Orb is already running a task. Wait for it to finish or stop it first.",
 };
@@ -279,6 +299,23 @@ export function validateAction(
   if (action.kind === "drag") {
     if (!isUsablePosition(action.startPosition) || !isUsablePosition(action.endPosition)) {
       return "needs-element-or-point";
+    }
+    return null;
+  }
+
+  if (action.kind === "openApp") {
+    // An application label, never a command line. Paths, separators, quotes, shell metacharacters
+    // and leading dashes are refused before the driver ever sees the action, so a model cannot
+    // smuggle arguments into an activation request.
+    const name = action.name.trim();
+    if (name.length === 0 || name.length > ORB_LIMITS.maxAppNameLength) return "invalid-app-name";
+    if (/[\\/:"';|&<>]/u.test(name) || name.startsWith("-")) return "invalid-app-name";
+    // An argument-looking segment, e.g. "powershell -Command whoami" or "app /silent": an
+    // application label never contains one, and accepting it would turn an activation into a
+    // command line.
+    if (/\s[-/]/u.test(name)) return "invalid-app-name";
+    if ([...name].some((character) => character.charCodeAt(0) < 0x20 || character.charCodeAt(0) === 0x7f)) {
+      return "invalid-app-name";
     }
     return null;
   }

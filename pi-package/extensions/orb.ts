@@ -158,6 +158,18 @@ const DRAG_PARAMS = Type.Object(
   { additionalProperties: false },
 );
 
+const OPEN_APP_PARAMS = Type.Object(
+  {
+    observation_id: Type.String({ description: "The observation_id this action was decided from." }),
+    name: Type.String({
+      minLength: 1,
+      maxLength: ORB_LIMITS.maxAppNameLength,
+      description: "Display name or executable base name of an application that is already running, for example Notepad.",
+    }),
+  },
+  { additionalProperties: false },
+);
+
 /** Read the Orb configuration, or `null` when it is absent, unreadable or malformed. */
 export function readOrbConfig(path: string): OrbConfig | null {
   let raw: string;
@@ -326,6 +338,31 @@ export default function orbExtension(pi: ExtensionAPI): void {
           observationId: params.observation_id,
           position: { x: params.x, y: params.y },
           durationSeconds: params.duration_seconds,
+        };
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.openApp,
+      label: "Orb: switch app",
+      // The reference tool activates a running application or launches it. pi-orb only keeps the
+      // first half, so the description has to say so: the model must not promise the user it can
+      // open something that is not already running.
+      description:
+        "Bring an already running application to the foreground and continue against its window. Launching an application that is not running is not available.",
+      promptSnippet: "Switch to an already running application",
+      promptGuidelines: [
+        "Use the application's display name or executable base name, never a path, URL, command line or launch arguments.",
+        "This switches the task to that application's window; use the observation returned by this call for the next action.",
+        "If the application is not already running the call fails and the target is unchanged. Tell the user instead of retrying.",
+      ],
+      parameters: OPEN_APP_PARAMS,
+      async execute(_toolCallId, params, _signal, _onUpdate, toolCtx: ExtensionContext) {
+        const action: DesktopAction = {
+          kind: "openApp",
+          observationId: params.observation_id,
+          name: params.name,
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },

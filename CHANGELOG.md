@@ -71,6 +71,26 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- **`orb_open_app` (P2-04), narrowed on the user's decision: activation only, never launch.** The
+  reference tool brings a running application forward *or starts it*
+  (`tool-computer-use/src/windows.ts:398-404`: `activateApp` falls through to `launch`). Launching a
+  process is native authority the user did not grant when they recorded one window, so pi-orb keeps
+  only the first half. The rule is three checks, all of which must pass before the task is rebound:
+  the application must appear in the running-application list (base-name equality — `Notepad` ==
+  `notepad.exe`, never a substring, so a browser whose *title* mentions the word cannot be selected);
+  `activateApp` must succeed (it returns `false` instead of starting anything); and the resulting
+  foreground window must still belong to that application. A failure at any step leaves the previous
+  target in place, because adopting whatever happens to be in front is exactly the "the driver
+  picked a target" behaviour this project forbids. On success the new window is reported to the
+  shell through `onTargetChanged`, so the panel shows where the next action will land and the user
+  can revoke; recording or picking a window and every revocation path clear it.
+  `validateAction` refuses any label that could carry a path, an argument-looking segment, shell
+  metacharacters or control characters, so an activation request cannot become a command line.
+  Tested in `tests/reference-windows-open-app.test.ts` (including "not running fails and `launch` is
+  never reached") and `tests/orb-tools.test.ts`; the tool set is now eight, re-verified against what
+  the provider actually receives (`evidence/p1-06/tool-exposure.json`, 7/7). The real desktop effect
+  stays manual: `doc/manual-acceptance.md` §10 (F1–F6).
+
 - **Windows distribution (P2-05).** pi-orb can now be built into something you can hand to someone:
   `npm run package:win` produces a per-user NSIS installer and `npm run package:win:dir` an unpacked
   app. The packaging posture is reused from the reference project's

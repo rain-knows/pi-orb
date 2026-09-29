@@ -371,6 +371,13 @@ export function parseAction(value: unknown): ParseResult {
     return { ok: true, action: { kind: "drag", observationId, startPosition, endPosition } };
   }
 
+  if (kind === "openApp") {
+    if (typeof record.name !== "string") {
+      return { ok: false, message: "An open-app action needs an application name." };
+    }
+    return { ok: true, action: { kind: "openApp", observationId, name: record.name } };
+  }
+
   return { ok: false, message: `Unknown action kind: ${String(kind)}` };
 }
 
