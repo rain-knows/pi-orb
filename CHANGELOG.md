@@ -183,6 +183,39 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- `evidence/p1-07/check-provenance.mjs`: the reuse rule is the first rule in `AGENTS.md`, and it runs
+  **both ways** — reused code must record its source commit and licence, and original work must never
+  be described as reused. Both claims lived only in prose file headers, and a header can say
+  "unmodified" while the file has drifted, which is the same defect as a documented constant with no
+  test.
+
+  The check compares every file pi-orb states it ported against the pinned upstream checkout, line by
+  line, and classifies it: `unmodified` (every non-blank pi-orb line appears verbatim upstream),
+  `adapted` (pi-orb-only lines exist, so the header **must** state commit, licence and reason), or
+  `missing`. It is a report rather than a hard gate, because `adapted` is legitimate when the
+  difference is recorded; what it removes is the ability to claim `unmodified` without it being true.
+  With no reference checkout present it reports `skipped` and exits 0, and is not counted as passed.
+
+  It found two real problems on its first run:
+
+  - **Three files reused reference code with no provenance at all** —
+    `src/main/windows-selection.ts`, `windows-selection-native.ts` and `selection-monitor.ts` carried
+    no source commit or licence, which `AGENTS.md` requires. All three now have proper headers naming
+    the upstream file, the pinned commit `72f1d73` and the MIT notice, plus what was adapted.
+  - **A claim that was subtly wrong.** The playbook recorded `wait.ts` as "一致/unmodified"; it
+    actually differs by a 3-line provenance header. It is now recorded as `adapted`, and the honest
+    result of the whole audit is **`unmodified 0`** — every ported file differs from upstream, which
+    is what the report now says instead of a table of "一致".
+
+  Also verified by the same method: `windows.ts`'s 11 timing constants match the reference exactly
+  and in order, and its single deliberate divergence is documented and real — the input paths release
+  held keys and mouse buttons in a `finally` block, where the reference only releases them on the
+  normal path and would leave a key stuck if a cancel landed mid-chord.
+
+  Falsified by replacing the pinned commit hash in `selection-monitor.ts` with zeros: the check
+  reports `adapted-without-provenance 1` and fails, and passes again when restored. The release gate
+  grows 64 → 66 to require both the checker and its report.
+
 - **The shell has a context menu, which fixes a real editing defect rather than adding polish.**
   Electron windows have no default context menu, so before this there was **no way to cut, copy or
   paste in the composer with the mouse** — right-clicking the field did nothing at all. The playbook

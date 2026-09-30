@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-30T00:46:28.423Z",
+  "capturedAt": "2026-09-30T00:55:52.033Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "11458 ms"
+      "detail": "10316 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "7920 ms"
+      "detail": "7604 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "6922 ms"
+      "detail": "7138 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4936 ms"
+      "detail": "4919 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -166,6 +166,16 @@
       "name": "the tests that hold documents to their recorded values exist",
       "ok": true,
       "detail": "a documented constant or count with no test is a claim, not a guarantee"
+    },
+    {
+      "name": "the reference-provenance checker exists",
+      "ok": true,
+      "detail": "porting claims need to be re-runnable against the upstream checkout"
+    },
+    {
+      "name": "every ported file records its reference commit and licence",
+      "ok": true,
+      "detail": "adapted=11 unmodified=0 withoutHeader=0"
     },
     {
       "name": "the agent instructions record the local reference checkout and the playbook entry point",
@@ -334,7 +344,7 @@
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 64,
+    "passed": 66,
     "skipped": 0,
     "failed": 0,
     "version": "0.1.0",

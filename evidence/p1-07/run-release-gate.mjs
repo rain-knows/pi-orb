@@ -396,6 +396,30 @@ check(
   existsSync(join(repo, "tests/playbook-constants.test.ts")) && existsSync(join(repo, "tests/documented-counts.test.ts")),
   "a documented constant or count with no test is a claim, not a guarantee",
 );
+
+// Attribution is a first rule of this project in both directions: reused code must record its source
+// commit and licence, and original work must not be described as reused. A prose header cannot
+// enforce either, so `check-provenance.mjs` compares each ported file against the pinned checkout.
+check(
+  "the reference-provenance checker exists",
+  existsSync(join(repo, "evidence/p1-07/check-provenance.mjs")),
+  "porting claims need to be re-runnable against the upstream checkout",
+);
+{
+  const provenancePath = join(repo, "evidence/p1-07/provenance.json");
+  const provenance = existsSync(provenancePath) ? JSON.parse(readFileSync(provenancePath, "utf8")) : null;
+  check(
+    "every ported file records its reference commit and licence",
+    // `skipped` is the honest answer on a checkout with no reference present, and must not be read as
+    // a pass; either way the report must exist.
+    provenance !== null && (provenance.skipped === true || provenance.adaptedWithoutProvenanceHeader === 0),
+    provenance === null
+      ? "evidence/p1-07/provenance.json is missing; run node evidence/p1-07/check-provenance.mjs"
+      : provenance.skipped === true
+        ? `skipped: ${String(provenance.reason)}`
+        : `adapted=${String(provenance.adapted)} unmodified=${String(provenance.unmodified)} withoutHeader=${String(provenance.adaptedWithoutProvenanceHeader)}`,
+  );
+}
 const agentInstructions = readFileSync(join(repo, "AGENTS.md"), "utf8");
 check(
   "the agent instructions record the local reference checkout and the playbook entry point",

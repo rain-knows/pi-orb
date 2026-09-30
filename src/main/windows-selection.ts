@@ -1,10 +1,16 @@
 /**
  * Windows selection events used by the Orb context chip.
  *
- * This follows deepseek-harness-orb's selection monitor: low-level mouse hooks only
- * provide the selection boundary, while UI Automation reads the selected text from
- * the focused control after the left-button release. No clipboard or synthetic Ctrl+C
- * is involved.
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `apps/desktop/src/windows-selection.ts` (MIT — see `THIRD_PARTY_NOTICES.md` §3.5).
+ *
+ * The mechanism is the reference's: low-level mouse hooks mark the selection boundary, and UI
+ * Automation reads the selected text from the focused control after left-button release. No clipboard
+ * and no synthetic Ctrl+C is involved, which is what keeps this from clobbering the user's clipboard
+ * or racing the application's own copy handling.
+ *
+ * Adapted: pi-orb's context chip and session model replace the reference's selection toolbar and
+ * selection-turn prompt, so this event surface is narrower than the reference's.
  */
 
 export interface WindowsSelectionMessage {

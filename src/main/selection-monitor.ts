@@ -1,4 +1,13 @@
-/** Platform boundary for the native foreground selection monitor. */
+/**
+ * Platform boundary for the native foreground selection monitor.
+ *
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `apps/desktop/src/selection-monitor.ts` (MIT — see `THIRD_PARTY_NOTICES.md` §3.5).
+ *
+ * Adapted: the reference also carries macOS implementations. pi-orb supports Windows x64 only, so the
+ * non-Windows branch returns undefined and the monitor stays disabled rather than pretending to work
+ * on a platform nothing here has been measured on.
+ */
 
 import type { SelectionMonitor, SelectionMonitorHandlers } from "./windows-selection";
 

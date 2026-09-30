@@ -1,4 +1,14 @@
-/** Native Windows selection monitor adapted from deepseek-harness-orb's UIA path. */
+/**
+ * Native Windows selection monitor: low-level mouse hook plus UI Automation read-back.
+ *
+ * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
+ * `apps/desktop/src/windows-selection-native.ts` (MIT — see `THIRD_PARTY_NOTICES.md` §3.5).
+ *
+ * The hook itself only reports the pointer position at the boundary; the selected text comes from
+ * `TextPattern` on the focused control, read after release. Both halves are needed: reading on
+ * mouse-move would run UIA on every movement, and reading without the hook would not know when the
+ * user finished selecting.
+ */
 
 import { execFile } from "node:child_process";
 import koffi from "koffi";

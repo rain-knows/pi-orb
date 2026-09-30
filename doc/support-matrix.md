@@ -86,7 +86,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **第三方许可清单**：每个已安装生产依赖均声明许可，无 AGPL/GPL-3/SSPL | 已验证 | `evidence/p1-07/license-inventory.json` |
 | **`cua_driver_sdk.dll` 的 MPL 归属核实**：交付物中无任何证据把 MPL 归于该 DLL（无许可文本、不引用 uniffi runtime、仅导入系统库） | 已核实并记录 | `THIRD_PARTY_NOTICES.md` §3 |
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
-| **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性、打包配置与产物审计记录、CI 与发布流程、renderer 参考一致性 | 已验证（且多次反向对照可证伪） | `evidence/p1-07/release-gate.json`（63/63） |
+| **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性、打包配置与产物审计记录、CI 与发布流程、renderer 参考一致性 | 已验证（且多次反向对照可证伪） | `evidence/p1-07/release-gate.json`（66/66） |
 | **生命周期**：折叠/停止/turn 完成或失败撤权与丢弃记录、不结束会话、不改代次、断连撤权 | 已验证 | `evidence/p1-07/lifecycle-regression.json`（10/10）与 `src/main/index.ts` 的统一撤权出口 |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab 与**停靠滑动动画**、拖动 IPC、收起还原、hover/pin、系统主题、新会话、**观察框** | 已接入（几何与 session controller 自动化通过；**前端已改为真移植参考的设计令牌、`body.<state>` 布局状态与 origin-based 展开动画**；**主进程停靠滑动已在打包产物上观测到真实位移**；**观察框已移植，打包探测断言其不挡输入、不动画、窗口无脚本**；真实多显示器、DPI 与人工窗口体验仍需确认） | `tests/floating-geometry.test.ts`、`tests/floating-dock-animation.test.ts`、`tests/renderer-reference-parity.test.ts`、`tests/observation-frame.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/main/observation-frame.ts`、`src/renderer/styles.css`、`src/renderer/App.tsx`、`evidence/p2-05/packaged-smoke.json`、`doc/p2-01-reference-reuse.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘体验未验证） | `tests/double-alt.test.ts`、`src/main/double-alt.ts`、`src/main/index.ts`、`src/renderer/App.tsx` |

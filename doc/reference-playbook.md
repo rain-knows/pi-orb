@@ -255,7 +255,7 @@ D:\workself\pi-orb\
 |---|---|---|---|---|
 | `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 39 | 一致；`activeCaptureExcludeWindowIds` 被 `windows.ts` 读取，但**写入方无调用方**（见 §6.2） |
 | `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：只保留 `mapNormalizedToGlobal` 及其私有分数换算。参考的 11 个导出里 9 个在 pi-orb 无调用方（校验职责由 `src/shared/orb-tools.ts` 的 `validateAction` 唯一承担），按 N8 删除；需要 pixel 编码时按固定提交恢复 |
-| `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 38 | 一致（`delay` 供驱动使用；`wait`/`long_wait` 工具未移植） |
+| `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 38 | 逻辑一致（`delay` 供驱动使用，见 `windows.ts` 的指针/长按/双击/粘贴时序；`wait`/`long_wait` 工具未移植）。文件本身是 **adapted** 而非 unmodified：多出的 3 行是来源提交与许可证头，由 `evidence/p1-07/check-provenance.mjs` 逐行核对 |
 | `src/observation-limits.ts` | 13 | `src/main/reference-windows/observation-limits.ts` | 16 | 一致 |
 | `src/windows-foreground.ts` | 187 | `src/main/reference-windows/windows-foreground.ts` | 190 | 一致；参考自带的 10 条不变量已移植到 `tests/reference-windows-foreground.test.ts` |
 | `src/windows.ts` | 494 | `src/main/reference-windows/windows.ts` | 513 | **优于参考**：补了 `try/finally` 释放已按下的键与鼠标键（参考在 20ms 修饰键间隔或 80ms 长按期间被 abort 会留下卡键）。这是本项目刻意改进，不得“还原”成参考写法 |

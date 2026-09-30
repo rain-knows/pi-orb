@@ -18,7 +18,7 @@
 | `p1-04/` | P1-04 明确授权的截图上下文：目标记录、DPI、拒绝路径零上传、text-only 拒绝、**真实窗口→预览→确认发送（正向路径）** | **通过**（41/41）；多屏/遮挡/高权限窗口未验证 |
 | `p1-05/` | P1-05 真机驱动验收：安装物哈希、运行时工具目录、坐标空间、后台点击、**前台点击与前台滚动投递**、输入读回、按键残留 | **通过**（只读 20/20、输入 27/27）；向 Chromium 内容输入文本、高权限窗口、多显示器未验证 |
 | `p1-06/` | P1-06 Orb 模式与工具闭环：工具仅限 Orb 模式、授权/预算/新鲜度、真实点击与滚动整链路、**截图取点↔输入落点同运行闭环（C7）** | **通过**（工具暴露 7/7、闭环 39/39）；当前参考 backend 的真实模型 C7 24/24、D6 25/25、D8 25/25 均以 disposable 目标自身日志确认 |
-| `p1-07/` | P1-07 发布门禁与生命周期：许可清单与 MPL 核实、可证伪门禁、折叠即撤权 | **通过**（门禁 64/64、生命周期 10/10） |
+| `p1-07/` | P1-07 发布门禁与生命周期：许可清单与 MPL 核实、可证伪门禁、折叠即撤权 | **通过**（门禁 66/66、生命周期 10/10） |
 | `p2-01/` | P2-01 参考 DeepSeek Orb 浮球几何与 Electron 窗口接入 | 浮球几何、拖动 IPC、贴边停靠、收起还原，以及**前端对参考设计令牌／`body.<state>` 布局状态／origin-based 展开动画的移植**均已接入；真实多屏、DPI、观察框 overlay 人工验收未完成 |
 | `p2-02/` | P2-02 双 Alt 快捷手势 | 左右 Alt 纯状态检测器和预览触发已接入；真实键盘验收未完成 |
 | `p2-03/` | P2-03 参考 history 与选区上下文 | 复用 pi-web 公开 session summary/detail API；workspace 过滤、历史绑定、文本恢复和 Windows UI Automation 选区 chip 已接入；真实 UIA 与原生工具栏仍未验收 |
@@ -75,7 +75,7 @@ node evidence/p1-06/run-p1-06.mjs
 node evidence/p1-06/run-real-model-c7.mjs
 # P1-07 发布门禁、许可清单与生命周期回归
 node evidence/p1-07/collect-licenses.mjs
-node evidence/p1-07/run-release-gate.mjs
+node evidence/p1-07/check-provenance.mjs`（参考来源核对）与 `node evidence/p1-07/run-release-gate.mjs
 node evidence/p1-07/run-lifecycle-regression.mjs
 
 # P2-05 打包与分发（构建解包产物 → 内容审计 → 启动打包后的产物）

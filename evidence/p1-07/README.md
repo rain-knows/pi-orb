@@ -2,11 +2,40 @@
 
 > 运行方式：
 > - `node evidence/p1-07/collect-licenses.mjs`（第三方许可清单）
-> - `node evidence/p1-07/run-release-gate.mjs`（发布门禁，32 项）
+> - `node evidence/p1-07/check-provenance.mjs`（参考来源核对，见 §0）
+> - `node evidence/p1-07/run-release-gate.mjs`（发布门禁，66 项）
 > - `node evidence/p1-07/run-lifecycle-regression.mjs`（折叠/停止/断连/代次生命周期，10 项）
 >
-> 原始结果：`license-inventory.json`、`release-gate.json`（32/32）、`lifecycle-regression.json`（10/10）
+> 原始结果：`license-inventory.json`、`provenance.json`、`release-gate.json`（66/66）、`lifecycle-regression.json`（10/10）
 > 状态：**门禁与生命周期通过**；**v0.1 尚不构成完整 M3 版本**，原因见 §6。
+
+## 0. 参考来源核对：`check-provenance.mjs` → `provenance.json`
+
+`AGENTS.md` 的第一条规则是**双向**的：复用的代码必须留下来源提交与许可证，原创的工作不得被描述成
+复用。这两件事此前只写在文件头的散文里——而散文会说「unmodified」而文件其实已经漂移，这和「文档里
+写了常量却没有测试」是同一类问题。
+
+`node evidence/p1-07/check-provenance.mjs` 把每一处声明为「移植自参考项目」的文件与固定提交的上游
+检出逐行比对，分成三类：
+
+| 状态 | 含义 |
+|---|---|
+| `unmodified` | pi-orb 的每一非空行都能在参考文件中逐字找到 |
+| `adapted` | 存在 pi-orb 独有的行，**因此文件头必须写明来源提交、许可证与差异原因** |
+| `missing` | 参考文件或检出不可用 |
+
+它是**报告而非绝对门禁**：`adapted` 在差异有记录且有理据时完全合法。它去掉的是「宣称 unmodified
+而不属实」的空间。当前结果：**unmodified 0 · adapted 11 · missing 0 · 无来源头 0**。
+
+> 写这个检查时它当场抓到了真问题：`src/main/windows-selection.ts`、
+> `windows-selection-native.ts`、`selection-monitor.ts` 三个文件复用了参考代码却**没有来源提交与
+> 许可证**，违反 AGENTS.md；已补齐。另一处顺带更正：此前手册把 `wait.ts` 记作「未修改」，实际它有
+> 3 行来源头，严格来说是 `adapted`——所以报告里 `unmodified` 是 0 而不是若干。
+>
+> 反向对照：把 `selection-monitor.ts` 里的提交哈希改成错误值后，检查报
+> `adapted-without-provenance 1` 并失败；恢复后通过。
+
+无参考检出时输出 `skipped: true` 并以 0 退出（与 pi-web 基线检查同一约定），**不计为通过**。
 
 ## 1. 交付内容
 
