@@ -34,7 +34,7 @@ function observation(overrides: Partial<DesktopObservation> = {}): DesktopObserv
   };
 }
 
-const budget = { actionsUsed: 0, expired: false, stopped: false };
+const budget = { stopped: false };
 
 describe("Orb tool naming", () => {
   it("prefixes every desktop tool so it cannot collide with a user extension", () => {
@@ -103,21 +103,9 @@ describe("validateAction", () => {
     expect(validateAction(action, null, budget)).toBe("observation-unknown");
   });
 
-  it("enforces the action limit", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
-    expect(
-      validateAction(action, observation(), { ...budget, actionsUsed: ORB_LIMITS.maxActionsPerTask }),
-    ).toBe("task-limit-actions");
-  });
-
   it("refuses everything once the batch was stopped", () => {
     const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
     expect(validateAction(action, observation(), { ...budget, stopped: true })).toBe("batch-stopped");
-  });
-
-  it("refuses everything once the task expired, even with budget left", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
-    expect(validateAction(action, observation(), { ...budget, expired: true })).toBe("task-expired");
   });
 
   it("requires text and bounds its length", () => {
@@ -256,8 +244,6 @@ describe("describeRefusal", () => {
       "stale-generation",
       "stale-observation",
       "batch-stopped",
-      "task-limit-actions",
-      "task-expired",
       "needs-position",
       "invalid-click-options",
       "invalid-long-wait",
@@ -273,7 +259,7 @@ describe("describeRefusal", () => {
   });
 
   it("tells the model that authorization is needed rather than letting it retry blindly", () => {
-    expect(describeRefusal("no-task-authorization")).toMatch(/approve/i);
+    expect(describeRefusal("no-task-authorization")).toMatch(/access level/i);
     expect(describeRefusal("stale-observation")).toMatch(/observe/i);
     expect(describeRefusal("batch-stopped")).toMatch(/stopped/i);
   });
@@ -306,8 +292,11 @@ describe("boundElements", () => {
 describe("describeOrbModeSection", () => {
   const section = describeOrbModeSection();
 
-  it("states that a matching directory is not authorization", () => {
+  it("states that access is session-level and a matching directory is not authorization", () => {
     expect(section).toMatch(/never grants it/i);
+    expect(section).toMatch(/Read Only.*Workspace Write.*Full Access/s);
+    expect(section).toMatch(/current foreground application/i);
+    expect(section).toMatch(/review and confirm/i);
   });
 
   it("states the one-action-one-observation rule", () => {

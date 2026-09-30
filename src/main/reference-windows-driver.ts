@@ -20,24 +20,17 @@ export interface ReferenceWindowInfo {
   readonly zIndex: bigint;
 }
 
-export interface ReferenceRecordedTarget {
-  readonly handle: string;
-  readonly pid: number;
-  readonly title: string;
-}
-
 export interface ReferenceWindowsDriverOptions {
   readonly backend: DesktopBackend;
   readonly ops: WindowsDesktopOps;
   readonly ownProcessId: number;
-  readonly resolveRecordedTarget?: () => ReferenceRecordedTarget | undefined;
   /** Hide or cloak the Orb while the target is captured or receives HID input. */
   readonly withGuiTurn?: <T>(run: () => Promise<T>) => Promise<T>;
   /**
    * Called after `orb_open_app` moved the task to another application's window.
    *
-   * The Orb owns target identity, so a driver-side retarget has to be reported rather than kept
-   * private: the panel shows the window every subsequent action will land on.
+   * The driver reports the adopted application so the observation frame and shell diagnostics
+   * follow the fresh observation returned to the model.
    */
   readonly onTargetChanged?: (target: ReferenceWindowInfo) => void;
 }
@@ -54,11 +47,6 @@ let observationCounter = 0;
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-function hwndFromString(value: string): number | undefined {
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
 function positionOf(position: ScreenshotPosition): [number, number] {
@@ -85,7 +73,7 @@ function sameApp(left: string, right: string): boolean {
 
 /**
  * pi-orb's narrow driver seam over the reference project's Windows backend.
- * Window identity is still owned by the Orb: the backend is never asked to guess a target.
+ * Each observation records the current foreground window; actions stay bound to that observation.
  */
 export class ReferenceWindowsDriver implements DesktopDriver {
   readonly #options: ReferenceWindowsDriverOptions;
@@ -113,28 +101,21 @@ export class ReferenceWindowsDriver implements DesktopDriver {
   }
 
   /**
-   * The screen rectangle of the window the next action would land on, or undefined when no target is
-   * recorded.
+   * The screen rectangle from the latest observation, or undefined when no target is recorded.
    *
-   * Exposed so the shell can draw the observation ribbon around the window the grant covers. The
-   * bounds are the driver's own `TargetWindow.bounds`, i.e. the same rectangle actions are mapped on,
-   * so the ribbon cannot drift from where input actually goes.
+   * Exposed so the shell can draw the observation ribbon around the window in the latest screenshot.
+   * The bounds are the driver's own `TargetWindow.bounds`, i.e. the same rectangle actions are mapped
+   * on, so the ribbon cannot drift from where input actually goes.
    */
   targetBounds(): { readonly x: number; readonly y: number; readonly width: number; readonly height: number } | undefined {
     return this.#target?.bounds;
   }
 
-  async observe(input: { readonly windowId?: string; readonly includeImage?: boolean }): Promise<ObserveResult> {
-    const target = this.#findTarget(input.windowId);
-    if (!target) {
-      return {
-        ok: false,
-        observation: null,
-        error: "The identified target window is not available. Select or record it again before observing.",
-      };
-    }
+  async observe(input: { readonly includeImage?: boolean }): Promise<ObserveResult> {
     try {
       const result = await this.#withGuiTurn(async () => {
+        const target = this.#findForegroundTarget();
+        if (!target) throw new Error("No foreground application window is available to observe.");
         if (!this.#options.ops.focusWindow(target.windowId)) {
           throw new Error("The target window could not be brought to the foreground.");
         }
@@ -164,7 +145,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     if (!screen || !target || observation.window.id !== String(target.windowId)) {
       return { ok: false, refused: true, error: "The observation target is no longer available." };
     }
-    if (action.kind === "openApp") return this.#openApp(action, signal);
+    if (action.kind === "openApp") return this.#openApp(action, target, signal);
     try {
       const abort = signal ?? new AbortController().signal;
       if (action.kind === "wait" || action.kind === "longWait") {
@@ -172,6 +153,9 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       }
       const apps = action.kind === "listApps" ? [...await this.#options.backend.listApps(abort)] : undefined;
       const observationAfterAction = await this.#withGuiTurn(async () => {
+        if (!this.#isCurrentForeground(target)) {
+          throw new Error("The foreground window changed after the observation. Observe again before acting.");
+        }
         if (!this.#options.ops.focusWindow(target.windowId)) {
           throw new Error("The target window could not be brought to the foreground.");
         }
@@ -204,6 +188,9 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           }, signal);
         }
         if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await delay(POST_ACTION_WAIT_MS, abort);
+        if (!this.#isCurrentForeground(target)) {
+          throw new Error("The foreground window changed during the action. Observe again before acting.");
+        }
         const captured = await this.#options.backend.capture(screen, signal);
         const nextObservation = this.#makeObservation(target, screen, captured, true,
           await this.#options.backend.inspectForeground(signal));
@@ -275,22 +262,21 @@ export class ReferenceWindowsDriver implements DesktopDriver {
    * Bring an already running application forward and continue against its window.
    *
    * The reference backend's `openApp` activates a running application *or launches it*. pi-orb
-   * keeps only the first half: starting a process is native authority the user did not grant when
-   * they recorded one window, so this path never reaches `launch`. It therefore uses
+   * keeps only the first half: starting a process is separate authority, so this path never reaches
+   * `launch`. It therefore uses
    * {@link WindowsDesktopOps.activateApp}, which returns `false` instead of starting anything,
    * and it fails closed at three separate points:
    *
    *   1. the requested application must appear in the running-application list, compared as a base
    *      name (`Notepad` == `notepad.exe`) and never as a substring;
    *   2. the activation itself must succeed;
-   *   3. the resulting foreground window must belong to that application — otherwise the previous
-   *      target is kept and the action fails, because adopting whatever happens to be in front is
-   *      exactly the "driver picked a target" behaviour this project forbids.
+   *   3. the resulting foreground window must belong to that application — otherwise the current
+   *      observation stays authoritative and the action fails.
    *
-   * On success the adopted window is reported through `onTargetChanged` so the panel shows where
-   * the next action will land, and the user can revoke at any time.
+   * On success the adopted window is reported through `onTargetChanged`; the grant remains bound to
+   * the Orb session and generation while later observations follow the foreground application.
    */
-  async #openApp(action: { readonly name: string }, signal?: AbortSignal): Promise<ActResult> {
+  async #openApp(action: { readonly name: string }, currentTarget: TargetWindow, signal?: AbortSignal): Promise<ActResult> {
     try {
       const abort = signal ?? new AbortController().signal;
       abort.throwIfAborted();
@@ -307,6 +293,9 @@ export class ReferenceWindowsDriver implements DesktopDriver {
 
       const adopted = await this.#withGuiTurn(async () => {
         abort.throwIfAborted();
+        if (!this.#isCurrentForeground(currentTarget)) {
+          throw new Error("The foreground window changed after the observation. Observe again before switching apps.");
+        }
         if (!this.#options.ops.activateApp(match)) {
           throw new Error(`"${requested}" could not be brought to the foreground.`);
         }
@@ -347,31 +336,11 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     }
   }
 
-  #findTarget(windowId?: string): TargetWindow | null {
-    const recorded = this.#options.resolveRecordedTarget?.();
-    const selected = recorded ? hwndFromString(recorded.handle) : undefined;
-    const requested = windowId ? hwndFromString(windowId) : selected;
-    if (requested === undefined) return null;
-    // The model may name the observation it wants to read, but it cannot expand the
-    // user's approved target. The explicit id must still be the target selected by Orb.
-    if (selected !== undefined && requested !== selected) return null;
-    const windows = this.#options.ops.listWindows().windows;
-    const fact = windows.find((window) => {
-      if (window.hwnd !== requested || window.pid === this.#options.ownProcessId) return false;
-      if (recorded) return window.pid === recorded.pid && window.title === recorded.title;
-      return true;
-    });
-    if (!fact || !fact.visible || fact.iconic || fact.cloaked || fact.frame.width <= 0 || fact.frame.height <= 0) return null;
-    return { windowId: fact.hwnd, pid: fact.pid, appName: fact.appName, title: fact.title, bounds: fact.frame };
-  }
-
   /**
-   * The window the OS currently reports as foreground, if it is one this process may act on.
+   * The window the OS currently reports as foreground, if it is one this process may observe.
    *
-   * Only the open-app path uses this, and only to *verify* what an activation produced — the
-   * ordinary action path never asks the OS which window is in front, because accepting that answer
-   * would let the desktop decide the target instead of the user. The Orb's own window is excluded,
-   * and so is a window that cannot own an observation.
+   * Observation adopts the current foreground application and excludes the Orb itself. Later actions
+   * remain bound to that observation and refuse if foreground identity changes before input is sent.
    */
   #findForegroundTarget(): TargetWindow | null {
     const snapshot = this.#options.ops.listWindows();
@@ -386,6 +355,14 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       title: foreground.title,
       bounds: foreground.frame,
     };
+  }
+
+  #isCurrentForeground(expected: TargetWindow): boolean {
+    const foreground = this.#findForegroundTarget();
+    return foreground !== null &&
+      foreground.windowId === expected.windowId &&
+      foreground.pid === expected.pid &&
+      foreground.title === expected.title;
   }
 
   #withGuiTurn<T>(run: () => Promise<T>): Promise<T> {

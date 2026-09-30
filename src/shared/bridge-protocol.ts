@@ -69,7 +69,6 @@ export type BridgeRequest =
       readonly token: string;
       readonly sessionId: string;
       readonly generation: number;
-      readonly windowId?: string;
     }
   | {
       readonly type: "act";

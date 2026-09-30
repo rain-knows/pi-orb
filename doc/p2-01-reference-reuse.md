@@ -161,8 +161,9 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
   挡截图的假边框」——那条理由本身没错，但它描述的是**当时的**状态，而 P2-01 的交付项写着「观察
   边框」；把未完成项写成设计选择，是这个项目已经犯过一次的同一类问题（见「一次被更正的事实」）。
   现在有了真的 click-through 原生 overlay，宿主边界由既有的 `withGuiTurn` + 统一撤权出口承担。
-- **头像**：参考在 Desktop profile 里持久化自定义头像；pi-orb 使用仓库内静态
-  `src/renderer/orb-avatar.png`，不扩展 Pi 配置写入。
+- **头像**：浮球直接使用参考固定提交中的 `deepseek-avatar-square.gif`，并随 expanded、running、question、selection
+  状态播放或冻结；pi-orb 不移植用户自定义头像 profile，也不扩展 Pi 配置写入。安装包应用图标仍使用
+  已批准的 `src/renderer/orb-avatar.png`。
 - **桌面授权、历史、截图预览浮层**：参考没有对应产品面（它的 Access 三档权限与 pi-orb 的任务授权
   语义不同）。pi-orb 这些浮层用**已移植的令牌**表达（`--white`/`--border`/`--pin`/`--panel-radius`
   等），因此属于同一套设计系统，而不是第二套主题。
@@ -175,7 +176,7 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
 | 项 | 证据 |
 |---|---|
 | 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（17 条，含时序常量与收起守卫集合） |
-| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（21/21，含本节新增 4 条） |
+| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（22/22，含本节新增 5 条） |
 | **观察框内孔落在观察矩形上**、贴边裁剪不位移、整数像素、CSS 变量齐全 | `tests/observation-frame.test.ts`（7 条） |
 | **观察框不挡输入、不动画、窗口无脚本** | `evidence/p2-05/packaged-smoke.json`（3 条；把 `pointer-events` 改回 `auto` 即失败） |
 | **停靠滑动真的在动**（拖动到边缘后 dock，采样到 9 帧不同位置，从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 同上，`the dock gesture slides the window off the edge instead of snapping it` |

@@ -32,7 +32,7 @@ function operations(): DesktopOperations & { revokes: number; discards: number; 
     get clears() {
       return clears;
     },
-    revokeDesktopTask: () => {
+    revokeOrbAccess: () => {
       revokes += 1;
     },
     discardPendingCapture: () => {

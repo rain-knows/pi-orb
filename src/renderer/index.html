@@ -21,17 +21,16 @@
         </svg>
       </button>
       <div id="permission">
-        <button id="permission-button" type="button" aria-haspopup="menu" aria-expanded="false">
+        <button id="permission-button" type="button" aria-haspopup="listbox" aria-expanded="false">
           <span id="permission-label"></span>
           <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
             <path d="M3 4.5 6 8l3-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
         </button>
-        <ul id="permission-menu" role="menu" hidden>
-          <li><button id="access-open" type="button" role="menuitem">Desktop access</button></li>
-          <li><button id="capture-context" type="button" role="menuitem">Add screenshot</button></li>
-          <li><button id="model-open" type="button" role="menuitem">Model</button></li>
-          <li><button id="shortcut-open" type="button" role="menuitem">Wake shortcut</button></li>
+        <ul id="permission-menu" role="listbox" hidden>
+          <li><button id="access-read-only" type="button" role="option" data-level="read-only">Read Only</button></li>
+          <li><button id="access-workspace-write" type="button" role="option" data-level="workspace-write">Workspace Write</button></li>
+          <li><button id="access-full" type="button" role="option" data-level="full-access">Full Access</button></li>
         </ul>
       </div>
       <button id="new-conversation" type="button">+</button>
@@ -70,16 +69,6 @@
         </div>
       </div>
       <div id="history-list" role="listbox" hidden></div>
-      <section id="access-sheet" class="orb-sheet" hidden aria-label="Desktop access">
-        <header><strong>Desktop access</strong><button id="access-close" type="button" aria-label="Close desktop access">×</button></header>
-        <p id="access-state"></p>
-        <p id="access-target"></p>
-        <button id="target-open" type="button">Choose target window</button>
-        <div id="target-list" role="listbox" hidden></div>
-        <form id="authorize-form"><label for="task-scope">What may Orb do?</label><input id="task-scope" type="text" autocomplete="off"><button id="authorize" type="submit">Approve task</button></form>
-        <button id="revoke" type="button">Revoke access</button>
-        <div id="shortcut-section" hidden><label for="shortcut-input">Wake shortcut</label><form id="shortcut-form"><input id="shortcut-input" type="text" autocomplete="off"><button type="submit">Apply</button></form></div>
-      </section>
       <section id="preview-sheet" class="orb-sheet" hidden aria-label="Review screenshot">
         <header><strong>Review screenshot</strong><button id="preview-close" type="button" aria-label="Close preview">×</button></header>
         <p id="preview-target"></p><img id="preview-image" alt="Screenshot preview"><p id="preview-meta"></p>
@@ -88,6 +77,14 @@
       <section id="model-sheet" class="orb-sheet" hidden aria-label="Model selection">
         <header><strong>Model</strong><button id="model-close" type="button" aria-label="Close model selection">×</button></header>
         <div id="model-list" role="listbox"></div>
+      </section>
+      <section id="shortcut-sheet" class="orb-sheet" hidden aria-label="Wake shortcut">
+        <header><strong>Wake shortcut</strong><button id="shortcut-close" type="button" aria-label="Close shortcut settings">×</button></header>
+        <form id="shortcut-form">
+          <label for="shortcut-input">Shortcut</label>
+          <input id="shortcut-input" type="text" autocomplete="off" spellcheck="false" maxlength="60">
+          <footer><button type="submit">Save</button></footer>
+        </form>
       </section>
       <p id="status" role="status"></p>
       <div id="selection-chip" hidden>
@@ -100,7 +97,7 @@
       </form>
     </section>
     <button id="ball" type="button">
-      <img id="ball-gif" src="orb-avatar.png" alt="" draggable="false">
+      <img id="ball-gif" src="deepseek-avatar-square.gif" alt="" draggable="false" data-mode="still">
     </button>
     <button id="dock-tab" type="button" hidden aria-hidden="true"></button>
     <button id="stop" type="button" hidden></button>

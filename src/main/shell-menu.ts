@@ -11,18 +11,19 @@
  * from the focused field's `editFlags` so a disabled item says *why* it is disabled (nothing
  * selected, clipboard empty) instead of silently doing nothing.
  *
- * The reference's remaining items are Open Main Window, Floating Agent Settings, a Selection Toolbar
- * toggle, a millifraction-coordinates toggle and Quit. Mapped to pi-orb:
+ * The reference's remaining items include Open Main Window, Floating Agent Settings, a Selection
+ * Toolbar toggle, a millifraction-coordinates toggle and Quit. Mapped to pi-orb:
  *
  *  - **Quit** is kept. The tray also has it, but a menu that opens on the ball and cannot quit the
  *    app would be the odd one out.
  *  - **Collapse** replaces Open Main Window: pi-orb has no main window of its own (pi-web owns the
  *    chat UI), and hiding the orb is the equivalent "put this away" action. It routes through the
  *    same lifecycle call as the tray and the shortcut, so it still revokes desktop authority.
- *  - **Agent model settings and the two toggles are not ported.** pi-orb does not own model
- *    configuration (pi-web does) and has neither a selection toolbar nor millifraction coordinates;
- *    per AGENTS.md the project does not add settings or product concepts the reference lacks a
- *    counterpart for.
+ *  - Model selection and wake-shortcut editing live here instead of the primary floating panel.
+ *    Model selection still uses pi-web's own catalog; shortcut editing changes only the existing
+ *    pi-orb wake shortcut.
+ *  - The two reference toggles are not ported: pi-orb has neither a selection toolbar nor an
+ *    alternate coordinate mode.
  */
 import { Menu, type BrowserWindow, type MenuItemConstructorOptions } from "electron";
 
@@ -42,6 +43,9 @@ export interface ShellMenuActions {
   readonly onCollapse: () => void;
   readonly onQuit: () => void;
   readonly onClearSelectionContext: () => void;
+  readonly onModel?: () => void;
+  readonly onScreenshot?: () => void;
+  readonly onShortcut?: () => void;
 }
 
 /**
@@ -54,16 +58,21 @@ export function shellMenuTemplate(
   request: ShellMenuRequest,
   actions: ShellMenuActions,
 ): MenuItemConstructorOptions[] {
+  const utilities: MenuItemConstructorOptions[] = [];
+  if (actions.onModel) utilities.push({ label: "Choose model", click: actions.onModel });
+  if (actions.onScreenshot) utilities.push({ label: "Capture screenshot", click: actions.onScreenshot });
+  if (actions.onShortcut) utilities.push({ label: "Change wake shortcut…", click: actions.onShortcut });
+  if (utilities.length > 0) utilities.push({ type: "separator" });
   const shell: MenuItemConstructorOptions[] = [
+    ...utilities,
     { label: "Hide orb", click: actions.onCollapse },
-    { type: "separator" },
-    { label: "Quit pi-orb", click: actions.onQuit },
   ];
   if (request.hasSelectionContext) {
     // A label that says what it does to the thing you can see, matching the reference's
     // enable/disable phrasing for its toolbar toggle.
-    shell.splice(1, 0, { label: "Remove attached selection", click: actions.onClearSelectionContext });
+    shell.splice(utilities.length + 1, 0, { label: "Remove attached selection", click: actions.onClearSelectionContext });
   }
+  shell.push({ type: "separator" }, { label: "Quit pi-orb", click: actions.onQuit });
   if (!request.isEditable) return shell;
   // The edit block sits on top, as in the reference: the roles are the platform's own, so labels,
   // accelerators and behaviour come from Electron rather than being re-spelled here.

@@ -30,12 +30,12 @@ export const MAX_BRIDGE_FRAME_BYTES = Math.ceil(MAX_SCREENSHOT_BYTES * 1.5) + 25
 
 export interface BridgeExecutor {
   /** Perform an observation. Returns a JSON-serializable result. */
-  observe(input: { readonly windowId?: string }): Promise<unknown>;
+  observe(input: { readonly sessionId: string; readonly generation: number }): Promise<unknown>;
   /** Perform one action. Returns a JSON-serializable result. */
-  act(action: unknown): Promise<unknown>;
+  act(action: unknown, sessionId: string, generation: number): Promise<unknown>;
   /** Report the task state for the session. */
   status(): unknown;
-  /** Revoke the current task authorization. */
+  /** Revoke the current session desktop Access grant. */
   revoke(): void;
   /**
    * Confirm that a session/generation pair is the live run.
@@ -175,13 +175,11 @@ export class BridgeServer {
         }
         try {
           if (type === "observe") {
-            const result = await this.#options.executor.observe(
-              typeof request.windowId === "string" ? { windowId: request.windowId } : {},
-            );
+            const result = await this.#options.executor.observe({ sessionId, generation });
             return promoteRefusal(result);
           }
           if (type === "act") {
-            const result = await this.#options.executor.act(request.action);
+            const result = await this.#options.executor.act(request.action, sessionId, generation);
             return promoteRefusal(result);
           }
           if (type === "revoke") {

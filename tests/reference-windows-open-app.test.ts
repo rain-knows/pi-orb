@@ -118,7 +118,6 @@ async function observedDriver(options: Parameters<typeof opsFake>[0], onTargetCh
     ops,
     backend: backendFake(backendCalls),
     ownProcessId: 1,
-    resolveRecordedTarget: () => ({ handle: "42", pid: 9001, title: "Untitled - Notepad" }),
     ...(onTargetChanged ? { onTargetChanged } : {}),
   });
   const observed = await driver.observe({ includeImage: true });
@@ -167,11 +166,12 @@ describe("orb_open_app: activation only", () => {
 
     const acted = await driver.act({ kind: "openApp", observationId: observation.observationId, name: "Notepad" }, observation);
     expect(acted.ok).toBe(true);
-    expect(acted.observation?.window.id).toBe("42");
-    expect(acted.observation?.window.appName).toBe("notepad.exe");
+    if (!acted.ok) throw new Error(acted.error ?? "Application activation failed");
+    expect(acted.observation.window.id).toBe("42");
+    expect(acted.observation.window.appName).toBe("notepad.exe");
     // One action, one observation: the caller gets a fresh observation with an image.
-    expect(acted.observation?.observationId).not.toBe(observation.observationId);
-    expect(acted.observation?.image).toMatchObject({ mimeType: "image/png" });
+    expect(acted.observation.observationId).not.toBe(observation.observationId);
+    expect(acted.observation.image).toMatchObject({ mimeType: "image/png" });
     expect(changed).toHaveLength(1);
     expect(changed[0]).toMatchObject({ windowId: 42, appName: "notepad.exe" });
     expect(backendCalls.some((call) => (call as { kind?: string }).kind === "capture")).toBe(true);

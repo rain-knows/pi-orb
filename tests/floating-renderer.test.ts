@@ -31,16 +31,16 @@ function harness(configured = true) {
     shortcutProblem: null as string | null,
     desktopTask: {
       authorized: false,
-      actionsUsed: 0,
-      actionLimit: 20,
-      scope: null as string | null,
-      target: null as null | { windowId: string; title: string; appName: string },
+      level: null as string | null,
+      sessionId: null as string | null,
+      generation: null as number | null,
       stoppedReason: null as string | null,
     },
   };
   let onEvent: (event: Record<string, unknown>) => void = () => {};
   let onSelection: (value: unknown) => void = () => {};
   let onDoubleAlt: () => void = () => {};
+  let onShellMenuAction: (action: "model" | "screenshot" | "shortcut") => void = () => {};
   const api = {
     getStatus: vi.fn(async () => status),
     getSelectionContext: vi.fn(async () => null),
@@ -60,17 +60,16 @@ function harness(configured = true) {
     newConversation: vi.fn(async () => "session-2"),
     listSessionHistory: vi.fn(async () => ({ ok: true, sessions: [{ sessionId: "session-old", name: "Earlier", firstMessage: "Earlier", modified: "2026-09-30T00:00:00Z", messageCount: 2 }] })),
     openSessionHistory: vi.fn(async () => ({ ok: true, sessionId: "session-old", messages: [{ role: "user", text: "Old question" }, { role: "assistant", text: "Old answer" }] })),
-    listDesktopWindows: vi.fn(async () => ({ ok: true, windows: [{ windowId: "7", title: "Editor", appName: "Code" }] })),
-    setDesktopTarget: vi.fn(async () => { status.desktopTask.target = { windowId: "7", title: "Editor", appName: "Code" }; return { ok: true }; }),
-    getDesktopTaskStatus: vi.fn(async () => status.desktopTask),
-    authorizeDesktopTask: vi.fn(async ({ scope }: { scope: string }) => { status.desktopTask.authorized = true; status.desktopTask.scope = scope; return status.desktopTask; }),
-    revokeDesktopTask: vi.fn(async () => { status.desktopTask.authorized = false; return status.desktopTask; }),
+    setOrbAccess: vi.fn(async ({ generation, level }: { generation: number; level: string }) => { status.desktopTask = { ...status.desktopTask, authorized: true, level, sessionId: "session-1", generation }; return status.desktopTask; }),
+    getOrbAccess: vi.fn(async () => status.desktopTask),
+    revokeOrbAccess: vi.fn(async () => { status.desktopTask = { ...status.desktopTask, authorized: false, level: null }; return status.desktopTask; }),
     captureScreenshot: vi.fn(async () => ({ ok: true, observationId: "observation-1", mimeType: "image/png", data: "iVBORw0KGgo=", width: 2, height: 2, bytes: 12, targetDescription: "Editor", targetStale: false })),
     resolveScreenshot: vi.fn(async () => ({ ok: true, sent: true })),
     exportScreenshot: vi.fn(async () => ({ ok: true, path: "C:\\capture.png", clipboard: true })),
     discardScreenshot: vi.fn(async () => true),
     setShortcut: vi.fn(async () => status),
     openShellMenu: vi.fn(async (_request: unknown) => true),
+    onShellMenuAction: vi.fn((listener: typeof onShellMenuAction) => { onShellMenuAction = listener; return () => {}; }),
     listModels: vi.fn(async () => ({ ok: true, models: [{ provider: "test", id: "one", name: "One", input: ["text"] }], selected: null })),
     setModel: vi.fn(async () => ({ ok: true, selected: { provider: "test", id: "one" } })),
     respondQuestion: vi.fn(async () => {}),
@@ -79,7 +78,7 @@ function harness(configured = true) {
   runInContext(script, dom.getInternalVMContext());
   const document = win.document;
   const byId = (id: string) => document.getElementById(id)!;
-  return { dom, win, document, byId, api, emit: (event: Record<string, unknown>) => onEvent(event), select: (value: unknown) => onSelection(value), doubleAlt: () => onDoubleAlt(), setDark: (dark: boolean) => { media.matches = dark; for (const listener of themeListeners) listener(); } };
+  return { dom, win, document, byId, api, emit: (event: Record<string, unknown>) => onEvent(event), select: (value: unknown) => onSelection(value), doubleAlt: () => onDoubleAlt(), shellAction: (action: "model" | "screenshot" | "shortcut") => onShellMenuAction(action), setDark: (dark: boolean) => { media.matches = dark; for (const listener of themeListeners) listener(); } };
 }
 
 afterEach(() => { for (const dom of openDoms.splice(0)) dom.window.close(); });
@@ -124,6 +123,52 @@ it("sends with the existing Pi bridge and displays streamed replies", async () =
   expect(h.document.body.classList.contains("running")).toBe(false);
 });
 
+it("keeps the composer available and queues follow-up turns in order", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.byId("permission-button").click();
+  h.byId("access-workspace-write").click();
+  await expect.poll(() => h.api.setOrbAccess.mock.calls.length).toBe(1);
+  const prompt = h.byId("prompt");
+  prompt.textContent = "First";
+  h.byId("composer").dispatchEvent(new h.win.Event("submit", { bubbles: true, cancelable: true }));
+  await expect.poll(() => h.api.sendPrompt.mock.calls.length).toBe(1);
+
+  prompt.textContent = "Second";
+  h.byId("composer").dispatchEvent(new h.win.Event("submit", { bubbles: true, cancelable: true }));
+  await expect.poll(() => h.api.sendPrompt.mock.calls.length).toBe(2);
+  expect(h.document.body.classList.contains("running")).toBe(true);
+  expect(h.document.querySelectorAll(".orb-message--user")).toHaveLength(2);
+
+  h.emit({ type: "queued", count: 1 });
+  expect(h.byId("status").textContent).toBe("1 message queued");
+  h.emit({ type: "turn-start" });
+  h.emit({ type: "assistant-delta", text: "Second reply" });
+  expect(h.document.querySelectorAll(".orb-message--assistant")).toHaveLength(1);
+  expect(h.document.querySelector(".orb-message--assistant p")?.textContent).toBe("Second reply");
+  h.emit({ type: "idle", stopReason: null });
+  expect(h.document.body.classList.contains("running")).toBe(false);
+  await expect.poll(() => h.byId("permission-label").textContent).toBe("Workspace Write");
+  expect(h.api.revokeOrbAccess).not.toHaveBeenCalled();
+});
+
+it("plays the reference avatar for active states and freezes it when idle", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  const avatar = h.byId("ball-gif");
+  expect(avatar.dataset.mode).toBe("still");
+
+  h.emit({ type: "turn-start" });
+  expect(avatar.dataset.mode).toBe("play");
+  h.emit({ type: "idle", stopReason: null });
+  expect(avatar.dataset.mode).toBe("still");
+
+  h.select({ text: "selected text", sourceLabel: "Editor" });
+  expect(avatar.dataset.mode).toBe("play");
+  h.select(null);
+  expect(avatar.dataset.mode).toBe("still");
+});
+
 it("keeps keyboard editing in the composer and submits only a plain Enter", async () => {
   const h = harness();
   await expect.poll(() => h.byId("composer").hidden).toBe(false);
@@ -160,20 +205,26 @@ it("opens history and restores its messages into the actual transcript", async (
   expect(h.byId("transcript").textContent).toContain("Old answer");
 });
 
-it("keeps desktop approval and screenshot confirmation explicit", async () => {
+it("selects a session access tier and keeps screenshot confirmation explicit", async () => {
   const h = harness();
   await expect.poll(() => h.byId("composer").hidden).toBe(false);
-  h.byId("access-open").click();
-  expect(h.byId("access-sheet").hidden).toBe(false);
-  h.byId("target-open").click();
-  await expect.poll(() => h.document.querySelectorAll("#target-list button").length).toBe(1);
-  (h.document.querySelector("#target-list button") as HTMLElement).click();
-  await expect.poll(() => h.byId("access-target").textContent).toContain("Editor");
-  (h.byId("task-scope") as HTMLInputElement).value = "Edit this window";
-  h.byId("authorize-form").dispatchEvent(new h.win.Event("submit", { bubbles: true, cancelable: true }));
-  await expect.poll(() => h.api.authorizeDesktopTask.mock.calls.length).toBe(1);
-  expect(h.byId("permission-label").textContent).toBe("Desktop access");
-  h.byId("access-close").click();
+  expect([...h.document.querySelectorAll("#history, #permission-button, #new-conversation")].map((button) => button.id)).toEqual([
+    "history",
+    "permission-button",
+    "new-conversation",
+  ]);
+  expect([...h.document.querySelectorAll("#permission-menu [data-level]")].map((option) => option.textContent)).toEqual([
+    "Read Only",
+    "Workspace Write",
+    "Full Access",
+  ]);
+  expect(h.byId("target-open")).toBeNull();
+  expect(h.byId("task-scope")).toBeNull();
+  h.byId("permission-button").click();
+  h.byId("access-workspace-write").click();
+  await expect.poll(() => h.api.setOrbAccess.mock.calls.length).toBe(1);
+  expect(h.api.setOrbAccess).toHaveBeenCalledWith({ generation: 1, level: "workspace-write" });
+  expect(h.byId("permission-label").textContent).toBe("Workspace Write");
   h.doubleAlt();
   await expect.poll(() => h.byId("preview-sheet").hidden).toBe(false);
   expect(h.api.resolveScreenshot).not.toHaveBeenCalled();
@@ -213,7 +264,7 @@ it("supports Pi confirm, input and model selection through the restricted bridge
   h.byId("question-continue").click();
   await expect.poll(() => h.api.respondQuestion.mock.calls.length).toBe(2);
   expect(h.api.respondQuestion).toHaveBeenNthCalledWith(2, { generation: 1, id: "input-1", value: "Sample" });
-  h.byId("model-open").click();
+  h.shellAction("model");
   await expect.poll(() => h.document.querySelectorAll("#model-list button").length).toBe(1);
   (h.document.querySelector("#model-list button") as HTMLElement).click();
   await expect.poll(() => h.api.setModel.mock.calls.length).toBe(1);

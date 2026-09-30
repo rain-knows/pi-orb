@@ -1,8 +1,10 @@
-# Cua 驱动接入事实（P1-05 实测）
+# 历史 Cua 驱动接入事实（P1-05 实测，非生产路径）
 
-- 状态：**运行时实测记录**，驱动版本 `@trycua/cua-driver@0.30.1`（Windows x64）。
+- 状态：**已移除生产路径的历史运行时实测记录**，驱动版本 `@trycua/cua-driver@0.30.1`（Windows x64）。
 - 依据：[`../evidence/p1-05/README.md`](../evidence/p1-05/README.md)、`../evidence/p1-05/cua-runtime-probe.json`、`../evidence/p1-05/input-verification.json`。
-- 用途：P1-06（Orb 模式与工具闭环）与 P1-07（发布门禁）的输入约束来源。**本文的结论不得在未重新实测的情况下外推到其它驱动版本或其它机器。**
+- 用途：记录为何 Cua 原型未作为生产 backend。当前生产输入实现位于 `src/main/reference-windows/`，
+  行为与验收合同见 [`desktop-tools-port.md`](./desktop-tools-port.md) 和 `tests/reference-windows-driver.test.ts`。
+  **本文不是当前产品的动作契约。**
 
 ## 1. 必须遵守的硬约束
 
@@ -56,7 +58,8 @@ SDK 侧对应方法名（`CuaDriver.prototype`，39 个）：`listWindows`、`li
 1. 只选**一种**坐标约定并写进代码与测试（见开发目标 §4.3）。
 2. 优先用**元素寻址**（`get_window_state` 的 `element_token`）而不是像素坐标——元素寻址不受 DPI 影响，但**Electron/Chromium 内容可能不暴露元素**（实测该窗口只暴露 4 个菜单按钮）。
 3. 任何坐标换算都必须能解释清楚来源；禁止"看起来差不多"的缩放假设。
-4. 动作后必须重新观察并核验（`verify_state` 或新快照），不能依赖动作返回的成功摘要。
+4. 上述约束只适用于历史 Cua 原型。当前 pi-orb 的 Windows backend 在成功动作结果内返回 fresh screenshot 和
+   `observation_id`，下一动作直接使用该 observation；目标侧日志仍是验证动作生效的依据。
 
 ## 4. 会话与授权
 
@@ -64,7 +67,7 @@ SDK 侧对应方法名（`CuaDriver.prototype`，39 个）：`listWindows`、`li
 |---|---|
 | `startSession`/`endSession` 可用且廉价 | 实测 1 ms 量级 |
 | `getSessionState` 含 `desktopCaptureAuthorized`、`desktopUnlocked`、`captureScope`、`effectiveScope` | 实测均为 false/0（本阶段未升级权限） |
-| `escalate_session` 存在但**未使用** | 产品侧授权不由驱动决定；pi-orb 的任务授权与运行代次绑定自行负责（P1-07） |
+| `escalate_session` 存在但**未使用** | 当前产品授权不由历史 Cua 驱动决定；pi-orb 的 session Access grant 绑定 Orb session 与 generation |
 | 会话结束后再查状态会明确报错 | "this session has ended; call start_session explicitly to…" |
 
 ## 5. 许可义务（带入 P1-07）

@@ -28,9 +28,8 @@ claim an end-to-end reference session. All three images use the same viewport.
 | `floating-renderer.spec.ts` interaction cases | Port applicable JSDOM scenarios | Replace DSH RPC assertions with bridge/Pi behavior; no DSH protocol shim |
 
 The source does not supply a Windows native selection toolbar or a Pi Web session
-client. The local selection chip and explicit desktop authorization continue to
-use their existing host interfaces. Reference branding, URL/path opening and
-automatic screenshot saving are outside the approved product boundary.
+client. The local selection chip and session Access bridge use pi-orb host interfaces.
+URL/path opening and automatic screenshot saving are outside the approved product boundary.
 
 Each following stage records its own source mapping, test result and commit.
 
@@ -48,10 +47,10 @@ removed. `jsdom@29.1.1` and `@types/jsdom@28.0.3` follow the reference test
 setup as development dependencies.
 
 The renderer now sends and stops Pi prompts, shows streaming replies, opens
-saved conversations, chooses a workspace, approves/revokes desktop tasks, and
+saved conversations, chooses a workspace, selects/revokes session Access, and
 previews/confirms/discards screenshots through `window.orb`. There is no DSH
-RPC compatibility endpoint. The model picker remains hidden until the Pi Web
-model commands are wired in stage 3.
+RPC compatibility endpoint. The Pi Web model picker is wired in stage 3 and is
+available from the native context menu rather than the main Access controls.
 
 Verification at this stage: 449 unit/renderer tests passed; `npm run typecheck`
 and `npm run package:win:dir` passed; the packaged smoke test passed all 19
@@ -89,12 +88,12 @@ closed-loop acceptance gate in stage 6.
 
 ## Stage 4: frontend completion gate
 
-`evidence/frontend-port/visual-review.md` records the state-by-state comparison
+`evidence/frontend-port/visual-review.md` records the initial state-by-state comparison
 at the reference window sizes. `capture-baseline.mjs --reference` renders the
 actual pinned reference DOM/CSS/image with fixture host state;
 `probe-interactions.mjs` captures the packaged pi-orb window while exercising
 its real preload/main-process boundary against a deterministic Pi Web wire
-fixture. The access gate and screenshot preview use Pi-specific UI, so their
+fixture. The initial access gate and screenshot preview use Pi-specific UI, so their
 comparison is against the same shell tokens and geometry. The preview image
 is explicitly synthetic.
 
@@ -107,6 +106,34 @@ checks reduced-motion dock styling with emulated media. Reference
 macOS app during a running DSH task; the Windows Pi Orb keeps keyboard focus
 in its composer.
 
-The frontend is accepted for the next stage after the full test suite,
-lint, packaged smoke and interaction probe pass. Real model inference and a
-native screenshot flow remain stage 6 evidence gates.
+The initial frontend port passed its then-current test, lint, packaged smoke and
+interaction gates. The session Access, queue and lifecycle implementation added later is recorded below.
+
+## Stage 5: session Access, queue and foreground observations
+
+Reference sources: `apps/desktop/src/orb-permission.ts` and the pinned
+`floating.{html,css,js}`. The renderer exposes only `History / Access / New` in
+the top row; Access selects `Read Only / Workspace Write / Full Access`. Model,
+screenshot and shortcut commands remain in the native context menu or existing
+global gesture. The three tiers map to observation/list/wait, those plus input,
+and those plus `orb_open_app`, respectively.
+
+The grant binds to the current Orb session and run generation. The prompt queue
+keeps one Pi session and its grant across consecutive turns. The Windows driver
+obtains the current foreground app for each observation, excludes the Orb
+process, and binds the next action to that observation id and HWND.
+`orb_open_app` activates an already running app and returns a fresh observation;
+it does not launch applications. The reference GIF is copied from
+`apps/desktop/renderer/deepseek-avatar-square.gif`; its source and license are
+recorded in `THIRD_PARTY_NOTICES.md`.
+
+Pi adaptation boundaries: session id/generation checks, screenshot preview
+confirmation, Windows foreground APIs and the restricted named-pipe bridge
+remain pi-orb code. DSH RPC and iframe session UI are not copied. Access revokes
+on hide, stop, disconnect, workspace/session change and process exit; normal
+turn idle preserves it.
+
+Targeted verification covers session/generation refusal, missing Access, stale
+observations after regrant, all three tiers, multi-prompt queue progression, and
+the actual renderer DOM. Full-suite, lint, build, package probe and live-model
+outcomes are recorded in `doc/reference-experience-gap.md` after this run.

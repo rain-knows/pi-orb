@@ -27,6 +27,11 @@ interface AssistantAccumulator {
   text: string;
 }
 
+interface QueuedPrompt {
+  readonly text: string;
+  readonly images?: readonly ImageContent[];
+}
+
 export class OrbSessionController {
   readonly #deps: OrbSessionDeps;
   #sessionId: string | null = null;
@@ -36,6 +41,7 @@ export class OrbSessionController {
   #running = false;
   #accumulator: AssistantAccumulator | null = null;
   #pendingQuestionId: string | null = null;
+  #promptQueue: QueuedPrompt[] = [];
   constructor(deps: OrbSessionDeps) {
     this.#deps = deps;
   }
@@ -79,6 +85,7 @@ export class OrbSessionController {
     this.#running = false;
     this.#accumulator = null;
     this.#pendingQuestionId = null;
+    this.#promptQueue = [];
     this.#generation = generation;
   }
 
@@ -98,6 +105,7 @@ export class OrbSessionController {
     this.#closeStream = null;
     this.#running = false;
     this.#pendingQuestionId = null;
+    this.#promptQueue = [];
 
     const sessionId = await this.#deps.client.createSession(workspace);
     this.#sessionId = sessionId;
@@ -119,6 +127,7 @@ export class OrbSessionController {
     this.#workspace = null;
     this.#accumulator = null;
     this.#pendingQuestionId = null;
+    this.#promptQueue = [];
     return this.ensureSession(workspace);
   }
 
@@ -150,29 +159,25 @@ export class OrbSessionController {
     // check only applies when there is nothing to send at all.
     if (text.trim().length === 0 && (!images || images.length === 0)) return;
 
-    await this.#subscribe(sessionId);
-    this.#running = true;
-    this.#accumulator = { text: "" };
-    try {
-      await this.#deps.client.prompt(sessionId, text, images, this.#workspace ?? undefined);
-    } catch (error) {
-      // The prompt never started, so no idle event will arrive to clear the state.
-      this.#running = false;
-      throw error;
+    const wasRunning = this.#running;
+    this.#promptQueue.push({ text, ...(images ? { images } : {}) });
+    if (wasRunning) {
+      this.#deps.emit({ type: "queued", count: this.#promptQueue.length });
+      return;
     }
-    // Deliberately no success-path cleanup here. The prompt call returning only
-    // means pi-web accepted the message; the turn itself continues until an
-    // `agent_end` (or a stream error) arrives. Releasing the task lock here would
-    // free it while the turn is still running, allowing a second GUI task to be
-    // started concurrently.
+    this.#running = true;
+    await this.#startNextPrompt();
   }
 
   async abort(): Promise<void> {
     const sessionId = this.#sessionId;
     if (!sessionId) return;
+    this.#promptQueue = [];
     await this.#deps.client.abort(sessionId);
     this.#running = false;
     this.#pendingQuestionId = null;
+    this.#accumulator = null;
+    this.#deps.emit({ type: "idle", stopReason: "aborted" });
   }
 
   async respondToQuestion(response: PiWebUiResponse): Promise<void> {
@@ -194,6 +199,7 @@ export class OrbSessionController {
     this.#running = false;
     this.#accumulator = null;
     this.#pendingQuestionId = null;
+    this.#promptQueue = [];
   }
 
   async #subscribe(sessionId: string): Promise<void> {
@@ -202,8 +208,54 @@ export class OrbSessionController {
     this.#closeStream = await this.#deps.client.openEventStream(
       sessionId,
       (event) => this.#handleEvent(event),
-      (error) => this.#deps.emit({ type: "error", message: error.message }),
+      (error) => this.#handleStreamError(error),
     );
+  }
+
+  async #startNextPrompt(): Promise<void> {
+    const sessionId = this.#sessionId;
+    const next = this.#promptQueue.shift();
+    if (!sessionId || !next) {
+      this.#finishQueue(null);
+      return;
+    }
+    try {
+      await this.#subscribe(sessionId);
+      this.#accumulator = { text: "" };
+      this.#deps.emit({ type: "turn-start" });
+      await this.#deps.client.prompt(sessionId, next.text, next.images, this.#workspace ?? undefined);
+    } catch (error) {
+      this.#accumulator = null;
+      this.#deps.emit({
+        type: "error",
+        message: error instanceof Error ? error.message : String(error),
+      });
+      if (this.#promptQueue.length > 0) {
+        await this.#startNextPrompt();
+      } else {
+        this.#finishQueue(null);
+      }
+    }
+  }
+
+  #finishQueue(stopReason: string | null): void {
+    if (this.#promptQueue.length > 0) {
+      void this.#startNextPrompt();
+      return;
+    }
+    this.#running = false;
+    this.#deps.emit({ type: "idle", stopReason });
+  }
+
+  #handleStreamError(error: Error): void {
+    if (!this.#running) return;
+    this.#closeStream?.();
+    this.#closeStream = null;
+    this.#promptQueue = [];
+    this.#accumulator = null;
+    this.#running = false;
+    this.#deps.emit({ type: "error", message: error.message });
+    this.#deps.emit({ type: "idle", stopReason: null });
   }
 
   #handleEvent(event: unknown): void {
@@ -278,23 +330,22 @@ export class OrbSessionController {
           this.#emitAssistantMessage(this.#accumulator.text);
           this.#accumulator = null;
         }
-        this.#running = false;
         if (this.#pendingQuestionId) {
           this.#deps.emit({ type: "question-closed", id: this.#pendingQuestionId });
           this.#pendingQuestionId = null;
         }
-        this.#deps.emit({ type: "idle", stopReason });
+        this.#finishQueue(stopReason);
         return;
       }
       case "error": {
         const message =
           typeof record.message === "string" ? record.message : "pi-web reported an error.";
-        this.#running = false;
         if (this.#pendingQuestionId) {
           this.#deps.emit({ type: "question-closed", id: this.#pendingQuestionId });
           this.#pendingQuestionId = null;
         }
         this.#deps.emit({ type: "error", message });
+        this.#finishQueue(null);
         return;
       }
       default:
@@ -329,7 +380,6 @@ export class OrbSessionController {
 
     if (updateType === "error") {
       const message = updateRecord.errorMessage;
-      this.#running = false;
       this.#deps.emit({
         type: "error",
         message: typeof message === "string" ? message : "The model call failed.",

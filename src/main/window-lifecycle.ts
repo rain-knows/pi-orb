@@ -22,8 +22,8 @@ export interface CollapseTarget {
 }
 
 export interface DesktopOperations {
-  /** Revoke the desktop task authority. Idempotent. */
-  revokeDesktopTask(): void;
+  /** Revoke the session-level Orb desktop authority. Idempotent. */
+  revokeOrbAccess(): void;
   /** Drop any unconfirmed screenshot. Idempotent. */
   discardPendingCapture(): void;
   /**
@@ -69,7 +69,7 @@ export class OrbWindowLifecycle {
     this.#target.hide();
     // Order matters only in that all of them must happen; there is no window in which hiding should
     // outlive the authority, the pending capture or the record of the target window.
-    this.#operations.revokeDesktopTask();
+    this.#operations.revokeOrbAccess();
     this.#operations.discardPendingCapture();
     this.#operations.clearRecordedTarget();
     this.#collapseCount += 1;

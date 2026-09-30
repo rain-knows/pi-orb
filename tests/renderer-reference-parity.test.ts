@@ -13,7 +13,7 @@ describe("reference floating shell", () => {
     const document = new JSDOM(html).window.document;
     const panel = document.querySelector("#panel");
     expect(panel).not.toBeNull();
-    for (const selector of ["#history", "#permission-button", "#new-conversation", "#transcript", "#question", "#history-list", "#selection-chip", "#composer", "#prompt", "#access-sheet", "#preview-sheet"]) {
+    for (const selector of ["#history", "#permission-button", "#permission-menu", "#access-read-only", "#access-workspace-write", "#access-full", "#new-conversation", "#transcript", "#question", "#history-list", "#selection-chip", "#composer", "#prompt", "#preview-sheet"]) {
       expect(panel?.querySelector(selector), selector).not.toBeNull();
     }
     for (const selector of ["#ball", "#ball-gif", "#dock-tab", "#stop"]) {
@@ -21,6 +21,7 @@ describe("reference floating shell", () => {
     }
     expect(panel?.querySelector("#composer #prompt[contenteditable='true']")).not.toBeNull();
     expect(document.querySelector("#tcc-gate")).toBeNull();
+    expect(document.querySelector("#access-sheet")).toBeNull();
     expect(document.querySelector("#root")).toBeNull();
   });
 
@@ -45,7 +46,7 @@ describe("reference floating shell", () => {
     const policy = new JSDOM(html).window.document.querySelector("meta[http-equiv='Content-Security-Policy']")?.getAttribute("content");
     expect(policy).toContain("connect-src 'none'");
     expect(policy).not.toContain("dsh-app:");
-    expect(html).not.toContain("deepseek-avatar");
+    expect(new JSDOM(html).window.document.querySelector("#ball-gif")?.getAttribute("src")).toBe("deepseek-avatar-square.gif");
     expect(html).not.toContain("main.tsx");
   });
 });

@@ -39,17 +39,7 @@ import { BridgeClient } from "./bridge-client.js";
 
 export { ORB_MODE_SECTION };
 
-const OBSERVE_PARAMS = Type.Object(
-  {
-    window_id: Type.Optional(
-      Type.String({
-        description:
-          "Observation target. Omit to observe the window the user recorded before the orb took focus.",
-      }),
-    ),
-  },
-  { additionalProperties: false },
-);
+const OBSERVE_PARAMS = Type.Object({}, { additionalProperties: false });
 
 /**
  * Position parameters, shared by click and scroll.
@@ -229,8 +219,8 @@ export default function orbExtension(pi: ExtensionAPI): void {
       name: ORB_TOOLS.observe,
       label: "Orb: observe a window",
       description:
-        "Observe a desktop window: its identity, geometry and accessible elements. When a desktop task is authorized, the target-window screenshot is also sent to the model.",
-      promptSnippet: "Observe a desktop window (identity, geometry, elements)",
+        "Observe the current foreground application: its identity, geometry and screenshot. The Orb window is excluded.",
+      promptSnippet: "Observe the current foreground application",
       promptGuidelines: [
         "Always observe before acting. A successful action returns a fresh observation and screenshot; use that observation_id for the next action.",
       ],
@@ -239,7 +229,6 @@ export default function orbExtension(pi: ExtensionAPI): void {
         return forward(toolCtx, "observe", {
           sessionId: toolCtx.sessionManager.getSessionId(),
           generation: sessionState.generation,
-          windowId: params.window_id,
         });
       },
     });
@@ -447,7 +436,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
             token,
           );
           commandCtx.ui.notify(
-            result.ok ? "Orb desktop task authorization revoked." : `Could not revoke: ${result.message}`,
+            result.ok ? "Orb desktop Access revoked." : `Could not revoke: ${result.message}`,
             result.ok ? "info" : "warning",
           );
           return;
@@ -485,7 +474,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
   async function forward(
     ctx: ExtensionContext,
     type: "observe" | "act",
-    payload: { sessionId: string; generation: number; windowId?: string; action?: DesktopAction },
+    payload: { sessionId: string; generation: number; action?: DesktopAction },
   ) {
     const bridge = createBridge();
     if (!bridge) {
@@ -512,7 +501,6 @@ export default function orbExtension(pi: ExtensionAPI): void {
             type: "observe" as const,
             sessionId: payload.sessionId,
             generation: payload.generation,
-            ...(payload.windowId ? { windowId: payload.windowId } : {}),
           }
         : {
             type: "act" as const,
@@ -559,9 +547,8 @@ export function renderResult(result: unknown): string {
   const nestedObservation = findObservation(record.observation);
   if (nestedObservation) {
     const heading = typeof record.action === "string" ? `action: ${record.action} completed` : "Fresh observation:";
-    const actionsUsed = typeof record.actionsUsed === "number" ? `actions_used: ${record.actionsUsed}` : null;
     const apps = Array.isArray(record.apps) ? `running_apps: ${record.apps.join(", ")}` : null;
-    return [heading, ...(actionsUsed ? [actionsUsed] : []), ...(apps ? [apps] : []), renderObservation(nestedObservation)].join("\n");
+    return [heading, ...(apps ? [apps] : []), renderObservation(nestedObservation)].join("\n");
   }
   const observation = findObservation(record);
   if (observation) return renderObservation(observation);

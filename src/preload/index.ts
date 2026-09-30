@@ -15,10 +15,9 @@ import { contextBridge, ipcRenderer } from "electron";
 import {
   IPC,
   type AbortRequest,
-  type AuthorizeDesktopTaskRequest,
+  type SetOrbAccessRequest,
   type CaptureRequest,
   type DesktopTaskStatus,
-  type ListDesktopWindowsResult,
   type OrbSessionEvent,
   type PromptRequest,
   type ScreenshotCaptureResult,
@@ -26,11 +25,11 @@ import {
   type ScreenshotResolveResult,
   type ScreenshotExportRequest,
   type ScreenshotExportResult,
-  type SetDesktopTargetResult,
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
   type FloatingWindowState,
   type ShellMenuEditFlags,
+  type ShellMenuAction,
   type ListSessionHistoryResult,
   type OpenSessionHistoryResult,
   type OrbSelectionContext,
@@ -55,11 +54,10 @@ export interface OrbBridge {
    * copy or a clipboard to paste from; the main process coerces them to booleans.
    */
   openShellMenu(flags: ShellMenuEditFlags): Promise<boolean>;
-  authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
-  revokeDesktopTask(): Promise<DesktopTaskStatus>;
-  getDesktopTaskStatus(): Promise<DesktopTaskStatus>;
-  listDesktopWindows(): Promise<ListDesktopWindowsResult>;
-  setDesktopTarget(windowId: string): Promise<SetDesktopTargetResult>;
+  onShellMenuAction(listener: (action: ShellMenuAction) => void): () => void;
+  setOrbAccess(request: SetOrbAccessRequest): Promise<DesktopTaskStatus>;
+  revokeOrbAccess(): Promise<DesktopTaskStatus>;
+  getOrbAccess(): Promise<DesktopTaskStatus>;
   validateWorkspace(candidate: string): Promise<WorkspaceCandidateResult>;
   chooseWorkspace(): Promise<WorkspaceCandidateResult>;
   setWorkspace(candidate: string, createConfirmed: boolean): Promise<WorkspaceStatus>;
@@ -93,12 +91,14 @@ const bridge: OrbBridge = {
   unsnapFloatingBall: () => ipcRenderer.invoke(IPC.unsnapFloatingBall),
   collapseOrb: () => ipcRenderer.invoke(IPC.collapseOrb),
   openShellMenu: (flags: ShellMenuEditFlags) => ipcRenderer.invoke(IPC.shellMenu, flags),
-  authorizeDesktopTask: (request: AuthorizeDesktopTaskRequest) =>
-    ipcRenderer.invoke(IPC.authorizeDesktopTask, request),
-  revokeDesktopTask: () => ipcRenderer.invoke(IPC.revokeDesktopTask),
-  getDesktopTaskStatus: () => ipcRenderer.invoke(IPC.getDesktopTaskStatus),
-  listDesktopWindows: () => ipcRenderer.invoke(IPC.listDesktopWindows),
-  setDesktopTarget: (windowId: string) => ipcRenderer.invoke(IPC.setDesktopTarget, windowId),
+  onShellMenuAction: (listener) => {
+    const handler = (_event: unknown, action: ShellMenuAction) => listener(action);
+    ipcRenderer.on(IPC.shellMenuAction, handler);
+    return () => ipcRenderer.removeListener(IPC.shellMenuAction, handler);
+  },
+  setOrbAccess: (request: SetOrbAccessRequest) => ipcRenderer.invoke(IPC.setOrbAccess, request),
+  revokeOrbAccess: () => ipcRenderer.invoke(IPC.revokeOrbAccess),
+  getOrbAccess: () => ipcRenderer.invoke(IPC.getOrbAccess),
   validateWorkspace: (candidate: string) =>
     ipcRenderer.invoke(IPC.validateWorkspace, candidate),
   chooseWorkspace: () => ipcRenderer.invoke(IPC.chooseWorkspace),

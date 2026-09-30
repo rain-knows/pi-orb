@@ -9,9 +9,10 @@
  *     broker refuses before touching the driver, so desktop authority cannot be bypassed by a
  *     malformed request.
  *  2. **One action, one observation.** An action must name the observation it was decided
- *     from, and the adapter re-observes afterwards as part of the caller's next turn.
+ *     from, and a successful action returns the fresh screenshot and observation id for the next
+ *     action.
  *  3. **A failure stops the batch.** The controller records the outcome, and a failed action
- *     makes the next one refuse until the run is re-authorized or the user continues.
+ *     makes the next one refuse until the user changes the Access level.
  *
  * It is deliberately narrow: it holds no session engine, no model, and no policy of its own
  * beyond what `desktop-task.ts` and `orb-tools.ts` define.
@@ -26,7 +27,8 @@ import {
   type DesktopElement,
   type DesktopObservation,
 } from "@shared/orb-tools";
-import { DesktopTaskController, type ActResult, type DesktopDriver } from "./desktop-task";
+import { DesktopTaskController, accessRefusalMessage, type ActResult, type DesktopDriver } from "./desktop-task";
+import type { OrbAccessLevel } from "@shared/ipc";
 
 export interface DesktopBrokerOptions {
   readonly driver: DesktopDriver;
@@ -38,11 +40,9 @@ export interface DesktopBrokerOptions {
 
 export interface BrokerStatus {
   readonly authorized: boolean;
-  readonly taskId: string | null;
-  readonly scope: string | null;
-  readonly actionsUsed: number;
-  readonly actionLimit: number;
-  readonly expiresAt: number | null;
+  readonly level: OrbAccessLevel | null;
+  readonly sessionId: string | null;
+  readonly generation: number | null;
   readonly stopped: boolean;
   readonly stoppedReason: string | null;
   readonly lastObservationId: string | null;
@@ -51,8 +51,8 @@ export interface BrokerStatus {
 export class DesktopBroker {
   readonly #options: DesktopBrokerOptions;
   readonly #controller: DesktopTaskController;
-  /** Task id that owned the current driver observation; null means it was read-only pre-authorization. */
-  #observationTaskId: string | null = null;
+  /** Session that owns the current driver observation. */
+  #observationSessionId: string | null = null;
   #activeAction: AbortController | null = null;
 
   constructor(options: DesktopBrokerOptions) {
@@ -67,20 +67,19 @@ export class DesktopBroker {
   /**
    * Grant a desktop task. Called only from an explicit user decision in the shell UI.
    *
-   * The scope text is recorded so the user can be shown what they approved, and the grant is
-   * bound to the session and generation so it cannot survive a run change.
+   * The grant is bound to the session and generation so it cannot survive a run change.
    */
-  authorize(input: { sessionId: string; generation: number; scope: string }): BrokerStatus {
+  authorize(input: { sessionId: string; generation: number; level: OrbAccessLevel }): BrokerStatus {
     this.#abortActiveAction("desktop task was replaced");
     // A new task must never inherit a picture captured under the previous grant. An observation
     // made before any grant is intentionally retained so the user can inspect it before approving.
-    if (this.#observationTaskId !== null) {
+    if (this.#observationSessionId !== null) {
       this.#consumeObservation();
       this.#options.driver.resetActionContext?.();
       this.#controller.clearObservation();
     }
     this.#controller.authorize(input);
-    this.#log({ event: "authorize", ...input });
+    this.#log({ event: "authorize", sessionId: input.sessionId, generation: input.generation, level: input.level });
     return this.status();
   }
 
@@ -98,11 +97,9 @@ export class DesktopBroker {
     const state = this.#controller.state;
     return {
       authorized: this.#controller.authorized,
-      taskId: state.authorization?.taskId ?? null,
-      scope: state.authorization?.scope ?? null,
-      actionsUsed: state.actionsUsed,
-      actionLimit: 12,
-      expiresAt: state.authorization?.expiresAt ?? null,
+      level: state.authorization?.level ?? null,
+      sessionId: state.authorization?.sessionId ?? null,
+      generation: state.authorization?.generation ?? null,
       stopped: state.stopped,
       stoppedReason: state.stoppedReason,
       lastObservationId: state.lastObservationId,
@@ -110,16 +107,21 @@ export class DesktopBroker {
   }
 
   /** The bridge executor entry point for an observation. */
-  async observe(sessionId: string, generation: number, windowId?: string): Promise<unknown> {
+  async observe(sessionId: string, generation: number): Promise<unknown> {
+    if (!this.#options.isLive(sessionId, generation)) return refusal("stale-generation");
     const authorization = this.#controller.state.authorization;
-    const includeImage =
-      this.#controller.isAuthorizedAt(Date.now()) &&
-      authorization?.sessionId === sessionId &&
-      authorization.generation === generation;
-    const result = await this.#options.driver.observe({
-      ...(windowId ? { windowId } : {}),
-      ...(includeImage ? { includeImage: true } : {}),
-    });
+    if (!authorization) return refusal("no-task-authorization");
+    if (authorization.sessionId !== sessionId) return refusal("no-task-authorization");
+    if (authorization.generation !== generation) return refusal("stale-generation");
+    const result = await this.#options.driver.observe({ includeImage: true });
+    if (this.#controller.state.authorization !== authorization || !this.#options.isLive(sessionId, generation)) {
+      // An observation can finish after revoke/regrant. Clear only its own picture; a newer
+      // request may already have replaced the driver's observation for the live grant.
+      if (result.observation && this.#currentObservation()?.observationId === result.observation.observationId) {
+        this.#consumeObservation();
+      }
+      return refusal("stale-generation");
+    }
     if (!result.ok || !result.observation) {
       this.#consumeObservation();
       this.#controller.clearObservation();
@@ -132,7 +134,7 @@ export class DesktopBroker {
       };
     }
     this.#controller.observe(result.observation.observationId);
-    this.#observationTaskId = this.#controller.state.authorization?.taskId ?? null;
+    this.#observationSessionId = this.#controller.state.authorization?.sessionId ?? null;
     this.#log({
       event: "observe",
       sessionId,
@@ -167,9 +169,13 @@ export class DesktopBroker {
     }
 
     const observation = this.#currentObservation();
-    const refusalReason = this.#controller.check(parsed.action, observation);
+    const refusalReason = this.#controller.check(parsed.action, observation, { sessionId, generation });
     if (refusalReason !== null) {
       this.#log({ event: "act-refused", reason: refusalReason, kind: parsed.action.kind });
+      if (refusalReason === "access-level") {
+        const level = this.#controller.state.authorization?.level ?? "read-only";
+        return { ok: false, refused: true, reason: refusalReason, message: accessRefusalMessage(level, parsed.action.kind) };
+      }
       return refusal(refusalReason);
     }
 
@@ -184,7 +190,7 @@ export class DesktopBroker {
       },
     });
 
-    const taskId = this.#controller.state.authorization?.taskId ?? null;
+    const grant = this.#controller.state.authorization;
     const actionController = new AbortController();
     this.#activeAction = actionController;
     let result: ActResult;
@@ -202,7 +208,7 @@ export class DesktopBroker {
 
     // A revoke or replacement may have happened while the native action was unwinding. Do not
     // account that old result against a new grant or consume the new grant's observation.
-    if (this.#controller.state.authorization?.taskId !== taskId) {
+    if (this.#controller.state.authorization !== grant || !this.#options.isLive(sessionId, generation)) {
       return refusal("no-task-authorization");
     }
     this.#controller.recordOutcome(result.ok, result.error);
@@ -222,25 +228,17 @@ export class DesktopBroker {
     }
 
     const nextObservation = result.observation;
-    if (nextObservation) {
-      this.#controller.observe(nextObservation.observationId);
-      this.#observationTaskId = taskId;
-    } else {
-      // Drivers without post-action observations must force an explicit fresh observe call.
-      this.#consumeObservation();
-    }
+    this.#controller.observe(nextObservation.observationId);
+    this.#observationSessionId = grant?.sessionId ?? null;
 
     this.#log({ event: "act", kind: parsed.action.kind, observationId: parsed.action.observationId });
     return {
       ok: true,
       action: parsed.action.kind,
       observationId: parsed.action.observationId,
-      actionsUsed: this.#controller.state.actionsUsed,
-      ...(nextObservation ? { observation: nextObservation } : {}),
+      observation: nextObservation,
       ...(result.apps ? { apps: result.apps } : {}),
-      next: nextObservation
-        ? "Use this fresh observation for the next action."
-        : "Observe the window again before the next action.",
+      next: "Use this fresh observation for the next action.",
     };
   }
 
@@ -257,7 +255,7 @@ export class DesktopBroker {
 
   #consumeObservation(): void {
     this.#options.driver.consumeObservation?.();
-    this.#observationTaskId = null;
+    this.#observationSessionId = null;
   }
 
   #abortActiveAction(reason: string): void {

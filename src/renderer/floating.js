@@ -64,6 +64,7 @@ async function main() {
   const el = (id) => document.getElementById(id)
   const panel = el('panel')
   const ball = el('ball')
+  const ballGif = el('ball-gif')
   const dockTab = el('dock-tab')
   const transcript = el('transcript')
   const questionRoot = el('question')
@@ -86,12 +87,13 @@ async function main() {
   const selectionChip = el('selection-chip')
   const selectionChipText = el('selection-chip-text')
   const selectionChipDismiss = el('selection-chip-dismiss')
-  const accessSheet = el('access-sheet')
   const previewSheet = el('preview-sheet')
   const modelSheet = el('model-sheet')
+  const shortcutSheet = el('shortcut-sheet')
   const workspaceGate = el('workspace-gate')
   const transcriptEmpty = el('transcript-empty')
   const newConversationButton = el('new-conversation')
+  const ballGifSource = ballGif.getAttribute('src')
   let snapshot = await api.getStatus()
   let desktopTask = snapshot.desktopTask
   let selectionContext = await api.getSelectionContext()
@@ -120,6 +122,7 @@ async function main() {
   let messageCount = 0
   let noticeTimer
   let pendingQuestion
+  let openModelChooser
   const toolRows = new Map()
 
   document.documentElement.lang = 'en'
@@ -223,20 +226,46 @@ async function main() {
     document.body.classList.toggle('running', running)
     stop.hidden = !expanded || !running
     newConversationButton.disabled = !snapshot.configured || running
-    if (next) {
-      if (!el('thinking')) {
-        const thinking = document.createElement('div')
-        thinking.id = 'thinking'
-        thinking.className = 'orb-thinking'
-        thinking.innerHTML = '<i></i><i></i><i></i><span>Thinking</span>'
-        transcript.append(thinking)
-      }
-    } else {
-      el('thinking')?.remove()
+    syncBallGif()
+    if (!next) {
       streaming = ''
       streamedMessage = undefined
       closeQuestion()
     }
+  }
+
+  function freezeBallGif() {
+    const still = () => {
+      if (ballGif.dataset.mode !== 'still' || ballGif.naturalWidth === 0) return
+      const canvas = document.createElement('canvas')
+      canvas.width = ballGif.naturalWidth
+      canvas.height = ballGif.naturalHeight
+      const context = canvas.getContext('2d')
+      if (!context) return
+      context.drawImage(ballGif, 0, 0)
+      try {
+        ballGif.src = canvas.toDataURL()
+      } catch {
+        // The GIF remains at its first frame when the canvas is unavailable.
+      }
+    }
+    if (ballGif.complete && ballGif.naturalWidth > 0) still()
+    else ballGif.addEventListener('load', still, { once: true })
+  }
+
+  function syncBallGif() {
+    const shouldPlay = expanded || running || Boolean(pendingQuestion) || hasSelectionChip()
+    if (shouldPlay) {
+      if (ballGif.dataset.mode !== 'play') {
+        ballGif.dataset.mode = 'play'
+        ballGif.src = ballGifSource
+      }
+      return
+    }
+    if (ballGif.dataset.mode === 'still') return
+    ballGif.dataset.mode = 'still'
+    ballGif.src = ballGifSource
+    freezeBallGif()
   }
 
   function applyDirection(state) {
@@ -313,12 +342,14 @@ async function main() {
       panel.hidden = false
       expanded = true
       document.body.classList.add('expanded')
+      syncBallGif()
       stop.hidden = !running
       return
     }
     if (!force && (pinned || running || hasSelectionChip() || activeSheet || historyOpen)) return
     expanded = false
     document.body.classList.remove('expanded')
+    syncBallGif()
     if (docked !== undefined) dockTab.hidden = false
     stop.hidden = true
     if (force) {
@@ -367,7 +398,7 @@ async function main() {
 
   function closeSheet() {
     activeSheet = undefined
-    for (const sheet of [accessSheet, previewSheet, modelSheet]) sheet.hidden = true
+    for (const sheet of [previewSheet, modelSheet, shortcutSheet]) sheet.hidden = true
   }
 
   function closeQuestion(id) {
@@ -375,12 +406,14 @@ async function main() {
     pendingQuestion = undefined
     questionRoot.hidden = true
     document.body.classList.remove('asking')
+    syncBallGif()
   }
 
   function renderQuestion() {
     const pending = pendingQuestion
     if (!pending) return
     document.body.classList.add('asking')
+    syncBallGif()
     questionRoot.hidden = false
     el('question-eyebrow').hidden = true
     questionTitle.textContent = pending.title
@@ -470,12 +503,11 @@ async function main() {
   }
 
   function renderPermission() {
-    permissionLabel.textContent = desktopTask.authorized ? 'Desktop access' : 'Orb access'
-    el('access-state').textContent = desktopTask.authorized
-      ? `Approved · ${desktopTask.actionsUsed}/${desktopTask.actionLimit} actions${desktopTask.scope ? ` · ${desktopTask.scope}` : ''}`
-      : desktopTask.stoppedReason || 'Desktop actions require approval for each task.'
-    el('access-target').textContent = desktopTask.target?.title || 'No target selected'
-    el('revoke').disabled = !desktopTask.authorized
+    const labels = { 'read-only': 'Read Only', 'workspace-write': 'Workspace Write', 'full-access': 'Full Access' }
+    permissionLabel.textContent = desktopTask.level ? labels[desktopTask.level] : 'Access'
+    for (const option of permissionMenu.querySelectorAll('[data-level]')) {
+      option.setAttribute('aria-selected', String(option.dataset.level === desktopTask.level))
+    }
   }
 
   function setSelectionContext(context) {
@@ -485,6 +517,7 @@ async function main() {
     const summary = context?.text.replace(/\s+/g, ' ').trim() ?? ''
     selectionChipText.textContent = context ? `${context.sourceLabel ?? 'Another application'} · ${summary.length > 72 ? `${summary.slice(0, 69)}...` : summary}` : ''
     selectionChip.title = context?.text ?? ''
+    syncBallGif()
   }
 
   async function refreshStatus() {
@@ -507,7 +540,7 @@ async function main() {
 
   async function sendPrompt() {
     const instruction = promptText(prompt).trim()
-    if ((!instruction && !selectionContext) || running || !snapshot.configured) return
+    if ((!instruction && !selectionContext) || !snapshot.configured) return
     const text = selectionContext
       ? `${instruction || 'Please help me understand this selected text.'}\n\n[Selected text from ${selectionContext.sourceLabel ?? 'another application'}]\n${selectionContext.text}`
       : instruction
@@ -515,8 +548,10 @@ async function main() {
     showNotice('')
     setHistoryOpen(false)
     setPermissionOpen(false)
-    streamedMessage = undefined
-    streaming = ''
+    if (!running) {
+      streamedMessage = undefined
+      streaming = ''
+    }
     addMessage('user', text)
     setRunning(true)
     try {
@@ -617,30 +652,6 @@ async function main() {
     await refreshStatus()
   }
 
-  function renderWindowChoices(windows) {
-    const list = el('target-list')
-    list.replaceChildren()
-    list.hidden = false
-    for (const choice of windows) {
-      const button = document.createElement('button')
-      button.type = 'button'
-      button.setAttribute('role', 'option')
-      button.setAttribute('aria-selected', String(choice.windowId === desktopTask.target?.windowId))
-      button.textContent = choice.title || choice.appName
-      const detail = document.createElement('small')
-      detail.textContent = choice.appName
-      button.append(detail)
-      button.addEventListener('click', async () => {
-        const result = await api.setDesktopTarget(choice.windowId)
-        if (!result.ok) { showNotice(result.message); return }
-        desktopTask = await api.getDesktopTaskStatus()
-        renderPermission()
-        list.hidden = true
-      })
-      list.append(button)
-    }
-  }
-
   api.onSessionEvent((event) => {
     if (event.type === 'assistant-delta') {
       streaming += event.text
@@ -649,10 +660,15 @@ async function main() {
       appendAssistant(event.text)
     } else if (event.type === 'error') {
       showNotice(event.message)
-      setRunning(false)
     } else if (event.type === 'idle') {
       setRunning(false)
       void refreshStatus().catch(report)
+    } else if (event.type === 'turn-start') {
+      streamedMessage = undefined
+      streaming = ''
+      setRunning(true)
+    } else if (event.type === 'queued') {
+      showNotice(String(event.count) + ' ' + (event.count === 1 ? 'message' : 'messages') + ' queued')
     } else if (event.type === 'session') {
       snapshot = { ...snapshot, sessionId: event.sessionId, generation: event.generation }
     } else if (event.type === 'tool') {
@@ -845,49 +861,38 @@ async function main() {
     setSelectionContext(null)
   })
   el('choose-workspace').addEventListener('click', () => { void chooseWorkspace().catch(report) })
-  el('access-open').addEventListener('click', () => {
-    el('shortcut-section').hidden = true
-    showSheet(accessSheet)
-  })
-  el('shortcut-open').addEventListener('click', () => {
-    el('shortcut-section').hidden = false
-    el('shortcut-input').placeholder = snapshot.shortcut
-    showSheet(accessSheet)
-  })
-  el('capture-context').addEventListener('click', () => { void captureScreenshot().catch(report) })
-  el('access-close').addEventListener('click', closeSheet)
-  el('target-open').addEventListener('click', async () => {
-    const result = await api.listDesktopWindows()
-    if (!result.ok) { showNotice(result.message); return }
-    renderWindowChoices(result.windows)
-  })
-  el('authorize-form').addEventListener('submit', async event => {
-    event.preventDefault()
-    const scope = el('task-scope').value.trim()
-    if (!scope) return
-    desktopTask = await api.authorizeDesktopTask({ generation: snapshot.generation, scope })
-    renderPermission()
-    showNotice(desktopTask.authorized ? 'Desktop task approved.' : desktopTask.stoppedReason)
-  })
-  el('revoke').addEventListener('click', async () => {
-    desktopTask = await api.revokeDesktopTask()
-    renderPermission()
-    showNotice('Desktop authorization revoked.')
-  })
-  el('shortcut-form').addEventListener('submit', async event => {
-    event.preventDefault()
-    const value = el('shortcut-input').value.trim()
-    if (!value) return
-    snapshot = await api.setShortcut(value)
-    el('shortcut-input').value = ''
-    showNotice(snapshot.shortcutRegistered ? `Wake shortcut set to ${snapshot.shortcut}.` : snapshot.shortcutProblem)
-  })
+  for (const option of permissionMenu.querySelectorAll('[data-level]')) {
+    option.addEventListener('click', async () => {
+      const level = option.dataset.level
+      if (!level) return
+      desktopTask = await api.setOrbAccess({ generation: snapshot.generation, level })
+      renderPermission()
+      setPermissionOpen(false)
+    })
+  }
   el('preview-close').addEventListener('click', () => { void resolveScreenshot(false).catch(report) })
   el('preview-discard').addEventListener('click', () => { void resolveScreenshot(false).catch(report) })
   el('preview-send').addEventListener('click', () => { void resolveScreenshot(true).catch(report) })
   el('preview-save').addEventListener('click', () => { void exportScreenshot().catch(report) })
   el('model-close').addEventListener('click', closeSheet)
-  el('model-open').addEventListener('click', async () => {
+  el('shortcut-close').addEventListener('click', closeSheet)
+  el('shortcut-form').addEventListener('submit', async event => {
+    event.preventDefault()
+    snapshot = await api.setShortcut(el('shortcut-input').value.trim())
+    if (!snapshot.shortcutRegistered) {
+      showNotice(snapshot.shortcutProblem ?? 'The shortcut could not be registered.')
+      return
+    }
+    showNotice('Wake shortcut: ' + snapshot.shortcut)
+    closeSheet()
+  })
+  function openShortcutEditor() {
+    el('shortcut-input').value = snapshot.shortcut
+    showSheet(shortcutSheet)
+    el('shortcut-input').focus()
+    el('shortcut-input').select()
+  }
+  openModelChooser = async () => {
     showSheet(modelSheet)
     const list = el('model-list')
     list.textContent = 'Loading…'
@@ -900,15 +905,20 @@ async function main() {
       button.type = 'button'
       button.setAttribute('role', 'option')
       button.setAttribute('aria-selected', String(result.selected?.provider === model.provider && result.selected?.id === model.id))
-      button.textContent = `${model.name} · ${model.provider}`
+      button.textContent = model.name + ' · ' + model.provider
       button.addEventListener('click', async () => {
         const selected = await api.setModel({ generation: snapshot.generation, provider: model.provider, id: model.id })
         if (!selected.ok) { showNotice(selected.message); return }
-        showNotice(`Model: ${model.name}`)
+        showNotice('Model: ' + model.name)
         closeSheet()
       })
       list.append(button)
     }
+  }
+  api.onShellMenuAction(action => {
+    if (action === 'model') void openModelChooser().catch(report)
+    else if (action === 'screenshot') void captureScreenshot().catch(report)
+    else if (action === 'shortcut') openShortcutEditor()
   })
   el('question-cancel').addEventListener('click', () => { void answerQuestion(true).catch(report) })
   questionContinue.addEventListener('click', () => { void answerQuestion().catch(report) })
@@ -925,7 +935,7 @@ async function main() {
     event.preventDefault()
     void answerQuestion().catch(report)
   })
-  panel.addEventListener('contextmenu', event => {
+  document.body.addEventListener('contextmenu', event => {
     event.preventDefault()
     const editable = editableTarget(event.target)
     const enabled = (command) => typeof document.queryCommandEnabled === 'function' && document.queryCommandEnabled(command)

@@ -26,12 +26,7 @@
 .orb-tool { border: 1px solid var(--border); border-radius: 14px; padding: 8px 12px; font-size: 12px; }
 .orb-tool strong { display: block; }
 .orb-tool p { margin: 4px 0 0; color: var(--pin); }
-.orb-thinking { display: flex; gap: 4px; align-items: center; color: var(--pin); font-size: 12px; }
-.orb-thinking i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: orb-thinking 1s infinite alternate; }
-.orb-thinking i:nth-child(2) { animation-delay: 150ms; }
-.orb-thinking i:nth-child(3) { animation-delay: 300ms; }
-@keyframes orb-thinking { to { opacity: .25; transform: translateY(-2px); } }
-@media (prefers-reduced-motion: reduce) { .orb-thinking i { animation: none; } #panel { transition: none; } }
+@media (prefers-reduced-motion: reduce) { #panel { transition: none; } }
 
 .orb-sheet {
   position: absolute;
@@ -58,9 +53,9 @@ body.expand-down .orb-sheet { padding-top: 20px; padding-bottom: 36px; }
 .orb-sheet label { font-size: 11px; color: var(--pin); }
 .orb-sheet input { width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; color: var(--black); background: var(--input-bg); font: inherit; user-select: text; -webkit-user-select: text; }
 .orb-sheet footer { display: flex; gap: 6px; flex-wrap: wrap; }
-#target-list, #model-list { display: grid; gap: 5px; overflow: auto; max-height: 140px; }
-#target-list button, #model-list button { text-align: left; border-radius: 12px; overflow-wrap: anywhere; }
-#target-list button[aria-selected="true"], #model-list button[aria-selected="true"] { background: var(--input-bg); border-color: var(--black); }
+#model-list { display: grid; gap: 5px; overflow: auto; max-height: 140px; }
+#model-list button { text-align: left; border-radius: 12px; overflow-wrap: anywhere; }
+#model-list button[aria-selected="true"] { background: var(--input-bg); border-color: var(--black); }
 #preview-image { width: 100%; max-height: 210px; object-fit: contain; border: 1px solid var(--border); border-radius: 12px; }
 #preview-image { box-sizing: border-box; }
 .history-row small { display: block; margin-top: 4px; color: var(--pin); }

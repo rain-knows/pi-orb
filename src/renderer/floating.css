@@ -321,7 +321,6 @@ body.expand-down #composer {
   top: 0;
 }
 
-body.running #composer,
 body.asking #composer,
 body.running #selection-chip,
 body.asking #selection-chip {

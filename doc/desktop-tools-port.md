@@ -6,7 +6,7 @@ The behavior baseline is `rain-knows/deepseek-harness-orb`, MIT, commit
 `72f1d738458a223696685a909e806b683eff5885`, primarily
 `packages/experimental/tool-computer-use/src/plugin.ts`, `wait-args.ts`,
 `coordinates.ts`, `backend.ts` and the Windows backend/specs. Pi Orb keeps its
-own extension, bridge, session generation and explicit task authorization. The
+own extension, bridge, session generation and explicit session Access grant. The
 reference Cordis session and DSH RPC are not copied.
 
 ## Stage 5 result
@@ -27,20 +27,24 @@ The action contracts follow the reference Windows behavior:
 - scroll is vertical only (`up`/`down`) and uses the reference 1-10 amount;
 - wait is fixed at one second; long wait accepts only 10, 30, 60 or 120 seconds;
 - list apps and foreground metadata are returned with a fresh observation;
-- every action still requires the current observation, authorization and task
-  budget, then captures a new image from the same HWND;
+- every action requires the latest observation and the session's current Access level; it returns a
+  fresh screenshot, observation id, foreground metadata and window identity for the next action;
+- each `orb_observe` selects the current foreground application. Actions remain bound to that
+  observation and refuse if the foreground identity changes before input is sent;
 - element tokens are not exposed to the model because the Windows backend
   produces no element tree. The parser rejects token payloads instead of
   silently falling back to coordinates.
 
-`orb_open_app` remains the product-specific narrowing: it activates an already
-running application and verifies the resulting foreground window; it never
-launches a process. Cross-screen drag and automatic screenshot export remain
-outside the approved Pi boundary.
+The reference `Read Only / Workspace Write / Full Access` levels now gate the tool set for the
+current Orb session. `orb_open_app` is available only at Full Access; it activates an already
+running application and verifies the resulting foreground window, then returns a fresh observation.
+It never launches a process. Cross-screen drag and automatic screenshot export remain outside the
+approved Pi boundary.
 
 ## Verification
 
 The adapted reference backend tests cover click modifiers, button/count,
 replace/submit input, vertical scroll, cancellation, foreground metadata,
-running-app listing, fixed waits, stale observations and target safety. The
-full suite, typecheck, lint and production build pass after this stage.
+running-app listing, fixed waits, stale observations, access-tier enforcement, grant/session binding,
+and revocation races. Full-suite, typecheck, lint, build, package probe and live model acceptance are
+recorded in `doc/reference-experience-gap.md` after the current implementation run.

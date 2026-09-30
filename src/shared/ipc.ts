@@ -39,6 +39,8 @@ export const IPC = {
    * text-editing set, enabled from the focused field's `editFlags`.
    */
   shellMenu: "orb:shell-menu",
+  /** Main -> renderer: invoke an Orb utility selected from the native context menu. */
+  shellMenuAction: "orb:shell-menu-action",
   /** Renderer -> main: read the Orb configuration and workspace status. */
   getStatus: "orb:get-status",
   /** Renderer -> main: validate a candidate workspace directory (read-only). */
@@ -65,7 +67,7 @@ export const IPC = {
   setModel: "orb:set-model",
   /** Renderer -> main: answer the current blocking Pi extension UI request. */
   respondQuestion: "orb:respond-question",
-  /** Renderer -> main: capture the previously recorded target window for preview. */
+  /** Renderer -> main: capture the window recorded before the Orb took focus for preview. */
   captureScreenshot: "orb:capture-screenshot",
   /** Renderer -> main: confirm or cancel the previewed screenshot. */
   resolveScreenshot: "orb:resolve-screenshot",
@@ -73,16 +75,12 @@ export const IPC = {
   exportScreenshot: "orb:export-screenshot",
   /** Renderer -> main: discard any pending screenshot (idempotent). */
   discardScreenshot: "orb:discard-screenshot",
-  /** Renderer -> main: grant a desktop task authorization after an explicit user decision. */
-  authorizeDesktopTask: "orb:authorize-desktop-task",
-  /** Renderer -> main: revoke the desktop task authorization. */
-  revokeDesktopTask: "orb:revoke-desktop-task",
-  /** Renderer -> main: read the desktop task state (authorization, budget, stop reason). */
-  getDesktopTaskStatus: "orb:get-desktop-task-status",
-  /** Renderer -> main: list the windows the user can choose to work with. */
-  listDesktopWindows: "orb:list-desktop-windows",
-  /** Renderer -> main: record which window desktop actions may target. */
-  setDesktopTarget: "orb:set-desktop-target",
+  /** Renderer -> main: set the session-level desktop access tier. */
+  setOrbAccess: "orb:set-access",
+  /** Renderer -> main: revoke the session-level desktop access grant. */
+  revokeOrbAccess: "orb:revoke-access",
+  /** Renderer -> main: read the session-level desktop access state. */
+  getOrbAccess: "orb:get-access",
   /** Main -> renderer: streaming session events. */
   sessionEvent: "orb:session-event",
   /** Main -> renderer: the physical double-Alt gesture entered screenshot preview. */
@@ -117,6 +115,8 @@ export interface ShellMenuEditFlags {
   readonly canPaste: boolean;
   readonly canSelectAll: boolean;
 }
+
+export type ShellMenuAction = "model" | "screenshot" | "shortcut";
 
 export interface WorkspaceStatus {
   readonly configured: boolean;
@@ -159,66 +159,35 @@ export interface WorkspaceStatus {
    */
   readonly piWeb: PiWebStatus;
   /**
-   * Desktop task state.
+   * Current session Access state.
    *
-   * Pull-based like the rest of the snapshot: an authorization grant and its remaining budget
-   * are current state, and the user must be able to see exactly what was approved.
+   * Pull-based like the rest of the snapshot; the selected level and stop state are current.
    */
   readonly desktopTask: DesktopTaskStatus;
 }
 
 /**
- * What the user can see about desktop authorization.
+ * What the user can see about the current session Access grant.
  *
- * Every field is here so the UI can state plainly whether the orb may touch the desktop, for
- * what, and why it stopped — the model's own claims are never the source of truth.
+ * The renderer displays the selected level and stop state; the main process remains authoritative.
  */
 export interface DesktopTaskStatus {
   readonly authorized: boolean;
-  readonly taskId: string | null;
-  readonly scope: string | null;
-  readonly actionsUsed: number;
-  readonly actionLimit: number;
-  readonly expiresAt: number | null;
+  readonly level: OrbAccessLevel | null;
+  readonly sessionId: string | null;
+  readonly generation: number | null;
   readonly stopped: boolean;
   readonly stoppedReason: string | null;
   /** Whether the shell's bridge is listening, so the extension can reach it at all. */
   readonly bridgeReady: boolean;
-  /**
-   * The window desktop actions will target, or `null` when none is chosen.
-   *
-   * Surfaced because the orb refuses to guess a target: the user has to see which window it is
-   * about to act on before approving a task.
-   */
-  readonly target: DesktopWindowChoice | null;
 }
 
-export interface AuthorizeDesktopTaskRequest {
+export type OrbAccessLevel = "read-only" | "workspace-write" | "full-access";
+
+export interface SetOrbAccessRequest {
   readonly generation: number;
-  readonly scope: string;
+  readonly level: OrbAccessLevel;
 }
-
-/** A window the user can choose to work with. */
-export interface DesktopWindowChoice {
-  /** Driver window id as a string; the driver reports it as a bigint. */
-  readonly windowId: string;
-  readonly pid: number;
-  readonly appName: string;
-  readonly title: string;
-  readonly bounds: { readonly x: number; readonly y: number; readonly width: number; readonly height: number };
-  /** Higher is closer to the front, or `null` when the driver reports no order. */
-  readonly zIndex: string | null;
-  /** True when this is the window the shell recorded before taking focus. */
-  readonly isRecorded: boolean;
-}
-
-export type ListDesktopWindowsResult =
-  | { readonly ok: true; readonly windows: readonly DesktopWindowChoice[] }
-  | { readonly ok: false; readonly message: string };
-
-export type SetDesktopTargetResult =
-  | { readonly ok: true; readonly target: DesktopWindowChoice }
-  | { readonly ok: false; readonly message: string };
 
 export interface PiWebStatus {
   readonly baseUrl: string;
@@ -269,6 +238,8 @@ export const SESSION_EVENT_CHANNEL_NAME = "orb:session-event";
 
 export type OrbSessionEvent =
   | { readonly type: "session"; readonly sessionId: string; readonly generation: number }
+  | { readonly type: "turn-start" }
+  | { readonly type: "queued"; readonly count: number }
   | { readonly type: "assistant-delta"; readonly text: string }
   | { readonly type: "assistant-message"; readonly text: string }
   | { readonly type: "error"; readonly message: string }

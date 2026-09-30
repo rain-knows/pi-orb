@@ -133,6 +133,31 @@ describe("OrbSessionController", () => {
     expect(order).toEqual(["subscribe", "prompt"]);
   });
 
+  it("queues follow-up prompts in the same Pi session and advances one turn at a time", async () => {
+    const { client, controller, events } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("first");
+    await controller.prompt("second");
+    await controller.prompt("third");
+
+    expect(controller.running).toBe(true);
+    expect(client.prompt).toHaveBeenCalledTimes(1);
+    expect(events).toContainEqual({ type: "queued", count: 1 });
+    expect(events).toContainEqual({ type: "queued", count: 2 });
+
+    client.delivered[0]!(agentEnd());
+    await expect.poll(() => client.prompt.mock.calls.length).toBe(2);
+    expect(client.prompt.mock.calls[1]).toEqual(["session-1", "second", undefined, "C:\\work\\orb"]);
+    client.delivered[1]!(agentEnd());
+    await expect.poll(() => client.prompt.mock.calls.length).toBe(3);
+    expect(client.prompt.mock.calls[2]).toEqual(["session-1", "third", undefined, "C:\\work\\orb"]);
+    expect(events.filter((event) => event.type === "idle")).toHaveLength(0);
+
+    client.delivered[2]!(agentEnd());
+    expect(controller.running).toBe(false);
+    expect(events.filter((event) => event.type === "idle")).toHaveLength(1);
+  });
+
   it("reports streaming text and the completed assistant message", async () => {
     const { controller, events, client } = setup();
     await controller.ensureSession("C:\\work\\orb");
@@ -252,12 +277,14 @@ describe("OrbSessionController", () => {
     expect(client.closed).toBeGreaterThan(0);
   });
 
-  it("propagates a prompt failure so the caller can report it", async () => {
-    const { controller, client } = setup();
+  it("reports a prompt failure and releases the queue when Pi Web rejects it", async () => {
+    const { controller, client, events } = setup();
     await controller.ensureSession("C:\\work\\orb");
     client.prompt.mockRejectedValueOnce(new Error("HTTP 500"));
-    await expect(controller.prompt("hi")).rejects.toThrow("HTTP 500");
+    await controller.prompt("hi");
     expect(controller.running).toBe(false);
+    expect(events).toContainEqual({ type: "error", message: "HTTP 500" });
+    expect(events.at(-1)).toEqual({ type: "idle", stopReason: null });
   });
 
   it("only aborts a session that exists", async () => {

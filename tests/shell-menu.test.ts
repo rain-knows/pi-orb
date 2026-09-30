@@ -120,25 +120,24 @@ describe("ported shell context menu", () => {
     expect(popup).not.toHaveBeenCalled();
   });
 
-  it("wires the shell actions the reference keeps, and only those", () => {
-    // Collapse replaces the reference's "Open Main Window" (pi-orb has no main window of its own) and
-    // routes through the lifecycle call, so it still revokes desktop authority. Model settings and
-    // the selection/millifraction toggles are deliberately absent: pi-orb does not own model
-    // configuration and has neither surface.
+  it("routes Pi utilities through the context menu and keeps the reference shell actions", () => {
     const calls: string[] = [];
     const items = shellMenuTemplate(
       { isEditable: false, canCut: false, canCopy: false, canPaste: false, canSelectAll: false, hasSelectionContext: true },
       {
+        onModel: () => calls.push("model"),
+        onScreenshot: () => calls.push("screenshot"),
+        onShortcut: () => calls.push("shortcut"),
         onCollapse: () => calls.push("collapse"),
         onQuit: () => calls.push("quit"),
         onClearSelectionContext: () => calls.push("clear"),
       },
     );
     for (const item of items) item.click?.({} as never, undefined, {} as never);
-    expect(calls).toEqual(["collapse", "clear", "quit"]);
+    expect(calls).toEqual(["model", "screenshot", "shortcut", "collapse", "clear", "quit"]);
 
     const text = items.map((item) => item.label ?? "").join(" ");
-    for (const absent of ["Settings", "Toolbar", "Millifraction", "Model"]) {
+    for (const absent of ["Settings", "Toolbar", "Millifraction"]) {
       expect(text).not.toContain(absent);
     }
   });

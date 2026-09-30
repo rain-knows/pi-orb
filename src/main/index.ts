@@ -45,7 +45,7 @@ import { ScreenshotFlow } from "./screenshot-flow";
 import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-export";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
-import { ReferenceWindowsDriver, type ReferenceWindowInfo } from "./reference-windows-driver";
+import { ReferenceWindowsDriver } from "./reference-windows-driver";
 import {
   createObservationFrameWindow,
   hideObservationFrame,
@@ -56,15 +56,13 @@ import { showShellMenu, type ShellMenuRequest } from "./shell-menu";
 import {
   IPC,
   type DesktopTaskStatus,
-  type DesktopWindowChoice,
   type ImageContent,
   type OrbSessionEvent,
   type PiWebStatus,
   type ScreenshotCaptureResult,
   type ScreenshotResolveResult,
   type ScreenshotExportResult,
-  type ListDesktopWindowsResult,
-  type SetDesktopTargetResult,
+  type OrbAccessLevel,
   type WorkspaceStatus,
   type FloatingWindowState,
   type ListSessionHistoryResult,
@@ -113,37 +111,17 @@ let referenceDriver: ReferenceWindowsDriver | null = null;
 let bridge: BridgeServer | null = null;
 
 /**
- * The one record of the window the user was looking at.
+ * The window shown in the explicit screenshot review flow.
  *
- * Written before the orb takes focus and shared by the screenshot path and the desktop tool path, so
- * there is exactly one answer to "which window is the user working with". Re-reading the foreground
- * window later would return the orb itself, because by then the user is interacting with the orb.
+ * It is recorded before the Orb takes focus. Desktop tools use fresh foreground observations from
+ * `ReferenceWindowsDriver` instead, so switching applications does not depend on this screenshot
+ * snapshot.
  */
 const recordedTarget = new RecordedTargetStore({
   readForeground: () => targetWindowReader.read(process.pid),
   isStillValid: (handle, title) => targetWindowReader.isStillValid(handle, title),
   log: (message) => console.log(message),
 });
-
-/**
- * The window desktop actions may target.
- *
- * Chosen from the recorded window or by an explicit user selection, and always carrying the driver's
- * own window id: the driver's id space and the Win32 handle space are different, so only the driver's
- * id can be acted on.
- */
-let desktopTarget: DesktopWindowChoice | null = null;
-
-/**
- * The target `orb_open_app` moved the task to, when the model switched applications.
- *
- * Kept apart from {@link desktopTarget} so "the window the user recorded" and "the window the model
- * switched to" stay distinguishable: the recorded target is restored as soon as the user picks or
- * records another window, and both are dropped together when desktop authority is revoked. Only an
- * application the user already had running can set this; see
- * `ReferenceWindowsDriver#openApp` and the P2-04 rule in `doc/pi-orb-development-goals.md` §5.
- */
-let openAppTarget: ReferenceWindowInfo | null = null;
 
 let configPath = "";
 let config: OrbConfig;
@@ -182,12 +160,9 @@ const client = new PiWebClient({
 });
 
 function emit(event: OrbSessionEvent): void {
-  if (event.type === "idle" || event.type === "error") {
-    // A completed or failed turn cannot retain desktop authority. Revoke before releasing the
-    // generation lock so the next turn always starts without a stale target or active action.
-    revokeDesktopOperations(event.type === "idle" ? "the turn completed" : "the turn failed");
-    // The turn is over. The single-task lock must not outlive it, or the orb would
-    // refuse every later message for the rest of the run.
+  if (event.type === "idle") {
+    // The full prompt queue has drained. A turn ending between queued prompts is not idle.
+    // Release the prompt lock only; session-level desktop Access is intentionally preserved.
     //
     // Released against the controller's own generation, not `generations.current`:
     // a turn that ends after a workspace switch must not free the new run's lock.
@@ -287,7 +262,7 @@ function currentStatus(): WorkspaceStatus {
 }
 
 /**
- * Report desktop task state, defaulting to "not authorized" when no broker exists.
+ * Report the current session Access state, defaulting to "not authorized" when no broker exists.
  *
  * The default matters: a missing broker must read as "the orb may not touch the desktop",
  * never as "unknown, so probably fine".
@@ -296,18 +271,15 @@ function desktopTaskStatus(): DesktopTaskStatus {
   if (!desktopBroker) {
     return {
       authorized: false,
-      taskId: null,
-      scope: null,
-      actionsUsed: 0,
-      actionLimit: 0,
-      expiresAt: null,
+      level: null,
+      sessionId: null,
+      generation: null,
       stopped: false,
       stoppedReason: null,
       bridgeReady: bridge !== null,
-      target: desktopTarget,
     };
   }
-  return { ...desktopBroker.status(), bridgeReady: bridge !== null, target: desktopTarget };
+  return { ...desktopBroker.status(), bridgeReady: bridge !== null };
 }
 
 /** Best-effort visible label for the process that owns a native text selection. */
@@ -364,35 +336,6 @@ async function startDesktop(): Promise<void> {
       ops,
       backend: createWindowsDesktopBackend(ops),
       ownProcessId: process.pid,
-      resolveRecordedTarget: () => {
-        if (openAppTarget) {
-          return {
-            handle: String(openAppTarget.windowId),
-            pid: openAppTarget.pid,
-            title: openAppTarget.title,
-          };
-        }
-        if (desktopTarget) {
-          return {
-            handle: desktopTarget.windowId,
-            pid: desktopTarget.pid,
-            title: desktopTarget.title,
-          };
-        }
-        const target = recordedTarget.snapshot?.target;
-        return target
-          ? { handle: target.handle, pid: target.processId, title: target.title }
-          : undefined;
-      },
-      onTargetChanged: (target) => {
-        // Reported, not silent: the panel shows the window the next action will land on, and the
-        // user can revoke. `openAppTarget` outranks the recorded window until the user picks one.
-        openAppTarget = target;
-        desktopTarget = toWindowChoice(target);
-        console.log(
-          `[pi-orb] desktop target moved to "${target.title}" (${target.appName}) by an open-app action`,
-        );
-      },
       withGuiTurn: async <T>(run: () => Promise<T>): Promise<T> => {
         const current = window;
         if (!current || current.isDestroyed()) return run();
@@ -492,11 +435,11 @@ async function startBridge(): Promise<void> {
     executor: {
       observe: async (input) => {
         const broker = requireBroker();
-        return broker.observe(session?.sessionId ?? "", generations.current, input.windowId);
+        return broker.observe(input.sessionId, input.generation);
       },
-      act: async (action) => {
+      act: async (action, sessionId, generation) => {
         const broker = requireBroker();
-        return broker.act(action, session?.sessionId ?? "", generations.current);
+        return broker.act(action, sessionId, generation);
       },
       status: () => desktopTaskStatus(),
       revoke: () => desktopBroker?.revoke(),
@@ -650,7 +593,7 @@ function attachWakeController(win: BrowserWindow): void {
       isDestroyed: () => win.isDestroyed(),
     },
     {
-      revokeDesktopTask: () => desktopBroker?.revoke(),
+      revokeOrbAccess: () => desktopBroker?.revoke(),
       discardPendingCapture: () => screenshotFlow?.discard(),
       // Collapse is the route users actually take, so the record must be dropped here too. The
       // revocation routine below documents this exact rule for a collapse, but only the tray, the
@@ -673,12 +616,7 @@ function attachWakeController(win: BrowserWindow): void {
       // was looking at is no longer the foreground window, so a recording taken afterwards would
       // capture the orb itself. This ordering is the whole reason the wake path is where the record
       // is written.
-      const outcome = await recordedTarget.record();
-      if (outcome.ok) {
-        // Keep the desktop target consistent with the same record, so the screenshot path and the
-        // desktop tool path cannot disagree about which window the user means.
-        await syncDesktopTargetFromRecord();
-      }
+      await recordedTarget.record();
       // The reposition-then-show sequence is shared with `showOrb` rather than repeated here: the two
       // paths had already diverged once on exactly this step (neither clamped), and a second copy is
       // how the next divergence would start.
@@ -725,7 +663,7 @@ function attachKeyboardEdgeRecovery(): void {
  * Torn down every outstanding desktop capability, in one place.
  *
  * There is exactly one revocation path so a new caller cannot invent a partial one. It revokes the
- * task authorization and drops any unconfirmed screenshot, and it is idempotent.
+ * session desktop Access and drops any unconfirmed screenshot, and it is idempotent.
  */
 function revokeDesktopOperations(reason: string): void {
   const hadAuthority = desktopBroker?.status().authorized === true;
@@ -736,11 +674,8 @@ function revokeDesktopOperations(reason: string): void {
   // collapse the user is no longer working with that window, so keeping it would let a later capture
   // silently reuse a window the user has moved on from. A fresh wake records a fresh target.
   recordedTarget.clear();
-  desktopTarget = null;
-  openAppTarget = null;
-  // The ribbon marks where the grant applies, so it goes away in the same breath as the grant. This
-  // is the single revoke exit (collapse, stop, turn end, disconnect), which is why the ribbon is
-  // hidden here rather than at each caller.
+  // The ribbon marks the last desktop observation, so it goes away with the grant. Turn idle does
+  // not call this path; hide, Stop, disconnect, session/workspace changes and quit do.
   hideObservationFrame(observationFrame ?? undefined);
   if (hadAuthority || hadCapture) {
     console.log(`[pi-orb] desktop operations revoked: ${reason}`);
@@ -850,6 +785,9 @@ function registerIpc(): void {
         hasSelectionContext: selectionContext !== null,
       },
       {
+        onModel: () => current.webContents.send(IPC.shellMenuAction, "model"),
+        onScreenshot: () => current.webContents.send(IPC.shellMenuAction, "screenshot"),
+        onShortcut: () => current.webContents.send(IPC.shellMenuAction, "shortcut"),
         onCollapse: () => lifecycle?.collapse(),
         onQuit: () => quit(),
         onClearSelectionContext: () => {
@@ -1128,7 +1066,11 @@ function registerIpc(): void {
     if (!parsed) throw new Error("Malformed prompt request.");
     const check = generations.check(parsed.generation);
     if (!check.ok) throw new Error(describeGenerationFailure(check.reason));
-    if (!generations.tryAcquire(parsed.generation)) {
+    const wasBusy = generations.busy;
+    if (wasBusy && !session.running) {
+      throw new Error("Orb is busy with another task.");
+    }
+    if (!wasBusy && !generations.tryAcquire(parsed.generation)) {
       throw new Error("Orb is busy with another task.");
     }
     try {
@@ -1226,86 +1168,42 @@ function registerIpc(): void {
     screenshotFlow.discard();
     return true;
   });
-  ipcMain.handle(IPC.getDesktopTaskStatus, () => desktopTaskStatus());
+  /* Target windows are resolved from the current foreground observation. */
 
-  ipcMain.handle(IPC.listDesktopWindows, async (): Promise<ListDesktopWindowsResult> => {
-    if (!referenceDriver) {
-      return { ok: false, message: "The desktop driver is unavailable, so windows cannot be listed." };
-    }
-    const windows = referenceDriver.listWindows();
-    return {
-      ok: true,
-      windows: windows.map((window) => toWindowChoice(window)),
-    };
-  });
-
-  /**
-   * Record which window desktop actions may target.
-   *
-   * Only windows the driver actually reports are accepted, so the choice cannot name a window
-   * that does not exist. Changing the target also revokes any current authorization: the previous
-   * approval was for the previous window and must not carry over to a different one.
-   */
-  ipcMain.handle(IPC.setDesktopTarget, async (_event, windowId: unknown): Promise<SetDesktopTargetResult> => {
-    if (typeof windowId !== "string" || windowId.length === 0) {
-      return { ok: false, message: "No window was chosen." };
-    }
-    if (!referenceDriver) {
-      return { ok: false, message: "The desktop driver is unavailable, so a target cannot be set." };
-    }
-    const windows = referenceDriver.listWindows();
-    const match = windows.find((window) => String(window.windowId) === windowId);
-    if (!match) {
-      return { ok: false, message: "That window is no longer available." };
-    }
-    if (desktopTarget && desktopTarget.windowId !== windowId) {
-      // Authority is bound to a window, so changing the window cannot keep it.
-      desktopBroker?.revoke();
-    }
-    // An explicit user choice supersedes whatever an open-app action had switched to.
-    openAppTarget = null;
-    desktopTarget = toWindowChoice(match);
-    return { ok: true, target: desktopTarget };
-  });
-
-  /**
-   * Grant a desktop task after an explicit user decision in the window.
-   *
-   * This is the only path that creates authority, and it requires the caller to say what the
-   * task is for. The grant is bound to the live session and generation, so it cannot outlive
-   * the run it was approved for.
-   */
-  ipcMain.handle(IPC.authorizeDesktopTask, (_event, request: unknown) => {
-    const parsed = parseAuthorizeRequest(request);
+  ipcMain.handle(IPC.setOrbAccess, (_event, request: unknown) => {
+    const parsed = parseAccessRequest(request);
     if (!parsed) {
-      lastDesktopProblem = "A desktop task needs a scope describing what it is for.";
+      lastDesktopProblem = "Choose Read Only, Workspace Write or Full Access.";
       return desktopTaskStatus();
     }
-    if (!desktopBroker || !session?.sessionId) {
-      lastDesktopProblem =
-        "The desktop driver or the Orb session is not available, so a task cannot be authorized.";
+    if (!desktopBroker) {
+      lastDesktopProblem = "The desktop driver is unavailable.";
       return desktopTaskStatus();
     }
     if (generations.current !== parsed.generation) {
       lastDesktopProblem = "This request belongs to an earlier run and was refused.";
       return desktopTaskStatus();
     }
+    if (!config.orbWorkspace || !validateWorkspace(config.orbWorkspace).ok) {
+      lastDesktopProblem = "Choose a usable Orb workspace before enabling desktop access.";
+      return desktopTaskStatus();
+    }
     lastDesktopProblem = null;
-    desktopBroker.authorize({
-      sessionId: session.sessionId,
-      generation: parsed.generation,
-      scope: parsed.scope,
+    return session.ensureSession(config.orbWorkspace).then((sessionId) => {
+      desktopBroker?.authorize({ sessionId, generation: parsed.generation, level: parsed.level });
+      return desktopTaskStatus();
     });
-    return desktopTaskStatus();
   });
 
-  ipcMain.handle(IPC.revokeDesktopTask, () => {
+  ipcMain.handle(IPC.revokeOrbAccess, () => {
     // The user's explicit emergency stop: one call drops the task authority and any
     // unconfirmed screenshot, so nothing is left able to touch the desktop.
     revokeDesktopOperations("the user stopped desktop operations");
     lastDesktopProblem = null;
     return desktopTaskStatus();
   });
+
+  ipcMain.handle(IPC.getOrbAccess, () => desktopTaskStatus());
 
   ipcMain.handle(IPC.abort, async (_event, request: unknown) => {
     const parsed = parseGenerationRequest(request);
@@ -1347,20 +1245,15 @@ function parseCaptureRequest(
   return { generation, text: typeof record.text === "string" ? record.text : "" };
 }
 
-/**
- * Parse a task authorization request.
- *
- * A blank scope is refused rather than defaulted: the user's approval has to say what it is
- * for, and the scope is what the window shows back to them.
- */
-function parseAuthorizeRequest(value: unknown): { generation: number; scope: string } | null {
+/** Parse the selected Access tier. */
+function parseAccessRequest(value: unknown): { generation: number; level: OrbAccessLevel } | null {
   if (typeof value !== "object" || value === null) return null;
   const record = value as Record<string, unknown>;
   const generation = record.generation;
   if (typeof generation !== "number" || !Number.isInteger(generation)) return null;
-  const scope = typeof record.scope === "string" ? record.scope.trim() : "";
-  if (scope.length === 0) return null;
-  return { generation, scope };
+  const level = record.level;
+  if (level !== "read-only" && level !== "workspace-write" && level !== "full-access") return null;
+  return { generation, level };
 }
 
 function parseResolveRequest(
@@ -1503,9 +1396,8 @@ void app.whenReady().then(async () => {
   await startDesktop();
   await startBridge();
 
-  // Record the window the user was looking at, before the orb can take focus. The same identity
-  // then gates every desktop observation and action.
-  await recordDesktopTarget();
+  // Preserve the explicit screenshot preview's foreground snapshot.
+  await recordedTarget.record();
 });
 
 /**
@@ -1517,8 +1409,7 @@ void app.whenReady().then(async () => {
  */
 async function showOrb(): Promise<void> {
   if (!window || window.isDestroyed()) return;
-  const outcome = await recordedTarget.record();
-  if (outcome.ok) await syncDesktopTargetFromRecord();
+  await recordedTarget.record();
   await presentOrb(window);
 }
 
@@ -1548,68 +1439,6 @@ async function presentOrb(win: BrowserWindow): Promise<void> {
   if (win.isMinimized()) win.restore();
   win.show();
   win.focus();
-}
-
-/**
- * Align the desktop tool target with the recorded window.
- *
- * The driver's window list is the only source of a usable window id, so the recorded window is
- * matched into it by (process id, title). When the recorded window is not in the list, the target is
- * cleared rather than retaining a stale driver id that may now refer to a different window.
- */
-async function syncDesktopTargetFromRecord(): Promise<void> {
-  const snapshot = recordedTarget.snapshot;
-  if (!snapshot || !referenceDriver) return;
-  // A window the user records is the user's choice, so it replaces an open-app switch.
-  openAppTarget = null;
-  const windows = referenceDriver.listWindows();
-  const match = windows.find(
-    (window) => window.pid === snapshot.target.processId && window.title === snapshot.target.title,
-  );
-  if (match) {
-    desktopTarget = toWindowChoice(match);
-  } else {
-    desktopTarget = null;
-    console.log(
-      `[pi-orb] the recorded window (pid ${snapshot.target.processId}) is not in the driver's window list; the desktop target was cleared`,
-    );
-  }
-}
-
-/**
- * Record the current foreground window as the target, outside a wake.
- *
- * Used at startup so the app has a target even if the user never wakes it with the shortcut, and by
- * the window picker when the user changes their mind. Every path goes through the same store, so
- * "the recorded window" has one meaning.
- */
-async function recordDesktopTarget(): Promise<void> {
-  const outcome = await recordedTarget.record();
-  if (!outcome.ok) {
-    console.log("[pi-orb] no foreground window was available to record as the desktop target");
-    return;
-  }
-  await syncDesktopTargetFromRecord();
-}
-
-/** Convert a driver window record into the shape the window shows the user. */
-function toWindowChoice(window: ReferenceWindowInfo): DesktopWindowChoice {
-  const recorded = recordedTarget.snapshot?.target;
-  return {
-    windowId: String(window.windowId),
-    pid: window.pid ?? -1,
-    appName: window.appName,
-    title: window.title,
-    bounds: window.bounds,
-    zIndex: window.zIndex === undefined ? null : String(window.zIndex),
-    // "Recorded" keeps its exact meaning — the window the user recorded before the Orb took
-    // focus. A window the model switched to carries the target without being recorded, so the
-    // picker must not claim the user chose it.
-    isRecorded:
-      recorded !== undefined &&
-      recorded.processId === window.pid &&
-      recorded.title === window.title,
-  };
 }
 
 app.on("window-all-closed", () => {

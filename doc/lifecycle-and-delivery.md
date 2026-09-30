@@ -18,22 +18,23 @@ backend 按虚拟键去重别名；pi-orb 仅补充空白修剪，不增加新�
 
 - 浮球收起、关闭按钮和托盘 Hide；
 - 用户停止当前回复；
-- Pi turn 完成或失败；
 - pi-web 断连、切换工作区、切换历史会话或开始新会话；
 - shell 退出。
 
 撤权同时清除 broker 授权、记录的桌面目标、driver 的 observation/action context，并通过
-`AbortSignal` 释放正在进行的 native 鼠标或键盘动作。它不结束 Pi 会话，也不改变 run
-generation；新的工作区或会话必须重新建立 generation、目标和显式授权。
+`AbortSignal` 释放正在进行的 native 鼠标或键盘动作。普通 turn 完成、模型回复结束或队列进入 idle
+不会撤权；同一个 Orb session 的后续 turn 继续使用用户选定的 Access。撤权不结束 Pi 会话，也不改变
+run generation；workspace/session 切换按各自生命周期建立新 session 或 generation，并要求重新选择 Access。
 
 ### 自动化结果
 
-`evidence/p1-07/lifecycle-regression.json` 的 10/10 断言覆盖：
+`evidence/p1-07/lifecycle-regression.json` 的 10/10 是旧 per-task API 的历史记录，不代表当前
+session Access 生命周期。当前探针 `evidence/p1-07/run-lifecycle-regression.mjs` 输出到
+`session-access-regression.json`，本轮为 **12/12**，覆盖：
 
-- 授权后显式停止清除任务，但保留会话和 generation；
-- 收起清除授权与目标；
-- pi-web 断连清除授权；
-- shell 在生命周期序列后仍存活。
+- 一个 session grant 跨三条排队 prompt 与 turn idle 保留；
+- Stop、收起、workspace 切换、新建 session 和 pi-web 断连撤权；
+- Stop 不结束 Pi session，workspace/session 切换不会继承旧 grant。
 
 这份记录来自真实 Electron 壳、真实 pi-web 隔离实例和 disposable target。它证明撤权边界，
 不等同于真实键盘、锁屏、休眠或多显示器人工验收。
@@ -46,13 +47,16 @@ generation；新的工作区或会话必须重新建立 generation、目标和�
 
 | 场景 | 最新记录 | 事实 |
 |---|---:|---|
-| C7 观察→点击→再观察 | **18/24，失败** | 模型没有产生 Orb 工具调用，目标未收到点击 |
-| D6 观察→滚动 | **24/25，失败** | 目标收到滚轮且 `scrollTop` 改变，但动作后没有再次 `orb_observe` |
-| D8 点击→观察→输入 | **24/25，失败** | 目标读回 `P1ORBD8TEST`，但输入动作后没有再次观察 |
+| C7 观察→点击→再观察 | **失败（截图前）** | 唤醒快捷键未触发目标记录，因此截图拒绝，未产生 Orb 工具调用 |
+| D6 观察→滚动 | **环境中止** | 前台为 `LockApp`/不可交互桌面，未向模型发送动作 |
+| D8 点击→观察→输入 | **本轮未完成** | 没有生成新的 session-access JSON；旧记录仅作历史 |
 
-失败 JSON 原样保留在 `evidence/p1-06/real-model-*-reference-backend.json`，不以旧的通过记录
-覆盖，也不把一次成功动作当作完整的“一动作一观察”合同。支持矩阵因此把 C7/D6/D8 标为
-未验证，直到同一版本、同一脚本在真实模型上稳定通过。
+新合同结果原样保留在 `evidence/p1-06/real-model-c7-session-access.json` 和
+`real-model-d6-scroll-session-access.json`；旧的 `real-model-*-reference-backend.json` 仍作为
+历史记录保留，不被覆盖。C7 本轮在截图前因唤醒快捷键未触发目标记录而失败；D6 在
+`LockApp`/不可交互桌面环境中止，未向模型发送动作；D8 本轮未完成，也没有新的 JSON。
+这些结果不能被一次成功动作或打包成功替代，支持矩阵因此继续把 C7/D6/D8 标为未验证，直到
+同一版本、同一脚本在真实模型上稳定通过。
 
 ## 打包与产物
 
@@ -60,7 +64,7 @@ generation；新的工作区或会话必须重新建立 generation、目标和�
 
 - Windows x64 解包产物构建成功；
 - 包内容审计 25/25：运行时文件、许可证和原生模块路径正确，无源码、测试、证据或凭据；
-- 打包启动探测 21/21：preload 桥、无 Node renderer、参考前端 DOM/令牌、停靠滑动和真实窗口枚举均通过。
+- 打包启动探测 22/22：preload 桥、无 Node renderer、参考前端 DOM/令牌、停靠滑动和 session Access 合同均通过。
 
 形态沿用参考项目的 electron-builder、每用户 NSIS、`asarUnpack` 原生模块和 `publish: null`；
 dsh 的随包 Node、发布上传、自动更新、签名链和自定义安装器没有移植。安装包仍为未签名产物。

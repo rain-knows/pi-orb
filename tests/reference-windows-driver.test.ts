@@ -23,7 +23,7 @@ function opsFake() {
   };
   const other = { ...target, hwnd: 77, pid: 9002, title: "Other window" };
   const ops = {
-    listWindows: () => ({ foregroundHwnd: 77, windows: [other, target] }),
+    listWindows: () => ({ foregroundHwnd: 42, windows: [other, target] }),
     focusWindow: (hwnd: number) => {
       calls.push(`focus:${hwnd}`);
       return hwnd === 42;
@@ -55,13 +55,12 @@ function backendFake(calls: unknown[]) {
 }
 
 describe("ReferenceWindowsDriver", () => {
-  it("binds observation to the recorded HWND and refuses a different window", async () => {
+  it("observes the foreground window without a renderer-selected target", async () => {
     const { ops, calls } = opsFake();
     const driver = new ReferenceWindowsDriver({
       ops,
       backend: backendFake([]),
       ownProcessId: 1,
-      resolveRecordedTarget: () => ({ handle: "42", pid: 9001, title: "Disposable target" }),
     });
 
     const observed = await driver.observe({});
@@ -69,25 +68,20 @@ describe("ReferenceWindowsDriver", () => {
     expect(observed.observation?.window.id).toBe("42");
     expect(calls).toEqual(["focus:42"]);
 
-    const refused = await driver.observe({ windowId: "77" });
-    expect(refused.ok).toBe(false);
-
-    const explicitSameTarget = await driver.observe({ windowId: "42" });
-    expect(explicitSameTarget.ok).toBe(true);
+    const foreground = await driver.observe({});
+    expect(foreground.observation?.window.id).toBe("42");
   });
 
   it("keeps unauthorised observations metadata-only and returns a fresh image after acting", async () => {
     const { ops } = opsFake();
     const driver = new ReferenceWindowsDriver({ ops, backend: backendFake([]), ownProcessId: 1 });
-    const privateObservation = (await driver.observe({ windowId: "42" })).observation!;
-    expect(privateObservation.image).toBeUndefined();
-
-    const sharedObservation = (await driver.observe({ windowId: "42", includeImage: true })).observation!;
+    const sharedObservation = (await driver.observe({ includeImage: true })).observation!;
     expect(sharedObservation.image).toMatchObject({ data: "AQ==", mimeType: "image/png", width: 800, height: 600 });
     const acted = await driver.act({ kind: "click", observationId: sharedObservation.observationId, position: { x: 400, y: 300 } }, sharedObservation);
-    expect(acted.observation?.observationId).not.toBe(sharedObservation.observationId);
-    expect(acted.observation?.image).toMatchObject({ mimeType: "image/png", width: 800, height: 600 });
-    expect(driver.lastObservation?.observationId).toBe(acted.observation?.observationId);
+    if (!acted.ok) throw new Error(acted.error ?? "Click failed");
+    expect(acted.observation.observationId).not.toBe(sharedObservation.observationId);
+    expect(acted.observation.image).toMatchObject({ mimeType: "image/png", width: 800, height: 600 });
+    expect(driver.lastObservation?.observationId).toBe(acted.observation.observationId);
   });
 
   it("passes reference backend millifraction coordinates and action amounts", async () => {
@@ -97,7 +91,6 @@ describe("ReferenceWindowsDriver", () => {
       ops,
       backend: backendFake(calls),
       ownProcessId: 1,
-      resolveRecordedTarget: () => ({ handle: "42", pid: 9001, title: "Disposable target" }),
     });
     const observed = await driver.observe({});
     expect(observed.observation).not.toBeNull();
@@ -124,12 +117,13 @@ describe("ReferenceWindowsDriver", () => {
   it("lists running apps with a fresh observation and cancels a long wait", async () => {
     const { ops } = opsFake();
     const driver = new ReferenceWindowsDriver({ ops, backend: backendFake([]), ownProcessId: 1 });
-    const first = (await driver.observe({ windowId: "42", includeImage: true })).observation!;
+    const first = (await driver.observe({ includeImage: true })).observation!;
     const apps = await driver.act({ kind: "listApps", observationId: first.observationId }, first);
+    if (!apps.ok) throw new Error(apps.error ?? "Application listing failed");
     expect(apps).toMatchObject({ ok: true, apps: ["electron", "notepad"] });
-    expect(apps.observation?.observationId).not.toBe(first.observationId);
+    expect(apps.observation.observationId).not.toBe(first.observationId);
     const controller = new AbortController();
-    const pending = driver.act({ kind: "longWait", observationId: apps.observation!.observationId, waitSeconds: 10 }, apps.observation!, controller.signal);
+    const pending = driver.act({ kind: "longWait", observationId: apps.observation.observationId, waitSeconds: 10 }, apps.observation, controller.signal);
     controller.abort(new Error("stopped"));
     await expect(pending).resolves.toMatchObject({ ok: false, error: "stopped" });
   });
@@ -142,7 +136,7 @@ describe("ReferenceWindowsDriver", () => {
       receivedSignal = signal;
     };
     const driver = new ReferenceWindowsDriver({ ops, backend, ownProcessId: 1 });
-    const observed = (await driver.observe({ windowId: "42" })).observation!;
+    const observed = (await driver.observe({})).observation!;
     const controller = new AbortController();
 
     await driver.act(
@@ -162,7 +156,7 @@ describe("ReferenceWindowsDriver", () => {
     backend.longPress = async (_input, signal) => { if (signal) received.push(signal); };
     backend.drag = async (_input, signal) => { if (signal) received.push(signal); };
     const driver = new ReferenceWindowsDriver({ ops, backend, ownProcessId: 1 });
-    const observation = (await driver.observe({ windowId: "42" })).observation!;
+    const observation = (await driver.observe({})).observation!;
     const controller = new AbortController();
 
     await driver.act({ kind: "hotkey", observationId: observation.observationId, keys: ["ctrl", "c"] }, observation, controller.signal);
@@ -172,17 +166,6 @@ describe("ReferenceWindowsDriver", () => {
     expect(received).toEqual([controller.signal, controller.signal, controller.signal]);
   });
 
-  it("does not expand an explicitly selected target through a model window id", async () => {
-    const { ops } = opsFake();
-    const driver = new ReferenceWindowsDriver({
-      ops,
-      backend: backendFake([]),
-      ownProcessId: 1,
-      resolveRecordedTarget: () => ({ handle: "42", pid: 9001, title: "Disposable target" }),
-    });
-    expect((await driver.observe({ windowId: "77" })).ok).toBe(false);
-  });
-
   it("requires each type action to name its own screenshot position", async () => {
     const { ops } = opsFake();
     const calls: unknown[] = [];
@@ -190,7 +173,6 @@ describe("ReferenceWindowsDriver", () => {
       ops,
       backend: backendFake(calls),
       ownProcessId: 1,
-      resolveRecordedTarget: () => ({ handle: "42", pid: 9001, title: "Disposable target" }),
     });
     const first = (await driver.observe({})).observation!;
     await driver.act({ kind: "click", observationId: first.observationId, position: { x: 125, y: 250 } }, first);

@@ -7,11 +7,18 @@ describe("Orb extension result rendering", () => {
       ok: true,
       action: "click",
       observationId: "obs-1",
-      actionsUsed: 1,
-      next: "Observe the window again before the next action.",
+      observation: {
+        observationId: "obs-after",
+        window: { id: "42", pid: 24, title: "Target", appName: "target.exe" },
+        coordinateSpace: { action: "screenshot-fraction", space: 1000, windowRect: { x: 0, y: 0, width: 1, height: 1 } },
+        elements: [],
+        image: { data: "AQID", mimeType: "image/png", width: 1, height: 1 },
+      },
+      next: "Use this fresh observation for the next action.",
     };
 
-    expect(JSON.parse(renderResult(result))).toEqual(result);
+    expect(renderResult(result)).toContain("action: click completed");
+    expect(renderResult(result)).toContain("observation_id: obs-after");
   });
 
   it("renders observations with their coordinate contract", () => {
@@ -37,7 +44,6 @@ describe("Orb extension result rendering", () => {
     const result = formatToolResult({
       ok: true,
       action: "drag",
-      actionsUsed: 1,
       observation: {
         observationId: "obs-after-action",
         window: { id: "42", pid: 24, title: "Target", appName: "target.exe" },

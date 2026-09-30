@@ -129,6 +129,8 @@ The same commit's Electron shell is reused outside that directory:
 - `src/renderer/floating.js` ← `apps/desktop/renderer/floating.js` (composer, hover, pin, drag,
   dock and popover state machine; the DSH RPC/event/iframe boundary is replaced by the existing
   restricted Pi preload bridge)
+- `src/renderer/deepseek-avatar-square.gif` ← `apps/desktop/renderer/deepseek-avatar-square.gif`
+  (animated orb state asset; copied from the pinned MIT source and used with its original name)
 - `src/renderer/orb-surface.css` is pi-orb adaptation styling for its workspace, desktop approval
   and screenshot review surfaces; it is not a reference source copy
 - `src/main/selection-monitor.ts`, `src/main/windows-selection*.ts` ← `apps/desktop/src/selection-*.ts`,
