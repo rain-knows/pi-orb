@@ -62,6 +62,19 @@ describe("ShortcutEdgeGuard", () => {
     expect(guard.accept()).toBe(false);
   });
 
+  it("releases a hold whose key-up was lost across a lock or sleep", () => {
+    const hook = fakeHook();
+    const guard = new ShortcutEdgeGuard(hook);
+    guard.configure("Control+Alt+F9");
+    guard.start();
+    expect(guard.accept()).toBe(true);
+    expect(guard.accept()).toBe(false);
+
+    guard.releaseLatchedHold();
+    expect(guard.accept()).toBe(true);
+    expect(guard.accept()).toBe(false);
+  });
+
   it("resets the edge when the registered accelerator changes", () => {
     const hook = fakeHook();
     const guard = new ShortcutEdgeGuard(hook);

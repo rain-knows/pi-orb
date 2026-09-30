@@ -17,6 +17,7 @@ import {
   app,
   BrowserWindow,
   ClipboardItem,
+  powerMonitor,
   clipboard,
   dialog,
   globalShortcut,
@@ -685,6 +686,37 @@ function attachWakeController(win: BrowserWindow): void {
       lifecycle?.collapse();
     },
   });
+}
+
+/**
+ * Recover the keyboard-edge state after the OS stops delivering key-up events.
+ *
+ * P2-02 requires that locking the screen or sleeping leaves no key stuck, and both keyboard features
+ * depend on a key-up that a lock or sleep can prevent from ever arriving:
+ *
+ *  - `ShortcutEdgeGuard` latches on a global-shortcut callback and unlatches on key-up, so a lock with
+ *    the wake key held would leave the shortcut permanently dead;
+ *  - `DoubleAltDetector` tracks Alt-down from key events for the same reason, so the gesture would
+ *    stop firing until that Alt happened to be pressed and released again.
+ *
+ * The reference project has no global shortcut, no double-Alt gesture and no lock/sleep listeners, so
+ * there is nothing to port here; `doc/reference-playbook.md` §5.5 records this as pi-orb's own
+ * capability, which is why it carries its own acceptance requirement rather than inherited behaviour.
+ *
+ * Bound to both the lock and the resume edge rather than only one: a lock without a suspend, and a
+ * suspend without a lock, are both ordinary, and recovering on either is harmless when the state was
+ * already clean.
+ */
+function attachKeyboardEdgeRecovery(): void {
+  const recover = (reason: string): void => {
+    shortcutEdgeGuard.releaseLatchedHold();
+    doubleAltDetector.recoverFromLostKeyUp();
+    console.log(`[pi-orb] keyboard edge state cleared (${reason})`);
+  };
+  powerMonitor.on("lock-screen", () => recover("lock-screen"));
+  powerMonitor.on("suspend", () => recover("suspend"));
+  powerMonitor.on("resume", () => recover("resume"));
+  powerMonitor.on("unlock-screen", () => recover("unlock-screen"));
 }
 
 /**
@@ -1401,6 +1433,7 @@ void app.whenReady().then(async () => {
   } else {
     doubleAltDetector.start();
   }
+  attachKeyboardEdgeRecovery();
   registerShortcut();
 
   // The connection probe runs first: the window is already created, so its first snapshot must

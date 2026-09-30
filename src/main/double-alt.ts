@@ -100,4 +100,21 @@ export class DoubleAltDetector {
     this.#firstDownAt = null;
     this.#triggered = false;
   }
+
+  /**
+   * Forget held state whose key-up was never delivered (P2-02's "锁屏／休眠恢复无卡键").
+   *
+   * `#leftDown`/`#rightDown` are cleared only by key-up events, and a machine that locks or sleeps
+   * with Alt held never delivers one. The detector then treats the first real press afterwards as a
+   * repeat and discards it, so the gesture stops working — silently, and until the user happens to
+   * press and release that Alt again. `#triggered` has the same exposure, which would limit the
+   * gesture to once per lock cycle.
+   *
+   * Kept as a named method rather than having callers reach for `reset`: the reason differs (recovery
+   * from a lost edge versus clearing between gestures), and that distinction is the whole point of the
+   * requirement.
+   */
+  recoverFromLostKeyUp(): void {
+    this.reset();
+  }
 }

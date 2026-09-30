@@ -96,6 +96,21 @@ export class ShortcutEdgeGuard {
     this.#latched = true;
     return true;
   }
+
+  /**
+   * Forget a hold whose key-up was never delivered.
+   *
+   * `#latched` is cleared only by a key-up event, and there are cases where none ever arrives: the
+   * machine locks or sleeps with the key down, the hook is unloaded, or the session is switched. The
+   * guard then believes the key is still held and rejects every later press — the shortcut silently
+   * stops working until the user happens to press and release that exact key again.
+   *
+   * Called on lock, suspend and resume, and when a session becomes active. Deliberately explicit
+   * rather than time-based: there is no honest timeout for "the user is still holding a key".
+   */
+  releaseLatchedHold(): void {
+    this.#latched = false;
+  }
 }
 
 const KEY_CODES: Record<string, number> = {
