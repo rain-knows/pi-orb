@@ -1,0 +1,65 @@
+/* Pi host surfaces within the pinned reference floating shell.
+ * The shell geometry, palette and core interaction selectors live in floating.css.
+ * Source/adaptation map: doc/frontend-port.md. */
+
+#panel [hidden] { display: none !important; }
+#transcript { min-height: 0; }
+#transcript-empty { margin: auto 0; text-align: center; }
+#workspace-gate { margin: auto 0; text-align: center; }
+#workspace-gate h1 { margin: 0 0 8px; font-size: 17px; color: var(--black); }
+#workspace-gate p { line-height: 1.5; }
+#workspace-gate button,
+.orb-sheet button {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: var(--black);
+  background: var(--white);
+  font: inherit;
+  font-size: 12px;
+}
+#workspace-gate button { margin-top: 10px; border-color: var(--black); color: var(--white); background: var(--black); }
+.orb-message { display: grid; gap: 4px; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+.orb-message strong { font-size: 11px; font-weight: 600; color: var(--pin); }
+.orb-message p { margin: 0; white-space: pre-wrap; user-select: text; -webkit-user-select: text; }
+.orb-message--error p { color: var(--error); }
+.orb-tool { border: 1px solid var(--border); border-radius: 14px; padding: 8px 12px; font-size: 12px; }
+.orb-tool strong { display: block; }
+.orb-tool p { margin: 4px 0 0; color: var(--pin); }
+.orb-thinking { display: flex; gap: 4px; align-items: center; color: var(--pin); font-size: 12px; }
+.orb-thinking i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: orb-thinking 1s infinite alternate; }
+.orb-thinking i:nth-child(2) { animation-delay: 150ms; }
+.orb-thinking i:nth-child(3) { animation-delay: 300ms; }
+@keyframes orb-thinking { to { opacity: .25; transform: translateY(-2px); } }
+@media (prefers-reduced-motion: reduce) { .orb-thinking i { animation: none; } #panel { transition: none; } }
+
+.orb-sheet {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  overflow: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 36px 20px 20px;
+  color: var(--black);
+  background: var(--white);
+  border-radius: var(--panel-radius);
+  font-size: 12px;
+}
+body.expand-down .orb-sheet { padding-top: 20px; padding-bottom: 36px; }
+.orb-sheet header { display: flex; justify-content: space-between; align-items: center; }
+.orb-sheet header strong { font-size: 14px; }
+.orb-sheet header button { border: none; font-size: 18px; padding: 2px 7px; }
+.orb-sheet p { margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
+.orb-sheet form { display: grid; gap: 6px; }
+.orb-sheet label { font-size: 11px; color: var(--pin); }
+.orb-sheet input { width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; color: var(--black); background: var(--input-bg); font: inherit; user-select: text; -webkit-user-select: text; }
+.orb-sheet footer { display: flex; gap: 6px; flex-wrap: wrap; }
+#target-list, #model-list { display: grid; gap: 5px; overflow: auto; max-height: 140px; }
+#target-list button, #model-list button { text-align: left; border-radius: 12px; overflow-wrap: anywhere; }
+#preview-image { width: 100%; max-height: 210px; object-fit: contain; border: 1px solid var(--border); border-radius: 12px; }
+#preview-meta { color: var(--pin); }
+#status:not(:empty) { position: absolute; z-index: 5; left: 24px; right: 24px; bottom: calc(var(--composer-height) + 16px); border-radius: 12px; padding: 6px 10px; color: var(--black); background: var(--input-bg); box-shadow: var(--panel-shadow); }
+body.expand-down #status:not(:empty) { bottom: auto; top: calc(var(--composer-height) + 16px); }

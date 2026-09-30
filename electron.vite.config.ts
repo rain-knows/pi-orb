@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import type { Plugin } from "vite";
-import react from "@vitejs/plugin-react";
 
 /**
  * Copy the native helper scripts next to the built main process.
@@ -69,13 +68,11 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(__dirname, "src/renderer"),
-    plugins: [react()],
     build: {
       outDir: "out/renderer",
       rollupOptions: {
         // Two entries: the orb shell, and the observation-frame ribbon. The ribbon is a separate page
-        // because it is a second window with its own CSP and no script of its own — loading the React
-        // app into it would ship a bridge it must never have.
+        // because it is a second window with its own CSP and no script of its own.
         input: {
           index: resolve(__dirname, "src/renderer/index.html"),
           "observation-frame": resolve(__dirname, "src/renderer/observation-frame.html"),

@@ -141,7 +141,7 @@ D:\workself\pi-orb\
   src/shared/orb-tools.ts         ← 工具契约（对应 <REF>/plugin.ts 的 schema，但换 Pi 语义）
   pi-package/extensions/orb.ts    ← 工具注册与提示（对应 <REF>/plugin.ts 的注册部分）
   src/main/floating-*.ts          ← <REF>/apps/desktop/src/floating-window.ts
-  src/renderer/App.tsx styles.css ← <REF>/apps/desktop/renderer/floating.{html,css,js}
+  src/renderer/index.html floating.css floating.js ← <REF>/apps/desktop/renderer/floating.{html,css,js}
 ```
 
 ## 5. A 面：产品壳与交互
@@ -151,9 +151,9 @@ D:\workself\pi-orb\
 | 参考文件 | 作用 | pi-orb 对应 | 状态 |
 |---|---|---|---|
 | `apps/desktop/src/floating-window.ts` | 浮球窗口几何、停靠、拖动、多屏、overlay guard | `src/main/floating-geometry.ts`、`floating-window-controller.ts` | 已移植几何子集 **+ 停靠滑动动画**（250/300ms 缓动、`prefersReducedMotion`、动画取消）；48 个导出中 30 个保持参考名，未移植项见文件头的 overlay guard / 菜单 / 观察框 |
-| `apps/desktop/renderer/floating.html` | 浮球/面板 DOM 结构 | `src/renderer/App.tsx` | 已移植：参考 id（`#panel`/`#ball`/`#composer`/`#dock-tab`/`#prompt`/`#selection-chip`/`#transcript` 等）与「`#panel` 常驻、`hidden` 切换」的结构一致；参考专有界面面（`#question*`/`#tcc-*`/`#ball-gif`）无对应物 |
-| `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/styles.css` | 已移植：18 个同名设计令牌、`body.<state>` 布局状态词表、origin-based 展开动画、`html[data-ds-dark-theme]` 暗色；由 `tests/renderer-reference-parity.test.ts` 钉住 |
-| `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/App.tsx` | 视觉与状态约定移植（body 级 `pointerenter`/`pointerleave`、展开/收起时序）；宿主调用未搬 |
+| `apps/desktop/renderer/floating.html` | 浮球/面板 DOM 结构 | `src/renderer/index.html` | **直接移植**参考结构与 id；删除 macOS TCC gate，增补 Pi 必需的工作区、桌面授权和截图预览 |
+| `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/floating.css` | **直接移植**布局、设计令牌、交互状态、暗色及动效；删除 DSH iframe/TCC 专用选择器；Pi 表面补丁在 `orb-surface.css` |
+| `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/floating.js` | **移植状态机**及输入行为；`window.dshDesktop`、RPC、NDJSON 和 iframe 转为现有 `window.orb` 及 Pi Web 会话事件，无 dsh 兼容层 |
 | `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | `src/main/shell-menu.ts` | **部分移植**：结构取自参考的 `floatingContextMenuTemplate`（`floating-window.ts:55-129`）——可编辑时置顶 `cut/copy/paste/selectAll` 角色块（由焦点字段的 `editFlags` 逐项 `enabled`），其下是壳层动作。参考的「打开主窗口」换成「隐藏浮球」（pi-orb 无自有主窗，pi-web 才是会话 UI），Quit 保留。**不移植**：Agent 模型设置（pi-orb 不另立模型配置）、选区工具栏开关与毫坐标开关（无对应物） |
 | `apps/desktop/src/orb-permission.ts` | 浮球权限模型（只读/编辑/完全访问） | 未移植 | 不适用：pi-orb 用 pi-web 自身权限与会话模型 |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
@@ -288,7 +288,7 @@ D:\workself\pi-orb\
 | 观察新鲜度的实现方式不同 | 参考**没有** observation id／陈旧校验／限流（`grep observationId\|stale\|throttle` 无命中），靠“工具互斥 + 每次动作后重拍 + 策略禁止批式依赖动作”保证 | pi-orb 的 `observationId` + 拒绝原因 + 12 动作/5 分钟预算是**本项目新增**，不是参考语义 | 保留（这是授权边界所需），但文档里必须继续标注为 pi-orb 新增，不得说成“参考项目语义” |
 | 参考测试未移植 | **已处理**：`windows-foreground.spec.ts` 10 条与 `windows.spec.ts` 13 条全部移植（`tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts`），并做过变异反证 | — | 参考升级后按 §11 对比这两个 spec 的新增用例 |
 | `coordinates.ts` 有死导出 | **已处理**：11 个导出删除 9 个，只留 `mapNormalizedToGlobal`；唯一校验实现是 `src/shared/orb-tools.ts` 的 `validateAction`。`COORDINATE_SPACE = 1000` 仍在 `orb-tools.ts` 单独声明（共享层不能依赖主进程模块，且扩展包会独立打包） | 曾经同一规则两套实现 | 需要 `button`/`count`/`modifiers` 时，先在 `orb-tools.ts` 扩 schema，不要恢复参考的第二套校验 |
-| 逐文件归属不完整 | **已处理**：`src/main/reference-windows/` 每个文件都有“仓库 + 提交 + 原路径 + MIT”来源头；`floating-window-controller.ts`、`floating-geometry.ts`、`src/renderer/App.tsx` 也已补头；`THIRD_PARTY_NOTICES.md` §3.5 逐文件列全 | — | 新增移植文件时同步补头与清单 |
+| 逐文件归属不完整 | **已处理**：`src/main/reference-windows/` 每个文件都有“仓库 + 提交 + 原路径 + MIT”来源头；`floating-window-controller.ts`、`floating-geometry.ts`、`src/renderer/index.html`、`floating.css`、`floating.js` 也已补头；`THIRD_PARTY_NOTICES.md` §3.5 逐文件列全 | — | 新增移植文件时同步补头与清单 |
 | 存在虚假归属表述 | `src/main/double-alt.ts` 原头注释写“adapted to the reference interaction contract”，但参考项目**没有**全局快捷键与双 Alt 手势 | 把本项目新增能力说成参考项目能力，违反“不得把复用内容描述为原创”的对称要求（也不得把原创描述为复用） | 已改为明确“pi-orb 新增、无参考对应物”；审查其它头注释是否有同类表述 |
 
 ### 6.3 必须保持的坐标语义
@@ -460,7 +460,7 @@ D:\workself\pi-orb\
 - Windows 打包/签名/安装器脚本（`apps/desktop/tests/windows-*.ps1`、`windows-sign*.spec.ts`）
   属发布基础设施，不属于运行时行为；P2-05 的结论见 §9.4，不要凭印象提前引入别的形态。
 
-- 来源记录现状：`src/main/reference-windows/*`、`floating-*.ts`、`src/renderer/App.tsx` 均有
+- 来源记录现状：`src/main/reference-windows/*`、`floating-*.ts`、`src/renderer/index.html`、`floating.css`、`floating.js` 均有
   “仓库 + 提交 + 原路径 + MIT”来源头，并同时登记在 `THIRD_PARTY_NOTICES.md` §3.5。
   **新增移植文件时必须两处都补**，否则来源不可追溯。
 - 参考项目的依赖版本差异必须跟：参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@^2.14.1`；
@@ -514,7 +514,7 @@ D:\workself\pi-orb\
 1. 查 `<REF>/apps/desktop/src/floating-window.ts` 的常量与状态机（§5.2）。
 2. 查 `<REF>/apps/desktop/renderer/floating.css` / `floating.html` 的 DOM 与样式规格。
 3. 改 pi-orb：`src/main/floating-geometry.ts`、`floating-window-controller.ts`、
-   `src/renderer/App.tsx`、`src/renderer/styles.css`。
+   `src/renderer/index.html`、`src/renderer/floating.css`、`src/renderer/floating.js`。
 4. 更新 `tests/floating-geometry.test.ts`；人工项写入 `doc/manual-acceptance.md`。
 5. 在阶段文档记录参考行号与差异。
 

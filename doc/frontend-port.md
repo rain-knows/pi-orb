@@ -33,3 +33,29 @@ use their existing host interfaces. Reference branding, URL/path opening and
 automatic screenshot saving are outside the approved product boundary.
 
 Each following stage records its own source mapping, test result and commit.
+
+## Stage 2: renderer replacement
+
+`src/renderer/index.html` and `floating.css` are direct copies of the pinned
+reference, with the host-specific substitutions in the table above. The
+reference interaction functions for theme, composer sizing, hover, pin, drag,
+dock, history and permission menu are ported in `floating.js`. Pi's existing
+preload bridge supplies the session, desktop task, selection and screenshot
+operations. `orb-surface.css` contains only Pi-specific workspace, access and
+preview surfaces. The obsolete `App.tsx`, `main.tsx`, `styles.css`, renderer
+bridge type, Vite React plugin, React packages and JSX compiler setting were
+removed. `jsdom@29.1.1` and `@types/jsdom@28.0.3` follow the reference test
+setup as development dependencies.
+
+The renderer now sends and stops Pi prompts, shows streaming replies, opens
+saved conversations, chooses a workspace, approves/revokes desktop tasks, and
+previews/confirms/discards screenshots through `window.orb`. There is no DSH
+RPC compatibility endpoint. The model picker remains hidden until the Pi Web
+model commands are wired in stage 3.
+
+Verification at this stage: 449 unit/renderer tests passed; `npm run typecheck`
+and `npm run package:win:dir` passed; the packaged smoke test passed all 19
+checks, including preload isolation, real native window enumeration, reference
+shell geometry, context menu and dock animation. Actual packaged captures are
+`evidence/frontend-port/after-{ball,panel,access}.png`. The panel and access
+captures were inspected at 344 × 444 against the reference capture.

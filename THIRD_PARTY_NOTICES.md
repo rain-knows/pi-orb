@@ -19,8 +19,6 @@ a release.
 
 | Component | Version | License | Ships a license file | Obligation |
 |---|---|---|---|---|
-| `react` | 19.3.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
-| `react-dom` | 19.3.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `scheduler` | 0.28.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `uiohook-napi` | 1.5.5 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `koffi` | 2.14.1 | MIT | yes (`LICENSE`) | include copyright and permission notice |
@@ -124,8 +122,15 @@ The same commit's Electron shell is reused outside that directory:
 
 - `src/main/floating-geometry.ts` ← `apps/desktop/src/floating-window.ts` (geometry constants)
 - `src/main/floating-window-controller.ts` ← `apps/desktop/src/floating-window.ts` (window state machine)
-- `src/renderer/App.tsx`, `src/renderer/styles.css` ← `apps/desktop/renderer/floating.{html,css,js}`
-  (DOM, interaction language and styling; the dsh host protocol is replaced by pi-web's public API)
+- `src/renderer/index.html` ← `apps/desktop/renderer/floating.html` (panel, controls, transcript,
+  question, history, selection chip, composer, ball and dock DOM; the macOS TCC gate is omitted)
+- `src/renderer/floating.css` ← `apps/desktop/renderer/floating.css` (layout, tokens, themes,
+  animation and responsive states; DSH iframe and TCC-only selectors are omitted)
+- `src/renderer/floating.js` ← `apps/desktop/renderer/floating.js` (composer, hover, pin, drag,
+  dock and popover state machine; the DSH RPC/event/iframe boundary is replaced by the existing
+  restricted Pi preload bridge)
+- `src/renderer/orb-surface.css` is pi-orb adaptation styling for its workspace, desktop approval
+  and screenshot review surfaces; it is not a reference source copy
 - `src/main/selection-monitor.ts`, `src/main/windows-selection*.ts` ← `apps/desktop/src/selection-*.ts`,
   `windows-selection*.ts` (selection reading; the reference's native toolbar is not ported)
 

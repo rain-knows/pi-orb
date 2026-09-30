@@ -34,6 +34,17 @@ export default tseslint.config(
     },
   },
   {
+    files: ["src/renderer/*.js"],
+    languageOptions: {
+      globals: {
+        window: "readonly",
+        document: "readonly",
+        matchMedia: "readonly",
+        Event: "readonly",
+      },
+    },
+  },
+  {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       ecmaVersion: 2023,

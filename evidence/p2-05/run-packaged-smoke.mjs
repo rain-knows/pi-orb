@@ -97,8 +97,8 @@ async function evaluate(client, expression) {
 /**
  * Poll a rendered fact until it holds.
  *
- * The window target exists before React has mounted, and the first CDP `Runtime.evaluate` can run
- * during that gap — which reported `rootChildren: 0` once and made a working renderer look broken.
+ * The window target exists before the preload-backed renderer has initialized, so the first CDP
+ * evaluation can see the HTML before the workspace gate is ready.
  * Waiting for the condition keeps the assertion strict (the DOM must actually reach that state)
  * while removing the timing assumption.
  */
@@ -193,12 +193,12 @@ try {
       const ball = document.getElementById('ball');
       const ballStyle = ball ? getComputedStyle(ball) : null;
       return {
-        rootChildren: document.getElementById('root')?.childElementCount ?? 0,
+        rendererReady: document.getElementById('workspace-gate')?.hidden === false,
         ball: ball !== null,
         panel: document.getElementById('panel') !== null,
         composer: document.getElementById('composer') !== null,
         dockTab: document.getElementById('dock-tab') !== null,
-        configured: !document.querySelector('.empty-state h1'),
+        configured: document.getElementById('workspace-gate')?.hidden === true,
         tokens: {
           ball: style.getPropertyValue('--ball').trim(),
           chrome: style.getPropertyValue('--chrome').trim(),
@@ -220,7 +220,7 @@ try {
         (raw) => {
           try {
             const value = JSON.parse(raw);
-            return value.rootChildren > 0 && value.ball === true;
+            return value.rendererReady === true && value.ball === true;
           } catch {
             return false;
           }
@@ -229,17 +229,14 @@ try {
     );
     check(
       "the built renderer bundle and its assets load from the archive",
-      render.rootChildren > 0 && render.ball && render.avatarLoaded && render.styleSheets > 0,
-      JSON.stringify({ rootChildren: render.rootChildren, ball: render.ball, avatarLoaded: render.avatarLoaded, styleSheets: render.styleSheets }).slice(0, 240),
+      render.rendererReady && render.ball && render.avatarLoaded && render.styleSheets > 0,
+      JSON.stringify({ rendererReady: render.rendererReady, ball: render.ball, avatarLoaded: render.avatarLoaded, styleSheets: render.styleSheets }).slice(0, 240),
     );
     check(
       "the ported reference shell is mounted, not just its stylesheet",
-      // `#panel`, `#ball` and `#dock-tab` exist regardless of state, as in the reference. `#composer`
-      // is absent only while the workspace is unconfigured: pi-orb replaces the transcript with the
-      // "choose a workspace" step, and offering an input before Orb mode can exist would be a false
-      // affordance. The probe runs unconfigured, so it asserts the reference structure minus that
-      // one state-dependent element.
-      render.panel && render.dockTab && (!render.composer || render.configured === false),
+      // The reference hierarchy remains mounted in every state. The Pi composer is hidden, not
+      // removed, until the user chooses a workspace.
+      render.panel && render.dockTab && render.composer && render.configured === false,
       JSON.stringify({ panel: render.panel, dockTab: render.dockTab, composer: render.composer, configured: render.configured, bodyClasses: render.bodyClasses }).slice(0, 240),
     );
     check(

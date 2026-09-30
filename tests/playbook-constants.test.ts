@@ -19,8 +19,8 @@ import { describe, expect, it } from "vitest";
 const repo = join(import.meta.dirname, "..");
 const playbook = readFileSync(join(repo, "doc", "reference-playbook.md"), "utf8");
 const geometry = readFileSync(join(repo, "src", "main", "floating-geometry.ts"), "utf8");
-const app = readFileSync(join(repo, "src", "renderer", "App.tsx"), "utf8");
-const css = readFileSync(join(repo, "src", "renderer", "styles.css"), "utf8");
+const app = readFileSync(join(repo, "src", "renderer", "floating.js"), "utf8");
+const css = readFileSync(join(repo, "src", "renderer", "floating.css"), "utf8");
 
 interface PinnedConstant {
   readonly name: string;
@@ -33,9 +33,9 @@ interface PinnedConstant {
 }
 
 const pinned: readonly PinnedConstant[] = [
-  { name: "COLLAPSE_MS", value: "180", source: app, sourcePath: "src/renderer/App.tsx", documentedInPlaybook: true },
-  { name: "ANIMATION_MS", value: "300", source: app, sourcePath: "src/renderer/App.tsx", documentedInPlaybook: true },
-  { name: "DOCK_HOVER_DELAY_MS", value: "800", source: app, sourcePath: "src/renderer/App.tsx", documentedInPlaybook: true },
+  { name: "COLLAPSE_MS", value: "180", source: app, sourcePath: "src/renderer/floating.js", documentedInPlaybook: true },
+  { name: "ANIMATION_MS", value: "300", source: app, sourcePath: "src/renderer/floating.js", documentedInPlaybook: true },
+  { name: "DOCK_HOVER_DELAY_MS", value: "800", source: app, sourcePath: "src/renderer/floating.js", documentedInPlaybook: true },
   { name: "FLOATING_DOCK_SLIDE_OFF_MS", value: "250", source: geometry, sourcePath: "src/main/floating-geometry.ts", documentedInPlaybook: true },
   { name: "FLOATING_DOCK_SLIDE_IN_MS", value: "300", source: geometry, sourcePath: "src/main/floating-geometry.ts", documentedInPlaybook: true },
   { name: "FLOATING_BALL_SIZE", value: "72", source: geometry, sourcePath: "src/main/floating-geometry.ts", documentedInPlaybook: false },
@@ -81,7 +81,7 @@ describe("playbook constants agree with the implementation", () => {
     // The CSS transition and the renderer's hide delay must agree, or the panel is hidden mid-reveal
     // (or left visible after collapsing).
     expect(css).toMatch(/transition:\s*opacity 300ms ease-in-out,\s*transform 300ms ease-in-out/u);
-    expect(app).toMatch(/const ANIMATION_MS = 300;/u);
+    expect(app).toMatch(/const ANIMATION_MS = 300\b/u);
   });
 
   it("keeps the composer height derived from the ball, not repeated", () => {

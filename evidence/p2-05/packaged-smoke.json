@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-30T01:08:31.853Z",
+  "capturedAt": "2026-09-30T02:04:46.535Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790730511853",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790733886535",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -26,7 +26,7 @@
     {
       "name": "the packaged app answers IPC status",
       "ok": true,
-      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"b"
+      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application "
     },
     {
       "name": "the packaged app starts in the isolated unconfigured state",
@@ -36,12 +36,12 @@
     {
       "name": "the built renderer bundle and its assets load from the archive",
       "ok": true,
-      "detail": "{\"rootChildren\":3,\"ball\":true,\"avatarLoaded\":true,\"styleSheets\":1}"
+      "detail": "{\"rendererReady\":true,\"ball\":true,\"avatarLoaded\":true,\"styleSheets\":1}"
     },
     {
       "name": "the ported reference shell is mounted, not just its stylesheet",
       "ok": true,
-      "detail": "{\"panel\":true,\"dockTab\":true,\"composer\":false,\"configured\":false,\"bodyClasses\":\"expand-right expand-down\"}"
+      "detail": "{\"panel\":true,\"dockTab\":true,\"composer\":true,\"configured\":false,\"bodyClasses\":\"\"}"
     },
     {
       "name": "the reference design tokens resolve to the reference values",
@@ -96,7 +96,7 @@
     {
       "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
       "ok": true,
-      "detail": "10 windows, first=\"\""
+      "detail": "9 windows, first=\"\""
     },
     {
       "name": "no desktop-driver failure was reported at startup",
@@ -110,6 +110,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-17388\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/1677d4da-dfcb-48af-aaaf-a9604d88eaab"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-83816\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/092c84cd-36b3-45c9-806a-2054fc54a449\n[pi-orb] wake shortcut not registered: Another application already owns this shortcut. Choose a different one."
 }
