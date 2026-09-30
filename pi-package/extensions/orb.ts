@@ -37,6 +37,7 @@ import {
   type DesktopAction,
   type DesktopObservation,
 } from "../../src/shared/orb-tools.js";
+import { limitOrbImages, orbImageBudget } from "./orb-image-context.js";
 import { BridgeClient } from "./bridge-client.js";
 
 export { ORB_MODE_SECTION };
@@ -495,6 +496,14 @@ export default function orbExtension(pi: ExtensionAPI): void {
         );
       },
     });
+  });
+
+  pi.on("context", (event, ctx) => {
+    const config = readOrbConfig(resolveOrbConfigPath());
+    if (!config || !isOrbWorkspace(ctx.cwd, config.orbWorkspace)) return;
+    const messages = limitOrbImages(event.messages);
+    console.log(`[pi-orb] image-budget ${JSON.stringify(orbImageBudget(messages))}`);
+    return { messages };
   });
 
   pi.on("tool_result", (event, ctx) => {
