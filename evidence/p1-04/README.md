@@ -16,7 +16,7 @@
 | 授权流程编排（记录目标→截图→预览→决策→发送） | `src/main/screenshot-flow.ts` |
 | 目标窗口记录（Win32，per-monitor-v2 DPI） | `src/main/native/foreground-window.ps1`、`src/main/target-window.ts` |
 | 按原生句柄精确捕获 | `src/main/desktop-capture.ts` |
-| 预览、删除、确认发送界面 | `src/renderer/App.tsx` |
+| 预览、删除、确认发送界面 | `src/renderer/index.html`、`src/renderer/floating.js`、`src/renderer/orb-surface.css` |
 | 单测 | `tests/screenshot.test.ts`、`tests/pending-capture.test.ts`、`tests/desktop-capture.test.ts`、`tests/screenshot-flow.test.ts` |
 
 **唤醒路径不含任何截图**：`WakeController.wake()` 只调用 `restore()`/`show()`/`focus()`。截图只能由用户点击 `Screenshot` 触发。

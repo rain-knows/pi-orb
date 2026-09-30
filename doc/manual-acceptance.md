@@ -167,7 +167,7 @@ node evidence/p1-05/run-p1-05.mjs
 | C4 | 脚本结束后检查键盘 | 无卡键（脚本已用 OS 全局键态差分自检，可另按一次修饰键确认） | 通过|
 | C5 | 对一个**高权限**丢弃窗口重复输入测试 | 记录普通 vs 高权限的差异 | 未验证，不需要|
 | C6 | 在真实前台下构造「按下中途取消」 | 松开后无残留按下状态 | **通过**：`probe-reference-cancel.mjs` 真实 native 路径收到 `mouse-down=1`、`mouse-up=1`；结果见 `evidence/p1-05/reference-cancel.json` |
-| C7 | **截图点 ↔ 输入点一致性（联合断言）**：先截图，在预览里选一个明确的标记点（如网格某格中心），再让 Orb 在该点点击 | 目标报告**同一格**被命中 | 当前参考 backend 已通过：`loop-verification-reference-backend.json` |
+| C7 | **截图点 ↔ 输入点一致性（联合断言）**：先截图，在预览里选一个明确的标记点（如网格某格中心），再让 Orb 在该点点击 | 目标报告**同一格**被命中 | 产品侧坐标闭环仍通过：`loop-verification-reference-backend.json`；真实模型最新复跑未通过（`real-model-c7-reference-backend.json`），需重新取得同一运行内的模型工具调用 |
 
 C7 是当前唯一把「截图坐标」与「输入坐标」放在同一次运行里对照的检查，因此不得由
 B1/B7 与 C1 的分段结果代替。
@@ -214,10 +214,10 @@ Get-Content (Join-Path $env:TEMP 'pi-orb-c7-grid.jsonl') -Tail 30
 
 ## 6. D 组：真实模型自主调用工具（P1-06）
 
-历史自动化已证明：普通会话拿不到 orb 工具、Orb 会话曾获得七个工具、工具 schema 由 provider 实收（7/7 断言，含 `orb_open_app`）。
+历史自动化已证明：普通会话拿不到 orb 工具、Orb 会话当前获得 11 个工具、工具 schema 由 provider 实收（11/11 断言，含 `orb_open_app`）。
 当前实现已扩展为 11 个工具，新的 provider schema 数量和真实模型闭环必须按本节重新执行；
-授权/预算/新鲜度/拒绝零副作用仍由自动化覆盖。当前参考 backend 的真实模型 C7、D6、D8 已在解锁桌面运行，
-并以 disposable 目标自身日志确认模型决定调用工具后的点击、滚动和输入结果。
+授权/预算/新鲜度/拒绝零副作用仍由自动化覆盖。真实模型脚本曾在解锁桌面通过 C7、D6、D8，
+但 2026-09-30 最新复跑分别为 18/24、24/25、24/25；失败 JSON 保留，暂不把模型侧闭环列为稳定支持。
 
 1. 在浮窗里选好 Orb 工作区（精确匹配该目录，见 §1）。
 2. 为验收新建一个**丢弃式**目标窗口，放在前台。可用的已入仓目标：
@@ -238,14 +238,14 @@ Get-Content (Join-Path $env:TEMP 'pi-orb-c7-grid.jsonl') -Tail 30
 
 | # | 观察 | 预期 | 结果 |
 |---|---|---|---|
-| D1 | 模型是否**实际发起** `orb_observe` 调用 | 是；你应看到一次观察结果回来 | 当前参考 backend 已通过：`real-model-c7-reference-backend.json` |
+| D1 | 模型是否**实际发起** `orb_observe` 调用 | 是；你应看到一次观察结果回来 | 历史运行通过；最新 C7 复跑没有 Orb 工具调用，见 `real-model-c7-reference-backend.json` |
 | D2 | 随后是否发起 `orb_click`，且**坐标**来自刚才的观察（分数 0–1000） | 是 | 当前参考 backend 已通过，参数在 0–1000 截图空间 |
 | D3 | 每次动作之后是否产生**新的观察** | 是（一动作一观察） | 当前参考 backend 已通过：工具序列 `orb_observe → orb_click → orb_observe` |
 | D4 | 目标窗口是否报告命中了预期位置 | 是 | 当前参考 backend 已通过：目标日志命中 `0,0` |
 | D5 | 浮窗里的桌面任务面板是否显示状态，且能 **Revoke** | 能撤销；撤销后不再执行 | 通过：自动化闭环已验证 |
-| D6 | 让模型尝试滚动（`orb_scroll`） | 目标收到 `wheel`；若被 OS 拒绝，产品须如实报失败，**不得**报成功 | 当前参考 backend 已通过：目标日志有 `wheel` 且 `scrollTop` 改变 |
+| D6 | 让模型尝试滚动（`orb_scroll`） | 目标收到 `wheel`；若被 OS 拒绝，产品须如实报失败，**不得**报成功；动作后再观察 | 最新复跑目标有 `wheel` 且 `scrollTop` 改变，但缺少动作后观察（24/25） |
 | D7 | 在**普通（非 Orb）**会话里要求模型操作桌面 | 无 orb 工具可用，模型无法调用 | 通过：普通会话无 `orb_*` 工具 |
-| D8 | 让模型输入一段非敏感文本（`orb_type`） | 落到丢弃式目标的文本区；由目标日志读回 marker | 当前参考 backend 已通过：目标日志读回 `P1ORBD8TEST` |
+| D8 | 让模型输入一段非敏感文本（`orb_type`） | 落到丢弃式目标的文本区；由目标日志读回 marker，并在动作后再观察 | 最新复跑读回 `P1ORBD8TEST`，但缺少动作后观察（24/25） |
 
 > 当前 D8 采用参考项目同类 clipboard + Ctrl+V 的 Win32 native input；目标自身日志已读回
 > `P1ORBD8TEST`。驱动摘要不作为证据，历史 Cua 路径仅作迁移对照。

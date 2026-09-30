@@ -109,14 +109,14 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
 
 ### renderer（本次改为真移植）
 
-1. **设计令牌**：`styles.css` 的 `:root` 采用参考的令牌名与值（`--ball: 72px`、
+1. **设计令牌**：`floating.css` 的 `:root` 采用参考的令牌名与值（`--ball: 72px`、
    `--chrome: 12px`、`--panel-radius: 36px`、`--composer-height: var(--ball)`、
    `--prompt-line/-pad`、`--composer-max`、`--selection-chip: 28px`、`--black/--white/--input-bg/
    --border/--pin/--error`、两个阴影、`--origin-x/--origin-y`）。深色值同样取自参考的
    `html[data-ds-dark-theme]` 块。
 2. **布局状态模型**：`body.expanded`、`body.docked`、`body.docked-left/right`、
    `body.expand-up/down/left/right`、`body.pinned`、`body.running`、`body.has-selection-chip`，
-   由 `App.tsx` 写入 `document.body.className`，CSS 负责布局——与参考一致。**一个状态只有一种
+   由 `floating.js` 写入 `document.body.className`，CSS 负责布局——与参考一致。**一个状态只有一种
    机制**（此前 expanded/pinned 曾被写进 `<html>` 的 data 属性，已改回 body 类）。
 3. **面板揭示**：`#panel { inset: var(--chrome); border-radius: var(--panel-radius); opacity: 0;
    transform: scale(0.18); transform-origin: var(--origin-x) var(--origin-y); transition: opacity
@@ -151,12 +151,12 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
 - **`floating.js` 不能直接运行**：它依赖 dsh Host RPC、独立 overlay Session、`dsh-app://` 协议和
   iframe ChatView。pi-orb 移植其 DOM 结构、CSS 约定与状态机，会话与授权仍走本仓库
   `OrbSessionController` 与 broker。
-- **`#transcript iframe`**：参考把对话渲染在 iframe 里；pi-orb 的对话是自身 React 树，因此没有
-  iframe 元素，`#transcript` 直接承载消息节点（`.message`）。
+- **`#transcript iframe`**：参考把对话渲染在 iframe 里；pi-orb 的 Pi transcript 由
+  `floating.js` 直接写入 `#transcript`，因此没有 iframe 元素。
 - **参考专有界面面无对应物**：`#question*`（参考向用户提问的卡片）、`#tcc-*`（macOS 屏幕录制／
   辅助功能授权门）、`#ball-gif`（参考用 GIF 头像）、`mandatory-update-frame.*`、`welcome.*`、
   `update-dialog.*`、`selection-toolbar.*`。pi-orb 没有这些产品概念，按 AGENTS.md 不自行增加，
-  因此不移植；这也意味着 `styles.css` 比参考的 `floating.css` 少一批选择器。
+  因此不移植；Pi 专属差异集中在 `orb-surface.css`，参考 `floating.css` 本身保持原有选择器。
 - **观察框**：已移植（见上文「观察框」节）。此前记的是「尚无生命周期契约，不在 renderer 里画会
   挡截图的假边框」——那条理由本身没错，但它描述的是**当时的**状态，而 P2-01 的交付项写着「观察
   边框」；把未完成项写成设计选择，是这个项目已经犯过一次的同一类问题（见「一次被更正的事实」）。

@@ -1,9 +1,9 @@
 {
-  "capturedAt": "2026-09-30T01:08:31.644Z",
+  "capturedAt": "2026-09-30T03:45:24.028Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
-    "count": 137,
+    "count": 49,
     "sample": [
       "node_modules",
       "node_modules/koffi",
@@ -24,7 +24,7 @@
       "node_modules/node-gyp-build/node-gyp-build.js",
       "node_modules/node-gyp-build/optional.js",
       "node_modules/node-gyp-build/package.json",
-      "node_modules/react"
+      "node_modules/uiohook-napi"
     ]
   },
   "unpacked": [
@@ -41,9 +41,9 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 9319944,
+    "asarBytes": 358604,
     "unpackedNativeBytes": 2658109,
-    "archiveEntryCount": 137
+    "archiveEntryCount": 49
   },
   "checks": [
     {
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-CKXGaqEc.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
+      "detail": "out/renderer/assets/index-CIMhhZBj.css, out/renderer/assets/index-DNbUuW9J.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
     },
     {
       "name": "the archive ships no src/ files",
@@ -149,12 +149,12 @@
     {
       "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
       "ok": true,
-      "detail": "9318 bytes"
+      "detail": "9704 bytes"
     },
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "52386 bytes"
+      "detail": "54781 bytes"
     },
     {
       "name": "the shipped manifest carries the project version",

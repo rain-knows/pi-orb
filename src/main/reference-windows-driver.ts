@@ -292,7 +292,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
    */
   async #openApp(action: { readonly name: string }, signal?: AbortSignal): Promise<ActResult> {
     try {
-      signal?.throwIfAborted();
+      const abort = signal ?? new AbortController().signal;
+      abort.throwIfAborted();
       const requested = action.name.trim();
       const running = this.#options.ops.listWindowApps();
       const match = running.find((name) => sameApp(name, requested));
@@ -305,23 +306,27 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       }
 
       const adopted = await this.#withGuiTurn(async () => {
-        signal?.throwIfAborted();
+        abort.throwIfAborted();
         if (!this.#options.ops.activateApp(match)) {
           throw new Error(`"${requested}" could not be brought to the foreground.`);
         }
+        // Match the reference tool's post-action settle before inspecting and recapturing the
+        // newly activated application. Without this delay a slow window manager can return the
+        // previous foreground surface as the "fresh" observation.
+        await delay(POST_ACTION_WAIT_MS, abort);
         const foreground = this.#findForegroundTarget();
         if (!foreground || !sameApp(foreground.appName, match)) {
           throw new Error(
             `"${requested}" did not become the foreground window, so the target was left unchanged.`,
           );
         }
-        const screens = await this.#options.backend.listScreens(signal);
+        const screens = await this.#options.backend.listScreens(abort);
         const screen = screens.find((candidate) => candidate.windowId === foreground.windowId);
         if (!screen) throw new Error(`No observation surface is available for "${requested}".`);
-        const captured = await this.#options.backend.capture(screen, signal);
-        signal?.throwIfAborted();
+        const captured = await this.#options.backend.capture(screen, abort);
+        abort.throwIfAborted();
         const next = this.#makeObservation(foreground, screen, captured, true,
-          await this.#options.backend.inspectForeground(signal));
+          await this.#options.backend.inspectForeground(abort));
         this.#target = foreground;
         this.#screen = screen;
         this.#observation = next;

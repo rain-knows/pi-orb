@@ -347,7 +347,9 @@ export function validateAction(
 
 const CLICK_MODIFIERS = new Set(["shift", "cmd", "command", "meta", "win", "windows", "option", "alt", "control", "ctrl"]);
 function validClickModifiers(modifiers: readonly string[]): boolean {
-  return Array.isArray(modifiers) && modifiers.every((value) => typeof value === "string" && CLICK_MODIFIERS.has(value.toLowerCase()));
+  return Array.isArray(modifiers) && modifiers.every((value) =>
+    typeof value === "string" && CLICK_MODIFIERS.has(value.trim().toLowerCase()),
+  );
 }
 
 const HOTKEY_MODIFIERS = new Set(["ctrl", "control", "alt", "option", "shift", "win", "windows", "meta", "cmd", "command", "super"]);

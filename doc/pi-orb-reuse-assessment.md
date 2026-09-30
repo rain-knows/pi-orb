@@ -53,19 +53,19 @@ pi-orb 的复用默认值应是“先复用参考项目已经跑通的软件实�
 
 | 项 | 当前结论 | 最短下一步 |
 |---|---|---|
-| C7 真实模型观察→点击→再观察 | 当前参考 backend 已通过（24/24，目标日志命中 `0,0`） | 已写入 `real-model-c7-reference-backend.json` |
+| C7 真实模型观察→点击→再观察 | 2026-09-29 曾通过；2026-09-30 最新复跑 18/24 失败，未产生 Orb 工具调用 | 失败记录写入 `real-model-c7-reference-backend.json`，暂不宣称稳定支持 |
 | A4 长按快捷键 | 代码和真实 Electron + native hook 集成探针通过；探针使用合成 F24 输入 | 用真实键盘长按一次；不能用 cooldown 代替 key-up |
 | A5 托盘开/收 | 状态机已修复，单测通过 | 重启 Electron 后实际点击托盘两次 |
 | B9 仅文本模型截图 | 隔离链路通过，旧进程未复测 | 重启当前 Orb，再用仅文本模型执行一次截图任务 |
-| D6 真实模型滚动 | 当前参考 backend 已通过（25/25，目标日志有 `wheel` 且 `scrollTop` 改变） | 已写入 `real-model-d6-scroll-reference-backend.json` |
-| D8 真实模型输入 | 当前参考 backend 已通过（25/25，目标日志读回 `P1ORBD8TEST`） | 已写入 `real-model-d8-type-reference-backend.json` |
+| D6 真实模型滚动 | 最新复跑 24/25 失败；目标有 `wheel` 且 `scrollTop` 改变，但动作后没有再次观察 | 失败记录写入 `real-model-d6-scroll-reference-backend.json` |
+| D8 真实模型输入 | 最新复跑 24/25 失败；目标读回 `P1ORBD8TEST`，但动作后没有再次观察 | 失败记录写入 `real-model-d8-type-reference-backend.json` |
 | 多屏/高权限 | 未验证 | 各自使用独立目标和目标自身日志，不合并为一个“综合通过” |
 
 ## 4. 验收门槛
 
-自动证据当前为：Vitest 440/440（含移植的参考规格测试 23 条、open-app 收窄规则 7 条、renderer 参考一致性 17 条、停靠滑动 4 条与手册常量双向对照 17 条）、P1-03 OS 探针通过、P1-06 当前参考
-backend 真实模型 C7/D6/D8 通过、P1-07 release gate 66/66、生命周期回归 10/10、P2-05 产物内容审计
-25/25 与打包产物启动探测 21/21、TypeScript/ESLint/build 通过。A4/A5 仍需人工真实键盘/托盘复测；
+自动证据当前为：Vitest 461/461（含移植的参考规格测试 23 条、open-app 收窄规则 8 条、renderer 参考一致性 17 条、停靠滑动 4 条与手册常量双向对照 17 条）、P1-03 OS 探针通过、P1-06 当前参考
+backend 产品侧闭环通过、P1-07 release gate 66/66、生命周期回归 10/10、P2-05 产物内容审计
+25/25 与打包产物启动探测 21/21、TypeScript/ESLint/build 通过。真实模型 C7/D6/D8 最新复跑未完整通过；A4/A5 仍需人工真实键盘/托盘复测；
 P2-05 的干净机安装／卸载／升级与 SmartScreen、以及 `orb_open_app` 的真机效果属人工项。
 
 P1-05/C6 审计发现 broker 原先没有把撤权传播给正在执行的 native action，因此只验证 backend 的

@@ -28,7 +28,7 @@ Windows desktop backend 接入热键、长按和拖拽。复用入口为参考�
 
 ## 自动化证据
 
-2026-09-29 本轮结果：类型检查通过；回图相关测试 92/92 通过；真实 pi-web 工具 schema 检查 7/7 通过；
+2026-09-30 本轮结果：类型检查通过；回图相关测试 93/93 通过；真实 pi-web 工具 schema 检查 11/11 通过；
 发布质量门禁 32/32 通过（包含全量 typecheck、lint、test 和 production build）。新增 broker 未授权回归在全量测试中通过。
 
 运行以下命令：
@@ -42,7 +42,7 @@ node evidence/p1-06/run-p1-06-tools.mjs
 覆盖点：参数范围、禁止热键、解析拒绝、窗口和坐标映射、授权 broker 的既有统一链路、授权前元数据/授权后图像边界、
 动作后新 observation、撤权信号传递，以及 native
 backend 在长按/拖拽取消后松开鼠标、热键取消后释放已按下的键。工具暴露脚本用实际 pi-web 装配和假 provider
-接收的 schema 判定：普通 cwd 不含 Orb 工具，Orb cwd 仅含七个当前受支持工具。
+接收的 schema 判定：普通 cwd 不含 Orb 工具，Orb cwd 含 11 个当前受支持工具。
 
 截图导出补充测试：`tests/screenshot-export.test.ts` 验证支持的媒体类型、精确 base64 解码和坏数据拒绝。
 

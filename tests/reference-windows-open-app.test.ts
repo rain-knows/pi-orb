@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { POST_ACTION_WAIT_MS } from "../src/shared/orb-tools";
 import type { DesktopBackend, ScreenInfo } from "../src/main/reference-windows/backend";
 import { ReferenceWindowsDriver, type ReferenceWindowInfo } from "../src/main/reference-windows-driver";
 import type { WindowsDesktopOps } from "../src/main/reference-windows/windows";
@@ -174,6 +175,39 @@ describe("orb_open_app: activation only", () => {
     expect(changed).toHaveLength(1);
     expect(changed[0]).toMatchObject({ windowId: 42, appName: "notepad.exe" });
     expect(backendCalls.some((call) => (call as { kind?: string }).kind === "capture")).toBe(true);
+  });
+
+  it("waits the reference settle interval before capturing the activated target", async () => {
+    vi.useFakeTimers();
+    try {
+      const { driver, observation, backendCalls } = await observedDriver({
+        running: ["notepad.exe"],
+        activates: (_name, state) => {
+          state.foregroundHwnd = 42;
+          return true;
+        },
+      });
+      backendCalls.length = 0;
+
+      let settled = false;
+      const action = driver.act(
+        { kind: "openApp", observationId: observation.observationId, name: "notepad" },
+        observation,
+      ).then((result) => {
+        settled = true;
+        return result;
+      });
+
+      await vi.advanceTimersByTimeAsync(POST_ACTION_WAIT_MS - 1);
+      expect(settled).toBe(false);
+      expect(backendCalls).toEqual([]);
+
+      await vi.advanceTimersByTimeAsync(1);
+      expect((await action).ok).toBe(true);
+      expect(backendCalls.some((call) => (call as { kind?: string }).kind === "capture")).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("accepts a display name in any case and with or without the .exe suffix", async () => {

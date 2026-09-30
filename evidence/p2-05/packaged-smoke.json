@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-30T03:08:46.128Z",
+  "capturedAt": "2026-09-30T03:45:24.189Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790737726128",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790739924189",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": "pi-orb"
+      "detail": ""
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -86,7 +86,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -96,7 +96,7 @@
     {
       "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
       "ok": true,
-      "detail": "9 windows, first=\"\""
+      "detail": "7 windows, first=\"\""
     },
     {
       "name": "no desktop-driver failure was reported at startup",
@@ -110,6 +110,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-78940\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/9f06c77e-b885-4845-b623-9b22a5b7eda4"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-78976\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/54cd4a62-147c-4fa8-a0a5-c1f5ca2fb80d"
 }

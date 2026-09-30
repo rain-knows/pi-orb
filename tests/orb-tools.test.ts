@@ -83,6 +83,7 @@ describe("validateAction", () => {
   it("validates right, double click and modifiers", () => {
     const base = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } } as const;
     expect(validateAction({ ...base, button: "right", count: 2, modifiers: ["shift", "ctrl"] }, observation(), budget)).toBeNull();
+    expect(validateAction({ ...base, modifiers: [" Shift ", "CTRL"] }, observation(), budget)).toBeNull();
     expect(validateAction({ ...base, modifiers: ["unknown"] }, observation(), budget)).toBe("invalid-click-options");
   });
 

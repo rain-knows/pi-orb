@@ -14,7 +14,7 @@ pi-orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi
 |---|---|---|
 | 桌面壳 | Electron 主进程、受限 preload、简洁 renderer | 已确定方向。Electron 是产品核心，不复制 Pi 会话引擎 |
 | 运行时与语言 | Node.js 24.19.0、TypeScript strict | 已按当前开发基线固定 |
-| renderer | React + TypeScript + Vite；普通 CSS 或轻量样式模块 | 推荐最小 UI 方案；不使用 Next.js，不复制 pi-web 页面状态树 |
+| renderer | 参考项目 floating HTML/CSS/JS + TypeScript 适配模块，经 electron-vite 打包 | 已落地整体移植；删除旧 React 页面、JSX 编译设置和 React/Vite React 依赖 |
 | Pi 接入 | Pi SDK 及 Pi 扩展 API；独立 `orb_` 工具与结构化 prompt section | 已确定接入方向；当前证据基线为 Pi SDK `0.87.1` |
 | pi-web 接入 | 小型 HTTP/SSE 客户端适配层 | 复用会话创建、消息、图片、事件和停止行为；不访问私有 registry 或 hook 私有方法 |
 | 本机桥接 | 认证的 loopback 连接、named pipe 或 Unix socket 之一 | 需要 P0-03 选择；不以关闭认证、wildcard CORS 或暴露 Node 给 renderer 代替桥接 |
@@ -22,7 +22,7 @@ pi-orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi
 | 截图与快捷键 | Electron `desktopCapturer`、`globalShortcut` + `uiohook-napi` key-up edge guard / 左右 Alt 手势 | Electron 负责普通组合键注册和冲突诊断；hook 提供 key-up 边沿及 P2-02 左右 Alt 手势；双 Alt 仅打开既有预览，不自动上传；真实键盘、AltGr、DPI 和锁屏恢复需人工验收 |
 | Orb 自有配置 | Electron `app.getPath('userData')` 下的独立配置 | 只保存工作区、窗口、快捷键等 Orb 配置；不改写 Pi 全局默认值 |
 | 测试 | TypeScript 类型检查、单元/协议测试、Electron 集成测试、Windows 真机 smoke | 推荐分层；mock 不能替代原生输入取消与释放测试 |
-| 打包 | Electron Forge 作为首选候选，Windows x64 优先 | 需通过干净机器安装、卸载和许可检查后才能锁定 |
+| 打包 | electron-builder JS 配置、Windows x64 每用户 NSIS | 已按参考项目形态落地；内容审计和打包启动探测通过，干净机安装/卸载/升级仍未验证 |
 | FFF/LSP | 不作为产品运行时依赖 | 作为可选开发工具单独试点；不应混入 pi-orb 运行时技术栈 |
 
 ## 2. 已确定方向、推荐项与待验证项
@@ -41,9 +41,9 @@ pi-orb 应采用**单仓库、TypeScript 为主、Electron 桌面壳 + 现有 pi
 ### 2.2 推荐但尚未锁定
 
 - Windows x64 是首发优先候选，但仍需在 P0-01 确认；macOS/Linux 不因代码可编译就宣称支持。
-- renderer 采用 React + Vite，而不是 Next.js。浮窗是单一客户端 UI，不需要再引入服务端渲染和路由框架；React 也与 pi-web 的现有前端生态一致，但 Orb 不复制其组件树或内部状态。
+- renderer 直接采用固定参考提交的 floating HTML/CSS/JS。浮窗是单一客户端 UI，不需要服务端渲染、路由框架或第二套组件树；Pi 专属状态通过 `orb-surface.css` 和 `floating.js` 的适配边界接入。
 - 使用 npm 与 `package-lock.json` 作为初始依赖管理方案。当前项目规模不需要提前拆包或引入 monorepo；如果上游接入实际要求其他包管理器，须在 P0 记录原因并只支持一种方案。
-- Electron Forge 作为首选打包工具，以减少自建 Windows 安装流程；v0.1 不默认加入自动更新，避免未经确认重启或替换用户当前 pi-web/Orb 环境。
+- 使用 electron-builder 的 JS 配置复用参考项目的 Windows 形态；v0.1 不加入自动更新、签名链或 dsh 随包运行时。
 - 测试采用 Vitest（纯函数、协议和适配器）加 Electron 集成测试；renderer 交互只有在出现稳定 UI 验收需求时再引入 Playwright。原生截图、输入、权限和取消必须在批准的 Windows 真机验证。
 - IPC 协议使用 TypeScript 判别联合、明确的请求代次/session 绑定和边界校验。只有在协议复杂度实际增加时，才引入运行时 schema 库；类型声明本身不能代替来自 renderer 或本机连接的数据校验。
 
@@ -114,7 +114,7 @@ Electron renderer 与 pi-web 的 Node 服务不是同一进程，不能把 rende
 | pi-web | `@agegr/pi-web@0.9.3` | 当前记录的本机包版本；远端固定提交需重新核验 |
 | Electron | `44.4.5` | 已锁定并通过 Electron 浮窗、截图、桥接和构建验证 |
 | Node.js | `24.19.0` | 当前开发与验收基线；其它版本未验证 |
-| 桌面驱动 | 已选定：参考项目 Windows native backend，固定提交 `72f1d738458a223696685a909e806b683eff5885` | Windows x64 生产路径已接入；真实模型 C7、D6、D8 已通过，其他环境项仍按支持矩阵单独验收 |
+| 桌面驱动 | 已选定：参考项目 Windows native backend，固定提交 `72f1d738458a223696685a909e806b683eff5885` | Windows x64 生产路径已接入；真实模型曾有通过记录，但 2026-09-30 C7/D6/D8 复跑未完整通过，按支持矩阵处理 |
 | OS | Windows 11 x64 | 首发目标；多屏、高权限和其它平台仍未验证 |
 
 ### 4.2 锁定规则
@@ -139,7 +139,7 @@ Electron renderer 与 pi-web 的 Node 服务不是同一进程，不能把 rende
 | P0-04 驱动 | 只读观察、图片、坐标和清理语义真实可用且许可明确 | 不能把截图探针当输入验收，必要时停在聊天/看图版本 |
 | P0-05 决策 | 只有一个最小接入方案和一个桌面后端候选，未通过项与上游改动清楚 | 提交决策给用户，不自行扩大范围 |
 
-P0 和大部分 P1 已完成。当前产品已启用显式授权的桌面工具；当前参考 backend 的 C7、D6、D8 已通过，但完整 v0.1 仍受多屏、高权限、Chromium 内容输入和取消时序等未验证项约束。
+P0 和大部分 P1 已完成。当前产品已启用显式授权的桌面工具；参考 backend 的产品侧闭环已通过，真实模型 C7/D6/D8 的最新复跑未完整通过，完整 v0.1 仍受多屏、高权限、Chromium 内容输入和模型闭环等未验证项约束。
 
 ## 6. 明确不纳入技术栈
 

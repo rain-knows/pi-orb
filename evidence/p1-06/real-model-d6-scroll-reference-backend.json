@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-29T00:28:43.340Z",
+  "capturedAt": "2026-09-30T03:24:59.576Z",
   "testCase": "d6-scroll",
   "scope": {
     "what": "real model observes a disposable target and scrolls its labelled strip",
@@ -7,9 +7,9 @@
     "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885"
   },
   "isolation": {
-    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790641723338\\shell-data",
-    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790641723338\\orb-config.json",
-    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d6-scroll-agent-1790641723338",
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790738699572\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790738699572\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d6-scroll-agent-1790738699572",
     "modelsJson": "hard link to the real file (no copy)",
     "authJson": "symlink to the real file (no copy)",
     "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
@@ -29,9 +29,9 @@
       "title": "ChatGPT",
       "inputDesktopAccessible": true
     },
-    "targetPid": 58144,
+    "targetPid": 83260,
     "target": {
-      "pid": 58144,
+      "pid": 83260,
       "windowBoundsDip": {
         "x": 120,
         "y": 90,
@@ -63,15 +63,15 @@
     },
     "piWeb": {
       "ok": true,
-      "baseUrl": "http://127.0.0.1:46360",
-      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:46360\n- Network:       http://127.0.0.1:46360\n✓ Ready in 540ms\n✓ Running next.config.ts took 168ms\n"
+      "baseUrl": "http://127.0.0.1:49708",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:49708\n- Network:       http://127.0.0.1:49708\n✓ Ready in 589ms\n✓ Running next.config.ts took 167ms\n"
     },
     "handshake": {
-      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790641723338\\shell-data\\bridge-token.json",
-      "pid": 57612,
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790738699572\\shell-data\\bridge-token.json",
+      "pid": 78796,
       "generation": 1,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790641723338\\orb-workspace",
-      "pipePath": "\\\\.\\pipe\\pi-orb-57612"
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790738699572\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-78796"
     },
     "rendererTarget": {
       "title": "pi-orb",
@@ -83,16 +83,16 @@
     },
     "workspace": {
       "configured": true,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790641723338\\orb-workspace",
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790738699572\\orb-workspace",
       "problem": null,
       "shortcut": "Control+Alt+F11",
       "shortcutRegistered": true,
       "shortcutProblem": null,
       "generation": 2,
       "busy": false,
-      "sessionId": "01a0ea90-9475-7732-8c79-3a71afd5ce5c",
+      "sessionId": "01a0f058-5b57-73e5-be85-a479bbd66673",
       "piWeb": {
-        "baseUrl": "http://127.0.0.1:46360",
+        "baseUrl": "http://127.0.0.1:49708",
         "reachable": true,
         "problem": null
       },
@@ -111,9 +111,9 @@
       }
     },
     "generation": 2,
-    "session": "01a0ea90-9475-7732-8c79-3a71afd5ce5c",
+    "session": "01a0f058-5b57-73e5-be85-a479bbd66673",
     "model": {
-      "sessionId": "01a0ea90-9acd-7732-8c79-3a73868c392b",
+      "sessionId": "01a0f058-620b-73e5-be85-a47a344f75e0",
       "selected": {
         "provider": "TZcode",
         "modelId": "deepseek-v4.1-flash"
@@ -130,8 +130,8 @@
       "inputDesktopAccessible": true
     },
     "windowChoice": {
-      "windowId": "6687000",
-      "pid": 58144,
+      "windowId": "5768360",
+      "pid": 83260,
       "appName": "electron",
       "title": "P1-05 input target",
       "bounds": {
@@ -140,42 +140,42 @@
         "width": 735,
         "height": 786
       },
-      "zIndex": "320",
+      "zIndex": "314",
       "isRecorded": false
     },
     "windowCandidates": [
       {
-        "pid": 34328,
+        "pid": 60608,
         "title": "",
         "appName": "explorer"
       },
       {
-        "pid": 58144,
+        "pid": 83260,
         "title": "P1-05 input target",
         "appName": "electron"
       },
       {
-        "pid": 7236,
+        "pid": 57976,
         "title": "ChatGPT",
         "appName": "ChatGPT"
       },
       {
         "pid": 25612,
-        "title": "TZCODE - Google Chrome",
+        "title": "agegr/pi-web: Web UI for the pi coding agent - Google Chrome",
         "appName": "chrome"
       },
       {
-        "pid": 38260,
-        "title": "*p1-05-keyboard-target.txt - Notepad",
-        "appName": "Notepad"
+        "pid": 78112,
+        "title": "CC Switch",
+        "appName": "cc-switch"
       },
       {
-        "pid": 45964,
+        "pid": 78112,
         "title": "com.ccswitch.desktop-siw",
         "appName": "cc-switch"
       },
       {
-        "pid": 45964,
+        "pid": 78112,
         "title": "",
         "appName": "cc-switch"
       },
@@ -190,7 +190,7 @@
         "appName": "clash-verge"
       },
       {
-        "pid": 34328,
+        "pid": 60608,
         "title": "Program Manager",
         "appName": "explorer"
       }
@@ -207,8 +207,8 @@
       "chordSent": "ctrl+alt+f11"
     },
     "recordedTarget": {
-      "windowId": "6687000",
-      "pid": 58144,
+      "windowId": "5768360",
+      "pid": 83260,
       "appName": "electron",
       "title": "P1-05 input target",
       "bounds": {
@@ -217,8 +217,8 @@
         "width": 735,
         "height": 786
       },
-      "zIndex": "327",
-      "isRecorded": false
+      "zIndex": "321",
+      "isRecorded": true
     },
     "approved": {
       "authorized": true,
@@ -227,11 +227,11 @@
     },
     "capture": {
       "ok": true,
-      "observationId": "obs-mulxv483-s8g7tcn3",
+      "observationId": "obs-munjlpqq-q9s53od1",
       "width": 749,
       "height": 795,
       "bytes": 32835,
-      "targetDescription": "P1-05 input target (753x795, pid 58144, dpi 144)",
+      "targetDescription": "P1-05 input target (753x795, pid 83260, dpi 144)",
       "targetStale": false
     },
     "resolve": {
@@ -240,35 +240,34 @@
     },
     "waitedForIdle": true,
     "bridgeDiagnostics": [
-      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-57612",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:28:49.769Z\",\"event\":\"revoke\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:29:07.611Z\",\"event\":\"authorize\",\"sessionId\":\"01a0ea90-9475-7732-8c79-3a71afd5ce5c\",\"generation\":2,\"scope\":\"observe and scroll down inside the labelled strip once\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:29:13.670Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea90-9475-7732-8c79-3a71afd5ce5c\",\"observationId\":\"obs-mulxv7sw-1\",\"windowId\":\"6687000\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:29:17.021Z\",\"event\":\"act-observation\",\"kind\":\"scroll\",\"observationId\":\"obs-mulxv7sw-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:29:17.121Z\",\"event\":\"act\",\"kind\":\"scroll\",\"observationId\":\"obs-mulxv7sw-1\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:29:19.444Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea90-9475-7732-8c79-3a71afd5ce5c\",\"observationId\":\"obs-mulxvc99-2\",\"windowId\":\"6687000\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}"
+      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-78796",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:25:06.061Z\",\"event\":\"revoke\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:25:26.620Z\",\"event\":\"authorize\",\"sessionId\":\"01a0f058-5b57-73e5-be85-a479bbd66673\",\"generation\":2,\"scope\":\"observe and scroll down inside the labelled strip once\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:25:33.068Z\",\"event\":\"observe\",\"sessionId\":\"01a0f058-5b57-73e5-be85-a479bbd66673\",\"observationId\":\"obs-munjltl3-1\",\"windowId\":\"5768360\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:25:37.180Z\",\"event\":\"act-observation\",\"kind\":\"scroll\",\"observationId\":\"obs-munjltl3-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:25:39.980Z\",\"event\":\"act\",\"kind\":\"scroll\",\"observationId\":\"obs-munjltl3-1\"}"
     ]
   },
   "checks": [
     {
       "name": "the isolated pi-web started",
       "ok": true,
-      "detail": "http://127.0.0.1:46360"
+      "detail": "http://127.0.0.1:49708"
     },
     {
       "name": "the isolated shell published its own handshake",
       "ok": true,
-      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790641723338\\\\shell-data\\\\bridge-token.json\",\"pid\":57612,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790641723338\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-57612\"}"
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790738699572\\\\shell-data\\\\bridge-token.json\",\"pid\":78796,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790738699572\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-78796\"}"
     },
     {
       "name": "the isolated shell's pipe accepts a connection",
       "ok": true,
-      "detail": "\\\\.\\pipe\\pi-orb-57612"
+      "detail": "\\\\.\\pipe\\pi-orb-78796"
     },
     {
       "name": "the isolated shell is NOT the user's running orb",
       "ok": true,
-      "detail": "handshake pid 57612"
+      "detail": "handshake pid 78796"
     },
     {
       "name": "the orb renderer is reachable over CDP",
@@ -278,22 +277,22 @@
     {
       "name": "the wake shortcut registered",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790641723338\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:46360\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790738699572\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:49708\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "the isolated shell reports this run's workspace and a generation",
       "ok": true,
-      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790641723338\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790641723338\\\\orb-workspace\",\"generation\":2}"
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790738699572\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790738699572\\\\orb-workspace\",\"generation\":2}"
     },
     {
       "name": "the isolated shell created a real pi-web session",
       "ok": true,
-      "detail": "\"01a0ea90-9475-7732-8c79-3a71afd5ce5c\""
+      "detail": "\"01a0f058-5b57-73e5-be85-a479bbd66673\""
     },
     {
       "name": "the session is served by a model that declares image input",
       "ok": true,
-      "detail": "{\"sessionId\":\"01a0ea90-9acd-7732-8c79-3a73868c392b\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+      "detail": "{\"sessionId\":\"01a0f058-620b-73e5-be85-a47a344f75e0\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
     },
     {
       "name": "an interactive desktop is available before target enumeration",
@@ -303,7 +302,7 @@
     {
       "name": "the driver lists the disposable target, identified by process id",
       "ok": true,
-      "detail": "grid pid=58144 candidates=[{\"pid\":34328,\"title\":\"\",\"appName\":\"explorer\"},{\"pid\":58144,\"title\":\"P1-05 input target\",\"appName\":\"electron\"},{\"pid\":7236,\"title\":\"ChatGPT\",\"appName\":\"ChatGPT\"},{\"pid\":25612,\"title\":\"TZCODE - Google Chrome\",\"appName\":\"chrome\"},{\"pid\":38260,\"title\":\"*p1-05-keyboard-target.txt - Notepad\",\"appName\":\"Notepad\"},{\"pid\":45964,\"title\":\"com.ccswitch.desktop-siw\",\"appName\":\"cc-switch\"},{\"pid\":45964,\"title\"…"
+      "detail": "grid pid=83260 candidates=[{\"pid\":60608,\"title\":\"\",\"appName\":\"explorer\"},{\"pid\":83260,\"title\":\"P1-05 input target\",\"appName\":\"electron\"},{\"pid\":57976,\"title\":\"ChatGPT\",\"appName\":\"ChatGPT\"},{\"pid\":25612,\"title\":\"agegr/pi-web: Web UI for the pi coding agent - Google Chrome\",\"appName\":\"chrome\"},{\"pid\":78112,\"title\":\"CC Switch\",\"appName\":\"cc-switch\"},{\"pid\":78112,\"title\":\"com.ccswitch.desktop-siw\",\"appName\":\"cc-switch\"},{\"pid\"…"
     },
     {
       "name": "an interactive desktop is available to foreground the target",
@@ -313,27 +312,27 @@
     {
       "name": "the product recorded the disposable target, not the user's desktop",
       "ok": true,
-      "detail": "{\"windowId\":\"6687000\",\"pid\":58144,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":false}"
+      "detail": "{\"windowId\":\"5768360\",\"pid\":83260,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"321\",\"isRecorded\":true}"
     },
     {
       "name": "the desktop target was set to the disposable window",
       "ok": true,
-      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"6687000\",\"pid\":58144,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":true}}"
+      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"5768360\",\"pid\":83260,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"321\",\"isRecorded\":true}}"
     },
     {
       "name": "the desktop task was approved through the product's UI path",
       "ok": true,
-      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"observe and scroll down inside the labelled strip once\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790642047611,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"6687000\",\"pid\":58144,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":true}}"
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"observe and scroll down inside the labelled strip once\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790739026620,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"5768360\",\"pid\":83260,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"321\",\"isRecorded\":true}}"
     },
     {
       "name": "a screenshot of the recorded target was captured for preview",
       "ok": true,
-      "detail": "{\"ok\":true,\"observationId\":\"obs-mulxv483-s8g7tcn3\",\"width\":749,\"height\":795,\"bytes\":32835,\"targetDescription\":\"P1-05 input target (753x795, pid 58144, dpi 144)\",\"targetStale\":false}"
+      "detail": "{\"ok\":true,\"observationId\":\"obs-munjlpqq-q9s53od1\",\"width\":749,\"height\":795,\"bytes\":32835,\"targetDescription\":\"P1-05 input target (753x795, pid 83260, dpi 144)\",\"targetStale\":false}"
     },
     {
       "name": "the preview describes the disposable target window, not the orb",
       "ok": true,
-      "detail": "P1-05 input target (753x795, pid 58144, dpi 144)"
+      "detail": "P1-05 input target (753x795, pid 83260, dpi 144)"
     },
     {
       "name": "the confirmed screenshot was sent with the instruction",
@@ -343,40 +342,40 @@
     {
       "name": "D6 (target's own log): the strip received wheel input",
       "ok": true,
-      "detail": "[{\"at\":1790641757038,\"kind\":\"wheel\",\"clientPoint\":{\"x\":194,\"y\":394},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":0},{\"at\":1790641757070,\"kind\":\"wheel\",\"clientPoint\":{\"x\":194,\"y\":394},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":3.3333332538604736},{\"at\":1790641757096,\"kind\":\"wheel\",\"clientPoint\":{\"x\":194,\"y\":394},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":15.333333015441895}]"
+      "detail": "[{\"at\":1790738738223,\"kind\":\"wheel\",\"clientPoint\":{\"x\":219,\"y\":397},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":0},{\"at\":1790738739254,\"kind\":\"wheel\",\"clientPoint\":{\"x\":219,\"y\":397},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":60},{\"at\":1790738739286,\"kind\":\"wheel\",\"clientPoint\":{\"x\":219,\"y\":397},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":63.33333206176758}]"
     },
     {
       "name": "D6 (target's own log): the strip scroll position changed",
       "ok": true,
-      "detail": "[{\"at\":1790641757055,\"kind\":\"scroll\",\"scrollTop\":0.6666666865348816},{\"at\":1790641757063,\"kind\":\"scroll\",\"scrollTop\":2},{\"at\":1790641757071,\"kind\":\"scroll\",\"scrollTop\":3.3333332538604736},{\"at\":1790641757080,\"kind\":\"scroll\",\"scrollTop\":6},{\"at\":1790641757088,\"kind\":\"scroll\",\"scrollTop\":10},{\"at\":1790641757097,\"kind\":\"scroll\",\"scrollTop\":15.333333015441895},{\"at\":1790641757102,\"kind\":\"scroll\",\"scrollTop\":22},{\"at\":1790641757113,\"kind\":\"scroll\",\"scrollTop\":31.33333396911621},{\"at\":1790641757122,\"kind\":\"scroll\",\"scrollTop\":42.66666793823242},{\"at\":1790641757129,\"kind\":\"scroll\",\"scrollTop\":56},{\"a…"
+      "detail": "[{\"at\":1790738738239,\"kind\":\"scroll\",\"scrollTop\":0.6666666865348816},{\"at\":1790738738249,\"kind\":\"scroll\",\"scrollTop\":2},{\"at\":1790738738255,\"kind\":\"scroll\",\"scrollTop\":3.3333332538604736},{\"at\":1790738738265,\"kind\":\"scroll\",\"scrollTop\":6},{\"at\":1790738738272,\"kind\":\"scroll\",\"scrollTop\":8.666666984558105},{\"at\":1790738738280,\"kind\":\"scroll\",\"scrollTop\":11.333333015441895},{\"at\":1790738738289,\"kind\":\"scroll\",\"scrollTop\":14.666666984558105},{\"at\":1790738738297,\"kind\":\"scroll\",\"scrollTop\":18.66666603088379},{\"at\":1790738738305,\"kind\":\"scroll\",\"scrollTop\":23.33333396911621},{\"at\":1790738738314,\"kin…"
     },
     {
       "name": "the real model called orb_observe on its own",
       "ok": true,
-      "detail": "[{\"toolName\":\"orb_observe\",\"arguments\":{}},{\"toolName\":\"orb_observe\",\"arguments\":{}}]"
+      "detail": "[{\"toolName\":\"orb_observe\",\"arguments\":{}}]"
     },
     {
       "name": "the real model called orb_scroll on its own",
       "ok": true,
-      "detail": "[{\"toolName\":\"orb_scroll\",\"arguments\":{\"observation_id\":\"obs-mulxv7sw-1\",\"direction\":\"down\",\"amount\":3,\"x\":400,\"y\":860}}]"
+      "detail": "[{\"toolName\":\"orb_scroll\",\"arguments\":{\"observation_id\":\"obs-munjltl3-1\",\"direction\":\"down\",\"amount\":3,\"x\":450,\"y\":865}}]"
     },
     {
       "name": "the model observed before acting",
       "ok": true,
-      "detail": "[\"orb_observe\",\"orb_scroll\",\"orb_observe\"]"
+      "detail": "[\"orb_observe\",\"orb_scroll\"]"
     },
     {
       "name": "the model observed again after its action",
-      "ok": true,
-      "detail": "[\"orb_observe\",\"orb_scroll\",\"orb_observe\"]"
+      "ok": false,
+      "detail": "[\"orb_observe\",\"orb_scroll\"]"
     },
     {
       "name": "the real model addressed the action in the 0-1000 screenshot space",
       "ok": true,
-      "detail": "{\"observation_id\":\"obs-mulxv7sw-1\",\"direction\":\"down\",\"amount\":3,\"x\":400,\"y\":860}"
+      "detail": "{\"observation_id\":\"obs-munjltl3-1\",\"direction\":\"down\",\"amount\":3,\"x\":450,\"y\":865}"
     }
   ],
-  "passed": true,
+  "passed": false,
   "targetLog": {
     "events": [
       {
@@ -488,15 +487,6 @@
         "scrollTop": 2
       },
       {
-        "kind": "wheel",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": 100,
-        "overScroller": true,
-        "scrollTop": null
-      },
-      {
         "kind": "scroll",
         "cell": null,
         "offsetInCell": null,
@@ -521,16 +511,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 10
-      },
-      {
-        "kind": "wheel",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": 100,
-        "overScroller": true,
-        "scrollTop": null
+        "scrollTop": 8.666666984558105
       },
       {
         "kind": "scroll",
@@ -539,7 +520,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 15.333333015441895
+        "scrollTop": 11.333333015441895
       },
       {
         "kind": "scroll",
@@ -548,7 +529,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 22
+        "scrollTop": 14.666666984558105
       },
       {
         "kind": "scroll",
@@ -557,7 +538,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 31.33333396911621
+        "scrollTop": 18.66666603088379
       },
       {
         "kind": "scroll",
@@ -566,7 +547,79 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 42.66666793823242
+        "scrollTop": 23.33333396911621
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 27.33333396911621
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 32
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 36.66666793823242
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 40.66666793823242
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 44.66666793823242
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 48
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 51.33333206176758
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 54
       },
       {
         "kind": "scroll",
@@ -584,7 +637,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 72.66666412353516
+        "scrollTop": 58
       },
       {
         "kind": "scroll",
@@ -593,7 +646,115 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 90.66666412353516
+        "scrollTop": 59.33333206176758
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 60
+      },
+      {
+        "kind": "wheel",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": 100,
+        "overScroller": true,
+        "scrollTop": null
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 60.66666793823242
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 62
+      },
+      {
+        "kind": "wheel",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": 100,
+        "overScroller": true,
+        "scrollTop": null
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 63.33333206176758
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 66
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 70
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 74.66666412353516
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 81.33333587646484
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 90
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 99.33333587646484
       },
       {
         "kind": "scroll",
@@ -611,7 +772,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 130.6666717529297
+        "scrollTop": 122
       },
       {
         "kind": "scroll",
@@ -620,7 +781,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 151.3333282470703
+        "scrollTop": 134.6666717529297
       },
       {
         "kind": "scroll",
@@ -629,7 +790,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 170.6666717529297
+        "scrollTop": 147.3333282470703
       },
       {
         "kind": "scroll",
@@ -638,7 +799,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 188.6666717529297
+        "scrollTop": 160
       },
       {
         "kind": "scroll",
@@ -647,7 +808,52 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 204.6666717529297
+        "scrollTop": 172
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 183.3333282470703
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 192.6666717529297
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 201.3333282470703
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 208
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 213.3333282470703
       },
       {
         "kind": "scroll",
@@ -665,7 +871,7 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 227.3333282470703
+        "scrollTop": 219.3333282470703
       },
       {
         "kind": "scroll",
@@ -674,43 +880,16 @@
         "value": null,
         "deltaY": null,
         "overScroller": null,
-        "scrollTop": 234
-      },
-      {
-        "kind": "scroll",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": null,
-        "overScroller": null,
-        "scrollTop": 238.6666717529297
-      },
-      {
-        "kind": "scroll",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": null,
-        "overScroller": null,
-        "scrollTop": 240
-      },
-      {
-        "kind": "key-up",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": null,
-        "overScroller": null,
-        "scrollTop": null
+        "scrollTop": 220
       }
     ],
     "matches": [
       {
-        "at": 1790641757038,
+        "at": 1790738738223,
         "kind": "wheel",
         "clientPoint": {
-          "x": 194,
-          "y": 394
+          "x": 219,
+          "y": 397
         },
         "deltaY": 100,
         "overScroller": true,
@@ -718,28 +897,28 @@
         "scrollerScrollTop": 0
       },
       {
-        "at": 1790641757070,
+        "at": 1790738739254,
         "kind": "wheel",
         "clientPoint": {
-          "x": 194,
-          "y": 394
+          "x": 219,
+          "y": 397
         },
         "deltaY": 100,
         "overScroller": true,
         "elementUnderPoint": "DIV",
-        "scrollerScrollTop": 3.3333332538604736
+        "scrollerScrollTop": 60
       },
       {
-        "at": 1790641757096,
+        "at": 1790738739286,
         "kind": "wheel",
         "clientPoint": {
-          "x": 194,
-          "y": 394
+          "x": 219,
+          "y": 397
         },
         "deltaY": 100,
         "overScroller": true,
         "elementUnderPoint": "DIV",
-        "scrollerScrollTop": 15.333333015441895
+        "scrollerScrollTop": 63.33333206176758
       }
     ],
     "cellDowns": [
@@ -749,124 +928,229 @@
     ],
     "scrollEvents": [
       {
-        "at": 1790641757055,
+        "at": 1790738738239,
         "kind": "scroll",
         "scrollTop": 0.6666666865348816
       },
       {
-        "at": 1790641757063,
+        "at": 1790738738249,
         "kind": "scroll",
         "scrollTop": 2
       },
       {
-        "at": 1790641757071,
+        "at": 1790738738255,
         "kind": "scroll",
         "scrollTop": 3.3333332538604736
       },
       {
-        "at": 1790641757080,
+        "at": 1790738738265,
         "kind": "scroll",
         "scrollTop": 6
       },
       {
-        "at": 1790641757088,
+        "at": 1790738738272,
         "kind": "scroll",
-        "scrollTop": 10
+        "scrollTop": 8.666666984558105
       },
       {
-        "at": 1790641757097,
+        "at": 1790738738280,
         "kind": "scroll",
-        "scrollTop": 15.333333015441895
+        "scrollTop": 11.333333015441895
       },
       {
-        "at": 1790641757102,
+        "at": 1790738738289,
         "kind": "scroll",
-        "scrollTop": 22
+        "scrollTop": 14.666666984558105
       },
       {
-        "at": 1790641757113,
+        "at": 1790738738297,
         "kind": "scroll",
-        "scrollTop": 31.33333396911621
+        "scrollTop": 18.66666603088379
       },
       {
-        "at": 1790641757122,
+        "at": 1790738738305,
         "kind": "scroll",
-        "scrollTop": 42.66666793823242
+        "scrollTop": 23.33333396911621
       },
       {
-        "at": 1790641757129,
+        "at": 1790738738314,
+        "kind": "scroll",
+        "scrollTop": 27.33333396911621
+      },
+      {
+        "at": 1790738738322,
+        "kind": "scroll",
+        "scrollTop": 32
+      },
+      {
+        "at": 1790738738330,
+        "kind": "scroll",
+        "scrollTop": 36.66666793823242
+      },
+      {
+        "at": 1790738738340,
+        "kind": "scroll",
+        "scrollTop": 40.66666793823242
+      },
+      {
+        "at": 1790738738348,
+        "kind": "scroll",
+        "scrollTop": 44.66666793823242
+      },
+      {
+        "at": 1790738738355,
+        "kind": "scroll",
+        "scrollTop": 48
+      },
+      {
+        "at": 1790738738365,
+        "kind": "scroll",
+        "scrollTop": 51.33333206176758
+      },
+      {
+        "at": 1790738738372,
+        "kind": "scroll",
+        "scrollTop": 54
+      },
+      {
+        "at": 1790738738380,
         "kind": "scroll",
         "scrollTop": 56
       },
       {
-        "at": 1790641757138,
+        "at": 1790738738389,
         "kind": "scroll",
-        "scrollTop": 72.66666412353516
+        "scrollTop": 58
       },
       {
-        "at": 1790641757146,
+        "at": 1790738738397,
         "kind": "scroll",
-        "scrollTop": 90.66666412353516
+        "scrollTop": 59.33333206176758
       },
       {
-        "at": 1790641757155,
+        "at": 1790738738406,
+        "kind": "scroll",
+        "scrollTop": 60
+      },
+      {
+        "at": 1790738739273,
+        "kind": "scroll",
+        "scrollTop": 60.66666793823242
+      },
+      {
+        "at": 1790738739280,
+        "kind": "scroll",
+        "scrollTop": 62
+      },
+      {
+        "at": 1790738739287,
+        "kind": "scroll",
+        "scrollTop": 63.33333206176758
+      },
+      {
+        "at": 1790738739297,
+        "kind": "scroll",
+        "scrollTop": 66
+      },
+      {
+        "at": 1790738739305,
+        "kind": "scroll",
+        "scrollTop": 70
+      },
+      {
+        "at": 1790738739314,
+        "kind": "scroll",
+        "scrollTop": 74.66666412353516
+      },
+      {
+        "at": 1790738739322,
+        "kind": "scroll",
+        "scrollTop": 81.33333587646484
+      },
+      {
+        "at": 1790738739330,
+        "kind": "scroll",
+        "scrollTop": 90
+      },
+      {
+        "at": 1790738739339,
+        "kind": "scroll",
+        "scrollTop": 99.33333587646484
+      },
+      {
+        "at": 1790738739347,
         "kind": "scroll",
         "scrollTop": 110
       },
       {
-        "at": 1790641757163,
+        "at": 1790738739355,
         "kind": "scroll",
-        "scrollTop": 130.6666717529297
+        "scrollTop": 122
       },
       {
-        "at": 1790641757171,
+        "at": 1790738739364,
         "kind": "scroll",
-        "scrollTop": 151.3333282470703
+        "scrollTop": 134.6666717529297
       },
       {
-        "at": 1790641757180,
+        "at": 1790738739372,
         "kind": "scroll",
-        "scrollTop": 170.6666717529297
+        "scrollTop": 147.3333282470703
       },
       {
-        "at": 1790641757189,
+        "at": 1790738739381,
         "kind": "scroll",
-        "scrollTop": 188.6666717529297
+        "scrollTop": 160
       },
       {
-        "at": 1790641757196,
+        "at": 1790738739389,
         "kind": "scroll",
-        "scrollTop": 204.6666717529297
+        "scrollTop": 172
       },
       {
-        "at": 1790641757204,
+        "at": 1790738739397,
+        "kind": "scroll",
+        "scrollTop": 183.3333282470703
+      },
+      {
+        "at": 1790738739405,
+        "kind": "scroll",
+        "scrollTop": 192.6666717529297
+      },
+      {
+        "at": 1790738739414,
+        "kind": "scroll",
+        "scrollTop": 201.3333282470703
+      },
+      {
+        "at": 1790738739422,
+        "kind": "scroll",
+        "scrollTop": 208
+      },
+      {
+        "at": 1790738739430,
+        "kind": "scroll",
+        "scrollTop": 213.3333282470703
+      },
+      {
+        "at": 1790738739439,
         "kind": "scroll",
         "scrollTop": 217.3333282470703
       },
       {
-        "at": 1790641757213,
+        "at": 1790738739447,
         "kind": "scroll",
-        "scrollTop": 227.3333282470703
+        "scrollTop": 219.3333282470703
       },
       {
-        "at": 1790641757221,
+        "at": 1790738739455,
         "kind": "scroll",
-        "scrollTop": 234
-      },
-      {
-        "at": 1790641757229,
-        "kind": "scroll",
-        "scrollTop": 238.6666717529297
-      },
-      {
-        "at": 1790641757238,
-        "kind": "scroll",
-        "scrollTop": 240
+        "scrollTop": 220
       }
     ]
   },
   "sessionFiles": [
-    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d6-scroll-1790641723338-orb-workspace--\\2026-09-29T00-28-58-869Z_01a0ea90-9475-7732-8c79-3a71afd5ce5c.jsonl"
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d6-scroll-1790738699572-orb-workspace--\\2026-09-30T03-25-17-528Z_01a0f058-5b57-73e5-be85-a479bbd66673.jsonl"
   ],
   "modelToolCalls": [
     {
@@ -876,17 +1160,13 @@
     {
       "toolName": "orb_scroll",
       "arguments": {
-        "observation_id": "obs-mulxv7sw-1",
+        "observation_id": "obs-munjltl3-1",
         "direction": "down",
         "amount": 3,
-        "x": 400,
-        "y": 860
+        "x": 450,
+        "y": 865
       }
-    },
-    {
-      "toolName": "orb_observe",
-      "arguments": {}
     }
   ],
-  "finishedAt": "2026-09-29T00:29:23.208Z"
+  "finishedAt": "2026-09-30T03:25:42.294Z"
 }

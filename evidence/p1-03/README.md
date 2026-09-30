@@ -12,7 +12,7 @@
 | 快捷键形状校验（区分"格式错误"与"被占用"） | `src/shared/accelerator.ts` |
 | 注册、冲突诊断、注销 | `src/main/shortcut.ts` |
 | 唤醒/收起状态机与自动重复抑制 | `src/main/window-toggle.ts` |
-| 快捷键可配置的 IPC 与界面 | `src/main/index.ts`、`src/renderer/App.tsx` |
+| 快捷键可配置的 IPC 与界面 | `src/main/index.ts`、`src/renderer/index.html`、`src/renderer/floating.js` |
 | 托盘备用入口 | `src/main/index.ts`（`createTray`） |
 | 单测 | `tests/accelerator.test.ts`、`tests/shortcut.test.ts`、`tests/window-toggle.test.ts` |
 

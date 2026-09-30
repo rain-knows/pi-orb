@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-29T00:35:19.720Z",
+  "capturedAt": "2026-09-30T03:25:57.188Z",
   "testCase": "d8-type",
   "scope": {
     "what": "real model observes a disposable target, focuses its text field, and types a synthetic marker",
@@ -7,9 +7,9 @@
     "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885"
   },
   "isolation": {
-    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\shell-data",
-    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\orb-config.json",
-    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d8-type-agent-1790642119679",
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790738757181\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790738757181\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d8-type-agent-1790738757181",
     "modelsJson": "hard link to the real file (no copy)",
     "authJson": "symlink to the real file (no copy)",
     "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
@@ -29,9 +29,9 @@
       "title": "ChatGPT",
       "inputDesktopAccessible": true
     },
-    "targetPid": 39232,
+    "targetPid": 72164,
     "target": {
-      "pid": 39232,
+      "pid": 72164,
       "windowBoundsDip": {
         "x": 120,
         "y": 90,
@@ -63,15 +63,15 @@
     },
     "piWeb": {
       "ok": true,
-      "baseUrl": "http://127.0.0.1:45952",
-      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:45952\n- Network:       http://127.0.0.1:45952\n✓ Ready in 549ms\n✓ Running next.config.ts took 163ms\n"
+      "baseUrl": "http://127.0.0.1:43184",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:43184\n- Network:       http://127.0.0.1:43184\n✓ Ready in 632ms\n✓ Running next.config.ts took 175ms\n"
     },
     "handshake": {
-      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\shell-data\\bridge-token.json",
-      "pid": 5272,
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790738757181\\shell-data\\bridge-token.json",
+      "pid": 51132,
       "generation": 1,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\orb-workspace",
-      "pipePath": "\\\\.\\pipe\\pi-orb-5272"
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790738757181\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-51132"
     },
     "rendererTarget": {
       "title": "pi-orb",
@@ -83,16 +83,16 @@
     },
     "workspace": {
       "configured": true,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790642119679\\orb-workspace",
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1790738757181\\orb-workspace",
       "problem": null,
       "shortcut": "Control+Alt+F11",
       "shortcutRegistered": true,
       "shortcutProblem": null,
       "generation": 2,
       "busy": false,
-      "sessionId": "01a0ea96-a14c-7155-99c9-8db17164baeb",
+      "sessionId": "01a0f059-3b67-7654-a5d0-2412c08d207d",
       "piWeb": {
-        "baseUrl": "http://127.0.0.1:45952",
+        "baseUrl": "http://127.0.0.1:43184",
         "reachable": true,
         "problem": null
       },
@@ -111,9 +111,9 @@
       }
     },
     "generation": 2,
-    "session": "01a0ea96-a14c-7155-99c9-8db17164baeb",
+    "session": "01a0f059-3b67-7654-a5d0-2412c08d207d",
     "model": {
-      "sessionId": "01a0ea96-a73f-7155-99c9-8db3f4871bbb",
+      "sessionId": "01a0f059-42a6-7654-a5d0-2415f1a09283",
       "selected": {
         "provider": "TZcode",
         "modelId": "deepseek-v4.1-flash"
@@ -130,8 +130,8 @@
       "inputDesktopAccessible": true
     },
     "windowChoice": {
-      "windowId": "20382672",
-      "pid": 39232,
+      "windowId": "15009504",
+      "pid": 72164,
       "appName": "electron",
       "title": "P1-05 input target",
       "bounds": {
@@ -140,42 +140,42 @@
         "width": 735,
         "height": 786
       },
-      "zIndex": "320",
+      "zIndex": "314",
       "isRecorded": false
     },
     "windowCandidates": [
       {
-        "pid": 34328,
+        "pid": 60608,
         "title": "",
         "appName": "explorer"
       },
       {
-        "pid": 39232,
+        "pid": 72164,
         "title": "P1-05 input target",
         "appName": "electron"
       },
       {
-        "pid": 7236,
+        "pid": 57976,
         "title": "ChatGPT",
         "appName": "ChatGPT"
       },
       {
         "pid": 25612,
-        "title": "TZCODE - Google Chrome",
+        "title": "agegr/pi-web: Web UI for the pi coding agent - Google Chrome",
         "appName": "chrome"
       },
       {
-        "pid": 38260,
-        "title": "*p1-05-keyboard-target.txt - Notepad",
-        "appName": "Notepad"
+        "pid": 78112,
+        "title": "CC Switch",
+        "appName": "cc-switch"
       },
       {
-        "pid": 45964,
+        "pid": 78112,
         "title": "com.ccswitch.desktop-siw",
         "appName": "cc-switch"
       },
       {
-        "pid": 45964,
+        "pid": 78112,
         "title": "",
         "appName": "cc-switch"
       },
@@ -190,7 +190,7 @@
         "appName": "clash-verge"
       },
       {
-        "pid": 34328,
+        "pid": 60608,
         "title": "Program Manager",
         "appName": "explorer"
       }
@@ -207,8 +207,8 @@
       "chordSent": "ctrl+alt+f11"
     },
     "recordedTarget": {
-      "windowId": "20382672",
-      "pid": 39232,
+      "windowId": "15009504",
+      "pid": 72164,
       "appName": "electron",
       "title": "P1-05 input target",
       "bounds": {
@@ -217,8 +217,8 @@
         "width": 735,
         "height": 786
       },
-      "zIndex": "327",
-      "isRecorded": false
+      "zIndex": "321",
+      "isRecorded": true
     },
     "approved": {
       "authorized": true,
@@ -227,11 +227,11 @@
     },
     "capture": {
       "ok": true,
-      "observationId": "obs-muly3m3i-cyk2o63s",
+      "observationId": "obs-munjmy4i-mh7pnyh3",
       "width": 749,
       "height": 795,
       "bytes": 32835,
-      "targetDescription": "P1-05 input target (753x795, pid 39232, dpi 144)",
+      "targetDescription": "P1-05 input target (753x795, pid 72164, dpi 144)",
       "targetStale": false
     },
     "resolve": {
@@ -240,38 +240,37 @@
     },
     "waitedForIdle": true,
     "bridgeDiagnostics": [
-      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-5272",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:26.064Z\",\"event\":\"revoke\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:44.038Z\",\"event\":\"authorize\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"generation\":2,\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:50.715Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"observationId\":\"obs-muly3q5w-1\",\"windowId\":\"20382672\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:53.429Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-muly3q5w-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:53.594Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muly3q5w-1\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:56.239Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"observationId\":\"obs-muly3ufd-2\",\"windowId\":\"20382672\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:58.844Z\",\"event\":\"act-observation\",\"kind\":\"type\",\"observationId\":\"obs-muly3ufd-2\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:35:59.149Z\",\"event\":\"act\",\"kind\":\"type\",\"observationId\":\"obs-muly3ufd-2\"}",
-      "[pi-orb] desktop {\"at\":\"2026-09-29T00:36:01.581Z\",\"event\":\"observe\",\"sessionId\":\"01a0ea96-a14c-7155-99c9-8db17164baeb\",\"observationId\":\"obs-muly3yjt-3\",\"windowId\":\"20382672\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}"
+      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-51132",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:03.763Z\",\"event\":\"revoke\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:24.145Z\",\"event\":\"authorize\",\"sessionId\":\"01a0f059-3b67-7654-a5d0-2412c08d207d\",\"generation\":2,\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:31.107Z\",\"event\":\"observe\",\"sessionId\":\"01a0f059-3b67-7654-a5d0-2412c08d207d\",\"observationId\":\"obs-munjn2d9-1\",\"windowId\":\"15009504\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:34.784Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-munjn2d9-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:35.612Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-munjn2d9-1\"}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:43.659Z\",\"event\":\"observe\",\"sessionId\":\"01a0f059-3b67-7654-a5d0-2412c08d207d\",\"observationId\":\"obs-munjnc1v-3\",\"windowId\":\"15009504\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:49.991Z\",\"event\":\"act-observation\",\"kind\":\"type\",\"observationId\":\"obs-munjnc1v-3\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] desktop {\"at\":\"2026-09-30T03:26:50.984Z\",\"event\":\"act\",\"kind\":\"type\",\"observationId\":\"obs-munjnc1v-3\"}"
     ]
   },
   "checks": [
     {
       "name": "the isolated pi-web started",
       "ok": true,
-      "detail": "http://127.0.0.1:45952"
+      "detail": "http://127.0.0.1:43184"
     },
     {
       "name": "the isolated shell published its own handshake",
       "ok": true,
-      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\shell-data\\\\bridge-token.json\",\"pid\":5272,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-5272\"}"
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790738757181\\\\shell-data\\\\bridge-token.json\",\"pid\":51132,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790738757181\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-51132\"}"
     },
     {
       "name": "the isolated shell's pipe accepts a connection",
       "ok": true,
-      "detail": "\\\\.\\pipe\\pi-orb-5272"
+      "detail": "\\\\.\\pipe\\pi-orb-51132"
     },
     {
       "name": "the isolated shell is NOT the user's running orb",
       "ok": true,
-      "detail": "handshake pid 5272"
+      "detail": "handshake pid 51132"
     },
     {
       "name": "the orb renderer is reachable over CDP",
@@ -281,22 +280,22 @@
     {
       "name": "the wake shortcut registered",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:45952\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790738757181\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:43184\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"taskId\":null,\"scope\":null,\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":null}}"
     },
     {
       "name": "the isolated shell reports this run's workspace and a generation",
       "ok": true,
-      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790642119679\\\\orb-workspace\",\"generation\":2}"
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790738757181\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1790738757181\\\\orb-workspace\",\"generation\":2}"
     },
     {
       "name": "the isolated shell created a real pi-web session",
       "ok": true,
-      "detail": "\"01a0ea96-a14c-7155-99c9-8db17164baeb\""
+      "detail": "\"01a0f059-3b67-7654-a5d0-2412c08d207d\""
     },
     {
       "name": "the session is served by a model that declares image input",
       "ok": true,
-      "detail": "{\"sessionId\":\"01a0ea96-a73f-7155-99c9-8db3f4871bbb\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+      "detail": "{\"sessionId\":\"01a0f059-42a6-7654-a5d0-2415f1a09283\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
     },
     {
       "name": "an interactive desktop is available before target enumeration",
@@ -306,7 +305,7 @@
     {
       "name": "the driver lists the disposable target, identified by process id",
       "ok": true,
-      "detail": "grid pid=39232 candidates=[{\"pid\":34328,\"title\":\"\",\"appName\":\"explorer\"},{\"pid\":39232,\"title\":\"P1-05 input target\",\"appName\":\"electron\"},{\"pid\":7236,\"title\":\"ChatGPT\",\"appName\":\"ChatGPT\"},{\"pid\":25612,\"title\":\"TZCODE - Google Chrome\",\"appName\":\"chrome\"},{\"pid\":38260,\"title\":\"*p1-05-keyboard-target.txt - Notepad\",\"appName\":\"Notepad\"},{\"pid\":45964,\"title\":\"com.ccswitch.desktop-siw\",\"appName\":\"cc-switch\"},{\"pid\":45964,\"title\"…"
+      "detail": "grid pid=72164 candidates=[{\"pid\":60608,\"title\":\"\",\"appName\":\"explorer\"},{\"pid\":72164,\"title\":\"P1-05 input target\",\"appName\":\"electron\"},{\"pid\":57976,\"title\":\"ChatGPT\",\"appName\":\"ChatGPT\"},{\"pid\":25612,\"title\":\"agegr/pi-web: Web UI for the pi coding agent - Google Chrome\",\"appName\":\"chrome\"},{\"pid\":78112,\"title\":\"CC Switch\",\"appName\":\"cc-switch\"},{\"pid\":78112,\"title\":\"com.ccswitch.desktop-siw\",\"appName\":\"cc-switch\"},{\"pid\"…"
     },
     {
       "name": "an interactive desktop is available to foreground the target",
@@ -316,27 +315,27 @@
     {
       "name": "the product recorded the disposable target, not the user's desktop",
       "ok": true,
-      "detail": "{\"windowId\":\"20382672\",\"pid\":39232,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":false}"
+      "detail": "{\"windowId\":\"15009504\",\"pid\":72164,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"321\",\"isRecorded\":true}"
     },
     {
       "name": "the desktop target was set to the disposable window",
       "ok": true,
-      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"20382672\",\"pid\":39232,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":true}}"
+      "detail": "{\"ok\":true,\"target\":{\"windowId\":\"15009504\",\"pid\":72164,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"321\",\"isRecorded\":true}}"
     },
     {
       "name": "the desktop task was approved through the product's UI path",
       "ok": true,
-      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790642444038,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"20382672\",\"pid\":39232,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"327\",\"isRecorded\":true}}"
+      "detail": "{\"authorized\":true,\"taskId\":\"task-1\",\"scope\":\"click the labelled disposable text field and type P1ORBD8TEST once\",\"actionsUsed\":0,\"actionLimit\":12,\"expiresAt\":1790739084145,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true,\"target\":{\"windowId\":\"15009504\",\"pid\":72164,\"appName\":\"electron\",\"title\":\"P1-05 input target\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786},\"zIndex\":\"321\",\"isRecorded\":true}}"
     },
     {
       "name": "a screenshot of the recorded target was captured for preview",
       "ok": true,
-      "detail": "{\"ok\":true,\"observationId\":\"obs-muly3m3i-cyk2o63s\",\"width\":749,\"height\":795,\"bytes\":32835,\"targetDescription\":\"P1-05 input target (753x795, pid 39232, dpi 144)\",\"targetStale\":false}"
+      "detail": "{\"ok\":true,\"observationId\":\"obs-munjmy4i-mh7pnyh3\",\"width\":749,\"height\":795,\"bytes\":32835,\"targetDescription\":\"P1-05 input target (753x795, pid 72164, dpi 144)\",\"targetStale\":false}"
     },
     {
       "name": "the preview describes the disposable target window, not the orb",
       "ok": true,
-      "detail": "P1-05 input target (753x795, pid 39232, dpi 144)"
+      "detail": "P1-05 input target (753x795, pid 72164, dpi 144)"
     },
     {
       "name": "the confirmed screenshot was sent with the instruction",
@@ -346,40 +345,40 @@
     {
       "name": "D8 (target's own log): the exact synthetic marker reached the text field",
       "ok": true,
-      "detail": "[{\"at\":1790642159074,\"kind\":\"text-input\",\"value\":\"P1ORBD8TEST\"}]"
+      "detail": "[{\"at\":1790738810252,\"kind\":\"text-input\",\"value\":\"P1ORBD8TEST\"}]"
     },
     {
       "name": "the real model called orb_observe on its own",
       "ok": true,
-      "detail": "[{\"toolName\":\"orb_observe\",\"arguments\":{}},{\"toolName\":\"orb_observe\",\"arguments\":{}}]"
+      "detail": "[{\"toolName\":\"orb_observe\",\"arguments\":{}},{\"toolName\":\"orb_observe\",\"arguments\":{\"observation_id\":\"obs-munjn5uc-2\"}}]"
     },
     {
       "name": "the real model called orb_type on its own",
       "ok": true,
-      "detail": "[{\"toolName\":\"orb_type\",\"arguments\":{\"observation_id\":\"obs-muly3ufd-2\",\"text\":\"P1ORBD8TEST\"}}]"
+      "detail": "[{\"toolName\":\"orb_type\",\"arguments\":{\"observation_id\":\"obs-munjnc1v-3\",\"text\":\"P1ORBD8TEST\",\"x\":500,\"y\":714}}]"
     },
     {
       "name": "the model observed before acting",
       "ok": true,
-      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_observe\",\"orb_type\"]"
     },
     {
       "name": "the model observed again after its action",
-      "ok": true,
-      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+      "ok": false,
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_observe\",\"orb_type\"]"
     },
     {
       "name": "D8: the model clicked the disposable field before typing",
       "ok": true,
-      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_observe\",\"orb_type\"]"
     },
     {
       "name": "D8: the model observed again between focus click and text input",
       "ok": true,
-      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_type\",\"orb_observe\"]"
+      "detail": "[\"orb_observe\",\"orb_click\",\"orb_observe\",\"orb_observe\",\"orb_type\"]"
     }
   ],
-  "passed": true,
+  "passed": false,
   "targetLog": {
     "events": [
       {
@@ -570,29 +569,11 @@
         "deltaY": null,
         "overScroller": null,
         "scrollTop": null
-      },
-      {
-        "kind": "key-down",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": null,
-        "overScroller": null,
-        "scrollTop": null
-      },
-      {
-        "kind": "key-up",
-        "cell": null,
-        "offsetInCell": null,
-        "value": null,
-        "deltaY": null,
-        "overScroller": null,
-        "scrollTop": null
       }
     ],
     "matches": [
       {
-        "at": 1790642159074,
+        "at": 1790738810252,
         "kind": "text-input",
         "value": "P1ORBD8TEST"
       }
@@ -602,7 +583,7 @@
     ]
   },
   "sessionFiles": [
-    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1790642119679-orb-workspace--\\2026-09-29T00-35-35-373Z_01a0ea96-a14c-7155-99c9-8db17164baeb.jsonl"
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1790738757181-orb-workspace--\\2026-09-30T03-26-14-888Z_01a0f059-3b67-7654-a5d0-2412c08d207d.jsonl"
   ],
   "modelToolCalls": [
     {
@@ -612,9 +593,15 @@
     {
       "toolName": "orb_click",
       "arguments": {
-        "observation_id": "obs-muly3q5w-1",
-        "x": 510,
-        "y": 740
+        "observation_id": "obs-munjn2d9-1",
+        "x": 500,
+        "y": 714
+      }
+    },
+    {
+      "toolName": "orb_observe",
+      "arguments": {
+        "observation_id": "obs-munjn5uc-2"
       }
     },
     {
@@ -624,14 +611,12 @@
     {
       "toolName": "orb_type",
       "arguments": {
-        "observation_id": "obs-muly3ufd-2",
-        "text": "P1ORBD8TEST"
+        "observation_id": "obs-munjnc1v-3",
+        "text": "P1ORBD8TEST",
+        "x": 500,
+        "y": 714
       }
-    },
-    {
-      "toolName": "orb_observe",
-      "arguments": {}
     }
   ],
-  "finishedAt": "2026-09-29T00:36:04.651Z"
+  "finishedAt": "2026-09-30T03:26:54.838Z"
 }

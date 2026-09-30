@@ -13,6 +13,7 @@
 | [`pi-orb-reuse-assessment.md`](./pi-orb-reuse-assessment.md) | 参考项目复用边界、当前 P1 状态和最短解阻塞路径 | 随能力和证据变化维护 |
 | [`p2-01-reference-reuse.md`](./p2-01-reference-reuse.md) | DeepSeek Orb 固定提交、本地检出和 P2-01 复用／适配记录 | P2-01 阶段记录 |
 | [`p2-05-distribution.md`](./p2-05-distribution.md) | P2-05 Windows x64 打包与分发：参考来源与不搬清单、三个非默认决定、自动化边界与人工项 | P2-05 阶段记录 |
+| [`lifecycle-and-delivery.md`](./lifecycle-and-delivery.md) | Stage 6 生命周期撤权、真实模型最新复跑和 Windows 交付证据 | Stage 6 阶段记录 |
 | [`release-process.md`](./release-process.md) | 发布流程：预览版定位、手动触发、为什么必须在 release 机器上重新验证、notes 的未验证清单为何不可省略 | 随发布流程变化维护 |
 | [`manual-acceptance.md`](./manual-acceptance.md) | 唯一的人工验收入口：前置条件、A–D 加 E（安装包）与 F（`orb_open_app`）组步骤、记录规则与结果回写位置 | 需要真实按键／多屏／高权限窗口／真实模型／干净机安装时使用 |
 | [`cua-driver-integration.md`](./cua-driver-integration.md) | **历史** Cua 驱动探针：坐标空间、投递模式约束、会话与授权、许可义务 | P1-05 迁移前运行时记录；不代表当前生产 backend |

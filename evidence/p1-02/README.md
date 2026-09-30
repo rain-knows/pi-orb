@@ -13,7 +13,7 @@
 | 会话控制：创建、订阅、发送、停止、代次绑定 | `src/main/orb-session.ts` |
 | pi-web 客户端适配（HTTP + SSE 解析） | `src/main/pi-web-client.ts` |
 | contextBridge 桥（固定方法集、无通用 IPC） | `src/preload/index.ts` |
-| 浮窗界面：流式输出、错误、显式停止、工作区选择 | `src/renderer/App.tsx` |
+| 浮窗界面：流式输出、错误、显式停止、工作区选择 | `src/renderer/index.html`、`src/renderer/floating.js`、`src/renderer/orb-surface.css` |
 | pi-web SSE 事件形状夹具（供单测复用） | `tests/fixtures/pi-web-events.ts` |
 
 设计约束（来自 P0-03 实测）：renderer 以 opaque origin 直连 pi-web 一律 403，因此**全部** API/SSE 调用经主进程代理，凭据不下发 renderer。

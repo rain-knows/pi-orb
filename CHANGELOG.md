@@ -12,6 +12,13 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ### Fixed
 
+- **Aligned `orb_open_app` with the reference action timing.** The Windows driver now waits the
+  reference `POST_ACTION_WAIT_MS` settle period after activation and before foreground inspection
+  and recapture, so a slow window switch cannot be reported as a fresh observation of the old target.
+  Stage 6 lifecycle, packaging and the latest real-model rerun results are recorded in
+  [`doc/lifecycle-and-delivery.md`](./doc/lifecycle-and-delivery.md); the failed C7/D6/D8 rerun JSON is
+  retained and the support matrix leaves those model-side contracts unverified.
+
 - **An orb left on a disconnected monitor could not be brought back.** P2-01's criterion is that the
   floating orb "stays findable" across multi-display, DPI and work-area changes, and the wake paths
   violated it: `showOrb` and the `WakeController` callback both called `window.show()` without

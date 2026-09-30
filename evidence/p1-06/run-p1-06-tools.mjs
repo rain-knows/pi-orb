@@ -221,7 +221,7 @@ try {
   // -------------------------------------------------------------------------
   // Assertions, judged from the tool schemas the provider actually received.
   // -------------------------------------------------------------------------
-  const expectedOrbTools = ["orb_click", "orb_drag", "orb_hotkey", "orb_long_press", "orb_observe", "orb_open_app", "orb_scroll", "orb_type"];
+  const expectedOrbTools = ["orb_click", "orb_drag", "orb_hotkey", "orb_list_apps", "orb_long_press", "orb_long_wait", "orb_observe", "orb_open_app", "orb_scroll", "orb_type", "orb_wait"];
 
   check(
     "a normal session is offered no Orb tool",

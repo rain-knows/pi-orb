@@ -62,7 +62,7 @@ P2 is being delivered as separately reviewable reference-reuse stages:
 | P2-02 — double-Alt screenshot gesture | **Implemented; real keyboard, AltGr and non-US layout acceptance remains unverified** |
 | P2-03 — pi-web history and selection context | **History and Windows UI Automation selection chip implemented; real UIA, multi-display/DPI and native selection toolbar remain unverified** |
 | P2-04 — reference desktop actions | **Hotkey, long press, same-window drag, authorized post-action image blocks and explicit screenshot export implemented; real desktop actions, target pixels and clipboard/save-dialog acceptance remain unverified** |
-| P2-05 — Windows distribution | **Unpacked app and per-user NSIS installer build; the packaged artifact's contents are audited (25/25) and the packaged app is started and driven (13/13, including a real desktop window enumeration). Clean-machine install, uninstall, upgrade and the unsigned-installer SmartScreen experience remain unverified** |
+| P2-05 — Windows distribution | **Unpacked app and per-user NSIS installer build; the packaged artifact's contents are audited (25/25) and the packaged app is started and driven (21/21, including a real desktop window enumeration). Clean-machine install, uninstall, upgrade and the unsigned-installer SmartScreen experience remain unverified** |
 
 So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
 must not be described as done. They are listed one by one in
@@ -78,7 +78,7 @@ native input, cancellation or key-release check.
 |---|---|
 | `src/main/` | Electron main process: window, tray, shortcut, Orb configuration, pi-web client, session controller |
 | `src/preload/` | Sandboxed `contextBridge` bridge; the only channel between renderer and main |
-| `src/renderer/` | React UI for the orb window |
+| `src/renderer/` | Reference floating HTML/CSS/JS shell plus Pi-specific surface modules |
 | `src/shared/` | Code shared by main, preload, renderer and the Pi extension (configuration schema and matching rules, IPC contract) |
 | `pi-package/` | Pi resources shipped with pi-orb; `extensions/orb.ts` is the Orb mode entry point |
 | `tests/` | Unit tests for pure logic and the workspace rules |

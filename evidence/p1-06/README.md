@@ -7,8 +7,8 @@
 > - `node evidence/p1-06/run-real-model-c7.mjs d6-scroll`（真实模型 D6；**需解锁的交互式桌面**）
 > - `node evidence/p1-06/run-real-model-c7.mjs d8-type`（真实模型 D8；**需解锁的交互式桌面**）
 >
-> 历史结果：`tool-exposure.json`（7/7）、`loop-verification.json`（迁移前）、`real-model-c7.json`；当前参考 backend harness 输出独立写入 `loop-verification-reference-backend.json`、`real-model-c7-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json`。
-> 状态：工具暴露、桌面策略闭环和当前参考 backend 的真实模型 C7、D6、D8 均已通过。旧 Cua 链路只作迁移基线，不代表最终生产后端。
+> 历史结果：旧版 `tool-exposure.json`（7/7）、`loop-verification.json`（迁移前）、`real-model-c7.json`；当前工具暴露记录由同名脚本重新生成，当前参考 backend harness 输出独立写入 `loop-verification-reference-backend.json`、`real-model-c7-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json`。
+> 状态：工具暴露 11/11、桌面策略闭环和生命周期自动化已通过；真实模型 C7/D6/D8 的最新复跑分别为 18/24、24/25、24/25，失败 JSON 原样保留，暂不宣称稳定通过。旧 Cua 链路只作迁移基线，不代表最终生产后端。
 
 ## 1. 交付内容
 
@@ -21,23 +21,23 @@
 | 桌面 broker（策略→驱动，行为唯一裁决点） | `src/main/desktop-broker.ts` |
 | Cua 适配器（历史 P1 证据；已从生产代码删除） | `evidence/p1-05/` 与本目录历史 JSON |
 | 扩展侧工具注册、`/orb` 命令、桥客户端 | `pi-package/extensions/orb.ts`、`bridge-client.ts` |
-| 壳侧授权 IPC 与界面 | `src/main/index.ts`、`src/renderer/App.tsx` |
+| 壳侧授权 IPC 与界面 | `src/main/index.ts`、`src/renderer/index.html`、`src/renderer/floating.js` |
 | 单测 | `tests/orb-tools.test.ts`、`desktop-task.test.ts`、`desktop-broker.test.ts`、`bridge-server.test.ts` |
 
-## 2. 工具暴露实测（7/7，真实 pi-web）
+## 2. 工具暴露实测（11/11，真实 pi-web 装配 + 假 provider）
 
 判定来自**本机假 provider 实际收到的工具 schema**，而不是注册调用是否成功。
 
 | 断言 | 实测 |
 |---|---|
 | 普通会话**没有**任何 Orb 工具 | 通过（`orbTools=[]`） |
-| Orb 会话恰好获得当前支持的七个工具 | `orb_click, orb_drag, orb_hotkey, orb_long_press, orb_observe, orb_scroll, orb_type` |
+| Orb 会话获得当前支持的 11 个工具 | `orb_click, orb_drag, orb_hotkey, orb_long_press, orb_observe, orb_scroll, orb_type, orb_open_app, orb_wait, orb_long_wait, orb_list_apps` |
 | 普通会话只保留 pi-web 自身工具 | `bash, read`（与 P0-02/P1-01 的基线一致） |
 | Orb 提示段只出现在 Orb 模式 | `orb=true normal=false` |
 | 提示段包含"一动作一观察" | 通过（`observe again`） |
 | 提示段声明屏幕内容为不可信输入 | 通过（`untrusted input`） |
 
-此脚本现作为 N3 回归门禁，验证普通会话不因安装扩展而新增模型可见的 GUI 能力，Orb 会话则只获得当前支持的工具。P1 初始工具集合为四个；P2-04 加入热键、长按和拖拽后扩展为七个。
+此脚本现作为 N3 回归门禁，验证普通会话不因安装扩展而新增模型可见的 GUI 能力，Orb 会话则只获得当前支持的工具。P1 初始工具集合为四个；后续阶段加入热键、长按、拖拽、应用激活、等待和应用列表后扩展为 11 个。
 
 ## 3. 历史产品侧闭环（迁移前 Cua，38/38）
 
@@ -141,12 +141,10 @@ broker 对策略拒绝返回 `{ ok:false, refused:true, reason }`，而桥服务
 
 因此工具集注册了 `orb_type` 与 `orb_scroll`，在这类窗口上被驱动拒绝时会**如实报回**给模型与用户，不会静默成功；`orb_scroll` 可以按驱动规定请求前台升级，但目标是否实际收到滚轮需逐次核验。
 
-## 5.1 真实模型 C7 验收：当前参考 backend 已通过
+## 5.1 真实模型 C7 验收：最新复跑未通过
 
-当前参考 backend 的真实模型 C7 已在解锁的 Windows 交互桌面上通过（24/24）。模型收到真实截图后自主调用了
-`orb_observe` → `orb_click` → `orb_observe`，并使用 0–1000 截图坐标；目标自身 JSONL
-记录到 `cell-mousedown`，命中截图中标记的 `0,0` 单元格。完整结果见
-`real-model-c7-reference-backend.json`，目标自身日志命中 `0,0`。
+2026-09-29 的记录曾通过（24/24），但 2026-09-30 最新复跑为 18/24：真实模型没有产生 Orb
+工具调用，目标没有收到点击。失败结果已写入 `real-model-c7-reference-backend.json`，因此本节不把旧记录当作当前稳定结论。
 
 ```powershell
 node evidence/p1-06/run-real-model-c7.mjs
@@ -183,18 +181,20 @@ node evidence/p1-06/run-real-model-c7.mjs
 
 | # | 项 | 结果（真实模型侧） | 自动化已证明的部分 + 判据来源 |
 |---|---|---|---|
-| D1 | 模型**实际发起** `orb_observe` | **通过** | `real-model-c7-reference-backend.json`，模型实际调用 `orb_observe` |
-| D2 | 随后发起 `orb_click`，坐标来自该次观察（分数 0–1000） | **通过** | 同一证据，点击参数在 0–1000 截图空间 |
-| D3 | 每次动作后产生**新的观察**（一动作一观察） | **通过** | 工具序列为 `orb_observe → orb_click → orb_observe` |
-| D4 | 目标窗口报告**命中预期位置** | **通过** | 目标自身日志命中 `cell=0,0` |
+| D1 | 模型**实际发起** `orb_observe` | **失败（最新复跑）** | 最新记录的模型工具调用为空；旧通过记录仍在 Git 历史 |
+| D2 | 随后发起 `orb_click`，坐标来自该次观察（分数 0–1000） | **失败（最新复跑）** | 最新运行没有产生点击调用 |
+| D3 | 每次动作后产生**新的观察**（一动作一观察） | **未验证（最新复跑未进入动作）** | 需重新取得同一运行内的 observe→click→observe |
+| D4 | 目标窗口报告**命中预期位置** | **失败（最新复跑）** | 目标日志没有 `cell-mousedown` |
 | D5 | 桌面任务面板显示状态且能 **Revoke**；撤销后不再执行 | **通过**（自动化 100% 覆盖该语义） | 真实 UI 路径 `revokeDesktopTask()` → 后续动作被拒 `no-task-authorization`：`loop-verification-reference-backend.json`；`tests/desktop-task.test.ts`。**人工点击**“Revoke”按钮的体验未验证 |
-| D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` | **通过** | `real-model-d6-scroll-reference-backend.json`：目标日志收到 `wheel` 且 `scrollTop` 改变 |
-| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；当前 Orb 会话恰好七个：`tool-exposure.json`（7/7，判据是 provider **实收** schema，不是 UI 标签） |
-| D8 | 让模型输入非敏感文本（`orb_type`） | **通过** | `real-model-d8-type-reference-backend.json`：目标日志读回 `P1ORBD8TEST` |
+| D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` 并动作后观察 | **失败（24/25）** | 目标日志收到 `wheel` 且 `scrollTop` 改变，但动作后没有再次 `orb_observe` |
+| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；当前 Orb 会话获得 11 个：`tool-exposure.json`（11/11，判据是 provider **实收** schema，不是 UI 标签） |
+| D8 | 让模型输入非敏感文本（`orb_type`）并动作后观察 | **失败（24/25）** | 目标日志读回 `P1ORBD8TEST`，但动作后没有再次观察 |
 
-小结：D1–D8 中当前范围内的 C7、D6、D8 以及 D5、D7 均已通过；证据均来自当前参考 backend，旧 Cua JSON 仅用于迁移对照。
+小结：工具注册、授权、目标日志中的滚动/输入动作和普通会话隔离已通过；最新真实模型 C7/D6/D8
+闭环均未完整通过，不能把一次动作成功写成稳定的模型闭环。旧 Cua JSON 仅用于迁移对照。
 
-D6 的通过判据是当前 backend 的目标自身日志看到 `wheel` 且 `scrollTop` 改变；本次已满足。不能用驱动或 `SendInput` 返回成功摘要替代目标证据。
+D6 的动作到达判据是当前 backend 的目标自身日志看到 `wheel` 且 `scrollTop` 改变；最新复跑满足这一部分，
+但完整模型合同还要求动作后 `orb_observe`，本次缺失。因此不能把驱动或 `SendInput` 返回成功摘要替代完整证据。
 
 2026-09-29 复核：`node evidence/p1-06/probe-native-wheel.mjs` 已启动并清理 disposable Electron 目标，但
 `activate-window.ps1` 返回前台为“Windows 默认锁屏界面”（`reason=could-not-foreground`）。本次没有产生
@@ -202,11 +202,12 @@ D6 的通过判据是当前 backend 的目标自身日志看到 `wheel` 且 `scr
 
 ## 6. 明确未验证
 
-此前 `not-configured` 的桥接问题已经修复；当前参考 backend 的真实模型 C7、D6、D8 已用新构建取得目标自身日志证据。
+此前 `not-configured` 的桥接问题已经修复；真实模型 C7/D6/D8 的历史通过记录与最新失败复跑并存，
+在连续复跑稳定前按未验证处理。
 
 | 项 | 原因 |
 |---|---|
-| **输入与滚动经 orb 工具** | 当前参考 backend 的 D6、D8 均由真实模型工具调用和 disposable 目标自身日志确认；Chromium 内容窗口的通用稳定性仍按支持矩阵限定。 |
+| **真实模型动作后观察合同** | 最新 D6/D8 均缺少动作后的 `orb_observe`，C7 最新运行未发起工具调用；失败 JSON 保留在 `evidence/p1-06/`。 |
 | **失败即停（batch-stopped）由真实驱动失败触发** | 由单测覆盖（`tests/desktop-broker.test.ts`）；本次整链路中未构造真实驱动失败。 |
 | 普通 vs 高权限窗口、多显示器 | 未对高权限窗口测试（不自动提权）；仅 1 个显示器。 |
 | 同一任务锁在多会话并发下的行为 | 单任务锁由单测覆盖；整链路只覆盖单会话场景。 |

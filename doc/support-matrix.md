@@ -19,9 +19,9 @@
 | Electron | `44.4.5` | 首个实测点 | `evidence/p0-03/README.md`（真实 Electron 腿 16/16） |
 | Pi SDK | `@earendil-works/pi-coding-agent@0.87.1` | P0-02 实测 | `evidence/p0-02/README.md` |
 | pi-web | `@agegr/pi-web@0.9.3`，HEAD `95a58744532c7fccaa933aa7757a1419ace67ed2` | P0-02/P0-03 实测 | `evidence/p0-02/README.md`、`evidence/p0-03/README.md` |
-| 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；当前参考 backend 的目标闭环、真实模型 C7/D6/D8 均已取得目标日志 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
+| 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；桌面闭环和历史真实模型运行记录存在，但 2026-09-30 C7/D6/D8 复跑未完整通过，暂不宣称稳定支持 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
 | 快捷键边沿监听 | `uiohook-napi@1.5.5` | Windows Node 环境可加载并完成 `start/stop`；hook 不可用时快捷键失败而不静默降级；真实长按仍需 Electron 人工复测 | `src/main/shortcut-edge-guard.ts`、`tests/shortcut-edge-guard.test.ts` |
-| renderer 构建 | `vite@7.3.6` + `electron-vite@5.0.0` + `@vitejs/plugin-react@5.2.0` | 构建通过 | 本仓库 `npm run build` |
+| renderer 构建 | `vite@7.3.6` + `electron-vite@5.0.0`，原生 HTML/CSS/JS renderer | 构建通过；已删除 React 与 Vite React 插件 | 本仓库 `npm run build` |
 | TypeScript | `5.9.3`（`strict`） | 类型检查通过 | 本仓库 `npm run typecheck` |
 | 测试 | `vitest@5.0.2` | 单测通过 | 本仓库 `npm test` |
 
@@ -47,7 +47,7 @@
 
 ## 2. 已支持 / 已验证
 
-P1 未完成前**没有**可发布的支持行。已完成并有证据的能力按阶段记录在 `evidence/` 下：
+当前没有可发布的完整 v0.1 支持行。已完成并有证据的能力按阶段记录在 `evidence/` 下：
 
 | 能力 | 状态 | 证据 |
 |---|---|---|
@@ -68,13 +68,10 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **点击坐标换算的正确性**（两种记录矛盾，以产品整链路实测为准） | **产品整链路实测已裁决**：当前实现「分数 × 驱动上报窗口尺寸」命中 `1,2`（`loop-verification.json`）；曾据一次直调探针改成「屏幕 DIP − 物理原点」，**同链路实测落 `0,1`**，故不采用。P1-05 记录的那条规则与本次链路实测相矛盾，其**逐次落点归属存疑**（与本次探针同类问题） | `evidence/p1-06/loop-verification.json`（39/39）；`doc/cua-driver-integration.md` §1 记录了两侧数字与残留疑问 |
 | **模型坐标契约：位置是截图分数（0–1000）** | 已验证（单测 + 产品链路）：分数→请求的换算命中预期格 | `tests/coordinate-mapping.test.ts`；`evidence/p1-06/loop-verification.json` |
 | **截图取点→输入落点在**同一次运行**内一致（C7 产品侧闭环）** | 已验证（自动化闭环：取的是截图分数，落点由目标自身日志判定） | `evidence/p1-06/loop-verification.json`（39/39）——取分数 `(611.6,360.4)` → 目标 JSONL 命中 `1,2` |
-| **真实模型 C7：模型自主观察、按截图坐标点击并再次观察** | **已验证（当前参考 backend，24/24）**；目标日志命中 `0,0`，工具序列为 `orb_observe → orb_click → orb_observe` | `evidence/p1-06/real-model-c7-reference-backend.json` |
 | **后台点击**：4/4 瞄准格子命中，落点在格中心，且不抢前台 | 已验证（丢弃式自报网格目标） | `evidence/p1-05/input-verification.json` |
 | **后台输入文本**：向原生应用投递并由读回文档证实 | 已验证 | 同上 |
 | **前台点击投递**：目标记录到真实 `mouse-down`，驱动报 `delivery_mode:foreground` | 已验证 | 同上 |
 | **历史 Cua 前台滚动的物理到达与生效**：曾在一次运行中由目标日志证实；2026-09-28 最新复跑驱动虽报成功但目标为 0 个 `wheel` | **历史 Cua 路径不稳定，不属于当前生产能力**；当前参考 backend 的 D6 以真实模型目标日志单独判定 | `evidence/p1-05/input-verification.json`（历史探针）；`evidence/p1-06/real-model-d6-scroll-reference-backend.json` |
-| **真实模型 D6：自主调用 `orb_scroll`** | **已验证（当前参考 backend，25/25）**；目标日志收到 `wheel` 且 `scrollTop` 改变 | `evidence/p1-06/real-model-d6-scroll-reference-backend.json` |
-| **真实模型 D8：自主调用 `orb_type`** | **已验证（当前参考 backend，25/25）**；目标日志读回 `P1ORBD8TEST` | `evidence/p1-06/real-model-d8-type-reference-backend.json` |
 | **历史 Cua 后台→前台升级**：typed `scroll` 无法表达 `delivery_mode`，旧适配器曾按 `background_unavailable` 升级 | 历史探针已验证；适配器已删除，不属于当前生产能力 | `evidence/p1-05/input-verification.json` |
 | **历史 Cua 拒绝结果解析**：驱动拒绝不能被适配器误报为成功 | 历史探针已验证；当前 broker/参考 backend 有独立拒绝合同 | `tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts` |
 | **按键/鼠标无残留** | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
@@ -114,6 +111,9 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | 窗口拖动/置顶/展开收起的人工体验 | P2-01 已接入参考几何和 IPC；真实 Electron 拖动、多显示器、DPI、停靠动画和置顶体验尚未人工复测 | 属人工确认；不得据自动断言宣称交互体验已验收 |
 | **快捷键的按键人工体验** | OS 注册、冲突诊断与释放已验证；真实 Electron + native hook 集成探针通过，但探针使用合成 F24 输入；真实键盘、AltGr/非 US 布局、锁屏/休眠恢复仍未复测 | 属人工确认；步骤见 `evidence/p1-03/README.md` |
 | **P2-04 真机动作与目标像素** | 新动作和动作后 Pi image block 已通过自动化；尚未在 disposable target 上验证真实热键、拖拽、长按落点及回图像素 | 目前不得宣称真实桌面已验收；需按 `evidence/p2-04/README.md` 补做交互式桌面验收 |
+| **真实模型 C7：自主观察→截图坐标点击→再次观察** | 2026-09-29 曾有通过记录；2026-09-30 最新复跑为 **18/24 失败**，没有产生 Orb 工具调用，目标未收到点击 | 保留失败记录 `evidence/p1-06/real-model-c7-reference-backend.json`；需在同一模型/脚本下稳定通过后再移入已验证 |
+| **真实模型 D6：自主调用 `orb_scroll` 并动作后观察** | 最新复跑 **24/25 失败**：目标确实收到 `wheel` 且 `scrollTop` 改变，但动作后没有再次 `orb_observe` | `evidence/p1-06/real-model-d6-scroll-reference-backend.json`；动作成功不替代完整观察合同 |
+| **真实模型 D8：自主调用 `orb_type` 并动作后观察** | 最新复跑 **24/25 失败**：目标读回 `P1ORBD8TEST`，但输入动作后没有再次观察 | `evidence/p1-06/real-model-d8-type-reference-backend.json`；需稳定闭环后再移入已验证 |
 | 窗口位置的**跨启动**恢复 | 防抖保存已实现，但未做「移动→退出→重启→恢复」实测 | 未验证；不得宣称已支持 |
 | **「存在但不可访问」的工作区**（`no-read-access` / `no-write-access`） | 本机以当前账户无法构造该状态而不改动 ACL（属对用户环境的破坏性操作） | 分支有单测，未真机构造；不得据此宣称已覆盖 |
 | 网络驱动器（UNC）路径的实际访问 | 只测了归一化，未做真机访问 | 不得宣称支持网络路径工作区 |

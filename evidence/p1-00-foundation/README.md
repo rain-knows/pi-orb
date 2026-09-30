@@ -28,7 +28,7 @@ P0 结束时仓库只有文档和证据，没有任何可运行工程。P1 要�
 | 文档索引 | `doc/README.md` | 新增支持矩阵入口与文档维护约定 |
 | 项目说明 | `README.md` | 结构、命令、非破坏性保证与已知例外 |
 
-目录划分：`src/main`（Electron 主进程）、`src/preload`（contextBridge）、`src/renderer`（React UI）、`src/shared`（主进程／preload／renderer 与 Pi 扩展共用的配置 schema 与 IPC 契约）、`pi-package/extensions`（Pi 扩展入口）、`tests`、`evidence`。
+目录划分：`src/main`（Electron 主进程）、`src/preload`（contextBridge）、`src/renderer`（参考 floating HTML/CSS/JS shell）、`src/shared`（主进程／preload／renderer 与 Pi 扩展共用的配置 schema 与 IPC 契约）、`pi-package/extensions`（Pi 扩展入口）、`tests`、`evidence`。
 
 ## 3. 质量门禁实测（4/4）
 
