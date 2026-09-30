@@ -98,6 +98,16 @@ function ops(overrides: Partial<WindowsDesktopOps> = {}): WindowsDesktopOps & {
 }
 
 describe("windows desktop backend", () => {
+  it("holds click modifiers only through the requested double-click", async () => {
+    const host = ops();
+    const backend = createWindowsDesktopBackend(host);
+    const screen = { index: 0, bounds, scale: 1 };
+    await backend.click({ screen, position: [500, 500], button: "right", count: 2, modifiers: ["shift", "ctrl"] });
+    expect(host.calls.filter((call) => call === "down")).toHaveLength(2);
+    expect(host.calls.filter((call) => call === "up")).toHaveLength(2);
+    expect(host.calls.indexOf("key:16:down:0")).toBeLessThan(host.calls.indexOf("down"));
+    expect(host.calls.indexOf("key:17:up:0")).toBeGreaterThan(host.calls.lastIndexOf("up"));
+  });
   it("encodes a one-pixel PNG and maps key names", () => {
     expect([...png.slice(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
     expect(encodeBgraPng(1, 1, Buffer.from([1, 2, 3, 255]), true).byteLength).toBeGreaterThan(8);

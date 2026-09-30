@@ -214,8 +214,9 @@ Get-Content (Join-Path $env:TEMP 'pi-orb-c7-grid.jsonl') -Tail 30
 
 ## 6. D 组：真实模型自主调用工具（P1-06）
 
-自动化已证明：普通会话拿不到 orb 工具、Orb 会话当前恰好八个、工具 schema 由 provider 实收（7/7 断言，含 `orb_open_app`）、
-授权/预算/新鲜度/拒绝零副作用。当前参考 backend 的真实模型 C7、D6、D8 已在解锁桌面运行，
+历史自动化已证明：普通会话拿不到 orb 工具、Orb 会话曾获得七个工具、工具 schema 由 provider 实收（7/7 断言，含 `orb_open_app`）。
+当前实现已扩展为 11 个工具，新的 provider schema 数量和真实模型闭环必须按本节重新执行；
+授权/预算/新鲜度/拒绝零副作用仍由自动化覆盖。当前参考 backend 的真实模型 C7、D6、D8 已在解锁桌面运行，
 并以 disposable 目标自身日志确认模型决定调用工具后的点击、滚动和输入结果。
 
 1. 在浮窗里选好 Orb 工作区（精确匹配该目录，见 §1）。

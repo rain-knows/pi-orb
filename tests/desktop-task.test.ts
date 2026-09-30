@@ -27,7 +27,7 @@ function observation(id = "obs-1"): DesktopObservation {
 const click = (observationId: string): DesktopAction => ({
   kind: "click",
   observationId,
-  elementToken: "s1:0",
+  position: { x: 500, y: 500 },
 });
 
 function grant(controller: DesktopTaskController, now = Date.now()) {

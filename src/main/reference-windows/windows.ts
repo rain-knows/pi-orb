@@ -410,7 +410,15 @@ export function createWindowsDesktopBackend(ops?: WindowsDesktopOps): DesktopBac
     async click(input: ClickInput, signal) {
       const host = await use()
       assertInput(host)
-      await clickAt(host, input.button, input.count, pointOf(input.position, input.screen), liveSignal(signal))
+      const abort = liveSignal(signal)
+      const modifiers = [...new Set((input.modifiers ?? []).map(key => windowsVirtualKey(key)))]
+      try {
+        for (const key of modifiers) host.key(key, true, false)
+        if (modifiers.length > 0) await delay(MODIFIER_GAP_MS, abort)
+        await clickAt(host, input.button, input.count, pointOf(input.position, input.screen), abort)
+      } finally {
+        for (const key of modifiers.reverse()) host.key(key, false, false)
+      }
     },
 
     async typeText(input: TypeInput, signal) {

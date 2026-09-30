@@ -4,9 +4,10 @@ import type {
   ScreenshotPosition,
 } from "@shared/orb-tools";
 import { validateCapture, type ScreenshotImage } from "@shared/screenshot";
-import { SCREENSHOT_CENTRE } from "@shared/orb-tools";
+import { POST_ACTION_WAIT_MS, WAIT_SECONDS } from "@shared/orb-tools";
+import { delay } from "./reference-windows/wait";
 import type { ActResult, DesktopDriver, ObserveResult } from "./desktop-task";
-import type { CapturedScreen, DesktopBackend, ScreenInfo } from "./reference-windows/backend";
+import type { CapturedScreen, DesktopBackend, DesktopForeground, ScreenInfo } from "./reference-windows/backend";
 import type { WindowsDesktopOps } from "./reference-windows/windows";
 
 export interface ReferenceWindowInfo {
@@ -60,9 +61,8 @@ function hwndFromString(value: string): number | undefined {
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
-function positionOf(position: ScreenshotPosition | undefined): [number, number] {
-  const point = position ?? SCREENSHOT_CENTRE;
-  return [point.x, point.y];
+function positionOf(position: ScreenshotPosition): [number, number] {
+  return [position.x, position.y];
 }
 
 /**
@@ -92,7 +92,6 @@ export class ReferenceWindowsDriver implements DesktopDriver {
   #observation: DesktopObservation | null = null;
   #screen: ScreenInfo | null = null;
   #target: TargetWindow | null = null;
-  #lastInputPosition: [number, number] = positionOf(undefined);
 
   constructor(options: ReferenceWindowsDriverOptions) {
     this.#options = options;
@@ -145,7 +144,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           throw new Error("The reference backend did not select the recorded target window.");
         }
         const captured = await this.#options.backend.capture(screen);
-        const observation = this.#makeObservation(target, screen, captured, input.includeImage === true);
+        const observation = this.#makeObservation(target, screen, captured, input.includeImage === true,
+          await this.#options.backend.inspectForeground());
         this.#target = target;
         this.#screen = screen;
         this.#observation = observation;
@@ -166,18 +166,20 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     }
     if (action.kind === "openApp") return this.#openApp(action, signal);
     try {
+      const abort = signal ?? new AbortController().signal;
+      if (action.kind === "wait" || action.kind === "longWait") {
+        await delay((action.kind === "wait" ? WAIT_SECONDS : action.waitSeconds) * 1000, abort);
+      }
+      const apps = action.kind === "listApps" ? [...await this.#options.backend.listApps(abort)] : undefined;
       const observationAfterAction = await this.#withGuiTurn(async () => {
         if (!this.#options.ops.focusWindow(target.windowId)) {
           throw new Error("The target window could not be brought to the foreground.");
         }
         if (action.kind === "click") {
-          if (action.elementToken) throw new Error("Element-addressed clicks are unavailable in the Windows backend; use a screenshot position.");
-          if (!action.position) throw new Error("A click needs a screenshot position.");
-          this.#lastInputPosition = positionOf(action.position);
-          await this.#options.backend.click({ screen, position: this.#lastInputPosition, button: "left", count: 1 }, signal);
+          await this.#options.backend.click({ screen, position: positionOf(action.position), button: action.button ?? "left", count: action.count ?? 1,
+            ...(action.modifiers ? { modifiers: action.modifiers } : {}) }, signal);
         } else if (action.kind === "type") {
-          if (action.elementToken) throw new Error("Element-addressed typing is unavailable in the Windows backend; click the field first.");
-          await this.#options.backend.typeText({ screen, position: this.#lastInputPosition, text: action.text, replace: false, submit: false }, signal);
+          await this.#options.backend.typeText({ screen, position: positionOf(action.position), text: action.text, replace: action.replace ?? false, submit: action.submit ?? false }, signal);
         } else if (action.kind === "hotkey") {
           await this.#options.backend.hotkey({ keys: action.keys }, signal);
         } else if (action.kind === "longPress") {
@@ -193,10 +195,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
             endScreen: screen,
             endPosition: positionOf(action.endPosition),
           }, signal);
-        } else {
-          if (action.direction === "left" || action.direction === "right") {
-            throw new Error("The Windows backend supports vertical scrolling only.");
-          }
+        } else if (action.kind === "scroll") {
           await this.#options.backend.scroll({
             screen,
             position: positionOf(action.position),
@@ -204,12 +203,14 @@ export class ReferenceWindowsDriver implements DesktopDriver {
             scrollLevel: action.amount,
           }, signal);
         }
+        if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await delay(POST_ACTION_WAIT_MS, abort);
         const captured = await this.#options.backend.capture(screen, signal);
-        const nextObservation = this.#makeObservation(target, screen, captured, true);
+        const nextObservation = this.#makeObservation(target, screen, captured, true,
+          await this.#options.backend.inspectForeground(signal));
         this.#observation = nextObservation;
         return nextObservation;
       });
-      return { ok: true, refused: false, error: null, observation: observationAfterAction };
+      return { ok: true, refused: false, error: null, observation: observationAfterAction, ...(apps ? { apps } : {}) };
     } catch (error) {
       return { ok: false, refused: false, error: message(error) };
     }
@@ -222,7 +223,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
   }
 
   resetActionContext(): void {
-    this.#lastInputPosition = positionOf(undefined);
+    // No position survives between actions: input_text always names its own target.
   }
 
   get lastObservation(): DesktopObservation | null {
@@ -234,6 +235,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     screen: ScreenInfo,
     captured: CapturedScreen,
     includeImage: boolean,
+    foreground: DesktopForeground,
   ): DesktopObservation {
     let image: ScreenshotImage | undefined;
     if (includeImage) {
@@ -263,6 +265,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       },
       elements: [],
       ...(image ? { image } : {}),
+      foreground,
       elementsUnavailable: true,
       degraded: false,
     };
@@ -317,7 +320,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         if (!screen) throw new Error(`No observation surface is available for "${requested}".`);
         const captured = await this.#options.backend.capture(screen, signal);
         signal?.throwIfAborted();
-        const next = this.#makeObservation(foreground, screen, captured, true);
+        const next = this.#makeObservation(foreground, screen, captured, true,
+          await this.#options.backend.inspectForeground(signal));
         this.#target = foreground;
         this.#screen = screen;
         this.#observation = next;

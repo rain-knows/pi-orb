@@ -237,6 +237,7 @@ export class DesktopBroker {
       observationId: parsed.action.observationId,
       actionsUsed: this.#controller.state.actionsUsed,
       ...(nextObservation ? { observation: nextObservation } : {}),
+      ...(result.apps ? { apps: result.apps } : {}),
       next: nextObservation
         ? "Use this fresh observation for the next action."
         : "Observe the window again before the next action.",
@@ -280,7 +281,7 @@ type ParseResult = { readonly ok: true; readonly action: DesktopAction } | { rea
  * Validate an action arriving over the bridge.
  *
  * The extension is not a trusted boundary: it is a separate process, and its payload is
- * untrusted input here. Every field is type-checked, and the element/point rule is enforced
+ * untrusted input here. Every field is type-checked, and the screenshot-position rule is enforced
  * again on this side so a malformed action cannot reach the driver.
  */
 export function parseAction(value: unknown): ParseResult {
@@ -299,7 +300,6 @@ export function parseAction(value: unknown): ParseResult {
     if (typeof position.x !== "number" || typeof position.y !== "number") return undefined;
     return { x: position.x, y: position.y };
   };
-  const elementToken = typeof record.elementToken === "string" && record.elementToken.length > 0 ? record.elementToken : undefined;
   const readPositionField = (field: string): { x: number; y: number } | undefined => {
     const value = record[field];
     if (typeof value !== "object" || value === null) return undefined;
@@ -310,28 +310,38 @@ export function parseAction(value: unknown): ParseResult {
 
   if (kind === "click") {
     const position = readPosition();
-    if (!elementToken && !position) return { ok: false, message: "A click needs an element token or a position." };
-    if (elementToken && position) return { ok: false, message: "A click needs an element token or a position, not both." };
+    if (!position) return { ok: false, message: "A click needs a screenshot position." };
+    if (record.elementToken !== undefined || record.element_token !== undefined) return { ok: false, message: "Element tokens are unavailable in the Windows backend." };
+    if (record.button !== undefined && record.button !== "left" && record.button !== "right") return { ok: false, message: "Invalid click button." };
+    if (record.count !== undefined && record.count !== 1 && record.count !== 2) return { ok: false, message: "Invalid click count." };
+    if (record.modifiers !== undefined && (!Array.isArray(record.modifiers) || !record.modifiers.every((key) => typeof key === "string"))) return { ok: false, message: "Invalid click modifiers." };
     return {
       ok: true,
-      action: { kind: "click", observationId, ...(elementToken ? { elementToken } : {}), ...(position ? { position } : {}) },
+      action: { kind: "click", observationId, position, ...(record.button ? { button: record.button as "left" | "right" } : {}), ...(record.count ? { count: record.count as 1 | 2 } : {}), ...(record.modifiers ? { modifiers: record.modifiers as string[] } : {}) },
     };
   }
 
   if (kind === "type") {
     const text = record.text;
     if (typeof text !== "string") return { ok: false, message: "A type action needs text." };
-    return { ok: true, action: { kind: "type", observationId, text, ...(elementToken ? { elementToken } : {}) } };
+    const position = readPosition();
+    if (!position) return { ok: false, message: "A type action needs a screenshot position." };
+    if (record.elementToken !== undefined || record.element_token !== undefined) return { ok: false, message: "Element tokens are unavailable in the Windows backend." };
+    if (record.replace !== undefined && typeof record.replace !== "boolean") return { ok: false, message: "Invalid replace flag." };
+    if (record.submit !== undefined && typeof record.submit !== "boolean") return { ok: false, message: "Invalid submit flag." };
+    return { ok: true, action: { kind: "type", observationId, text, position, ...(record.replace !== undefined ? { replace: record.replace as boolean } : {}), ...(record.submit !== undefined ? { submit: record.submit as boolean } : {}) } };
   }
 
   if (kind === "scroll") {
     const direction = record.direction;
     const amount = record.amount;
-    if (direction !== "up" && direction !== "down" && direction !== "left" && direction !== "right") {
+    if (direction !== "up" && direction !== "down") {
       return { ok: false, message: "A scroll action needs a direction." };
     }
     if (typeof amount !== "number") return { ok: false, message: "A scroll action needs a numeric amount." };
     const position = readPosition();
+    if (!position) return { ok: false, message: "A scroll action needs a screenshot position." };
+    if (record.elementToken !== undefined || record.element_token !== undefined) return { ok: false, message: "Element tokens are unavailable in the Windows backend." };
     return {
       ok: true,
       action: {
@@ -339,8 +349,7 @@ export function parseAction(value: unknown): ParseResult {
         observationId,
         direction,
         amount,
-        ...(elementToken ? { elementToken } : {}),
-        ...(position ? { position } : {}),
+        position,
       },
     };
   }
@@ -376,6 +385,12 @@ export function parseAction(value: unknown): ParseResult {
       return { ok: false, message: "An open-app action needs an application name." };
     }
     return { ok: true, action: { kind: "openApp", observationId, name: record.name } };
+  }
+
+  if (kind === "wait" || kind === "listApps") return { ok: true, action: { kind, observationId } };
+  if (kind === "longWait") {
+    if (typeof record.waitSeconds !== "number") return { ok: false, message: "A long wait needs waitSeconds." };
+    return { ok: true, action: { kind, observationId, waitSeconds: record.waitSeconds } };
   }
 
   return { ok: false, message: `Unknown action kind: ${String(kind)}` };

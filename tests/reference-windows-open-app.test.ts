@@ -95,6 +95,7 @@ function backendFake(calls: unknown[]) {
   });
   const backend = {
     listScreens: async () => [screenFor(42), screenFor(55), screenFor(77)],
+    inspectForeground: async () => ({ appName: "notepad", windowTitle: "Untitled - Notepad" }),
     capture: async (screen: ScreenInfo) => {
       calls.push({ kind: "capture", windowId: screen.windowId });
       return { data: new Uint8Array([1]), mediaType: "image/png" as const };

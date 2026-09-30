@@ -12,9 +12,7 @@
  *
  * Design constraints carried in from measurement
  * (see doc/cua-driver-integration.md and evidence/p1-05/README.md):
- *  - element addressing is preferred over pixel coordinates, because element tokens do
- *    not depend on DPI at all;
- *  - a pixel coordinate must be an explicit screen DIP value, never a scaled guess;
+ *  - actions address the 0-1000 fraction of the screenshot returned by the Windows backend;
  *  - one action per call, and every action must be followed by a fresh observation;
  *  - driver failure must stop the batch, not be retried blindly.
  */
@@ -34,6 +32,9 @@ export const ORB_TOOLS = {
   longPress: "orb_long_press",
   drag: "orb_drag",
   openApp: "orb_open_app",
+  wait: "orb_wait",
+  longWait: "orb_long_wait",
+  listApps: "orb_list_apps",
 } as const;
 
 export type OrbToolName = (typeof ORB_TOOLS)[keyof typeof ORB_TOOLS];
@@ -58,8 +59,11 @@ export interface ScreenshotPosition {
   readonly y: number;
 }
 
-/** The centre of a screenshot in fraction space, used when a position is optional and omitted. */
-export const SCREENSHOT_CENTRE: ScreenshotPosition = { x: COORDINATE_SPACE / 2, y: COORDINATE_SPACE / 2 };
+/** Reference `wait-args.ts`: fixed and enumerated waits. */
+export const WAIT_SECONDS = 1;
+export const LONG_WAIT_SECONDS = [10, 30, 60, 120] as const;
+/** Reference `config.ts` default settle before recapturing an action. */
+export const POST_ACTION_WAIT_MS = 600;
 
 /**
  * The minimum observation shape the executor needs.
@@ -102,6 +106,7 @@ export interface DesktopObservation {
   readonly elements: readonly DesktopElement[];
   /** Present only when this observation is authorized to be sent to the model. */
   readonly image?: { readonly data: string; readonly mimeType: string; readonly width: number; readonly height: number };
+  readonly foreground?: { readonly appName: string; readonly windowTitle?: string; readonly finderFolder?: string; readonly focusNote?: string };
   /** True when the driver reported no elements; element-addressed actions are impossible. */
   readonly elementsUnavailable: boolean;
   readonly degraded: boolean;
@@ -117,28 +122,32 @@ export interface DesktopElement {
 export interface ClickAction {
   readonly kind: "click";
   readonly observationId: string;
-  /** Element token when available; preferred. */
-  readonly elementToken?: string;
-  /** Screenshot fraction, only when no element can address the target. */
-  readonly position?: ScreenshotPosition;
+  readonly position: ScreenshotPosition;
+  readonly button?: "left" | "right";
+  readonly count?: 1 | 2;
+  readonly modifiers?: readonly string[];
 }
 
 export interface TypeAction {
   readonly kind: "type";
   readonly observationId: string;
   readonly text: string;
-  readonly elementToken?: string;
+  readonly position: ScreenshotPosition;
+  readonly replace?: boolean;
+  readonly submit?: boolean;
 }
 
 export interface ScrollAction {
   readonly kind: "scroll";
   readonly observationId: string;
-  readonly direction: "up" | "down" | "left" | "right";
+  readonly direction: "up" | "down";
   readonly amount: number;
-  readonly elementToken?: string;
-  /** Screenshot fraction to place the wheel at. Defaults to the screenshot centre. */
-  readonly position?: ScreenshotPosition;
+  readonly position: ScreenshotPosition;
 }
+
+export interface WaitAction { readonly kind: "wait"; readonly observationId: string }
+export interface LongWaitAction { readonly kind: "longWait"; readonly observationId: string; readonly waitSeconds: number }
+export interface ListAppsAction { readonly kind: "listApps"; readonly observationId: string }
 
 export interface HotkeyAction {
   readonly kind: "hotkey";
@@ -174,7 +183,7 @@ export interface OpenAppAction {
   readonly name: string;
 }
 
-export type DesktopAction = ClickAction | TypeAction | ScrollAction | HotkeyAction | LongPressAction | DragAction | OpenAppAction;
+export type DesktopAction = ClickAction | TypeAction | ScrollAction | HotkeyAction | LongPressAction | DragAction | OpenAppAction | WaitAction | LongWaitAction | ListAppsAction;
 
 /** Hard limits. Never "unlimited": a desktop task must be bounded. */
 export const ORB_LIMITS = {
@@ -207,8 +216,9 @@ export type ActionRefusal =
   | "batch-stopped"
   | "task-limit-actions"
   | "task-expired"
-  | "needs-element-or-point"
-  | "ambiguous-target"
+  | "needs-position"
+  | "invalid-click-options"
+  | "invalid-long-wait"
   | "coordinate-mapping-unavailable"
   | "text-too-long"
   | "scroll-amount-out-of-range"
@@ -230,13 +240,14 @@ const REFUSAL_MESSAGES: Record<ActionRefusal, string> = {
     "A previous action in this task failed, so the task was stopped. Observe again and ask the user how to proceed.",
   "task-limit-actions": `This task reached its action limit of ${ORB_LIMITS.maxActionsPerTask}. Ask the user to approve a new task.`,
   "task-expired": "This task exceeded its time limit and was stopped.",
-  "needs-element-or-point": "Provide either an element token or a screenshot position.",
-  "ambiguous-target": "Provide exactly one of an element token or a screenshot position, not both.",
+  "needs-position": "Provide a position in the current screenshot, with x and y from 0 to 1000.",
+  "invalid-click-options": "Click button, count or modifiers are unsupported.",
+  "invalid-long-wait": "wait_seconds must be 10, 30, 60 or 120.",
   "coordinate-mapping-unavailable":
-    "This window's desktop rect could not be determined, so a position cannot be mapped to it. Address the target by element token instead, or observe again.",
+    "This window's desktop rect could not be determined. Observe again before acting.",
   "text-too-long": `Text is limited to ${ORB_LIMITS.maxTypedCharacters} characters per action.`,
   "scroll-amount-out-of-range": `Scroll amount must be between 1 and ${ORB_LIMITS.maxScrollAmount}.`,
-  "unsupported-direction": "Direction must be up, down, left or right.",
+  "unsupported-direction": "Direction must be up or down.",
   "invalid-hotkey": "Provide a supported key chord with one to four keys, including a non-modifier key.",
   "forbidden-hotkey": "System screenshot shortcuts are not allowed.",
   "invalid-long-press-duration": `Long press duration must be between ${ORB_LIMITS.minLongPressSeconds} and ${ORB_LIMITS.maxLongPressSeconds} seconds.`,
@@ -268,13 +279,21 @@ export function validateAction(
   if (observation.observationId !== action.observationId) return "stale-observation";
 
   if (action.kind === "type") {
-    if (action.text.length === 0) return "needs-element-or-point";
+    if (action.text.length === 0) return "text-too-long";
     if (action.text.length > ORB_LIMITS.maxTypedCharacters) return "text-too-long";
+    return isUsablePosition(action.position) ? null : "needs-position";
+  }
+
+  if (action.kind === "click") {
+    if (!isUsablePosition(action.position)) return "needs-position";
+    if (action.button !== undefined && action.button !== "left" && action.button !== "right") return "invalid-click-options";
+    if (action.count !== undefined && action.count !== 1 && action.count !== 2) return "invalid-click-options";
+    if (action.modifiers !== undefined && !validClickModifiers(action.modifiers)) return "invalid-click-options";
     return null;
   }
 
   if (action.kind === "scroll") {
-    if (!["up", "down", "left", "right"].includes(action.direction)) return "unsupported-direction";
+    if (!["up", "down"].includes(action.direction)) return "unsupported-direction";
     if (
       !Number.isInteger(action.amount) ||
       action.amount < 1 ||
@@ -282,8 +301,11 @@ export function validateAction(
     ) {
       return "scroll-amount-out-of-range";
     }
-    return validateTarget(action.elementToken, action.position);
+    return isUsablePosition(action.position) ? null : "needs-position";
   }
+
+  if (action.kind === "wait" || action.kind === "listApps") return null;
+  if (action.kind === "longWait") return LONG_WAIT_SECONDS.includes(action.waitSeconds as 10) ? null : "invalid-long-wait";
 
   if (action.kind === "hotkey") return validateHotkey(action.keys);
 
@@ -293,12 +315,12 @@ export function validateAction(
       action.durationSeconds < ORB_LIMITS.minLongPressSeconds ||
       action.durationSeconds > ORB_LIMITS.maxLongPressSeconds
     ) return "invalid-long-press-duration";
-    return isUsablePosition(action.position) ? null : "needs-element-or-point";
+    return isUsablePosition(action.position) ? null : "needs-position";
   }
 
   if (action.kind === "drag") {
     if (!isUsablePosition(action.startPosition) || !isUsablePosition(action.endPosition)) {
-      return "needs-element-or-point";
+      return "needs-position";
     }
     return null;
   }
@@ -320,7 +342,12 @@ export function validateAction(
     return null;
   }
 
-  return validateTarget(action.elementToken, action.position);
+  return null;
+}
+
+const CLICK_MODIFIERS = new Set(["shift", "cmd", "command", "meta", "win", "windows", "option", "alt", "control", "ctrl"]);
+function validClickModifiers(modifiers: readonly string[]): boolean {
+  return Array.isArray(modifiers) && modifiers.every((value) => typeof value === "string" && CLICK_MODIFIERS.has(value.toLowerCase()));
 }
 
 const HOTKEY_MODIFIERS = new Set(["ctrl", "control", "alt", "option", "shift", "win", "windows", "meta", "cmd", "command", "super"]);
@@ -383,18 +410,6 @@ export function positionToRequest(
     x: windowRect.x + (position.x / COORDINATE_SPACE) * windowRect.width,
     y: windowRect.y + (position.y / COORDINATE_SPACE) * windowRect.height,
   };
-}
-
-function validateTarget(
-  elementToken: string | undefined,
-  position: ScreenshotPosition | undefined,
-): ActionRefusal | null {
-  const hasElement = typeof elementToken === "string" && elementToken.length > 0;
-  const hasPosition = position !== undefined;
-  if (hasElement && hasPosition) return "ambiguous-target";
-  if (!hasElement && !hasPosition) return "needs-element-or-point";
-  if (hasPosition && !isUsablePosition(position)) return "needs-element-or-point";
-  return null;
 }
 
 /**

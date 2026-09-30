@@ -30,6 +30,7 @@ import {
   ORB_LIMITS,
   ORB_MODE_SECTION,
   ORB_TOOLS,
+  LONG_WAIT_SECONDS,
   describeOrbModeSection,
   type DesktopAction,
   type DesktopObservation,
@@ -59,22 +60,18 @@ const OBSERVE_PARAMS = Type.Object(
  * documented wrong-place failure. The shell converts the fraction onto the window's own rect.
  */
 const POSITION_PARAMS = {
-  x: Type.Optional(
-    Type.Number({
+  x: Type.Number({
       minimum: 0,
       maximum: 1000,
       description:
         "Horizontal fraction of the screenshot being viewed, 0 (left edge) to 1000 (right edge). Not a screen coordinate.",
     }),
-  ),
-  y: Type.Optional(
-    Type.Number({
+  y: Type.Number({
       minimum: 0,
       maximum: 1000,
       description:
         "Vertical fraction of the screenshot being viewed, 0 (top edge) to 1000 (bottom edge). Not a screen coordinate.",
     }),
-  ),
 };
 
 const CLICK_PARAMS = Type.Object(
@@ -82,10 +79,10 @@ const CLICK_PARAMS = Type.Object(
     observation_id: Type.String({
       description: "The observation_id from the orb_observe result this action was decided from.",
     }),
-    element_token: Type.Optional(
-      Type.String({ description: "Element token from the observation. Preferred when available." }),
-    ),
     ...POSITION_PARAMS,
+    button: Type.Optional(Type.Union([Type.Literal("left"), Type.Literal("right")], { description: "Mouse button; default left." })),
+    count: Type.Optional(Type.Union([Type.Literal(1), Type.Literal(2)], { description: "1 single click or 2 double-click; default 1." })),
+    modifiers: Type.Optional(Type.Array(Type.String(), { description: "Modifiers held for this click: shift, control, option or cmd." })),
   },
   { additionalProperties: false },
 );
@@ -96,9 +93,9 @@ const TYPE_PARAMS = Type.Object(
     text: Type.String({
       description: `Text to type (1-${ORB_LIMITS.maxTypedCharacters} characters). Never type credentials or other secrets.`,
     }),
-    element_token: Type.Optional(
-      Type.String({ description: "Element token to receive the text, when it can be addressed." }),
-    ),
+    ...POSITION_PARAMS,
+    replace: Type.Optional(Type.Boolean({ description: "Select all in the focused field before typing." })),
+    submit: Type.Optional(Type.Boolean({ description: "Press Enter after typing." })),
   },
   { additionalProperties: false },
 );
@@ -107,7 +104,7 @@ const SCROLL_PARAMS = Type.Object(
   {
     observation_id: Type.String({ description: "The observation_id this action was decided from." }),
     direction: Type.Union(
-      [Type.Literal("up"), Type.Literal("down"), Type.Literal("left"), Type.Literal("right")],
+      [Type.Literal("up"), Type.Literal("down")],
       { description: "Scroll direction." },
     ),
     amount: Type.Integer({
@@ -115,7 +112,6 @@ const SCROLL_PARAMS = Type.Object(
       maximum: ORB_LIMITS.maxScrollAmount,
       description: `Scroll ticks (1-${ORB_LIMITS.maxScrollAmount}).`,
     }),
-    element_token: Type.Optional(Type.String({ description: "Scrollable element token." })),
     ...POSITION_PARAMS,
   },
   { additionalProperties: false },
@@ -169,6 +165,15 @@ const OPEN_APP_PARAMS = Type.Object(
   },
   { additionalProperties: false },
 );
+
+const OBSERVATION_PARAMS = Type.Object({
+  observation_id: Type.String({ description: "The current observation_id." }),
+}, { additionalProperties: false });
+
+const LONG_WAIT_PARAMS = Type.Object({
+  observation_id: Type.String({ description: "The current observation_id." }),
+  wait_seconds: Type.Union(LONG_WAIT_SECONDS.map((seconds) => Type.Literal(seconds)), { description: "10, 30, 60 or 120 seconds." }),
+}, { additionalProperties: false });
 
 /** Read the Orb configuration, or `null` when it is absent, unreadable or malformed. */
 export function readOrbConfig(path: string): OrbConfig | null {
@@ -243,10 +248,9 @@ export default function orbExtension(pi: ExtensionAPI): void {
       name: ORB_TOOLS.click,
       label: "Orb: click",
       description:
-        "Click once in the observed window, addressed by an element token or by a position in the screenshot you are looking at. Requires an authorized desktop task.",
-      promptSnippet: "Click once in the observed window",
+        "Click at a 0-1000 position in the observed screenshot. Supports right button, double-click and modifiers. Returns a fresh screenshot.",
+      promptSnippet: "Click in the observed window",
       promptGuidelines: [
-        "Address the target by element_token when the observation provides one; use x/y fractions only when it does not.",
         "x and y are fractions of the screenshot you can see (0-1000), not screen coordinates. Read them off the image.",
         "Do not click twice from the same observation. After an action, use its returned fresh observation and screenshot.",
       ],
@@ -255,10 +259,10 @@ export default function orbExtension(pi: ExtensionAPI): void {
         const action: DesktopAction = {
           kind: "click",
           observationId: params.observation_id,
-          ...(params.element_token ? { elementToken: params.element_token } : {}),
-          ...(params.x !== undefined && params.y !== undefined
-            ? { position: { x: params.x, y: params.y } }
-            : {}),
+          position: { x: params.x, y: params.y },
+          ...(params.button ? { button: params.button } : {}),
+          ...(params.count ? { count: params.count } : {}),
+          ...(params.modifiers ? { modifiers: params.modifiers } : {}),
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },
@@ -268,7 +272,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
       name: ORB_TOOLS.type,
       label: "Orb: type text",
       description:
-        "Type text into the observed window. Requires an authorized desktop task, and never sends credentials or secrets.",
+        "Click the specified 0-1000 position, type text, optionally replace field contents and press Enter. Returns a fresh screenshot.",
       promptSnippet: "Type text into the observed window",
       promptGuidelines: ["Ask the user for confirmation before typing into a field that may hold sensitive data."],
       parameters: TYPE_PARAMS,
@@ -277,7 +281,9 @@ export default function orbExtension(pi: ExtensionAPI): void {
           kind: "type",
           observationId: params.observation_id,
           text: params.text,
-          ...(params.element_token ? { elementToken: params.element_token } : {}),
+          position: { x: params.x, y: params.y },
+          ...(params.replace !== undefined ? { replace: params.replace } : {}),
+          ...(params.submit !== undefined ? { submit: params.submit } : {}),
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },
@@ -289,7 +295,6 @@ export default function orbExtension(pi: ExtensionAPI): void {
       description: "Scroll inside the observed window. Requires an authorized desktop task.",
       promptSnippet: "Scroll inside the observed window",
       promptGuidelines: [
-        "Prefer an element token for the scrollable container over a coordinate.",
         "If you give x/y, they are fractions of the screenshot you can see (0-1000), not screen coordinates.",
       ],
       parameters: SCROLL_PARAMS,
@@ -299,10 +304,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
           observationId: params.observation_id,
           direction: params.direction,
           amount: params.amount,
-          ...(params.element_token ? { elementToken: params.element_token } : {}),
-          ...(params.x !== undefined && params.y !== undefined
-            ? { position: { x: params.x, y: params.y } }
-            : {}),
+          position: { x: params.x, y: params.y },
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
       },
@@ -383,6 +385,39 @@ export default function orbExtension(pi: ExtensionAPI): void {
           endPosition: { x: params.end_x, y: params.end_y },
         };
         return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation, action });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.wait,
+      label: "Orb: wait",
+      description: "Wait one second for the current window, then return a fresh screenshot.",
+      parameters: OBSERVATION_PARAMS,
+      async execute(_id, params, _signal, _update, toolCtx: ExtensionContext) {
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation,
+          action: { kind: "wait", observationId: params.observation_id } });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.longWait,
+      label: "Orb: long wait",
+      description: "Wait 10, 30, 60 or 120 seconds for a visible long-running task, then return a fresh screenshot.",
+      parameters: LONG_WAIT_PARAMS,
+      async execute(_id, params, _signal, _update, toolCtx: ExtensionContext) {
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation,
+          action: { kind: "longWait", observationId: params.observation_id, waitSeconds: params.wait_seconds } });
+      },
+    });
+
+    pi.registerTool({
+      name: ORB_TOOLS.listApps,
+      label: "Orb: list running apps",
+      description: "List running applications, then return a fresh screenshot of the authorized target.",
+      parameters: OBSERVATION_PARAMS,
+      async execute(_id, params, _signal, _update, toolCtx: ExtensionContext) {
+        return forward(toolCtx, "act", { sessionId: toolCtx.sessionManager.getSessionId(), generation: sessionState.generation,
+          action: { kind: "listApps", observationId: params.observation_id } });
       },
     });
 
@@ -525,7 +560,8 @@ export function renderResult(result: unknown): string {
   if (nestedObservation) {
     const heading = typeof record.action === "string" ? `action: ${record.action} completed` : "Fresh observation:";
     const actionsUsed = typeof record.actionsUsed === "number" ? `actions_used: ${record.actionsUsed}` : null;
-    return [heading, ...(actionsUsed ? [actionsUsed] : []), renderObservation(nestedObservation)].join("\n");
+    const apps = Array.isArray(record.apps) ? `running_apps: ${record.apps.join(", ")}` : null;
+    return [heading, ...(actionsUsed ? [actionsUsed] : []), ...(apps ? [apps] : []), renderObservation(nestedObservation)].join("\n");
   }
   const observation = findObservation(record);
   if (observation) return renderObservation(observation);
@@ -552,6 +588,10 @@ function removeImageData(value: unknown): unknown {
   const record = value as Record<string, unknown>;
   const copy: Record<string, unknown> = { ...record };
   delete copy.image;
+  // The Windows backend has no accessibility element tree. Keep the internal shape for
+  // driver contracts, but never return obsolete element tokens in the model-facing details.
+  delete copy.elements;
+  delete copy.elementsUnavailable;
   if ("observation" in copy) copy.observation = removeImageData(copy.observation);
   return copy;
 }
@@ -564,14 +604,9 @@ function renderObservation(observation: DesktopObservation): string {
     `coordinate space for actions: x and y are fractions of the screenshot you can see, 0-${observation.coordinateSpace.space} on each axis ([0,0] top-left, [${observation.coordinateSpace.space},${observation.coordinateSpace.space}] bottom-right)`,
     rect
       ? `the screenshot covers this window (${Math.round(rect.width)}x${Math.round(rect.height)} px); a position is mapped onto it`
-      : "warning: this window's rect could not be determined, so x/y cannot be mapped; address the target by element token",
-    observation.elementsUnavailable
-      ? "elements: unavailable for this window; address actions by x/y fractions read off the screenshot"
-      : `elements (${observation.elements.length}):`,
+      : "warning: this window's rect could not be determined; observe again before acting",
+    observation.foreground ? `foreground: ${observation.foreground.appName}${observation.foreground.windowTitle ? ` — ${observation.foreground.windowTitle}` : ""}${observation.foreground.focusNote ? ` (${observation.foreground.focusNote})` : ""}` : "foreground: unavailable",
   ];
-  for (const element of observation.elements.slice(0, 40)) {
-    lines.push(`  - [${element.token}] ${element.role} "${element.label}" actions=[${element.actions.join(",")}]`);
-  }
   if (observation.degraded) lines.push("note: the driver reported a degraded observation; treat it with caution.");
   return lines.join("\n");
 }

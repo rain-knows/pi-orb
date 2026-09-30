@@ -186,7 +186,7 @@ describe("bridge admission rules", () => {
       token,
       sessionId: "s",
       generation: 1,
-      action: { kind: "click", observationId: "obs-1", elementToken: "t" },
+      action: { kind: "click", observationId: "obs-1", position: { x: 500, y: 500 } },
     });
     expect(response.parsed.ok).toBe(true);
     expect(executor.calls).toEqual(["act"]);
@@ -199,7 +199,7 @@ describe("bridge admission rules", () => {
       token,
       sessionId: "s",
       generation: 1,
-      action: { kind: "click", observationId: "obs-1", elementToken: "t" },
+      action: { kind: "click", observationId: "obs-1", position: { x: 500, y: 500 } },
     });
     expect(response.parsed).toMatchObject({ ok: false, reason: "executor-error" });
     expect(String(response.parsed.message)).toContain("the driver exploded");
@@ -246,7 +246,7 @@ describe("bridge admission rules", () => {
       token,
       sessionId: "s",
       generation: 1,
-      action: { kind: "click", observationId: "obs-1", elementToken: "t" },
+      action: { kind: "click", observationId: "obs-1", position: { x: 500, y: 500 } },
     });
     expect(refusedAct.parsed).toMatchObject({ ok: false, reason: "no-task-authorization" });
   });

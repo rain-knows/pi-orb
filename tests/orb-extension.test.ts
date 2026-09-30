@@ -42,7 +42,7 @@ describe("Orb extension result rendering", () => {
         observationId: "obs-after-action",
         window: { id: "42", pid: 24, title: "Target", appName: "target.exe" },
         coordinateSpace: { action: "screenshot-fraction", space: 1000, windowRect: { x: 0, y: 0, width: 1, height: 1 } },
-        elements: [],
+        elements: [{ token: "obsolete", role: "Button", label: "Old", actions: ["invoke"] }],
         elementsUnavailable: true,
         degraded: false,
         image,
@@ -54,5 +54,6 @@ describe("Orb extension result rendering", () => {
       { type: "image", data: "AQID", mimeType: "image/png" },
     ]);
     expect(JSON.stringify(result.details)).not.toContain("AQID");
+    expect(JSON.stringify(result.details)).not.toContain("obsolete");
   });
 });

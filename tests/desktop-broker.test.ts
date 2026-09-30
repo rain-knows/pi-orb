@@ -106,7 +106,7 @@ function broker(options: Parameters<typeof fakeDriver>[0] = {}, live = true) {
 const click = (observationId: string): DesktopAction => ({
   kind: "click",
   observationId,
-  elementToken: "s1:0",
+  position: { x: 500, y: 500 },
 });
 
 describe("DesktopBroker authorization", () => {
@@ -355,16 +355,16 @@ describe("DesktopBroker failure handling", () => {
   it("rejects an action that names no observation", async () => {
     const { broker: instance, driver } = broker();
     instance.authorize({ sessionId: "sess", generation: 1, scope: "x" });
-    const result = (await instance.act({ kind: "click", elementToken: "t" }, "sess", 1)) as Record<string, unknown>;
+    const result = (await instance.act({ kind: "click", position: { x: 500, y: 500 } }, "sess", 1)) as Record<string, unknown>;
     expect(result).toMatchObject({ reason: "malformed" });
     expect(driver.acted).toHaveLength(0);
   });
 });
 
 describe("parseAction", () => {
-  it("accepts a click with an element token", () => {
+  it("rejects element tokens unsupported by the Windows backend", () => {
     const parsed = parseAction({ kind: "click", observationId: "obs-1", elementToken: "s1:0" });
-    expect(parsed.ok).toBe(true);
+    expect(parsed.ok).toBe(false);
   });
 
   it("accepts a click with a screenshot fraction", () => {
@@ -372,7 +372,7 @@ describe("parseAction", () => {
     expect(parsed.ok).toBe(true);
   });
 
-  it("refuses a click with both forms", () => {
+  it("refuses an element token even when a position is present", () => {
     const parsed = parseAction({
       kind: "click",
       observationId: "obs-1",
@@ -382,7 +382,7 @@ describe("parseAction", () => {
     expect(parsed).toMatchObject({ ok: false });
   });
 
-  it("refuses a click with neither form", () => {
+  it("refuses a click without a position", () => {
     expect(parseAction({ kind: "click", observationId: "obs-1" })).toMatchObject({ ok: false });
   });
 
@@ -391,14 +391,16 @@ describe("parseAction", () => {
   });
 
   it("accepts a type action and refuses a non-string text", () => {
-    expect(parseAction({ kind: "type", observationId: "obs-1", text: "hello" }).ok).toBe(true);
+    expect(parseAction({ kind: "type", observationId: "obs-1", text: "hello", position: { x: 100, y: 200 }, replace: true, submit: true }).ok).toBe(true);
+    expect(parseAction({ kind: "type", observationId: "obs-1", text: "hello" }).ok).toBe(false);
     expect(parseAction({ kind: "type", observationId: "obs-1", text: 5 })).toMatchObject({ ok: false });
   });
 
-  it("accepts each scroll direction and refuses an unknown one", () => {
-    for (const direction of ["up", "down", "left", "right"]) {
-      expect(parseAction({ kind: "scroll", observationId: "obs-1", direction, amount: 2 }).ok).toBe(true);
+  it("accepts vertical scroll and refuses unsupported directions", () => {
+    for (const direction of ["up", "down"]) {
+      expect(parseAction({ kind: "scroll", observationId: "obs-1", direction, amount: 2, position: { x: 200, y: 300 } }).ok).toBe(true);
     }
+    expect(parseAction({ kind: "scroll", observationId: "obs-1", direction: "left", amount: 2, position: { x: 200, y: 300 } }).ok).toBe(false);
     expect(parseAction({ kind: "scroll", observationId: "obs-1", direction: "sideways", amount: 2 })).toMatchObject({
       ok: false,
     });
@@ -415,5 +417,8 @@ describe("parseAction", () => {
     expect(parseAction({ kind: "longPress", observationId: "obs-1", position: { x: 20, y: 30 }, durationSeconds: 2 })).toMatchObject({ ok: true });
     expect(parseAction({ kind: "drag", observationId: "obs-1", startPosition: { x: 20, y: 30 }, endPosition: { x: 70, y: 80 } })).toMatchObject({ ok: true });
     expect(parseAction({ kind: "drag", observationId: "obs-1", startPosition: { x: "20", y: 30 }, endPosition: { x: 70, y: 80 } })).toMatchObject({ ok: false });
+    expect(parseAction({ kind: "wait", observationId: "obs-1" })).toMatchObject({ ok: true });
+    expect(parseAction({ kind: "longWait", observationId: "obs-1", waitSeconds: 30 })).toMatchObject({ ok: true });
+    expect(parseAction({ kind: "listApps", observationId: "obs-1" })).toMatchObject({ ok: true });
   });
 });

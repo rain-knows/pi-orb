@@ -41,6 +41,8 @@ function backendFake(calls: unknown[]) {
   };
   const backend = {
     listScreens: async () => [screen],
+    inspectForeground: async () => ({ appName: "electron", windowTitle: "Disposable target" }),
+    listApps: async () => ["electron", "notepad"],
     capture: async () => ({ data: new Uint8Array([1]), mediaType: "image/png" as const }),
     click: async (input: unknown) => calls.push({ kind: "click", input }),
     typeText: async (input: unknown) => calls.push({ kind: "type", input }),
@@ -103,7 +105,7 @@ describe("ReferenceWindowsDriver", () => {
 
     expect(await driver.act({ kind: "click", observationId: observation.observationId, position: { x: 125, y: 250 } }, observation)).toMatchObject({ ok: true });
     expect(await driver.act({ kind: "scroll", observationId: observation.observationId, direction: "down", amount: 3, position: { x: 500, y: 600 } }, observation)).toMatchObject({ ok: true });
-    expect(await driver.act({ kind: "type", observationId: observation.observationId, text: "hello" }, observation)).toMatchObject({ ok: true });
+    expect(await driver.act({ kind: "type", observationId: observation.observationId, text: "hello", position: { x: 125, y: 250 } }, observation)).toMatchObject({ ok: true });
     expect(await driver.act({ kind: "hotkey", observationId: observation.observationId, keys: ["ctrl", "c"] }, observation)).toMatchObject({ ok: true });
     expect(await driver.act({ kind: "longPress", observationId: observation.observationId, position: { x: 300, y: 400 }, durationSeconds: 2 }, observation)).toMatchObject({ ok: true });
     expect(await driver.act({ kind: "drag", observationId: observation.observationId, startPosition: { x: 100, y: 200 }, endPosition: { x: 800, y: 700 } }, observation)).toMatchObject({ ok: true });
@@ -116,6 +118,20 @@ describe("ReferenceWindowsDriver", () => {
       { kind: "longPress", input: expect.objectContaining({ position: [300, 400], durationSeconds: 2 }) },
       { kind: "drag", input: expect.objectContaining({ startPosition: [100, 200], endPosition: [800, 700] }) },
     ]);
+    expect(driver.lastObservation?.foreground).toEqual({ appName: "electron", windowTitle: "Disposable target" });
+  });
+
+  it("lists running apps with a fresh observation and cancels a long wait", async () => {
+    const { ops } = opsFake();
+    const driver = new ReferenceWindowsDriver({ ops, backend: backendFake([]), ownProcessId: 1 });
+    const first = (await driver.observe({ windowId: "42", includeImage: true })).observation!;
+    const apps = await driver.act({ kind: "listApps", observationId: first.observationId }, first);
+    expect(apps).toMatchObject({ ok: true, apps: ["electron", "notepad"] });
+    expect(apps.observation?.observationId).not.toBe(first.observationId);
+    const controller = new AbortController();
+    const pending = driver.act({ kind: "longWait", observationId: apps.observation!.observationId, waitSeconds: 10 }, apps.observation!, controller.signal);
+    controller.abort(new Error("stopped"));
+    await expect(pending).resolves.toMatchObject({ ok: false, error: "stopped" });
   });
 
   it("forwards the broker cancellation signal into the native backend", async () => {
@@ -167,7 +183,7 @@ describe("ReferenceWindowsDriver", () => {
     expect((await driver.observe({ windowId: "77" })).ok).toBe(false);
   });
 
-  it("keeps the last click position across the required re-observation before typing", async () => {
+  it("requires each type action to name its own screenshot position", async () => {
     const { ops } = opsFake();
     const calls: unknown[] = [];
     const driver = new ReferenceWindowsDriver({
@@ -180,19 +196,19 @@ describe("ReferenceWindowsDriver", () => {
     await driver.act({ kind: "click", observationId: first.observationId, position: { x: 125, y: 250 } }, first);
     driver.consumeObservation();
     const second = (await driver.observe({})).observation!;
-    await driver.act({ kind: "type", observationId: second.observationId, text: "marker" }, second);
+    await driver.act({ kind: "type", observationId: second.observationId, text: "marker", position: { x: 700, y: 400 }, replace: true, submit: true }, second);
 
     expect(calls.at(-1)).toEqual({
       kind: "type",
-      input: expect.objectContaining({ position: [125, 250], text: "marker" }),
+      input: expect.objectContaining({ position: [700, 400], text: "marker", replace: true, submit: true }),
     });
     driver.resetActionContext();
     driver.consumeObservation();
     const third = (await driver.observe({})).observation!;
-    await driver.act({ kind: "type", observationId: third.observationId, text: "center" }, third);
+    await driver.act({ kind: "type", observationId: third.observationId, text: "center", position: { x: 300, y: 500 } }, third);
     expect(calls.at(-1)).toEqual({
       kind: "type",
-      input: expect.objectContaining({ position: [500, 500], text: "center" }),
+      input: expect.objectContaining({ position: [300, 500], text: "center" }),
     });
   });
 });

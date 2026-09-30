@@ -48,19 +48,14 @@ describe("Orb tool naming", () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it("exposes the bounded reference hotkey, long-press, drag and open-app actions", () => {
+  it("exposes reference actions supported by the Windows backend", () => {
     expect(Object.values(ORB_TOOLS)).toEqual([
-      "orb_observe", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app",
+      "orb_observe", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app", "orb_wait", "orb_long_wait", "orb_list_apps",
     ]);
   });
 });
 
 describe("validateAction", () => {
-  it("accepts a click addressed by element token", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", elementToken: "s1:0" };
-    expect(validateAction(action, observation(), budget)).toBeNull();
-  });
-
   it("accepts a click addressed by a screenshot fraction", () => {
     const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 10, y: 20 } };
     expect(validateAction(action, observation(), budget)).toBeNull();
@@ -76,66 +71,63 @@ describe("validateAction", () => {
   it("refuses a fraction outside 0-1000 instead of clamping it, which would move the action", () => {
     for (const position of [{ x: -1, y: 0 }, { x: 0, y: 1001 }, { x: Number.NaN, y: 0 }, { x: Number.POSITIVE_INFINITY, y: 0 }]) {
       const action: DesktopAction = { kind: "click", observationId: "obs-1", position };
-      expect(validateAction(action, observation(), budget)).toBe("needs-element-or-point");
+      expect(validateAction(action, observation(), budget)).toBe("needs-position");
     }
   });
 
   it("refuses a click with no target at all", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1" };
-    expect(validateAction(action, observation(), budget)).toBe("needs-element-or-point");
+    const action = { kind: "click", observationId: "obs-1" } as DesktopAction;
+    expect(validateAction(action, observation(), budget)).toBe("needs-position");
   });
 
-  it("refuses a click that supplies both forms, because the intent would be ambiguous", () => {
-    const action: DesktopAction = {
-      kind: "click",
-      observationId: "obs-1",
-      elementToken: "s1:0",
-      position: { x: 1, y: 2 },
-    };
-    expect(validateAction(action, observation(), budget)).toBe("ambiguous-target");
+  it("validates right, double click and modifiers", () => {
+    const base = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } } as const;
+    expect(validateAction({ ...base, button: "right", count: 2, modifiers: ["shift", "ctrl"] }, observation(), budget)).toBeNull();
+    expect(validateAction({ ...base, modifiers: ["unknown"] }, observation(), budget)).toBe("invalid-click-options");
   });
 
   it("refuses a non-finite coordinate instead of letting it reach the driver", () => {
     const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: Number.NaN, y: 0 } };
-    expect(validateAction(action, observation(), budget)).toBe("needs-element-or-point");
+    expect(validateAction(action, observation(), budget)).toBe("needs-position");
   });
 
   it("refuses an action decided from a superseded observation", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-OLD", elementToken: "s1:0" };
+    const action: DesktopAction = { kind: "click", observationId: "obs-OLD", position: { x: 1, y: 2 } };
     // This is the one-action-one-observation rule: acting on a stale picture is refused.
     expect(validateAction(action, observation(), budget)).toBe("stale-observation");
   });
 
   it("refuses an action when there is no observation", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", elementToken: "s1:0" };
+    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
     expect(validateAction(action, null, budget)).toBe("observation-unknown");
   });
 
   it("enforces the action limit", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", elementToken: "s1:0" };
+    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
     expect(
       validateAction(action, observation(), { ...budget, actionsUsed: ORB_LIMITS.maxActionsPerTask }),
     ).toBe("task-limit-actions");
   });
 
   it("refuses everything once the batch was stopped", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", elementToken: "s1:0" };
+    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
     expect(validateAction(action, observation(), { ...budget, stopped: true })).toBe("batch-stopped");
   });
 
   it("refuses everything once the task expired, even with budget left", () => {
-    const action: DesktopAction = { kind: "click", observationId: "obs-1", elementToken: "s1:0" };
+    const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
     expect(validateAction(action, observation(), { ...budget, expired: true })).toBe("task-expired");
   });
 
   it("requires text and bounds its length", () => {
-    const empty: DesktopAction = { kind: "type", observationId: "obs-1", text: "" };
-    expect(validateAction(empty, observation(), budget)).toBe("needs-element-or-point");
+    const empty: DesktopAction = { kind: "type", observationId: "obs-1", text: "", position: { x: 1, y: 2 } };
+    expect(validateAction(empty, observation(), budget)).toBe("text-too-long");
 
     const tooLong: DesktopAction = {
       kind: "type",
       observationId: "obs-1",
       text: "x".repeat(ORB_LIMITS.maxTypedCharacters + 1),
+      position: { x: 1, y: 2 },
     };
     expect(validateAction(tooLong, observation(), budget)).toBe("text-too-long");
 
@@ -143,6 +135,7 @@ describe("validateAction", () => {
       kind: "type",
       observationId: "obs-1",
       text: "x".repeat(ORB_LIMITS.maxTypedCharacters),
+      position: { x: 1, y: 2 },
     };
     expect(validateAction(atLimit, observation(), budget)).toBeNull();
   });
@@ -197,7 +190,16 @@ describe("validateAction", () => {
     expect(validateAction({ kind: "longPress", observationId: "obs-1", position: point, durationSeconds: 3 }, observation(), budget)).toBeNull();
     expect(validateAction({ kind: "longPress", observationId: "obs-1", position: point, durationSeconds: 0.5 }, observation(), budget)).toBe("invalid-long-press-duration");
     expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 900, y: 700 } }, observation(), budget)).toBeNull();
-    expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 1001, y: 700 } }, observation(), budget)).toBe("needs-element-or-point");
+    expect(validateAction({ kind: "drag", observationId: "obs-1", startPosition: point, endPosition: { x: 1001, y: 700 } }, observation(), budget)).toBe("needs-position");
+  });
+
+  it("accepts reference wait durations and lists apps under the current observation", () => {
+    expect(validateAction({ kind: "wait", observationId: "obs-1" }, observation(), budget)).toBeNull();
+    expect(validateAction({ kind: "listApps", observationId: "obs-1" }, observation(), budget)).toBeNull();
+    for (const waitSeconds of [10, 30, 60, 120]) {
+      expect(validateAction({ kind: "longWait", observationId: "obs-1", waitSeconds }, observation(), budget)).toBeNull();
+    }
+    expect(validateAction({ kind: "longWait", observationId: "obs-1", waitSeconds: 9 }, observation(), budget)).toBe("invalid-long-wait");
   });
 });
 
@@ -255,8 +257,9 @@ describe("describeRefusal", () => {
       "batch-stopped",
       "task-limit-actions",
       "task-expired",
-      "needs-element-or-point",
-      "ambiguous-target",
+      "needs-position",
+      "invalid-click-options",
+      "invalid-long-wait",
       "text-too-long",
       "scroll-amount-out-of-range",
       "unsupported-direction",

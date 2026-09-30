@@ -309,20 +309,20 @@ D:\workself\pi-orb\
 
 ### 7.1 参考工具面与 pi-orb 现状
 
-参考项目注册 13 个工具（`<REF>/src/plugin.ts:278-1013`），pi-orb 注册 7 个
+参考项目注册 13 个工具（`<REF>/src/plugin.ts:278-1013`），pi-orb 当前注册 11 个
 （`pi-package/extensions/orb.ts`）。下表按“可复用程度”排序：
 
 | 参考工具 | 参考参数要点 | pi-orb 对应 | 差距与建议 |
 |---|---|---|---|
-| `click` | `screen_index`、`position [x,y]`、`button(left/right)`、`count(1\|2)`、`modifiers` | `orb_click`（元素 token 或 position） | 缺 `button`/`count`/`modifiers`；后端已支持（`ClickInput`），建议按参考补齐参数 |
-| `input_text` | `screen_index`、`position`、`text`、`replace`、`submit` | `orb_type`（`text`、`element_token`） | 缺 `replace`/`submit`；后端 `TypeInput` 已支持 |
-| `scroll` | `position`、`direction(up/down)`、`scroll_level` | `orb_scroll`（`direction` 含 left/right、`amount`） | 参考仅纵向；pi-orb schema 允许横向而 backend 拒绝。建议收窄 schema 与参考一致 |
+| `click` | `screen_index`、`position [x,y]`、`button(left/right)`、`count(1\|2)`、`modifiers` | `orb_click`（position） | 已对齐按钮、次数和修饰键；Windows backend 在 finally 中释放修饰键 |
+| `input_text` | `screen_index`、`position`、`text`、`replace`、`submit` | `orb_type`（position） | 已对齐；删除隐式上次点击位置 |
+| `scroll` | `position`、`direction(up/down)`、`scroll_level` | `orb_scroll`（`direction`、`amount`） | 已收窄为参考的纵向滚动 |
 | `hotkey` | `keys[]` | `orb_hotkey` | 一致；禁用组合校验来自 `coordinates.ts:47-64` |
 | `long_press` | `position`、`duration_seconds` | `orb_long_press` | 一致（1–10 秒区间） |
 | `drag` | `start/end position`（可跨屏） | `orb_drag`（同窗口） | pi-orb 明确不支持跨屏；保持现状并在 schema 描述中写明 |
-| `wait` | 无参数，固定 1 秒后重新观察 | 无 | **建议移植**：等待后必须给新观察，是“一动作一观察”的组成部分 |
-| `long_wait` | `wait_seconds ∈ {10,30,60,120}` | 无 | **建议移植**：给长耗时可见任务一个受限等待面 |
-| `list_apps` | 无参数 | 无 | 可选；pi-orb 的驱动器内部用 `ops.listWindowApps()` 做 open-app 的运行前置检查，不单独暴露工具 |
+| `wait` | 无参数，固定 1 秒后重新观察 | `orb_wait` | 已移植，使用可取消等待并返回新观察 |
+| `long_wait` | `wait_seconds ∈ {10,30,60,120}` | `orb_long_wait` | 已移植，使用参考枚举并返回新观察 |
+| `list_apps` | 无参数 | `orb_list_apps` | 已移植，返回运行中应用列表和新观察 |
 | `open_app` | `name`（参考：显示名或 bundle id；**激活或启动**） | `orb_open_app`（`name`；**只激活**） | **已开放，但按用户决定收窄**：参考的 `activateApp` 失败后会 `launch`，pi-orb 只保留前半段。规则见 §7.5 |
 | `open_in_browser` | 可选 `url`（仅 http(s)） | 无 | 可选；移植时必须保留 URL 校验 |
 | `open_in_finder` | `path`、`reveal_only` | `orb` 无；仅有 `screenshot-export.ts` 的保存对话框 | Windows 对应 `open_in_explorer`；移植时必须保留路径解析与 realpath 校验 |

@@ -210,6 +210,7 @@ export interface ActResult {
   readonly refused: boolean;
   /** Fresh post-action state, captured from the same target window after a successful action. */
   readonly observation?: DesktopObservation;
+  readonly apps?: readonly string[];
 }
 
 /**
