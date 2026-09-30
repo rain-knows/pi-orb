@@ -183,6 +183,18 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- `tests/playbook-constants.test.ts`: the loop that was missing when the collapse timing drifted.
+  `doc/reference-playbook.md` §5.2/§5.3 pin the values that must match the reference project, and
+  those tables were *correct* while the code said otherwise for several stages — the delay sat at
+  480ms against a documented 180ms because nothing compared the two; the drift was found by reading
+  source, not by a test. Every pinned value is now asserted against the implementation **and** against
+  a mention in the playbook, so the two cannot disagree in either direction: the code drifting from
+  the document fails, and the document drifting from the code fails too. Both directions were
+  falsified. It also checks the derivations that hold the shell together rather than repeating a
+  literal — `--composer-height: var(--ball)`, the CSS panel transition against `ANIMATION_MS`, and the
+  dock tab fill agreeing between the main-process constant and the stylesheet, where a mismatch would
+  be silent because the two copies exist for different reasons.
+
 - **Continuous integration** (`.github/workflows/ci.yml`): a pull-request and `main`-push workflow on
   a Windows runner with a read-only token, running the same gates a contributor runs locally —
   typecheck, lint, unit tests and the release gate — and uploading the gate record. Its shape
