@@ -34,6 +34,10 @@ import {
   type ListSessionHistoryResult,
   type OpenSessionHistoryResult,
   type OrbSelectionContext,
+  type ListModelsResult,
+  type SetModelRequest,
+  type SetModelResult,
+  type QuestionResponseRequest,
 } from "@shared/ipc";
 
 export interface OrbBridge {
@@ -65,6 +69,9 @@ export interface OrbBridge {
   openSessionHistory(sessionId: string): Promise<OpenSessionHistoryResult>;
   sendPrompt(request: PromptRequest): Promise<void>;
   abort(request: AbortRequest): Promise<void>;
+  listModels(): Promise<ListModelsResult>;
+  setModel(request: SetModelRequest): Promise<SetModelResult>;
+  respondQuestion(request: QuestionResponseRequest): Promise<void>;
   captureScreenshot(request: CaptureRequest): Promise<ScreenshotCaptureResult>;
   resolveScreenshot(request: ScreenshotResolveRequest): Promise<ScreenshotResolveResult>;
   exportScreenshot(request: ScreenshotExportRequest): Promise<ScreenshotExportResult>;
@@ -103,6 +110,9 @@ const bridge: OrbBridge = {
   openSessionHistory: (sessionId: string) => ipcRenderer.invoke(IPC.openSessionHistory, sessionId),
   sendPrompt: (request: PromptRequest) => ipcRenderer.invoke(IPC.sendPrompt, request),
   abort: (request: AbortRequest) => ipcRenderer.invoke(IPC.abort, request),
+  listModels: () => ipcRenderer.invoke(IPC.listModels),
+  setModel: (request: SetModelRequest) => ipcRenderer.invoke(IPC.setModel, request),
+  respondQuestion: (request: QuestionResponseRequest) => ipcRenderer.invoke(IPC.respondQuestion, request),
   captureScreenshot: (request: CaptureRequest) =>
     ipcRenderer.invoke(IPC.captureScreenshot, request),
   resolveScreenshot: (request: ScreenshotResolveRequest) =>

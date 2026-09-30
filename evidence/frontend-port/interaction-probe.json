@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "commands": [
+    "get_state",
+    "prompt",
+    "extension_ui_response"
+  ],
+  "screenshots": [
+    "after-ready.png",
+    "after-model.png",
+    "after-question.png",
+    "after-tool-thread.png"
+  ]
+}

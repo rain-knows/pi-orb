@@ -70,6 +70,8 @@ import {
   type ListSessionHistoryResult,
   type OpenSessionHistoryResult,
   type OrbSelectionContext,
+  type ListModelsResult,
+  type SetModelResult,
 } from "@shared/ipc";
 import { writeFile } from "node:fs/promises";
 import { isOrbWorkspace, type OrbConfig } from "@shared/orb-config";
@@ -1006,6 +1008,61 @@ function registerIpc(): void {
     } catch (error) {
       throw new Error(describeError(error));
     }
+  });
+
+  ipcMain.handle(IPC.listModels, async (): Promise<ListModelsResult> => {
+    const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
+    if (!validation?.ok || !validation.resolved) return { ok: false, message: "Select a usable Orb workspace first." };
+    if (!isOrbWorkspace(validation.resolved, config.orbWorkspace)) return { ok: false, message: "The Orb workspace changed." };
+    try {
+      const sessionId = await session.ensureSession(validation.resolved);
+      const [models, state] = await Promise.all([client.listModels(validation.resolved), client.getState(sessionId)]);
+      return {
+        ok: true,
+        models,
+        selected: state.provider && state.modelId ? { provider: state.provider, id: state.modelId } : null,
+      };
+    } catch (error) {
+      return { ok: false, message: describeError(error) };
+    }
+  });
+
+  ipcMain.handle(IPC.setModel, async (_event, request: unknown): Promise<SetModelResult> => {
+    if (typeof request !== "object" || request === null) return { ok: false, message: "Malformed model selection." };
+    const data = request as Record<string, unknown>;
+    if (typeof data.generation !== "number" || typeof data.provider !== "string" || typeof data.id !== "string") {
+      return { ok: false, message: "Malformed model selection." };
+    }
+    const check = generations.check(data.generation);
+    if (!check.ok) return { ok: false, message: describeGenerationFailure(check.reason) };
+    if (generations.busy || session.running) return { ok: false, message: "Stop the current reply before changing models." };
+    const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
+    if (!validation?.ok || !validation.resolved) return { ok: false, message: "Select a usable Orb workspace first." };
+    try {
+      const models = await client.listModels(validation.resolved);
+      if (!models.some((item) => item.provider === data.provider && item.id === data.id)) {
+        return { ok: false, message: "That model is not available in the Orb workspace." };
+      }
+      const sessionId = await session.ensureSession(validation.resolved);
+      const selected = await client.setModel(sessionId, data.provider, data.id);
+      if (!selected.provider || !selected.modelId) throw new Error("Pi Web did not confirm the selected model.");
+      return { ok: true, selected: { provider: selected.provider, id: selected.modelId } };
+    } catch (error) {
+      return { ok: false, message: describeError(error) };
+    }
+  });
+
+  ipcMain.handle(IPC.respondQuestion, async (_event, request: unknown) => {
+    if (typeof request !== "object" || request === null) throw new Error("Malformed question response.");
+    const data = request as Record<string, unknown>;
+    if (typeof data.generation !== "number" || typeof data.id !== "string") throw new Error("Malformed question response.");
+    const check = generations.check(data.generation);
+    if (!check.ok) throw new Error(describeGenerationFailure(check.reason));
+    if (session.pendingQuestionId !== data.id) throw new Error("The question is no longer active.");
+    if (data.cancelled === true) await session.respondToQuestion({ id: data.id, cancelled: true });
+    else if (typeof data.confirmed === "boolean") await session.respondToQuestion({ id: data.id, confirmed: data.confirmed });
+    else if (typeof data.value === "string") await session.respondToQuestion({ id: data.id, value: data.value });
+    else throw new Error("Malformed question response.");
   });
 
   ipcMain.handle(IPC.newConversation, async () => {

@@ -59,6 +59,7 @@ body.expand-down .orb-sheet { padding-top: 20px; padding-bottom: 36px; }
 .orb-sheet footer { display: flex; gap: 6px; flex-wrap: wrap; }
 #target-list, #model-list { display: grid; gap: 5px; overflow: auto; max-height: 140px; }
 #target-list button, #model-list button { text-align: left; border-radius: 12px; overflow-wrap: anywhere; }
+#target-list button[aria-selected="true"], #model-list button[aria-selected="true"] { background: var(--input-bg); border-color: var(--black); }
 #preview-image { width: 100%; max-height: 210px; object-fit: contain; border: 1px solid var(--border); border-radius: 12px; }
 #preview-meta { color: var(--pin); }
 #status:not(:empty) { position: absolute; z-index: 5; left: 24px; right: 24px; bottom: calc(var(--composer-height) + 16px); border-radius: 12px; padding: 6px 10px; color: var(--black); background: var(--input-bg); box-shadow: var(--panel-shadow); }

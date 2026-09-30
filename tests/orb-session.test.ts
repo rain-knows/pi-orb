@@ -17,6 +17,7 @@ interface FakeClient {
   createSession: ReturnType<typeof vi.fn>;
   prompt: ReturnType<typeof vi.fn>;
   abort: ReturnType<typeof vi.fn>;
+  respondToExtensionUi: ReturnType<typeof vi.fn>;
   openEventStream: ReturnType<typeof vi.fn>;
   delivered: ((event: unknown) => void)[];
   closed: number;
@@ -27,6 +28,7 @@ function fakeClient(): FakeClient {
     createSession: vi.fn(),
     prompt: vi.fn().mockResolvedValue(undefined),
     abort: vi.fn().mockResolvedValue(undefined),
+    respondToExtensionUi: vi.fn().mockResolvedValue(undefined),
     openEventStream: vi.fn(),
     delivered: [],
     closed: 0,
@@ -152,6 +154,36 @@ describe("OrbSessionController", () => {
     expect(completed).toHaveLength(1);
     expect((completed[0] as { text: string }).text).toBe("partial");
     expect(events.at(-1)).toEqual({ type: "idle", stopReason: "stop" });
+  });
+
+  it("forwards tool progress without exposing image or secret payloads", async () => {
+    const { controller, events, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("inspect");
+    const deliver = client.delivered[0]!;
+    deliver({ type: "tool_execution_start", toolCallId: "call-1", toolName: "orb_observe", args: { target: "Editor", imageData: "secret pixels", password: "hidden" } });
+    deliver({ type: "tool_execution_end", toolCallId: "call-1", toolName: "orb_observe", isError: false });
+    const tools = events.filter((event) => event.type === "tool");
+    expect(tools).toHaveLength(2);
+    expect(tools[0]).toMatchObject({ phase: "start", id: "call-1", name: "orb_observe" });
+    expect(JSON.stringify(tools)).not.toContain("secret pixels");
+    expect(JSON.stringify(tools)).not.toContain("hidden");
+    expect(tools[1]).toMatchObject({ phase: "end", detail: "Completed", isError: false });
+  });
+
+  it("answers only the active Pi extension question and closes it once", async () => {
+    const { controller, events, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("choose");
+    client.delivered[0]!({ type: "extension_ui_request", id: "question-1", method: "select", title: "Choose a route", options: ["A", "B"] });
+    expect(controller.pendingQuestionId).toBe("question-1");
+    expect(events.at(-1)).toMatchObject({ type: "question", id: "question-1", method: "select", options: ["A", "B"] });
+    await expect(controller.respondToQuestion({ id: "other", value: "A" })).rejects.toThrow("no longer active");
+    await controller.respondToQuestion({ id: "question-1", value: "A" });
+    expect(client.respondToExtensionUi).toHaveBeenCalledWith("session-1", { id: "question-1", value: "A" });
+    expect(controller.pendingQuestionId).toBeNull();
+    await expect(controller.respondToQuestion({ id: "question-1", value: "B" })).rejects.toThrow("no longer active");
+    expect(events.at(-1)).toEqual({ type: "question-closed", id: "question-1" });
   });
 
   it("ignores the system-message projection and unrelated event types", async () => {

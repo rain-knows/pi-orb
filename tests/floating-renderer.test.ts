@@ -69,6 +69,9 @@ function harness(configured = true) {
     discardScreenshot: vi.fn(async () => true),
     setShortcut: vi.fn(async () => status),
     openShellMenu: vi.fn(async () => true),
+    listModels: vi.fn(async () => ({ ok: true, models: [{ provider: "test", id: "one", name: "One", input: ["text"] }], selected: null })),
+    setModel: vi.fn(async () => ({ ok: true, selected: { provider: "test", id: "one" } })),
+    respondQuestion: vi.fn(async () => {}),
   };
   Object.defineProperty(win, "orb", { value: api });
   runInContext(script, dom.getInternalVMContext());
@@ -150,4 +153,42 @@ it("keeps desktop approval and screenshot confirmation explicit", async () => {
   h.byId("preview-send").click();
   await expect.poll(() => h.api.resolveScreenshot.mock.calls.length).toBe(1);
   expect(h.api.resolveScreenshot).toHaveBeenCalledWith({ generation: 1, observationId: "observation-1", confirmed: true });
+});
+
+it("renders tool progress and answers a Pi select request in the reference card", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.emit({ type: "tool", phase: "start", id: "call-1", name: "orb_observe", detail: "Running", isError: false });
+  h.emit({ type: "tool", phase: "end", id: "call-1", name: "orb_observe", detail: "Completed", isError: false });
+  expect(h.document.querySelector(".orb-tool p")?.textContent).toBe("Completed");
+  h.emit({ type: "question", id: "ask-1", method: "select", title: "Choose", message: "Pick one", options: ["First (Recommended)", "Second"], prefill: "" });
+  expect(h.byId("question").hidden).toBe(false);
+  expect(h.document.querySelector(".question-recommended")?.textContent).toBe("Recommended");
+  (h.document.querySelector("#question-options button") as HTMLElement).click();
+  h.byId("question-continue").click();
+  await expect.poll(() => h.api.respondQuestion.mock.calls.length).toBe(1);
+  expect(h.api.respondQuestion).toHaveBeenCalledWith({ generation: 1, id: "ask-1", value: "First (Recommended)" });
+  expect(h.byId("question").hidden).toBe(true);
+});
+
+it("supports Pi confirm, input and model selection through the restricted bridge", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.emit({ type: "question", id: "confirm-1", method: "confirm", title: "Proceed?", message: "This window", options: [], prefill: "" });
+  (h.document.querySelectorAll("#question-options button")[1] as HTMLElement).click();
+  h.byId("question-continue").click();
+  await expect.poll(() => h.api.respondQuestion.mock.calls.length).toBe(1);
+  expect(h.api.respondQuestion).toHaveBeenNthCalledWith(1, { generation: 1, id: "confirm-1", confirmed: false });
+  h.emit({ type: "question", id: "input-1", method: "input", title: "Name", message: "", options: [], prefill: "" });
+  const field = h.byId("question-custom") as HTMLTextAreaElement;
+  field.value = "Sample";
+  field.dispatchEvent(new h.win.Event("input", { bubbles: true }));
+  h.byId("question-continue").click();
+  await expect.poll(() => h.api.respondQuestion.mock.calls.length).toBe(2);
+  expect(h.api.respondQuestion).toHaveBeenNthCalledWith(2, { generation: 1, id: "input-1", value: "Sample" });
+  h.byId("model-open").click();
+  await expect.poll(() => h.document.querySelectorAll("#model-list button").length).toBe(1);
+  (h.document.querySelector("#model-list button") as HTMLElement).click();
+  await expect.poll(() => h.api.setModel.mock.calls.length).toBe(1);
+  expect(h.api.setModel).toHaveBeenCalledWith({ generation: 1, provider: "test", id: "one" });
 });

@@ -59,6 +59,12 @@ export const IPC = {
   sendPrompt: "orb:send-prompt",
   /** Renderer -> main: stop the running turn. */
   abort: "orb:abort",
+  /** Renderer -> main: list Pi Web models visible to the Orb workspace. */
+  listModels: "orb:list-models",
+  /** Renderer -> main: select a Pi Web model for the Orb session. */
+  setModel: "orb:set-model",
+  /** Renderer -> main: answer the current blocking Pi extension UI request. */
+  respondQuestion: "orb:respond-question",
   /** Renderer -> main: capture the previously recorded target window for preview. */
   captureScreenshot: "orb:capture-screenshot",
   /** Renderer -> main: confirm or cancel the previewed screenshot. */
@@ -266,7 +272,36 @@ export type OrbSessionEvent =
   | { readonly type: "assistant-delta"; readonly text: string }
   | { readonly type: "assistant-message"; readonly text: string }
   | { readonly type: "error"; readonly message: string }
+  | { readonly type: "tool"; readonly phase: "start" | "end"; readonly id: string; readonly name: string; readonly detail: string; readonly isError: boolean }
+  | { readonly type: "question"; readonly id: string; readonly method: "select" | "confirm" | "input" | "editor"; readonly title: string; readonly message: string; readonly options: readonly string[]; readonly prefill: string }
+  | { readonly type: "question-closed"; readonly id: string }
   | { readonly type: "idle"; readonly stopReason: string | null };
+
+export interface OrbModelChoice {
+  readonly provider: string;
+  readonly id: string;
+  readonly name: string;
+  readonly input: readonly string[];
+}
+
+export type ListModelsResult =
+  | { readonly ok: true; readonly models: readonly OrbModelChoice[]; readonly selected: { readonly provider: string; readonly id: string } | null }
+  | { readonly ok: false; readonly message: string };
+
+export interface SetModelRequest {
+  readonly generation: number;
+  readonly provider: string;
+  readonly id: string;
+}
+
+export type SetModelResult =
+  | { readonly ok: true; readonly selected: { readonly provider: string; readonly id: string } }
+  | { readonly ok: false; readonly message: string };
+
+export type QuestionResponseRequest =
+  | { readonly generation: number; readonly id: string; readonly value: string }
+  | { readonly generation: number; readonly id: string; readonly confirmed: boolean }
+  | { readonly generation: number; readonly id: string; readonly cancelled: true };
 
 export interface PromptRequest {
   readonly generation: number;

@@ -14,7 +14,7 @@
  *    completion is tracked from assistant-role events only.
  */
 
-import type { ImageContent, PiWebClient } from "./pi-web-client";
+import type { ImageContent, PiWebClient, PiWebUiResponse } from "./pi-web-client";
 import type { OrbSessionEvent } from "@shared/ipc";
 
 export interface OrbSessionDeps {
@@ -35,6 +35,7 @@ export class OrbSessionController {
   #closeStream: (() => void) | null = null;
   #running = false;
   #accumulator: AssistantAccumulator | null = null;
+  #pendingQuestionId: string | null = null;
   constructor(deps: OrbSessionDeps) {
     this.#deps = deps;
   }
@@ -49,6 +50,10 @@ export class OrbSessionController {
 
   get running(): boolean {
     return this.#running;
+  }
+
+  get pendingQuestionId(): string | null {
+    return this.#pendingQuestionId;
   }
 
   /**
@@ -73,6 +78,7 @@ export class OrbSessionController {
     this.#workspace = null;
     this.#running = false;
     this.#accumulator = null;
+    this.#pendingQuestionId = null;
     this.#generation = generation;
   }
 
@@ -91,6 +97,7 @@ export class OrbSessionController {
     this.#closeStream?.();
     this.#closeStream = null;
     this.#running = false;
+    this.#pendingQuestionId = null;
 
     const sessionId = await this.#deps.client.createSession(workspace);
     this.#sessionId = sessionId;
@@ -111,6 +118,7 @@ export class OrbSessionController {
     this.#sessionId = null;
     this.#workspace = null;
     this.#accumulator = null;
+    this.#pendingQuestionId = null;
     return this.ensureSession(workspace);
   }
 
@@ -122,6 +130,7 @@ export class OrbSessionController {
     this.#sessionId = sessionId;
     this.#workspace = workspace;
     this.#accumulator = null;
+    this.#pendingQuestionId = null;
     this.#deps.emit({ type: "session", sessionId, generation: this.#generation });
     return sessionId;
   }
@@ -163,6 +172,17 @@ export class OrbSessionController {
     if (!sessionId) return;
     await this.#deps.client.abort(sessionId);
     this.#running = false;
+    this.#pendingQuestionId = null;
+  }
+
+  async respondToQuestion(response: PiWebUiResponse): Promise<void> {
+    if (!this.#sessionId || this.#pendingQuestionId !== response.id) {
+      throw new Error("The question is no longer active.");
+    }
+    await this.#deps.client.respondToExtensionUi(this.#sessionId, response);
+    // Pi Web also emits extension_ui_closed. Clear locally now so a double click cannot answer twice.
+    this.#pendingQuestionId = null;
+    this.#deps.emit({ type: "question-closed", id: response.id });
   }
 
   /** Release the stream and drop the session binding (used on shutdown). */
@@ -173,6 +193,7 @@ export class OrbSessionController {
     this.#workspace = null;
     this.#running = false;
     this.#accumulator = null;
+    this.#pendingQuestionId = null;
   }
 
   async #subscribe(sessionId: string): Promise<void> {
@@ -195,6 +216,45 @@ export class OrbSessionController {
       case "message_update":
         this.#handleMessageUpdate(record);
         return;
+      case "tool_execution_start":
+      case "tool_execution_end": {
+        const id = typeof record.toolCallId === "string" ? record.toolCallId : "";
+        const name = typeof record.toolName === "string" ? record.toolName : "";
+        if (!id || !name) return;
+        const phase = type === "tool_execution_start" ? "start" : "end";
+        this.#deps.emit({
+          type: "tool",
+          phase,
+          id,
+          name,
+          detail: phase === "start" ? summarizeToolArgs(record.args) : record.isError === true ? "Failed" : "Completed",
+          isError: phase === "end" && record.isError === true,
+        });
+        return;
+      }
+      case "extension_ui_request": {
+        const method = record.method;
+        const id = record.id;
+        if (typeof id !== "string" || !["select", "confirm", "input", "editor"].includes(String(method))) return;
+        this.#pendingQuestionId = id;
+        this.#deps.emit({
+          type: "question",
+          id,
+          method: method as "select" | "confirm" | "input" | "editor",
+          title: typeof record.title === "string" ? record.title : "Question",
+          message: typeof record.message === "string" ? record.message : "",
+          options: Array.isArray(record.options) ? record.options.filter((value): value is string => typeof value === "string") : [],
+          prefill: typeof record.prefill === "string" ? record.prefill : "",
+        });
+        return;
+      }
+      case "extension_ui_closed": {
+        if (this.#pendingQuestionId === null || record.id !== this.#pendingQuestionId) return;
+        const id = this.#pendingQuestionId;
+        this.#pendingQuestionId = null;
+        this.#deps.emit({ type: "question-closed", id });
+        return;
+      }
       case "message_end": {
         // The first message_end of a turn belongs to the user message of that
         // turn; only an assistant message ends the reply.
@@ -219,6 +279,10 @@ export class OrbSessionController {
           this.#accumulator = null;
         }
         this.#running = false;
+        if (this.#pendingQuestionId) {
+          this.#deps.emit({ type: "question-closed", id: this.#pendingQuestionId });
+          this.#pendingQuestionId = null;
+        }
         this.#deps.emit({ type: "idle", stopReason });
         return;
       }
@@ -226,6 +290,10 @@ export class OrbSessionController {
         const message =
           typeof record.message === "string" ? record.message : "pi-web reported an error.";
         this.#running = false;
+        if (this.#pendingQuestionId) {
+          this.#deps.emit({ type: "question-closed", id: this.#pendingQuestionId });
+          this.#pendingQuestionId = null;
+        }
         this.#deps.emit({ type: "error", message });
         return;
       }
@@ -272,6 +340,17 @@ export class OrbSessionController {
   #emitAssistantMessage(text: string): void {
     if (text.length === 0) return;
     this.#deps.emit({ type: "assistant-message", text });
+  }
+}
+
+function summarizeToolArgs(value: unknown): string {
+  if (typeof value !== "object" || value === null) return "Running";
+  try {
+    const summary = JSON.stringify(value, (key, item: unknown) =>
+      /(?:data|base64|image|token|secret|password)/iu.test(key) ? "[omitted]" : item);
+    return summary.length > 160 ? `${summary.slice(0, 157)}...` : summary;
+  } catch {
+    return "Running";
   }
 }
 

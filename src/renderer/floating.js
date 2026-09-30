@@ -15,6 +15,13 @@ const COMPOSER_MIN_PX = 72
 const COMPOSER_LINE_PX = 20
 const COMPOSER_EXTRA_LINES = 3
 const COMPOSER_MAX_PX = COMPOSER_MIN_PX + COMPOSER_LINE_PX * COMPOSER_EXTRA_LINES
+const RECOMMENDED_SUFFIX = /\s*(?:\((?:recommended|推荐)\)|（(?:recommended|推荐)）)\s*$/i
+
+function parseRecommendedLabel(label) {
+  return RECOMMENDED_SUFFIX.test(label)
+    ? { label: label.replace(RECOMMENDED_SUFFIX, ''), recommended: true }
+    : { label, recommended: false }
+}
 
 function applyColorScheme(scheme) {
   const dark = scheme === 'dark'
@@ -59,6 +66,13 @@ async function main() {
   const ball = el('ball')
   const dockTab = el('dock-tab')
   const transcript = el('transcript')
+  const questionRoot = el('question')
+  const questionTitle = el('question-title')
+  const questionDetail = el('question-detail')
+  const questionOptions = el('question-options')
+  const questionCustom = el('question-custom')
+  const questionError = el('question-error')
+  const questionContinue = el('question-continue')
   const historyButton = el('history')
   const historyList = el('history-list')
   const permissionRoot = el('permission')
@@ -105,6 +119,8 @@ async function main() {
   let streamedMessage
   let messageCount = 0
   let noticeTimer
+  let pendingQuestion
+  const toolRows = new Map()
 
   document.documentElement.lang = 'en'
   el('input-label').textContent = 'Message'
@@ -115,6 +131,10 @@ async function main() {
   historyButton.setAttribute('aria-label', 'Conversation history')
   selectionChipDismiss.setAttribute('aria-label', 'Remove selected text')
   selectionChipDismiss.textContent = '\u00d7'
+  el('question-cancel').textContent = 'Cancel'
+  el('question-skip').hidden = true
+  el('question-continue').textContent = 'Continue'
+  el('question-pager').hidden = true
   const theme = matchMedia('(prefers-color-scheme: dark)')
   applyColorScheme(theme.matches ? 'dark' : 'light')
   theme.addEventListener('change', () => applyColorScheme(theme.matches ? 'dark' : 'light'))
@@ -172,6 +192,7 @@ async function main() {
     }
     streamedMessage = undefined
     streaming = ''
+    toolRows.clear()
     messageCount = 0
     syncEmpty()
   }
@@ -214,6 +235,7 @@ async function main() {
       el('thinking')?.remove()
       streaming = ''
       streamedMessage = undefined
+      closeQuestion()
     }
   }
 
@@ -332,6 +354,7 @@ async function main() {
     historyButton.setAttribute('aria-pressed', String(next))
     historyList.hidden = !next
     transcript.hidden = next
+    questionRoot.hidden = next || !pendingQuestion
     if (next) { setPermissionOpen(false); closeSheet() }
   }
 
@@ -345,6 +368,97 @@ async function main() {
   function closeSheet() {
     activeSheet = undefined
     for (const sheet of [accessSheet, previewSheet, modelSheet]) sheet.hidden = true
+  }
+
+  function closeQuestion(id) {
+    if (id !== undefined && pendingQuestion?.id !== id) return
+    pendingQuestion = undefined
+    questionRoot.hidden = true
+    document.body.classList.remove('asking')
+  }
+
+  function renderQuestion() {
+    const pending = pendingQuestion
+    if (!pending) return
+    document.body.classList.add('asking')
+    questionRoot.hidden = false
+    el('question-eyebrow').hidden = true
+    questionTitle.textContent = pending.title
+    questionDetail.textContent = pending.message
+    questionDetail.hidden = !pending.message
+    questionOptions.replaceChildren()
+    const choices = pending.method === 'confirm' ? ['Yes', 'No'] : pending.options
+    questionOptions.setAttribute('role', 'radiogroup')
+    for (const [index, option] of choices.entries()) {
+      const display = parseRecommendedLabel(option)
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = pending.selected === option ? 'question-option selected' : 'question-option'
+      button.setAttribute('role', 'radio')
+      button.setAttribute('aria-checked', String(pending.selected === option))
+      button.disabled = pending.busy
+      const mark = document.createElement('span')
+      mark.className = 'question-option-mark'
+      mark.textContent = String(index + 1)
+      const copy = document.createElement('span')
+      copy.className = 'question-option-copy'
+      const label = document.createElement('span')
+      label.className = 'question-option-label'
+      label.textContent = display.label
+      copy.append(label)
+      if (display.recommended) {
+        const badge = document.createElement('span')
+        badge.className = 'question-recommended'
+        badge.textContent = 'Recommended'
+        copy.append(badge)
+      }
+      button.append(mark, copy)
+      button.addEventListener('click', () => {
+        if (pending.busy) return
+        pending.selected = option
+        renderQuestion()
+      })
+      questionOptions.append(button)
+    }
+    questionCustom.hidden = pending.method !== 'input' && pending.method !== 'editor'
+    if (!questionCustom.hidden) {
+      questionCustom.value = pending.value
+      questionCustom.placeholder = pending.method === 'input' ? 'Your answer' : 'Write your answer'
+      questionCustom.rows = pending.method === 'editor' ? 4 : 1
+    }
+    questionError.hidden = !pending.error
+    questionError.textContent = pending.error ?? ''
+    questionContinue.textContent = pending.method === 'confirm' ? 'Confirm' : 'Continue'
+    questionContinue.disabled = pending.busy || (questionCustom.hidden ? pending.selected === undefined : pending.value.trim() === '')
+    el('question-cancel').disabled = pending.busy
+  }
+
+  async function answerQuestion(cancelled = false) {
+    const pending = pendingQuestion
+    if (!pending || pending.busy) return
+    let answer
+    if (cancelled) answer = { generation: snapshot.generation, id: pending.id, cancelled: true }
+    else if (pending.method === 'confirm' && pending.selected !== undefined) {
+      answer = { generation: snapshot.generation, id: pending.id, confirmed: pending.selected === 'Yes' }
+    } else if ((pending.method === 'input' || pending.method === 'editor') && pending.value.trim()) {
+      answer = { generation: snapshot.generation, id: pending.id, value: pending.value }
+    } else if (pending.method === 'select' && pending.selected !== undefined) {
+      answer = { generation: snapshot.generation, id: pending.id, value: pending.selected }
+    } else {
+      pending.error = 'Choose or enter an answer.'
+      renderQuestion()
+      return
+    }
+    pending.busy = true
+    renderQuestion()
+    try {
+      await api.respondQuestion(answer)
+      closeQuestion(pending.id)
+    } catch (error) {
+      pending.busy = false
+      pending.error = error instanceof Error ? error.message : String(error)
+      renderQuestion()
+    }
   }
 
   function showSheet(sheet) {
@@ -494,6 +608,8 @@ async function main() {
     if (preview) { await api.discardScreenshot(); preview = undefined }
     await api.newConversation()
     clearMessages()
+    toolRows.clear()
+    closeQuestion()
     clearPrompt()
     setHistoryOpen(false)
     setPermissionOpen(false)
@@ -539,6 +655,30 @@ async function main() {
       void refreshStatus().catch(report)
     } else if (event.type === 'session') {
       snapshot = { ...snapshot, sessionId: event.sessionId, generation: event.generation }
+    } else if (event.type === 'tool') {
+      let row = toolRows.get(event.id)
+      if (!row) {
+        row = document.createElement('div')
+        row.className = 'orb-tool'
+        const name = document.createElement('strong')
+        name.textContent = event.name
+        const detail = document.createElement('p')
+        row.append(name, detail)
+        transcript.append(row)
+        toolRows.set(event.id, row)
+      }
+      row.querySelector('p').textContent = event.phase === 'start' ? event.detail || 'Running' : event.detail
+      row.classList.toggle('orb-tool--error', event.isError)
+      transcript.scrollTop = transcript.scrollHeight
+    } else if (event.type === 'question') {
+      pendingQuestion = { ...event, selected: undefined, value: event.prefill, error: undefined, busy: false }
+      setHistoryOpen(false)
+      setPermissionOpen(false)
+      closeSheet()
+      renderQuestion()
+      void setExpanded(true).catch(report)
+    } else if (event.type === 'question-closed') {
+      closeQuestion(event.id)
     }
   })
   api.onSelectionContext(setSelectionContext)
@@ -747,6 +887,44 @@ async function main() {
   el('preview-send').addEventListener('click', () => { void resolveScreenshot(true).catch(report) })
   el('preview-save').addEventListener('click', () => { void exportScreenshot().catch(report) })
   el('model-close').addEventListener('click', closeSheet)
+  el('model-open').addEventListener('click', async () => {
+    showSheet(modelSheet)
+    const list = el('model-list')
+    list.textContent = 'Loading…'
+    const result = await api.listModels()
+    if (!result.ok) { list.textContent = result.message; return }
+    list.replaceChildren()
+    if (result.models.length === 0) { list.textContent = 'No models available in this workspace.'; return }
+    for (const model of result.models) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.setAttribute('role', 'option')
+      button.setAttribute('aria-selected', String(result.selected?.provider === model.provider && result.selected?.id === model.id))
+      button.textContent = `${model.name} · ${model.provider}`
+      button.addEventListener('click', async () => {
+        const selected = await api.setModel({ generation: snapshot.generation, provider: model.provider, id: model.id })
+        if (!selected.ok) { showNotice(selected.message); return }
+        showNotice(`Model: ${model.name}`)
+        closeSheet()
+      })
+      list.append(button)
+    }
+  })
+  el('question-cancel').addEventListener('click', () => { void answerQuestion(true).catch(report) })
+  questionContinue.addEventListener('click', () => { void answerQuestion().catch(report) })
+  questionCustom.addEventListener('input', () => {
+    if (!pendingQuestion) return
+    pendingQuestion.value = questionCustom.value
+    pendingQuestion.error = undefined
+    questionContinue.disabled = pendingQuestion.value.trim() === ''
+    questionError.hidden = true
+  })
+  questionCustom.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.shiftKey || isComposing(event)) return
+    if (pendingQuestion?.method === 'editor') return
+    event.preventDefault()
+    void answerQuestion().catch(report)
+  })
   panel.addEventListener('contextmenu', event => {
     event.preventDefault()
     const editable = editableTarget(event.target)

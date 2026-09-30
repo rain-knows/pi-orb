@@ -37,6 +37,18 @@ export interface AgentState {
   readonly thinkingLevel: string | null;
 }
 
+export interface PiWebModelChoice {
+  readonly provider: string;
+  readonly id: string;
+  readonly name: string;
+  readonly input: readonly string[];
+}
+
+export type PiWebUiResponse =
+  | { readonly id: string; readonly value: string }
+  | { readonly id: string; readonly confirmed: boolean }
+  | { readonly id: string; readonly cancelled: true };
+
 export interface PiWebSessionSummary {
   readonly id: string;
   readonly cwd: string;
@@ -184,14 +196,8 @@ export class PiWebClient {
     if (!selected.provider || !selected.modelId) {
       throw new Error("The current model could not be identified. The screenshot was not sent.");
     }
-    const response = await this.#request(`/api/models?cwd=${encodeURIComponent(cwd)}`, { method: "GET" });
-    if (!response.ok) {
-      throw new PiWebError("Could not check whether the current model supports images. The screenshot was not sent.", response.status);
-    }
-    const body = (await response.json().catch(() => ({}))) as {
-      modelList?: { provider?: string; id?: string; input?: string[] }[];
-    };
-    const model = body.modelList?.find(
+    const models = await this.listModels(cwd);
+    const model = models.find(
       (candidate) => candidate.provider === selected.provider && candidate.id === selected.modelId,
     );
     if (!model) {
@@ -216,6 +222,33 @@ export class PiWebClient {
       modelId: data.model?.id ?? null,
       thinkingLevel: data.thinkingLevel ?? null,
     };
+  }
+
+  async listModels(cwd: string): Promise<readonly PiWebModelChoice[]> {
+    const response = await this.#request(`/api/models?cwd=${encodeURIComponent(cwd)}`, { method: "GET" });
+    if (!response.ok) throw new PiWebError("Could not load Pi Web models.", response.status);
+    const body = (await response.json().catch(() => ({}))) as { modelList?: unknown };
+    if (!Array.isArray(body.modelList)) return [];
+    return body.modelList.flatMap((value): PiWebModelChoice[] => {
+      if (typeof value !== "object" || value === null) return [];
+      const item = value as Record<string, unknown>;
+      if (typeof item.provider !== "string" || typeof item.id !== "string") return [];
+      return [{
+        provider: item.provider,
+        id: item.id,
+        name: typeof item.name === "string" ? item.name : item.id,
+        input: Array.isArray(item.input) ? item.input.filter((part): part is string => typeof part === "string") : [],
+      }];
+    });
+  }
+
+  async setModel(sessionId: string, provider: string, modelId: string): Promise<AgentState> {
+    await this.#sessionCommand(sessionId, { type: "set_model", provider, modelId });
+    return this.getState(sessionId);
+  }
+
+  async respondToExtensionUi(sessionId: string, response: PiWebUiResponse): Promise<void> {
+    await this.#sessionCommand(sessionId, { type: "extension_ui_response", ...response });
   }
 
   /**

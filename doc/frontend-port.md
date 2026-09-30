@@ -59,3 +59,30 @@ checks, including preload isolation, real native window enumeration, reference
 shell geometry, context menu and dock animation. Actual packaged captures are
 `evidence/frontend-port/after-{ball,panel,access}.png`. The panel and access
 captures were inspected at 344 × 444 against the reference capture.
+
+## Stage 3: reference interaction and Pi Web adapters
+
+The reference's `floating.js` question draft functions and `floating.html`
+question card provide the interaction pattern. Pi Web's existing
+`extension_ui_request` events (`select`, `confirm`, `input`, `editor`) map into
+that card; the reply uses its existing `extension_ui_response` command through
+the Orb session and generation guards. The reference's DSH waterfall event
+client and multi-question answer envelope are not transported into Pi Web.
+Pi Web's `custom` terminal UI is not rendered as a reference question card
+because it has different input and update semantics.
+
+Pi Web's `tool_execution_start/end` events create transcript progress rows.
+The reference transcript iframe stays absent: the existing Pi Web session
+client and sanitized Orb event channel provide the data. The reference model
+menu concept is backed by Pi Web's `/api/models?cwd=` catalog and `set_model`
+session command. Model changes are restricted to the Orb session, rejected
+during a running turn, and checked against the workspace catalog. No separate
+model registry was added.
+
+The packaged `probe-interactions.mjs` uses a deterministic Pi Web wire fixture
+with the real Electron main process, preload and renderer. It verified model
+catalogue loading, a prompt, tool progress, a blocking choice and its exact
+response ID, plus the resumed assistant reply. `interaction-probe.json` records
+the command sequence; `after-{ready,model,question,tool-thread}.png` are actual
+packaged-window captures. The fixture does not stand in for the real-model
+closed-loop acceptance gate in stage 6.
