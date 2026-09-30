@@ -2,9 +2,9 @@
  * Capture-interval overlay window ids.
  * {@link wrapDesktopBackend} stores the ids. macOS overlay-exclude ScreenCaptureKit and the Windows foreground walk both read them.
  * Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,
- * `packages/experimental/tool-computer-use/src/capture-exclude.ts` (MIT). Unmodified; the writer
- * has no pi-orb caller, so the list is always empty and `withGuiTurn` hides the Orb instead
- * (`doc/reference-playbook.md` §6.2).
+ * `packages/experimental/tool-computer-use/src/capture-exclude.ts` (MIT). Unmodified;
+ * `ReferenceWindowsDriver.#withGuiTurn` writes Orb HWNDs into this context while the
+ * main process also hides Orb chrome (`doc/reference-playbook.md` §6.2).
  * @module @deepseek-ai/dsh-experimental-tool-computer-use/src/capture-exclude
  */
 

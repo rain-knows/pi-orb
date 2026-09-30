@@ -125,18 +125,18 @@ async function main() {
   let openModelChooser
   const toolRows = new Map()
 
-  document.documentElement.lang = 'en'
-  el('input-label').textContent = 'Message'
-  prompt.dataset.placeholder = 'Ask anything'
+  document.documentElement.lang = 'zh-CN'
+  el('input-label').textContent = '消息'
+  prompt.dataset.placeholder = '输入消息'
   prompt.classList.add('prompt-empty')
-  stop.setAttribute('aria-label', 'Stop response')
-  newConversationButton.setAttribute('aria-label', 'New conversation')
-  historyButton.setAttribute('aria-label', 'Conversation history')
-  selectionChipDismiss.setAttribute('aria-label', 'Remove selected text')
+  stop.setAttribute('aria-label', '停止回复')
+  newConversationButton.setAttribute('aria-label', '新建对话')
+  historyButton.setAttribute('aria-label', '会话历史')
+  selectionChipDismiss.setAttribute('aria-label', '移除选中文本')
   selectionChipDismiss.textContent = '\u00d7'
-  el('question-cancel').textContent = 'Cancel'
+  el('question-cancel').textContent = '取消'
   el('question-skip').hidden = true
-  el('question-continue').textContent = 'Continue'
+  el('question-continue').textContent = '继续'
   el('question-pager').hidden = true
   const theme = matchMedia('(prefers-color-scheme: dark)')
   applyColorScheme(theme.matches ? 'dark' : 'light')
@@ -204,7 +204,7 @@ async function main() {
     const article = document.createElement('article')
     article.className = `orb-message orb-message--${role}`
     const label = document.createElement('strong')
-    label.textContent = role === 'user' ? 'You' : role === 'error' ? 'Error' : 'Orb'
+    label.textContent = role === 'user' ? '你' : role === 'error' ? '错误' : 'Orb'
     const copy = document.createElement('p')
     copy.textContent = text
     article.append(label, copy)
@@ -346,7 +346,7 @@ async function main() {
       stop.hidden = !running
       return
     }
-    if (!force && (pinned || running || hasSelectionChip() || activeSheet || historyOpen)) return
+    if (!force && (pinned || running || pendingQuestion || hasSelectionChip() || activeSheet || historyOpen || hasDraft() || isEditing())) return
     expanded = false
     document.body.classList.remove('expanded')
     syncBallGif()
@@ -370,9 +370,11 @@ async function main() {
   }
 
   function hasSelectionChip() { return selectionContext !== null && selectionContext !== undefined }
+  function hasDraft() { return promptText(prompt).trim().length > 0 }
+  function isEditing() { return document.activeElement === prompt || document.activeElement === questionCustom || document.activeElement === el('shortcut-input') }
 
   function scheduleCollapse() {
-    if (pinned || running || dragging || hasSelectionChip() || activeSheet || historyOpen) return
+    if (pinned || running || dragging || pendingQuestion || hasSelectionChip() || activeSheet || historyOpen || hasDraft() || isEditing()) return
     if (collapseTimer !== undefined) clearTimeout(collapseTimer)
     collapseTimer = setTimeout(() => {
       collapseTimer = undefined
@@ -420,7 +422,7 @@ async function main() {
     questionDetail.textContent = pending.message
     questionDetail.hidden = !pending.message
     questionOptions.replaceChildren()
-    const choices = pending.method === 'confirm' ? ['Yes', 'No'] : pending.options
+    const choices = pending.method === 'confirm' ? ['是', '否'] : pending.options
     questionOptions.setAttribute('role', 'radiogroup')
     for (const [index, option] of choices.entries()) {
       const display = parseRecommendedLabel(option)
@@ -442,7 +444,7 @@ async function main() {
       if (display.recommended) {
         const badge = document.createElement('span')
         badge.className = 'question-recommended'
-        badge.textContent = 'Recommended'
+        badge.textContent = '推荐'
         copy.append(badge)
       }
       button.append(mark, copy)
@@ -456,12 +458,12 @@ async function main() {
     questionCustom.hidden = pending.method !== 'input' && pending.method !== 'editor'
     if (!questionCustom.hidden) {
       questionCustom.value = pending.value
-      questionCustom.placeholder = pending.method === 'input' ? 'Your answer' : 'Write your answer'
+      questionCustom.placeholder = pending.method === 'input' ? '输入回答' : '填写回答'
       questionCustom.rows = pending.method === 'editor' ? 4 : 1
     }
     questionError.hidden = !pending.error
     questionError.textContent = pending.error ?? ''
-    questionContinue.textContent = pending.method === 'confirm' ? 'Confirm' : 'Continue'
+    questionContinue.textContent = pending.method === 'confirm' ? '确认' : '继续'
     questionContinue.disabled = pending.busy || (questionCustom.hidden ? pending.selected === undefined : pending.value.trim() === '')
     el('question-cancel').disabled = pending.busy
   }
@@ -472,13 +474,13 @@ async function main() {
     let answer
     if (cancelled) answer = { generation: snapshot.generation, id: pending.id, cancelled: true }
     else if (pending.method === 'confirm' && pending.selected !== undefined) {
-      answer = { generation: snapshot.generation, id: pending.id, confirmed: pending.selected === 'Yes' }
+      answer = { generation: snapshot.generation, id: pending.id, confirmed: pending.selected === '是' }
     } else if ((pending.method === 'input' || pending.method === 'editor') && pending.value.trim()) {
       answer = { generation: snapshot.generation, id: pending.id, value: pending.value }
     } else if (pending.method === 'select' && pending.selected !== undefined) {
       answer = { generation: snapshot.generation, id: pending.id, value: pending.selected }
     } else {
-      pending.error = 'Choose or enter an answer.'
+      pending.error = '请选择或填写回答。'
       renderQuestion()
       return
     }
@@ -503,8 +505,8 @@ async function main() {
   }
 
   function renderPermission() {
-    const labels = { 'read-only': 'Read Only', 'workspace-write': 'Workspace Write', 'full-access': 'Full Access' }
-    permissionLabel.textContent = desktopTask.level ? labels[desktopTask.level] : 'Access'
+    const labels = { 'read-only': '只读', 'workspace-write': '工作区写入', 'full-access': '完全访问' }
+    permissionLabel.textContent = desktopTask.level ? labels[desktopTask.level] : '访问权限'
     for (const option of permissionMenu.querySelectorAll('[data-level]')) {
       option.setAttribute('aria-selected', String(option.dataset.level === desktopTask.level))
     }
@@ -515,7 +517,7 @@ async function main() {
     selectionChip.hidden = !context
     document.body.classList.toggle('has-selection-chip', Boolean(context))
     const summary = context?.text.replace(/\s+/g, ' ').trim() ?? ''
-    selectionChipText.textContent = context ? `${context.sourceLabel ?? 'Another application'} · ${summary.length > 72 ? `${summary.slice(0, 69)}...` : summary}` : ''
+    selectionChipText.textContent = context ? `${context.sourceLabel ?? '其他应用'} · ${summary.length > 72 ? `${summary.slice(0, 69)}...` : summary}` : ''
     selectionChip.title = context?.text ?? ''
     syncBallGif()
   }
@@ -542,7 +544,7 @@ async function main() {
     const instruction = promptText(prompt).trim()
     if ((!instruction && !selectionContext) || !snapshot.configured) return
     const text = selectionContext
-      ? `${instruction || 'Please help me understand this selected text.'}\n\n[Selected text from ${selectionContext.sourceLabel ?? 'another application'}]\n${selectionContext.text}`
+      ? `${instruction || '请帮我理解这段选中的文本。'}\n\n[选自 ${selectionContext.sourceLabel ?? '其他应用'}]\n${selectionContext.text}`
       : instruction
     clearPrompt()
     showNotice('')
@@ -570,9 +572,9 @@ async function main() {
     const result = await api.captureScreenshot({ generation: snapshot.generation, text: promptText(prompt).trim() })
     if (!result.ok) { showNotice(result.message); return }
     preview = result
-    el('preview-target').textContent = result.targetDescription + (result.targetStale ? ' · Window changed since capture' : '')
+    el('preview-target').textContent = result.targetDescription + (result.targetStale ? ' · 截图后窗口已变化' : '')
     el('preview-image').src = `data:${result.mimeType};base64,${result.data}`
-    el('preview-meta').textContent = `${result.width} × ${result.height} · ${formatBytes(result.bytes)} · not sent yet`
+    el('preview-meta').textContent = `${result.width} × ${result.height} · ${formatBytes(result.bytes)} · 尚未发送`
     showSheet(previewSheet)
     await setExpanded(true, true)
   }
@@ -592,7 +594,7 @@ async function main() {
   async function exportScreenshot() {
     if (!preview) return
     const result = await api.exportScreenshot({ generation: snapshot.generation, observationId: preview.observationId })
-    if (result.ok) showNotice(result.clipboard ? `Saved ${result.path} and copied it to the clipboard.` : `Saved ${result.path}.`)
+    if (result.ok) showNotice(result.clipboard ? `已保存 ${result.path}，并复制到剪贴板。` : `已保存 ${result.path}。`)
     else if (!result.canceled) showNotice(result.message)
   }
 
@@ -601,7 +603,7 @@ async function main() {
     historyList.replaceChildren()
     const loading = document.createElement('p')
     loading.className = 'history-empty'
-    loading.textContent = 'Loading…'
+    loading.textContent = '加载中…'
     historyList.append(loading)
     const result = await api.listSessionHistory()
     historyList.replaceChildren()
@@ -609,7 +611,7 @@ async function main() {
     if (result.sessions.length === 0) {
       const empty = document.createElement('p')
       empty.className = 'history-empty'
-      empty.textContent = 'No saved conversations.'
+      empty.textContent = '暂无历史会话。'
       historyList.append(empty)
       return
     }
@@ -619,9 +621,9 @@ async function main() {
       button.className = 'history-row'
       button.setAttribute('role', 'option')
       button.setAttribute('aria-selected', String(item.sessionId === snapshot.sessionId))
-      button.textContent = item.name || item.firstMessage || 'Untitled conversation'
+      button.textContent = item.name || item.firstMessage || '未命名会话'
       const detail = document.createElement('small')
-      detail.textContent = `${item.messageCount} messages · ${formatHistoryDate(item.modified)}`
+      detail.textContent = `${item.messageCount} 条消息 · ${formatHistoryDate(item.modified)}`
       button.append(detail)
       button.addEventListener('click', () => { void openHistory(item.sessionId).catch(report) })
       historyList.append(button)
@@ -668,7 +670,7 @@ async function main() {
       streaming = ''
       setRunning(true)
     } else if (event.type === 'queued') {
-      showNotice(String(event.count) + ' ' + (event.count === 1 ? 'message' : 'messages') + ' queued')
+      showNotice(`${event.count} 条消息已排队`)
     } else if (event.type === 'session') {
       snapshot = { ...snapshot, sessionId: event.sessionId, generation: event.generation }
     } else if (event.type === 'tool') {
@@ -676,15 +678,29 @@ async function main() {
       if (!row) {
         row = document.createElement('div')
         row.className = 'orb-tool'
+        const marker = document.createElement('span')
+        marker.className = 'orb-tool-marker'
+        marker.setAttribute('aria-hidden', 'true')
         const name = document.createElement('strong')
-        name.textContent = event.name
+        name.textContent = ({
+          read: '读取文件', write: '写入文件', edit: '编辑文件', bash: '执行命令',
+          orb_observe: '观察桌面', orb_click: '点击', orb_type: '输入文字', orb_scroll: '滚动',
+          orb_hotkey: '按键', orb_long_press: '长按', orb_drag: '拖动', orb_open_app: '切换应用',
+          orb_list_apps: '查看应用', orb_wait: '等待', orb_long_wait: '等待任务',
+        })[event.name] ?? event.name
+        const phase = document.createElement('span')
+        phase.className = 'orb-tool-phase'
         const detail = document.createElement('p')
-        row.append(name, detail)
+        row.append(marker, name, phase, detail)
         transcript.append(row)
         toolRows.set(event.id, row)
       }
-      row.querySelector('p').textContent = event.phase === 'start' ? event.detail || 'Running' : event.detail
+      row.classList.toggle('orb-tool--running', event.phase === 'start')
       row.classList.toggle('orb-tool--error', event.isError)
+      row.querySelector('.orb-tool-phase').textContent = event.phase === 'start' ? '进行中' : event.isError ? '失败' : '完成'
+      row.querySelector('p').textContent = event.phase === 'start'
+        ? (event.detail && event.detail !== 'Running' ? event.detail : '正在执行…')
+        : event.isError ? (event.detail && event.detail !== 'Failed' ? event.detail : '调用失败') : ''
       transcript.scrollTop = transcript.scrollHeight
     } else if (event.type === 'question') {
       pendingQuestion = { ...event, selected: undefined, value: event.prefill, error: undefined, busy: false }
@@ -830,6 +846,9 @@ async function main() {
     void sendPrompt().catch(report)
   })
   prompt.addEventListener('input', syncComposerHeight)
+  prompt.addEventListener('focusout', () => {
+    setTimeout(() => { if (!dockPointerInside) scheduleCollapse() }, 0)
+  })
   prompt.addEventListener('keydown', event => {
     if (event.key !== 'Enter' || event.shiftKey || isComposing(event)) return
     event.preventDefault()
@@ -880,10 +899,10 @@ async function main() {
     event.preventDefault()
     snapshot = await api.setShortcut(el('shortcut-input').value.trim())
     if (!snapshot.shortcutRegistered) {
-      showNotice(snapshot.shortcutProblem ?? 'The shortcut could not be registered.')
+      showNotice(snapshot.shortcutProblem ?? '快捷键注册失败。')
       return
     }
-    showNotice('Wake shortcut: ' + snapshot.shortcut)
+    showNotice('唤醒快捷键：' + snapshot.shortcut)
     closeSheet()
   })
   function openShortcutEditor() {
@@ -895,11 +914,11 @@ async function main() {
   openModelChooser = async () => {
     showSheet(modelSheet)
     const list = el('model-list')
-    list.textContent = 'Loading…'
+    list.textContent = '加载中…'
     const result = await api.listModels()
     if (!result.ok) { list.textContent = result.message; return }
     list.replaceChildren()
-    if (result.models.length === 0) { list.textContent = 'No models available in this workspace.'; return }
+    if (result.models.length === 0) { list.textContent = '当前工作区没有可用模型。'; return }
     for (const model of result.models) {
       const button = document.createElement('button')
       button.type = 'button'
@@ -909,7 +928,7 @@ async function main() {
       button.addEventListener('click', async () => {
         const selected = await api.setModel({ generation: snapshot.generation, provider: model.provider, id: model.id })
         if (!selected.ok) { showNotice(selected.message); return }
-        showNotice('Model: ' + model.name)
+        showNotice('模型：' + model.name)
         closeSheet()
       })
       list.append(button)

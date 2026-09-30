@@ -29,7 +29,7 @@ describe("ported shell context menu", () => {
       { isEditable: false, canCut: false, canCopy: true, canPaste: false, canSelectAll: false, hasSelectionContext: false },
       actions,
     );
-    expect(labels(readonly)).toEqual(["Hide orb", "separator", "Quit pi-orb"]);
+    expect(labels(readonly)).toEqual(["隐藏悬浮球", "separator", "退出 pi-orb"]);
 
     const editable = shellMenuTemplate(
       { isEditable: true, canCut: true, canCopy: true, canPaste: true, canSelectAll: true, hasSelectionContext: false },
@@ -42,9 +42,9 @@ describe("ported shell context menu", () => {
       "separator",
       "selectAll",
       "separator",
-      "Hide orb",
+      "隐藏悬浮球",
       "separator",
-      "Quit pi-orb",
+      "退出 pi-orb",
     ]);
   });
 
@@ -84,8 +84,8 @@ describe("ported shell context menu", () => {
       { isEditable: false, canCut: false, canCopy: false, canPaste: false, canSelectAll: false, hasSelectionContext: true },
       actions,
     );
-    expect(labels(without)).not.toContain("Remove attached selection");
-    expect(labels(with_)).toEqual(["Hide orb", "Remove attached selection", "separator", "Quit pi-orb"]);
+    expect(labels(without)).not.toContain("移除选中文本");
+    expect(labels(with_)).toEqual(["隐藏悬浮球", "移除选中文本", "separator", "退出 pi-orb"]);
   });
 
   it("refuses to stack a second menu while one is open", () => {

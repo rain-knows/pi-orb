@@ -12,6 +12,13 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ### Fixed
 
+- **通用桌面操作与浮球体验收敛。** 截图按请求选择非 Orb 原生窗口，移除唤醒快捷键锁定依赖；
+  桌面动作后接收新原生窗口的观察。直接移植参考 `floating-window.ts` 的计数式截图排除／
+  点击穿透，工具调用期间不再隐藏整个面板。输入焦点、草稿和问题阻止自动收起；工具过程
+  使用紧凑中文状态行；运行中空输入框隐藏光标，停止按钮改为方形图标。新 Orb 会话默认
+  完全访问，停止、隐藏及断连仍撤权；文件和后台任务使用 Pi 原有工具。参考提交、差异和
+  验证边界见 [`doc/orb-experience-improvements.md`](./doc/orb-experience-improvements.md)。
+
 - **Aligned `orb_open_app` with the reference action timing.** The Windows driver now waits the
   reference `POST_ACTION_WAIT_MS` settle period after activation and before foreground inspection
   and recapture, so a slow window switch cannot be reported as a fresh observation of the old target.

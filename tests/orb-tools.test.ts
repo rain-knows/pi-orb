@@ -295,6 +295,7 @@ describe("describeOrbModeSection", () => {
   it("states that access is session-level and a matching directory is not authorization", () => {
     expect(section).toMatch(/never grants it/i);
     expect(section).toMatch(/Read Only.*Workspace Write.*Full Access/s);
+    expect(section).toContain("New Orb sessions default to Full Access");
     expect(section).toMatch(/current foreground application/i);
     expect(section).toMatch(/review and confirm/i);
   });

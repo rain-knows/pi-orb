@@ -68,8 +68,9 @@
 | **点击坐标换算的正确性**（两种记录矛盾，以产品整链路实测为准） | **产品整链路实测已裁决**：当前实现「分数 × 驱动上报窗口尺寸」命中 `1,2`（`loop-verification-session-access.json`）；曾据一次直调探针改成「屏幕 DIP − 物理原点」，**同链路实测落 `0,1`**，故不采用。P1-05 记录的那条规则与本次链路实测相矛盾，其**逐次落点归属存疑**（与本次探针同类问题） | `evidence/p1-06/loop-verification-session-access.json`；`doc/cua-driver-integration.md` §1 记录了两侧数字与残留疑问 |
 | **模型坐标契约：位置是截图分数（0–1000）** | 已验证（单测 + 产品链路）：分数→请求的换算命中预期格 | `tests/coordinate-mapping.test.ts`；`evidence/p1-06/loop-verification-session-access.json` |
 | **截图取点→输入落点在**同一次运行**内一致（C7 产品侧闭环）** | 已验证（自动化闭环：取的是截图分数，落点由目标自身日志判定） | `evidence/p1-06/loop-verification-session-access.json`（当前运行全项通过）——取分数 `(611.6,360.4)` → 目标 JSONL 命中 `1,2` |
-| **后台点击**：4/4 瞄准格子命中，落点在格中心，且不抢前台 | 已验证（丢弃式自报网格目标） | `evidence/p1-05/input-verification.json` |
-| **后台输入文本**：向原生应用投递并由读回文档证实 | 已验证 | 同上 |
+| **历史 Cua 后台点击**：4/4 瞄准格子命中，且不抢前台 | 历史验证；当前参考 Win32 backend 使用可见 GUI／SendInput，不声明任意后台窗口点击支持 | `evidence/p1-05/input-verification.json` |
+| **历史 Cua 后台输入文本**：向原生应用投递并读回 | 历史验证；不属于当前参考 Windows backend 的后台投递能力 | 同上 |
+| **通用桌面体验改进**：按请求选窗、默认完全访问、中文状态行、草稿保持、运行输入光标隐藏、工具期间不隐藏面板 | 单测及打包交互已验证；实际 bridge／broker／Win32 点击自报目标 `0,0` 通过，未宣称模型自主跨应用或任意后台 GUI 投递 | `doc/orb-experience-improvements.md`；`evidence/frontend-port/interaction-probe.json`、`native-target-probe.json` |
 | **前台点击投递**：目标记录到真实 `mouse-down`，驱动报 `delivery_mode:foreground` | 已验证 | 同上 |
 | **历史 Cua 前台滚动的物理到达与生效**：曾在一次运行中由目标日志证实；2026-09-28 最新复跑驱动虽报成功但目标为 0 个 `wheel` | **历史 Cua 路径不稳定，不属于当前生产能力**；当前参考 backend 的 D6 以真实模型目标日志单独判定 | `evidence/p1-05/input-verification.json`（历史探针）；`evidence/p1-06/real-model-d6-scroll-reference-backend.json` |
 | **历史 Cua 后台→前台升级**：typed `scroll` 无法表达 `delivery_mode`，旧适配器曾按 `background_unavailable` 升级 | 历史探针已验证；适配器已删除，不属于当前生产能力 | `evidence/p1-05/input-verification.json` |
@@ -84,7 +85,7 @@
 | **`cua_driver_sdk.dll` 的 MPL 归属核实**：交付物中无任何证据把 MPL 归于该 DLL（无许可文本、不引用 uniffi runtime、仅导入系统库） | 已核实并记录 | `THIRD_PARTY_NOTICES.md` §3 |
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
 | **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性、打包配置与产物审计记录、CI 与发布流程、renderer 参考一致性 | 已验证（且多次反向对照可证伪） | `evidence/p1-07/release-gate.json`（66/66） |
-| **session Access 生命周期**：turn idle 保留 grant；Stop、隐藏、断连、workspace/session 切换撤权 | 当前探针和单元测试运行后按实际结果记录；旧 `lifecycle-regression.json` 是 per-task API 历史记录 | `evidence/p1-07/run-lifecycle-regression.mjs`、`tests/orb-session.test.ts`、`tests/desktop-task.test.ts`、`tests/window-lifecycle.test.ts` |
+| **session Access 生命周期**：新会话默认完全访问；turn idle 保留 grant；Stop、隐藏、断连撤权；workspace/session 切换替换为新会话 grant | 当前探针 13/13 通过；首次启动失败保留；旧 `lifecycle-regression.json` 是 per-task API 历史记录 | `evidence/p1-07/session-access-regression.json`；`doc/orb-experience-improvements.md` |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab 与**停靠滑动动画**、拖动 IPC、收起还原、hover/pin、系统主题、参考 GIF 状态动效、History/Access/New、连续 prompt、问题卡片、**观察框**、**布局变化后仍可找回** | 已接入；JSDOM、打包探测和 renderer parity 自动化通过；跨应用真实模型流程、多屏/DPI 与逐状态人工视觉验收仍未验证 | `tests/floating-geometry.test.ts`、`tests/floating-dock-animation.test.ts`、`tests/floating-recovery.test.ts`、`tests/renderer-reference-parity.test.ts`、`tests/observation-frame.test.ts`、`tests/floating-renderer.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/main/observation-frame.ts`、`src/main/index.ts`、`src/renderer/index.html`、`src/renderer/floating.js`、`src/renderer/floating.css`、`evidence/frontend-port/visual-review.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览、锁屏／休眠后清除遗失的按键状态 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘及真实锁屏／休眠体验未验证）。参考项目固定提交 `72f1d738458a223696685a909e806b683eff5885` 无对应全局手势；本项是 Pi 接入所需的独立能力 | `tests/double-alt.test.ts`、`tests/double-alt-recovery.test.ts`、`tests/shortcut-edge-guard.test.ts`、`src/main/double-alt.ts`、`src/main/shortcut-edge-guard.ts`、`src/main/index.ts` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/floating.js`、`evidence/p2-03/README.md` |

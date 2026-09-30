@@ -185,8 +185,7 @@ describe("RecordedTargetStore.clear", () => {
 
 describe("RecordedTargetStore ordering", () => {
   it("reads the foreground window once per recording and never during validation", async () => {
-    // The ordering rule: read at record time (before the orb takes focus), then only check validity.
-    // Reading again at capture time would return the orb itself.
+    // Select at screenshot request time, then keep the reviewed target stable during validation.
     const { store, reads, validityChecks } = makeStore();
     await store.record();
     expect(reads).toHaveLength(1);
@@ -214,7 +213,7 @@ describe("RecordedTargetStore ordering", () => {
 });
 
 describe("RecordedTargetStore failure signalling", () => {
-  it("logs the focus-order hint when no window could be read", async () => {
+  it("reports that no application window is available when selection fails", async () => {
     const logs: string[] = [];
     const store = new RecordedTargetStore({
       readForeground: async () => null,
@@ -222,7 +221,7 @@ describe("RecordedTargetStore failure signalling", () => {
       log: (message) => logs.push(message),
     });
     await store.record();
-    expect(logs.join("\n")).toMatch(/must not take focus first/i);
+    expect(logs.join("\n")).toMatch(/no application window is available/i);
   });
 
   it("does not attempt a validity check when recording failed", async () => {

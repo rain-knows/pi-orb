@@ -23,9 +23,35 @@
 .orb-message strong { font-size: 11px; font-weight: 600; color: var(--pin); }
 .orb-message p { margin: 0; white-space: pre-wrap; user-select: text; -webkit-user-select: text; }
 .orb-message--error p { color: var(--error); }
-.orb-tool { border: 1px solid var(--border); border-radius: 14px; padding: 8px 12px; font-size: 12px; }
-.orb-tool strong { display: block; }
-.orb-tool p { margin: 4px 0 0; color: var(--pin); }
+.orb-tool {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px 11px;
+  background: var(--input-bg);
+  font-size: 12px;
+}
+.orb-tool-marker { width: 7px; height: 7px; border-radius: 50%; background: var(--pin); }
+.orb-tool--running .orb-tool-marker { background: var(--black); animation: orb-tool-pulse 900ms ease-in-out infinite alternate; }
+.orb-tool--error .orb-tool-marker { background: var(--error); }
+.orb-tool strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.orb-tool-phase { color: var(--pin); font-size: 11px; }
+.orb-tool--error .orb-tool-phase { color: var(--error); }
+.orb-tool p { grid-column: 2 / 4; margin: 2px 0 0; color: var(--pin); overflow-wrap: anywhere; }
+.orb-tool p:empty { display: none; }
+@keyframes orb-tool-pulse { to { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .orb-tool--running .orb-tool-marker { animation: none; } }
+body.running #prompt.prompt-empty { caret-color: transparent; }
+body.running #prompt.prompt-empty::after { content: ""; }
+body.running #stop { width: 36px; height: 36px; }
+body.running #stop::after { inset: 11px; border-radius: 3px; }
+body.running.expand-left #stop { left: calc(var(--chrome) + 18px); }
+body.running.expand-right #stop { right: calc(var(--chrome) + 18px); }
+body.running.expand-up #stop { bottom: calc(var(--chrome) + 18px); }
+body.running.expand-down #stop { top: calc(var(--chrome) + 18px); }
 @media (prefers-reduced-motion: reduce) { #panel { transition: none; } }
 
 .orb-sheet {

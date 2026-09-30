@@ -42,6 +42,7 @@ export class OrbSessionController {
   #accumulator: AssistantAccumulator | null = null;
   #pendingQuestionId: string | null = null;
   #promptQueue: QueuedPrompt[] = [];
+  #creating: { workspace: string; promise: Promise<string> } | null = null;
   constructor(deps: OrbSessionDeps) {
     this.#deps = deps;
   }
@@ -78,6 +79,7 @@ export class OrbSessionController {
    * from the previous run so no stale work can continue under a new generation.
    */
   beginGeneration(generation: number): void {
+    this.#creating = null;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = null;
@@ -100,6 +102,7 @@ export class OrbSessionController {
     if (this.#sessionId && this.#workspace === workspace) {
       return this.#sessionId;
     }
+    if (this.#creating?.workspace === workspace) return this.#creating.promise;
 
     this.#closeStream?.();
     this.#closeStream = null;
@@ -107,20 +110,26 @@ export class OrbSessionController {
     this.#pendingQuestionId = null;
     this.#promptQueue = [];
 
-    const sessionId = await this.#deps.client.createSession(workspace);
-    this.#sessionId = sessionId;
-    this.#workspace = workspace;
-    this.#deps.emit({
-      type: "session",
-      sessionId,
-      generation: this.#generation,
-    });
-    return sessionId;
+    const creating: { workspace: string; promise: Promise<string> } = {
+      workspace,
+      promise: this.#deps.client.createSession(workspace).then((sessionId) => {
+        if (this.#creating !== creating) throw new Error("The session request was superseded.");
+        this.#sessionId = sessionId;
+        this.#workspace = workspace;
+        this.#deps.emit({ type: "session", sessionId, generation: this.#generation });
+        return sessionId;
+      }).finally(() => {
+        if (this.#creating === creating) this.#creating = null;
+      }),
+    };
+    this.#creating = creating;
+    return creating.promise;
   }
 
   /** Start a fresh session without changing the configured workspace or run generation. */
   async newConversation(workspace: string): Promise<string> {
     if (this.#running) throw new Error("The current conversation is still running.");
+    this.#creating = null;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = null;
@@ -134,6 +143,7 @@ export class OrbSessionController {
   /** Attach to an existing persisted Pi session in the same workspace. */
   async openExistingSession(workspace: string, sessionId: string): Promise<string> {
     if (this.#running) throw new Error("The current conversation is still running.");
+    this.#creating = null;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = sessionId;
@@ -192,6 +202,7 @@ export class OrbSessionController {
 
   /** Release the stream and drop the session binding (used on shutdown). */
   dispose(): void {
+    this.#creating = null;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = null;

@@ -1,5 +1,5 @@
 /**
- * The screenshot consent flow: record a target, capture it, hold it for review, and
+ * The screenshot consent flow: select a current target, capture it, hold it for review, and
  * act on the user's decision.
  *
  * Extracted from the main process so it can be driven directly in tests with stubbed
@@ -25,11 +25,8 @@ export interface CaptureOutcomeLike {
 
 export interface ScreenshotFlowDeps {
   /**
-   * The record of the window the user was looking at.
-   *
-   * The flow **consumes** this record; it must not read the foreground window itself. By the time the
-   * user presses the screenshot control, the orb holds focus, so a fresh foreground lookup would
-   * return the orb and refuse every request — which made the positive capture path unreachable.
+   * A snapshot selected from the reference Win32 window walk immediately before start().
+   * The walk excludes Orb chrome, so it can select a native application while Orb has focus.
    */
   readonly recordedTarget: {
     readonly snapshot: CaptureTargetSnapshot | null;
@@ -62,7 +59,7 @@ export class ScreenshotFlow {
   }
 
   /**
-   * Capture the recorded target for preview.
+   * Capture the selected target for preview.
    *
    * `text` is the message the capture belongs to. It is kept here and sent only
    * together with the confirmed image, so a cancelled preview cannot leave a message
@@ -92,8 +89,7 @@ export class ScreenshotFlow {
       userInitiated: true,
       target,
       image: outcome.image,
-      // The recorded window need not be in front — the user deliberately switched to the orb, so the
-      // preview simply states which window it shows rather than calling it stale.
+      // The Orb is allowed to be foreground; the selected application is shown in the preview.
       targetStale: false,
     });
     if (!started.ok) {
@@ -112,8 +108,7 @@ export class ScreenshotFlow {
       height: image.height,
       bytes: base64Bytes(image.data),
       targetDescription: describeTarget(target.target),
-      // The recorded window is not required to be in front: the user deliberately switched to the orb,
-      // so the preview simply names the window it shows.
+      // Orb focus does not make the target stale.
       targetStale: false,
     };
   }
@@ -189,12 +184,12 @@ export function describeTargetRefusal(validity: {
 }): string {
   switch (validity.reason) {
     case "no-record":
-      return "No target window has been recorded yet. Bring the window you want to share to the front, then wake the orb with the shortcut so it can record it before it takes focus.";
+      return "没有可用的应用窗口。请打开目标应用，再尝试截图。";
     case "window-gone":
-      return "The recorded window is no longer open. Bring the window you want to share to the front, then wake the orb again so it records the new target.";
+      return "目标窗口已关闭。请打开目标应用，再尝试截图。";
     case "window-changed":
-      return `The recorded window was replaced by a different one${validity.currentTitle ? ` (now "${validity.currentTitle}")` : ""}. Wake the orb again to record the target you want.`;
+      return `目标窗口已经变化${validity.currentTitle ? `（现在是“${validity.currentTitle}”）` : ""}。请重新截图。`;
     default:
-      return "The recorded target cannot be used.";
+      return "无法使用当前目标窗口。";
   }
 }

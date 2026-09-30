@@ -5,8 +5,8 @@
  *  - a capture happens only after an explicit user action, and only the confirmed
  *    image is sent; cancelling uploads nothing,
  *  - the image the user previewed is byte-identical to the image that is sent,
- *  - the target window is recorded BEFORE the orb takes focus, so the orb cannot
- *    capture itself,
+ *  - the target is selected from non-Orb windows at the explicit capture request,
+ *    so Orb focus cannot cause self-capture,
  *  - a failure to identify or capture the target window is reported; the code must
  *    never silently fall back to a full-screen capture,
  *  - size limits are explicit numbers, never "unlimited".

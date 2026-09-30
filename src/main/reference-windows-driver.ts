@@ -9,6 +9,9 @@ import { delay } from "./reference-windows/wait";
 import type { ActResult, DesktopDriver, ObserveResult } from "./desktop-task";
 import type { CapturedScreen, DesktopBackend, DesktopForeground, ScreenInfo } from "./reference-windows/backend";
 import type { WindowsDesktopOps } from "./reference-windows/windows";
+import { selectWindowsObservation } from "./reference-windows/windows-foreground";
+import { runWithCaptureExcludeWindowIds } from "./reference-windows/capture-exclude";
+import type { CaptureTarget } from "@shared/screenshot";
 
 export interface ReferenceWindowInfo {
   readonly windowId: number;
@@ -111,14 +114,27 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     return this.#target?.bounds;
   }
 
+  /** Current topmost non-Orb window for the explicit screenshot preview. */
+  captureTarget(): CaptureTarget | null {
+    const snapshot = this.#options.ops.listWindows();
+    const ownIds = snapshot.windows.filter((window) => window.pid === this.#options.ownProcessId).map((window) => window.hwnd);
+    const selected = selectWindowsObservation(snapshot, ownIds);
+    const owner = snapshot.windows.find((window) => window.hwnd === selected?.windowId);
+    if (!owner || owner.pid === this.#options.ownProcessId) return null;
+    return {
+      handle: String(owner.hwnd),
+      processId: owner.pid,
+      title: owner.title,
+      bounds: owner.frame,
+      dpi: owner.monitorDpi,
+    };
+  }
+
   async observe(input: { readonly includeImage?: boolean }): Promise<ObserveResult> {
     try {
       const result = await this.#withGuiTurn(async () => {
         const target = this.#findForegroundTarget();
-        if (!target) throw new Error("No foreground application window is available to observe.");
-        if (!this.#options.ops.focusWindow(target.windowId)) {
-          throw new Error("The target window could not be brought to the foreground.");
-        }
+        if (!target) throw new Error("No application window is available to observe.");
         const screens = await this.#options.backend.listScreens();
         const screen = screens.find((candidate) => candidate.windowId === target.windowId) ?? screens[0];
         if (!screen || screen.windowId !== target.windowId) {
@@ -156,9 +172,6 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         if (!this.#isCurrentForeground(target)) {
           throw new Error("The foreground window changed after the observation. Observe again before acting.");
         }
-        if (!this.#options.ops.focusWindow(target.windowId)) {
-          throw new Error("The target window could not be brought to the foreground.");
-        }
         if (action.kind === "click") {
           await this.#options.backend.click({ screen, position: positionOf(action.position), button: action.button ?? "left", count: action.count ?? 1,
             ...(action.modifiers ? { modifiers: action.modifiers } : {}) }, signal);
@@ -188,12 +201,16 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           }, signal);
         }
         if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await delay(POST_ACTION_WAIT_MS, abort);
-        if (!this.#isCurrentForeground(target)) {
-          throw new Error("The foreground window changed during the action. Observe again before acting.");
-        }
-        const captured = await this.#options.backend.capture(screen, signal);
-        const nextObservation = this.#makeObservation(target, screen, captured, true,
+        const nextTarget = this.#findForegroundTarget();
+        if (!nextTarget) throw new Error("No application window is available after the action.");
+        const nextScreens = await this.#options.backend.listScreens(signal);
+        const nextScreen = nextScreens.find((candidate) => candidate.windowId === nextTarget.windowId);
+        if (!nextScreen) throw new Error("The new application window could not be observed.");
+        const captured = await this.#options.backend.capture(nextScreen, signal);
+        const nextObservation = this.#makeObservation(nextTarget, nextScreen, captured, true,
           await this.#options.backend.inspectForeground(signal));
+        this.#target = nextTarget;
+        this.#screen = nextScreen;
         this.#observation = nextObservation;
         return nextObservation;
       });
@@ -336,24 +353,20 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     }
   }
 
-  /**
-   * The window the OS currently reports as foreground, if it is one this process may observe.
-   *
-   * Observation adopts the current foreground application and excludes the Orb itself. Later actions
-   * remain bound to that observation and refuse if foreground identity changes before input is sent.
-   */
+  /** Select the reference backend's frontmost operable window, excluding Orb chrome. */
   #findForegroundTarget(): TargetWindow | null {
     const snapshot = this.#options.ops.listWindows();
-    const foreground = snapshot.windows.find((window) => window.hwnd === snapshot.foregroundHwnd);
-    if (!foreground || foreground.pid === this.#options.ownProcessId) return null;
-    if (!foreground.visible || foreground.iconic || foreground.cloaked) return null;
-    if (foreground.frame.width <= 0 || foreground.frame.height <= 0) return null;
+    const ownIds = snapshot.windows.filter((window) => window.pid === this.#options.ownProcessId).map((window) => window.hwnd);
+    const selected = selectWindowsObservation(snapshot, ownIds);
+    if (!selected) return null;
+    const owner = snapshot.windows.find((window) => window.hwnd === selected.windowId);
+    if (!owner || owner.pid === this.#options.ownProcessId) return null;
     return {
-      windowId: foreground.hwnd,
-      pid: foreground.pid,
-      appName: foreground.appName,
-      title: foreground.title,
-      bounds: foreground.frame,
+      windowId: owner.hwnd,
+      pid: owner.pid,
+      appName: owner.appName,
+      title: owner.title,
+      bounds: selected.bounds,
     };
   }
 
@@ -366,6 +379,12 @@ export class ReferenceWindowsDriver implements DesktopDriver {
   }
 
   #withGuiTurn<T>(run: () => Promise<T>): Promise<T> {
-    return this.#options.withGuiTurn ? this.#options.withGuiTurn(run) : run();
+    const withExcludedOrb = () => {
+      const ownIds = this.#options.ops.listWindows().windows
+        .filter((window) => window.pid === this.#options.ownProcessId)
+        .map((window) => window.hwnd);
+      return runWithCaptureExcludeWindowIds(ownIds, run);
+    };
+    return this.#options.withGuiTurn ? this.#options.withGuiTurn(withExcludedOrb) : withExcludedOrb();
   }
 }

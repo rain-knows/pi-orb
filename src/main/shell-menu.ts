@@ -59,20 +59,20 @@ export function shellMenuTemplate(
   actions: ShellMenuActions,
 ): MenuItemConstructorOptions[] {
   const utilities: MenuItemConstructorOptions[] = [];
-  if (actions.onModel) utilities.push({ label: "Choose model", click: actions.onModel });
-  if (actions.onScreenshot) utilities.push({ label: "Capture screenshot", click: actions.onScreenshot });
-  if (actions.onShortcut) utilities.push({ label: "Change wake shortcut…", click: actions.onShortcut });
+  if (actions.onModel) utilities.push({ label: "选择模型", click: actions.onModel });
+  if (actions.onScreenshot) utilities.push({ label: "截取屏幕", click: actions.onScreenshot });
+  if (actions.onShortcut) utilities.push({ label: "修改唤醒快捷键…", click: actions.onShortcut });
   if (utilities.length > 0) utilities.push({ type: "separator" });
   const shell: MenuItemConstructorOptions[] = [
     ...utilities,
-    { label: "Hide orb", click: actions.onCollapse },
+    { label: "隐藏悬浮球", click: actions.onCollapse },
   ];
   if (request.hasSelectionContext) {
     // A label that says what it does to the thing you can see, matching the reference's
     // enable/disable phrasing for its toolbar toggle.
-    shell.splice(utilities.length + 1, 0, { label: "Remove attached selection", click: actions.onClearSelectionContext });
+    shell.splice(utilities.length + 1, 0, { label: "移除选中文本", click: actions.onClearSelectionContext });
   }
-  shell.push({ type: "separator" }, { label: "Quit pi-orb", click: actions.onQuit });
+  shell.push({ type: "separator" }, { label: "退出 pi-orb", click: actions.onQuit });
   if (!request.isEditable) return shell;
   // The edit block sits on top, as in the reference: the roles are the platform's own, so labels,
   // accelerators and behaviour come from Electron rather than being re-spelled here.

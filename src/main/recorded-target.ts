@@ -1,17 +1,11 @@
 /**
- * The one record of "the window the user was looking at".
+ * The short-lived target snapshot for one explicit screenshot preview.
  *
- * The rule this enforces (doc/pi-orb-development-goals.md §6.2 P1-04): the target must be recorded
- * **before the orb takes focus**, because afterwards the orb is the foreground window and a lookup
- * would return the orb itself.
+ * The caller now selects a non-Orb window using the reference Win32 window walk at
+ * screenshot request time. The store keeps that target stable through preview and confirmation.
  *
- * Two consequences follow from recording once and sharing the record:
- *
- *  1. The screenshot flow must **consume** the record rather than re-read the foreground window.
- *     Re-reading at the moment the user presses the screenshot button always fails — by then the
- *     user is interacting with the orb — which made the positive capture path unreachable.
- *  2. Recording happens on a wake and on a deliberate user action, never on a timer, and never after
- *     the window is shown.
+ * A failed selection clears any earlier target, so it cannot silently capture a window
+ * from a previous request.
  *
  * Kept free of Electron so the ordering rules are testable directly.
  */
@@ -19,7 +13,7 @@
 import type { CaptureTarget, CaptureTargetSnapshot } from "@shared/screenshot";
 
 export interface RecordedTargetStoreDeps {
-  /** Read the current foreground window, excluding this process. */
+  /** Select the current topmost non-Orb window. */
   readonly readForeground: () => Promise<CaptureTarget | null>;
   /** True when a recorded handle still refers to the same window. */
   readonly isStillValid: (handle: string, title: string) => Promise<{ valid: boolean; currentTitle: string }>;
@@ -57,10 +51,7 @@ export class RecordedTargetStore {
   }
 
   /**
-   * Record the current foreground window.
-   *
-   * Call this **before** showing or focusing the orb. Returns a refusal rather than storing nothing
-   * silently, so the caller can tell the user why nothing can be captured.
+   * Record the current topmost non-Orb window for this screenshot request.
    */
   async record(): Promise<RecordOutcome> {
     const target = await this.#deps.readForeground().catch(() => null);
@@ -71,10 +62,8 @@ export class RecordedTargetStore {
       // capture silently use a window the user has already moved away from — a privacy failure that
       // presents as a successful capture.
       //
-      // The most common cause is that the orb itself already has focus. Saying so is more useful
-      // than a generic failure, because it tells the user the order to do things in.
       this.#snapshot = null;
-      this.#deps.log?.("[pi-orb] no foreground window to record; the orb must not take focus first");
+      this.#deps.log?.("[pi-orb] no application window is available for screenshot preview");
       return { ok: false, reason: "no-foreground-window" };
     }
     const now = this.#deps.now ?? Date.now;

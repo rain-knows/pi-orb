@@ -109,6 +109,29 @@ it("expands on hover, pins on ball click, and collapses after the reference dela
   await expect.poll(() => h.document.body.classList.contains("expanded")).toBe(false);
 });
 
+it("keeps the panel open while editing a draft or answering a question", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.document.body.dispatchEvent(new h.win.MouseEvent("pointerenter"));
+  await expect.poll(() => h.document.body.classList.contains("expanded")).toBe(true);
+  const prompt = h.byId("prompt");
+  prompt.focus();
+  h.document.body.dispatchEvent(new h.win.MouseEvent("pointerleave"));
+  await new Promise((resolve) => setTimeout(resolve, 230));
+  expect(h.document.body.classList.contains("expanded")).toBe(true);
+  prompt.textContent = "未发送的内容";
+  prompt.dispatchEvent(new h.win.Event("input", { bubbles: true }));
+  prompt.blur();
+  await new Promise((resolve) => setTimeout(resolve, 230));
+  expect(h.document.body.classList.contains("expanded")).toBe(true);
+  prompt.textContent = "";
+  prompt.dispatchEvent(new h.win.Event("input", { bubbles: true }));
+  h.emit({ type: "question", id: "q", method: "input", title: "问题", message: "", options: [], prefill: "" });
+  h.document.body.dispatchEvent(new h.win.MouseEvent("pointerleave"));
+  await new Promise((resolve) => setTimeout(resolve, 230));
+  expect(h.document.body.classList.contains("expanded")).toBe(true);
+});
+
 it("sends with the existing Pi bridge and displays streamed replies", async () => {
   const h = harness();
   await expect.poll(() => h.byId("composer").hidden).toBe(false);
@@ -141,14 +164,14 @@ it("keeps the composer available and queues follow-up turns in order", async () 
   expect(h.document.querySelectorAll(".orb-message--user")).toHaveLength(2);
 
   h.emit({ type: "queued", count: 1 });
-  expect(h.byId("status").textContent).toBe("1 message queued");
+  expect(h.byId("status").textContent).toBe("1 条消息已排队");
   h.emit({ type: "turn-start" });
   h.emit({ type: "assistant-delta", text: "Second reply" });
   expect(h.document.querySelectorAll(".orb-message--assistant")).toHaveLength(1);
   expect(h.document.querySelector(".orb-message--assistant p")?.textContent).toBe("Second reply");
   h.emit({ type: "idle", stopReason: null });
   expect(h.document.body.classList.contains("running")).toBe(false);
-  await expect.poll(() => h.byId("permission-label").textContent).toBe("Workspace Write");
+  await expect.poll(() => h.byId("permission-label").textContent).toBe("工作区写入");
   expect(h.api.revokeOrbAccess).not.toHaveBeenCalled();
 });
 
@@ -214,9 +237,9 @@ it("selects a session access tier and keeps screenshot confirmation explicit", a
     "new-conversation",
   ]);
   expect([...h.document.querySelectorAll("#permission-menu [data-level]")].map((option) => option.textContent)).toEqual([
-    "Read Only",
-    "Workspace Write",
-    "Full Access",
+    "只读",
+    "工作区写入",
+    "完全访问",
   ]);
   expect(h.byId("target-open")).toBeNull();
   expect(h.byId("task-scope")).toBeNull();
@@ -224,7 +247,7 @@ it("selects a session access tier and keeps screenshot confirmation explicit", a
   h.byId("access-workspace-write").click();
   await expect.poll(() => h.api.setOrbAccess.mock.calls.length).toBe(1);
   expect(h.api.setOrbAccess).toHaveBeenCalledWith({ generation: 1, level: "workspace-write" });
-  expect(h.byId("permission-label").textContent).toBe("Workspace Write");
+  expect(h.byId("permission-label").textContent).toBe("工作区写入");
   h.doubleAlt();
   await expect.poll(() => h.byId("preview-sheet").hidden).toBe(false);
   expect(h.api.resolveScreenshot).not.toHaveBeenCalled();
@@ -238,10 +261,11 @@ it("renders tool progress and answers a Pi select request in the reference card"
   await expect.poll(() => h.byId("composer").hidden).toBe(false);
   h.emit({ type: "tool", phase: "start", id: "call-1", name: "orb_observe", detail: "Running", isError: false });
   h.emit({ type: "tool", phase: "end", id: "call-1", name: "orb_observe", detail: "Completed", isError: false });
-  expect(h.document.querySelector(".orb-tool p")?.textContent).toBe("Completed");
+  expect(h.document.querySelector(".orb-tool strong")?.textContent).toBe("观察桌面");
+  expect(h.document.querySelector(".orb-tool-phase")?.textContent).toBe("完成");
   h.emit({ type: "question", id: "ask-1", method: "select", title: "Choose", message: "Pick one", options: ["First (Recommended)", "Second"], prefill: "" });
   expect(h.byId("question").hidden).toBe(false);
-  expect(h.document.querySelector(".question-recommended")?.textContent).toBe("Recommended");
+  expect(h.document.querySelector(".question-recommended")?.textContent).toBe("推荐");
   (h.document.querySelector("#question-options button") as HTMLElement).click();
   h.byId("question-continue").click();
   await expect.poll(() => h.api.respondQuestion.mock.calls.length).toBe(1);

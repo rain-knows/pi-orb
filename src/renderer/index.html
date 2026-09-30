@@ -3,7 +3,7 @@
      72f1d738458a223696685a909e806b683eff5885,
      apps/desktop/renderer/floating.html. Pi-only surfaces and CSP are documented
      in doc/frontend-port.md and THIRD_PARTY_NOTICES.md §3.5. -->
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,19 +28,19 @@
           </svg>
         </button>
         <ul id="permission-menu" role="listbox" hidden>
-          <li><button id="access-read-only" type="button" role="option" data-level="read-only">Read Only</button></li>
-          <li><button id="access-workspace-write" type="button" role="option" data-level="workspace-write">Workspace Write</button></li>
-          <li><button id="access-full" type="button" role="option" data-level="full-access">Full Access</button></li>
+          <li><button id="access-read-only" type="button" role="option" data-level="read-only">只读</button></li>
+          <li><button id="access-workspace-write" type="button" role="option" data-level="workspace-write">工作区写入</button></li>
+          <li><button id="access-full" type="button" role="option" data-level="full-access">完全访问</button></li>
         </ul>
       </div>
       <button id="new-conversation" type="button">+</button>
       <div id="transcript" role="log" aria-live="polite">
         <div id="workspace-gate" class="history-empty" hidden>
-          <h1>Choose a workspace</h1>
-          <p>Give pi-orb its own folder to start a private desktop conversation.</p>
-          <button id="choose-workspace" type="button">Choose folder</button>
+          <h1>选择工作区</h1>
+          <p>为 pi-orb 选择专用文件夹，即可开始桌面对话。</p>
+          <button id="choose-workspace" type="button">选择文件夹</button>
         </div>
-        <p id="transcript-empty" class="history-empty" hidden>Ask me anything about the window you're working in.</p>
+        <p id="transcript-empty" class="history-empty" hidden>告诉我你想在桌面上完成什么。</p>
       </div>
       <div id="question" hidden>
         <div class="question-card">
@@ -69,21 +69,21 @@
         </div>
       </div>
       <div id="history-list" role="listbox" hidden></div>
-      <section id="preview-sheet" class="orb-sheet" hidden aria-label="Review screenshot">
-        <header><strong>Review screenshot</strong><button id="preview-close" type="button" aria-label="Close preview">×</button></header>
-        <p id="preview-target"></p><img id="preview-image" alt="Screenshot preview"><p id="preview-meta"></p>
-        <footer><button id="preview-send" type="button">Send</button><button id="preview-save" type="button">Save copy</button><button id="preview-discard" type="button">Discard</button></footer>
+      <section id="preview-sheet" class="orb-sheet" hidden aria-label="预览截图">
+        <header><strong>预览截图</strong><button id="preview-close" type="button" aria-label="关闭预览">×</button></header>
+        <p id="preview-target"></p><img id="preview-image" alt="截图预览"><p id="preview-meta"></p>
+        <footer><button id="preview-send" type="button">发送</button><button id="preview-save" type="button">保存副本</button><button id="preview-discard" type="button">丢弃</button></footer>
       </section>
-      <section id="model-sheet" class="orb-sheet" hidden aria-label="Model selection">
-        <header><strong>Model</strong><button id="model-close" type="button" aria-label="Close model selection">×</button></header>
+      <section id="model-sheet" class="orb-sheet" hidden aria-label="选择模型">
+        <header><strong>模型</strong><button id="model-close" type="button" aria-label="关闭模型选择">×</button></header>
         <div id="model-list" role="listbox"></div>
       </section>
-      <section id="shortcut-sheet" class="orb-sheet" hidden aria-label="Wake shortcut">
-        <header><strong>Wake shortcut</strong><button id="shortcut-close" type="button" aria-label="Close shortcut settings">×</button></header>
+      <section id="shortcut-sheet" class="orb-sheet" hidden aria-label="唤醒快捷键">
+        <header><strong>唤醒快捷键</strong><button id="shortcut-close" type="button" aria-label="关闭快捷键设置">×</button></header>
         <form id="shortcut-form">
-          <label for="shortcut-input">Shortcut</label>
+          <label for="shortcut-input">快捷键</label>
           <input id="shortcut-input" type="text" autocomplete="off" spellcheck="false" maxlength="60">
-          <footer><button type="submit">Save</button></footer>
+          <footer><button type="submit">保存</button></footer>
         </form>
       </section>
       <p id="status" role="status"></p>

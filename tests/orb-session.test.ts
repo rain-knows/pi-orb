@@ -58,6 +58,34 @@ function setup() {
 }
 
 describe("OrbSessionController", () => {
+  it("shares concurrent creation so startup and a prompt cannot bind different sessions", async () => {
+    const { client, controller, events } = setup();
+    const ids = await Promise.all([controller.ensureSession("C:\\orb"), controller.ensureSession("C:\\orb")]);
+    expect(ids).toEqual(["session-1", "session-1"]);
+    expect(client.createSession).toHaveBeenCalledTimes(1);
+    expect(events.filter((event) => event.type === "session")).toHaveLength(1);
+  });
+
+  it("rejects creation from an old generation without replacing the new session", async () => {
+    const { client, controller } = setup();
+    let finish!: (id: string) => void;
+    client.createSession.mockImplementationOnce(() => new Promise<string>((resolve) => { finish = resolve; }));
+    const pending = controller.ensureSession("C:\\orb");
+    const rejected = expect(pending).rejects.toThrow("superseded");
+    controller.beginGeneration(2);
+    const current = await controller.ensureSession("C:\\next");
+    finish("obsolete-session");
+    await rejected;
+    expect(controller.sessionId).toBe(current);
+    expect(controller.generation).toBe(2);
+  });
+
+  it("can create after a failed startup request", async () => {
+    const { client, controller } = setup();
+    client.createSession.mockRejectedValueOnce(new Error("service unavailable"));
+    await expect(controller.ensureSession("C:\\orb")).rejects.toThrow("service unavailable");
+    await expect(controller.ensureSession("C:\\orb")).resolves.toBe("session-1");
+  });
   it("creates a session for a workspace and reuses it for the same workspace", async () => {
     const { client, controller } = setup();
     const first = await controller.ensureSession("C:\\work\\orb-a");

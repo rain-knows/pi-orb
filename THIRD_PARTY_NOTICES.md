@@ -122,6 +122,10 @@ The same commit's Electron shell is reused outside that directory:
 
 - `src/main/floating-geometry.ts` ← `apps/desktop/src/floating-window.ts` (geometry constants)
 - `src/main/floating-window-controller.ts` ← `apps/desktop/src/floating-window.ts` (window state machine)
+- `src/main/floating-overlay-guard.ts` ← `apps/desktop/src/floating-window.ts:848-868,906-961`
+  (reference-counted capture protection and input click-through; called directly by the Pi host)
+- `tests/floating-overlay-guard.test.ts` ← `apps/desktop/tests/floating-window.spec.ts`
+  (five overlay interval tests; DSH media-source and macOS-only tests omitted)
 - `src/renderer/index.html` ← `apps/desktop/renderer/floating.html` (panel, controls, transcript,
   question, history, selection chip, composer, ball and dock DOM; the macOS TCC gate is omitted)
 - `src/renderer/floating.css` ← `apps/desktop/renderer/floating.css` (layout, tokens, themes,

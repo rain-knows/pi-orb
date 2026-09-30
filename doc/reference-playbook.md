@@ -95,7 +95,7 @@ git -C D:\pi-orb-ref\deepseek-harness-orb status --porcelain   # 期望：无输
 | Cordis 装配与 `ctx.*` 服务模型 | `@deepseek-ai/cordis` `Context`、`ctx.tools.register`、`ctx.on('agent/pre-step')` | 换成 Pi 扩展的 `pi.registerTool` / `pi.on('session_start' \| 'before_agent_start')` |
 | dsh 会话、事件、附件持久化 | `@deepseek-ai/dsh-session`、`dsh/session` 事件映射、`@deepseek-ai/dsh-attachment` | 换成 pi-web HTTP + SSE 与 Pi `ImageContent` |
 | 自动前置观察与自动附图 | `plugin.ts` 的 `agent/pre-step` 瀑布、`observeDesktop` 自动附图 | pi-orb 由模型显式 `orb_observe`；不自动截屏、不自动上传 |
-| 自动选择“最前台窗口”作为目标 | `backend.listScreens()` 自动选窗 + overlay 排除 | 每次 observe 读取当前前台应用并排除 Orb；action 绑定该 observation，前台变化即拒绝。截图分享另经用户预览确认 |
+| 自动选择“最前台窗口”作为目标 | `backend.listScreens()` 自动选窗 + overlay 排除 | 每次 observe 按参考 `selectWindowsObservation` 选择当前窗口或下一个合格顶层窗口，排除 Orb；action 前绑定 observation 并校验，动作后重新选择实际窗口。截图分享在请求时同样选择窗口，另经用户预览确认 |
 | 后台 `code_agent` 双轨 | `code-agent.ts`、`presets/computer-use/agent.cordis.yml` | 属于 dsh 编排；pi-orb 用 Pi 会话／子代理另行评估（P2-07） |
 | 私有工作区包依赖 | `package.json` 的 `peerDependencies: @deepseek-ai/dsh-*@workspace:^`、`"private": true`；`paths.ts:4` 的 `@deepseek-ai/dsh-home-paths`、`project-manager.ts` 的 `@deepseek-ai/dsh-app-boot` | 不能作为 npm 依赖安装；只能移植源码 + 保留 MIT 通知 |
 | 浮球 renderer 的宿主协议 | `dsh-app://app/api/<method>` 的 `client-request`/`server-response` RPC（`floating.js:15-31`）、`dsh-app://app/.dsh/remote-stream` NDJSON（`floating.js:7`、`:1046-1062`）、历史面板 iframe `dsh-app://app/index.html?surface=overlay` + `postMessage`（`floating.js:34-37`、`main.ts:786-788`）、模型目录 `/api/session/modelCatalog`（`main.ts:750-770`） | pi-orb 只移植 DOM/CSS/交互层；会话、历史、模型全部走 pi-web 公开 API |
@@ -155,7 +155,7 @@ D:\workself\pi-orb\
 | `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/floating.css` | **直接移植**布局、设计令牌、交互状态、暗色及动效；删除 DSH iframe/TCC 专用选择器；Pi 表面补丁在 `orb-surface.css` |
 | `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/floating.js` | **移植状态机**及输入行为；`window.dshDesktop`、RPC、NDJSON 和 iframe 转为现有 `window.orb` 及 Pi Web 会话事件，无 dsh 兼容层 |
 | `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | `src/main/shell-menu.ts` | **部分移植**：结构取自参考的 `floatingContextMenuTemplate`（`floating-window.ts:55-129`）——可编辑时置顶 `cut/copy/paste/selectAll` 角色块（由焦点字段的 `editFlags` 逐项 `enabled`），其下是壳层动作。参考的「打开主窗口」换成「隐藏浮球」（pi-orb 无自有主窗，pi-web 才是会话 UI），Quit 保留。**不移植**：Agent 模型设置（pi-orb 不另立模型配置）、选区工具栏开关与毫坐标开关（无对应物） |
-| `apps/desktop/src/orb-permission.ts` | 浮球权限模型与 `read-only` / `workspace-write` / `danger-full-access` presets | `src/main/desktop-task.ts`、`src/shared/ipc.ts` | **复用能力等级语义，适配授权主体**：不持久化参考项目的 profile preset；用户在 Access 芯片显式选择并绑定 Orb session/generation；`Full Access` 对应参考 `danger-full-access` |
+| `apps/desktop/src/orb-permission.ts` | 浮球权限模型与 `read-only` / `workspace-write` / `danger-full-access` presets | `src/main/index.ts`、`desktop-task.ts`、`src/shared/ipc.ts` | **复用能力等级语义和默认值，适配授权主体**：新 Orb session 默认 `Full Access`，绑定 session/generation；Stop/hide 撤权后须在 Access 芯片重新选择。不持久化参考项目的 profile preset；`Full Access` 对应参考 `danger-full-access` |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
 | `apps/desktop/renderer/deepseek-avatar-square.gif` | 浮球 GIF 动效资源 | `src/renderer/deepseek-avatar-square.gif` | **直接复用**固定提交的 MIT 素材；pi-orb 按浮球状态播放/冻结，不移植 `orb-avatar.ts` 的用户自定义头像存储 |
 | `apps/desktop/src/observation-frame-window.ts` | 观察框原生 overlay（点透、不进截图） | `src/main/observation-frame.ts`、`src/renderer/observation-frame.{html,css}` | **已移植**：几何（stroke 8 / glow 28 / outset 36、work-area 裁剪不位移、DIP 换算）、窗口构造（`setIgnoreMouseEvents(true,{forward:true})` 点透、`contentProtection` 不进截图、`showInactive` 不抢焦点、`roundedCorners:false`）、renderer 渐变遮罩挖空。宿主调用面不同：pi-orb 在 `withGuiTurn` 里画、在统一撤权出口隐藏，参考由 dsh 的 observation lifecycle 驱动 |
@@ -253,7 +253,7 @@ D:\workself\pi-orb\
 
 | 参考文件 | 参考行数 | pi-orb 文件 | pi-orb 行数 | 判定 |
 |---|---|---|---|---|
-| `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 39 | 一致；`activeCaptureExcludeWindowIds` 被 `windows.ts` 读取，但**写入方无调用方**（见 §6.2） |
+| `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 39 | 一致；`ReferenceWindowsDriver.#withGuiTurn` 写入本进程 HWND 排除列表，Windows backend 读取（见 §6.2） |
 | `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：只保留 `mapNormalizedToGlobal` 及其私有分数换算。参考的 11 个导出里 9 个在 pi-orb 无调用方（校验职责由 `src/shared/orb-tools.ts` 的 `validateAction` 唯一承担），按 N8 删除；需要 pixel 编码时按固定提交恢复 |
 | `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 38 | 逻辑一致（`delay` 供驱动使用，见 `windows.ts` 的指针/长按/双击/粘贴时序；`wait`/`long_wait` 工具未移植）。文件本身是 **adapted** 而非 unmodified：多出的 3 行是来源提交与许可证头，由 `evidence/p1-07/check-provenance.mjs` 逐行核对 |
 | `src/observation-limits.ts` | 13 | `src/main/reference-windows/observation-limits.ts` | 16 | 一致 |
@@ -283,9 +283,9 @@ D:\workself\pi-orb\
 |---|---|---|---|
 | `coordinate-mode.ts` 只剩类型 | **已处理**：文件删除，像素模式未实现这一事实现在写在 `coordinates.ts` 的文件头里 | 像素编码（pixel 模式）在 pi-orb 不可表达 | 需要 pixel 时按固定提交恢复该文件与 `modelPositionToHid` 调用方，不要重新推导 |
 | 后端 7 个方法只声明未调用 | `inspectForeground`、`listApps`、`openApp`、`openInBrowser`、`openInFinder`、`copyImageToClipboard`、`backend.withGuiTurn` 无调用方（`ReferenceWindowsDriver` 只用 `listWindows`/`focusWindow` + `listScreens`/`capture`/`click`/`typeText`/`hotkey`/`longPress`/`drag`/`scroll`） | 模型拿不到 `inspectForeground` 的前台元数据（前台／非前台提示）；`list_apps`/`open_app`/`open_in_browser`/`open_in_finder`/`screenshot` 语义无落点 | 与 §7.1 的工具补齐一起做：先接进驱动与 Pi 工具，再接授权边界。`open_app` 另受 P2-04 的“目标重绑定规则确定后才开放”约束 |
-| 捕获排除列表恒为空 | `runWithCaptureExcludeWindowIds`（`capture-exclude.ts:26`）在 pi-orb **无任何调用方**，因此 `activeCaptureExcludeWindowIds()` 永远是 `[]`（读取方 `windows.ts:325` 是活的） | GDI 截图无法排除 Orb 自己；当前靠 `withGuiTurn` 隐藏窗口（`src/main/index.ts:358`）替代 | 保留现状但写清理由；若要恢复参考的 contentProtection/排除机制，按 `floating-window.ts:909-924` 与 `overlay-guard.ts` 接入 |
+| 捕获排除列表恒为空 | **已修复**：`ReferenceWindowsDriver.#withGuiTurn` 写入 Orb HWND 排除列表，主进程直接复用 `floating-window.ts:848-868,906-961` 的计数式 `contentProtection`／点击穿透；删除整窗隐藏路径 | 工具调用期间保留面板，不进入截图、不截获原生输入 | `floating-overlay-guard.ts` 及参考 5 项测试；Orb 前台下仍能观察原生目标 |
 | 前台提示文案被截断 | **已修复**：`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句，并由 `tests/reference-windows-input.test.ts` 钉住字面量 | — | 保持；该测试就是防止再次被简写的绊线 |
-| 观察新鲜度的实现方式不同 | 参考**没有** observation id／陈旧校验／限流（`grep observationId\|stale\|throttle` 无命中），靠“工具互斥 + 每次动作后重拍 + 策略禁止批式依赖动作”保证 | pi-orb 的 `observationId` + 拒绝原因 + 12 动作/5 分钟预算是**本项目新增**，不是参考语义 | 保留（这是授权边界所需），但文档里必须继续标注为 pi-orb 新增，不得说成“参考项目语义” |
+| 观察新鲜度的实现方式不同 | 参考**没有** observation id／陈旧校验／限流（`grep observationId\|stale\|throttle` 无命中），靠“工具互斥 + 每次动作后重拍 + 策略禁止批式依赖动作”保证 | pi-orb 的 `observationId` + 拒绝原因 + session/generation 授权是**本项目新增**（旧 per-task 的 12 动作/5 分钟预算已删除），不是参考语义 | 保留（这是授权边界所需），但文档里必须继续标注为 pi-orb 新增，不得说成“参考项目语义” |
 | 参考测试未移植 | **已处理**：`windows-foreground.spec.ts` 10 条与 `windows.spec.ts` 13 条全部移植（`tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts`），并做过变异反证 | — | 参考升级后按 §11 对比这两个 spec 的新增用例 |
 | `coordinates.ts` 有死导出 | **已处理**：11 个导出删除 9 个，只留 `mapNormalizedToGlobal`；唯一校验实现是 `src/shared/orb-tools.ts` 的 `validateAction`。`COORDINATE_SPACE = 1000` 仍在 `orb-tools.ts` 单独声明（共享层不能依赖主进程模块，且扩展包会独立打包） | 曾经同一规则两套实现 | 需要 `button`/`count`/`modifiers` 时，先在 `orb-tools.ts` 扩 schema，不要恢复参考的第二套校验 |
 | 逐文件归属不完整 | **已处理**：`src/main/reference-windows/` 每个文件都有“仓库 + 提交 + 原路径 + MIT”来源头；`floating-window-controller.ts`、`floating-geometry.ts`、`src/renderer/index.html`、`floating.css`、`floating.js` 也已补头；`THIRD_PARTY_NOTICES.md` §3.5 逐文件列全 | — | 新增移植文件时同步补头与清单 |
@@ -417,8 +417,8 @@ D:\workself\pi-orb\
 
 **不可让步的三条**（pi-orb 的宿主授权边界）：
 
-1. 每次 observe 读取当前前台应用并排除 Orb；每个 action 只能使用最新 observation，前台身份变化时必须重新观察。
-2. 桌面工具必须有当前 Orb session 的 Access grant；截图消息必须另经用户预览确认。唤醒、cwd 匹配、`/orb` 字符串都不构成授权。
+1. 每次 observe 按参考规则选择前台或最上层合格原生应用并排除 Orb；每个 action 只能使用最新 observation，动作前目标身份变化时必须重新观察，动作后采用新的观察结果。
+2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话默认完全访问，Stop／hide／断连后不静默重授。截图消息必须另经用户预览确认。唤醒、cwd 匹配、`/orb` 字符串都不构成授权。
 3. 断连、换 workspace/session、收起、Stop、退出都必须撤权并释放按键／鼠标／监听器；turn idle 与普通回复完成不撤权。
 
 ## 9. E/F 面：工程、验证与文档约定

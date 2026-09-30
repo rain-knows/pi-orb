@@ -151,7 +151,7 @@ describe("ScreenshotFlow.start", () => {
     const { flow, captureCalls } = harness({ target: null, validityReason: "no-record" });
     const result = await flow.start("hello");
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.message).toMatch(/wake the orb/i);
+    if (!result.ok) expect(result.message).toMatch(/打开目标应用/);
     expect(captureCalls).toHaveLength(0);
   });
 
@@ -159,7 +159,7 @@ describe("ScreenshotFlow.start", () => {
     const { flow } = harness({ validityReason: "window-gone" });
     const result = await flow.start("hello");
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.message).toMatch(/no longer open/i);
+    if (!result.ok) expect(result.message).toMatch(/目标窗口已关闭/);
   });
 
   it("names the replacement window when the recorded one changed", async () => {
@@ -167,7 +167,7 @@ describe("ScreenshotFlow.start", () => {
     const result = await flow.start("hello");
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.message).toMatch(/replaced/i);
+      expect(result.message).toMatch(/目标窗口已经变化/);
       expect(result.message).toContain("Something else");
     }
   });

@@ -66,7 +66,7 @@ describe("ReferenceWindowsDriver", () => {
     const observed = await driver.observe({});
     expect(observed.ok).toBe(true);
     expect(observed.observation?.window.id).toBe("42");
-    expect(calls).toEqual(["focus:42"]);
+    expect(calls).toEqual([]);
 
     const foreground = await driver.observe({});
     expect(foreground.observation?.window.id).toBe("42");
@@ -112,6 +112,59 @@ describe("ReferenceWindowsDriver", () => {
       { kind: "drag", input: expect.objectContaining({ startPosition: [100, 200], endPosition: [800, 700] }) },
     ]);
     expect(driver.lastObservation?.foreground).toEqual({ appName: "electron", windowTitle: "Disposable target" });
+  });
+
+  it("observes a native app behind Orb without a wake shortcut or renderer target", async () => {
+    const { ops } = opsFake();
+    const original = ops.listWindows;
+    ops.listWindows = () => {
+      const snapshot = original();
+      return {
+        foregroundHwnd: 99,
+        windows: [
+          { ...snapshot.windows[0]!, hwnd: 99, pid: 1, appName: "pi-orb", title: "Orb" },
+          { ...snapshot.windows[1]!, appName: "notepad", className: "Notepad" },
+        ],
+      };
+    };
+    const driver = new ReferenceWindowsDriver({ ops, backend: backendFake([]), ownProcessId: 1 });
+    expect(driver.captureTarget()).toMatchObject({ handle: "42", processId: 9001, title: "Disposable target", dpi: 96 });
+    const observed = await driver.observe({ includeImage: true });
+    expect(observed).toMatchObject({ ok: true, observation: { window: { id: "42", appName: "notepad" } } });
+  });
+
+  it("rejects input when a different app takes foreground before the action", async () => {
+    const { ops } = opsFake();
+    let foregroundHwnd = 42;
+    const original = ops.listWindows;
+    ops.listWindows = () => ({ ...original(), foregroundHwnd });
+    const calls: unknown[] = [];
+    const driver = new ReferenceWindowsDriver({ ops, backend: backendFake(calls), ownProcessId: 1 });
+    const observation = (await driver.observe({})).observation!;
+    foregroundHwnd = 77;
+    const result = await driver.act({ kind: "click", observationId: observation.observationId, position: { x: 500, y: 500 } }, observation);
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining("foreground window changed") });
+    expect(calls).toEqual([]);
+  });
+
+  it("returns a fresh observation when an action opens a native application window", async () => {
+    const { ops } = opsFake();
+    let foregroundHwnd = 42;
+    const original = ops.listWindows;
+    ops.listWindows = () => ({ ...original(), foregroundHwnd });
+    const backend = backendFake([]);
+    backend.click = async () => { foregroundHwnd = 77; };
+    backend.listScreens = async () => [{
+      index: 0,
+      bounds: { x: 100, y: 200, width: 800, height: 600 },
+      scale: 1,
+      windowId: foregroundHwnd,
+    }];
+    const driver = new ReferenceWindowsDriver({ ops, backend, ownProcessId: 1 });
+    const first = (await driver.observe({ includeImage: true })).observation!;
+    const result = await driver.act({ kind: "click", observationId: first.observationId, position: { x: 500, y: 500 } }, first);
+    expect(result).toMatchObject({ ok: true, observation: { window: { id: "77", title: "Other window" } } });
+    expect(driver.lastObservation?.observationId).not.toBe(first.observationId);
   });
 
   it("lists running apps with a fresh observation and cancels a long wait", async () => {

@@ -46,6 +46,8 @@ import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-e
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
 import { ReferenceWindowsDriver } from "./reference-windows-driver";
+import { applyFloatingOverlayGuard, resetFloatingOverlayGuard, OVERLAY_GUARD_INPUT_APPLY_MS } from "./floating-overlay-guard";
+import { delay } from "./reference-windows/wait";
 import {
   createObservationFrameWindow,
   hideObservationFrame,
@@ -94,7 +96,7 @@ const targetWindowReader = new Win32TargetWindowReader();
  * The screenshot consent flow.
  *
  * It is constructed after `session` exists because it sends through it. The telegram
- * of rules — record the target before taking focus, never fall back to a full-screen
+ * of rules — select a non-Orb target when requested, never fall back to a full-screen
  * capture, send only the exact image the user confirmed — lives in ScreenshotFlow,
  * which is driven directly by tests.
  */
@@ -113,12 +115,10 @@ let bridge: BridgeServer | null = null;
 /**
  * The window shown in the explicit screenshot review flow.
  *
- * It is recorded before the Orb takes focus. Desktop tools use fresh foreground observations from
- * `ReferenceWindowsDriver` instead, so switching applications does not depend on this screenshot
- * snapshot.
+ * Explicit screenshot preview selects the current topmost non-Orb window when requested.
  */
 const recordedTarget = new RecordedTargetStore({
-  readForeground: () => targetWindowReader.read(process.pid),
+  readForeground: async () => referenceDriver?.captureTarget() ?? null,
   isStillValid: (handle, title) => targetWindowReader.isStillValid(handle, title),
   log: (message) => console.log(message),
 });
@@ -134,6 +134,16 @@ let lifecycle: OrbWindowLifecycle | null = null;
 let lastWorkspaceProblem: string | null = null;
 let lastShortcutProblem: string | null = null;
 let lastDesktopProblem: string | null = null;
+// The reference Orb ships with Full Access selected. Apply it once to each new Orb session;
+// Stop and hide still revoke it until the user selects Access again or starts a new session.
+let defaultAccessPending = true;
+
+function grantDefaultAccess(sessionId: string, generation: number): void {
+  if (!defaultAccessPending || !desktopBroker || generations.current !== generation || session.sessionId !== sessionId) return;
+  desktopBroker.authorize({ sessionId, generation, level: "full-access" });
+  defaultAccessPending = false;
+  lastDesktopProblem = null;
+}
 let selectionMonitor: SelectionMonitor | undefined;
 let selectionContext: OrbSelectionContext | null = null;
 let isQuitting = false;
@@ -339,21 +349,17 @@ async function startDesktop(): Promise<void> {
       withGuiTurn: async <T>(run: () => Promise<T>): Promise<T> => {
         const current = window;
         if (!current || current.isDestroyed()) return run();
-        const wasVisible = current.isVisible();
-        current.setIgnoreMouseEvents(true, { forward: true });
-        if (wasVisible) current.hide();
-        // Bracket the desktop action with the observation ribbon: the orb is hidden for the duration,
-        // and the ribbon is what tells the user which window the grant currently covers. It is shown
-        // here rather than around each action because every desktop operation already funnels through
-        // this turn, which is also the boundary the reference uses.
-        showObservationFrameForTarget();
+        // Reference cloak keeps the transcript visible and excludes it from GDI captures.
+        // Counts pair overlapping turns; a capture finishing cannot restore hit testing during HID.
+        applyFloatingOverlayGuard(current, "input", "begin");
         try {
+          await delay(OVERLAY_GUARD_INPUT_APPLY_MS, new AbortController().signal);
+          showObservationFrameForTarget();
           return await run();
         } finally {
           hideObservationFrame(observationFrame ?? undefined);
           if (!current.isDestroyed()) {
-            current.setIgnoreMouseEvents(false);
-            if (wasVisible) current.showInactive();
+            applyFloatingOverlayGuard(current, "input", "end");
             // The ribbon's `showInactive` can restack same-level panels, so the orb's higher level is
             // re-asserted after it comes back rather than only at creation.
             raiseOverlayAboveObservationFrame(current);
@@ -557,8 +563,7 @@ function onShortcutTrigger(): void {
 }
 
 /**
- * Double Alt is a gesture, not a second upload path: record the target before the Orb takes focus,
- * then ask the renderer to open the existing one-shot screenshot preview.
+ * Double Alt opens the same one-shot screenshot preview as the menu action.
  */
 async function triggerDoubleAlt(): Promise<void> {
   await showOrb();
@@ -612,11 +617,6 @@ function attachWakeController(win: BrowserWindow): void {
     }),
     wake: async () => {
       if (win.isDestroyed()) return;
-      // Record the target BEFORE showing the window. Once the orb takes focus the window the user
-      // was looking at is no longer the foreground window, so a recording taken afterwards would
-      // capture the orb itself. This ordering is the whole reason the wake path is where the record
-      // is written.
-      await recordedTarget.record();
       // The reposition-then-show sequence is shared with `showOrb` rather than repeated here: the two
       // paths had already diverged once on exactly this step (neither clamped), and a second copy is
       // how the next divergence would start.
@@ -666,13 +666,12 @@ function attachKeyboardEdgeRecovery(): void {
  * session desktop Access and drops any unconfirmed screenshot, and it is idempotent.
  */
 function revokeDesktopOperations(reason: string): void {
+  defaultAccessPending = false;
   const hadAuthority = desktopBroker?.status().authorized === true;
   const hadCapture = screenshotFlow?.pending !== null && screenshotFlow?.pending !== undefined;
   desktopBroker?.revoke();
   screenshotFlow?.discard();
-  // The record of "the window the user was looking at" also stops being current here: after a
-  // collapse the user is no longer working with that window, so keeping it would let a later capture
-  // silently reuse a window the user has moved on from. A fresh wake records a fresh target.
+  // The next screenshot request selects a fresh target; no snapshot survives revocation.
   recordedTarget.clear();
   // The ribbon marks the last desktop observation, so it goes away with the grant. Turn idle does
   // not call this path; hide, Stop, disconnect, session/workspace changes and quit do.
@@ -712,13 +711,13 @@ function createTray(): void {
   tray.setContextMenu(
     Menu.buildFromTemplate([
       // "Show" is an explicit wake, not a toggle: a menu item labelled Show must never hide a focused
-      // orb. It records the target before showing for the same reason the shortcut does.
-      { label: "Show orb", click: () => void showOrb() },
+      // orb.
+      { label: "显示悬浮球", click: () => void showOrb() },
       // Goes through the same collapse routine as the shortcut and the window button, so the tray
       // cannot hide the orb while leaving desktop authority alive.
-      { label: "Hide orb", click: () => lifecycle?.collapse() },
+      { label: "隐藏悬浮球", click: () => lifecycle?.collapse() },
       { type: "separator" },
-      { label: "Quit", click: () => quit() },
+      { label: "退出", click: () => quit() },
     ]),
   );
   tray.on("click", () => toggleWindow("tray"));
@@ -872,7 +871,7 @@ function registerIpc(): void {
   ipcMain.handle(IPC.chooseWorkspace, async () => {
     if (!window) return { ok: false, message: "No window available.", resolved: null };
     const result = await dialog.showOpenDialog(window, {
-      title: "Select the Orb workspace",
+      title: "选择 Orb 工作区",
       properties: ["openDirectory", "createDirectory"],
     });
     if (result.canceled || result.filePaths.length === 0) {
@@ -918,6 +917,7 @@ function registerIpc(): void {
       // screenshot and any desktop authorization belong to the previous run and must not
       // survive it either.
       revokeDesktopOperations("the workspace changed");
+      defaultAccessPending = true;
       clearSelectionContext();
       if (!selectionMonitor) await startNativeSelectionMonitor();
       const generation = generations.begin();
@@ -925,7 +925,8 @@ function registerIpc(): void {
       // The extension must learn the new generation, or its next request would be refused as stale.
       publishHandshake();
       try {
-        await session.ensureSession(validation.resolved);
+        const sessionId = await session.ensureSession(validation.resolved);
+        grantDefaultAccess(sessionId, generation);
       } catch (error) {
         emit({ type: "error", message: describeError(error) });
       }
@@ -934,6 +935,7 @@ function registerIpc(): void {
   );
 
   ipcMain.handle(IPC.ensureSession, async () => {
+    const generation = generations.current;
     const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
     if (!validation?.ok || !validation.resolved) {
       throw new Error("Select a usable Orb workspace first.");
@@ -942,7 +944,9 @@ function registerIpc(): void {
       throw new Error("The configured workspace no longer matches its resolved path.");
     }
     try {
-      return await session.ensureSession(validation.resolved);
+      const sessionId = await session.ensureSession(validation.resolved);
+      grantDefaultAccess(sessionId, generation);
+      return sessionId;
     } catch (error) {
       throw new Error(describeError(error));
     }
@@ -1004,6 +1008,7 @@ function registerIpc(): void {
   });
 
   ipcMain.handle(IPC.newConversation, async () => {
+    const generation = generations.current;
     const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
     if (!validation?.ok || !validation.resolved) {
       throw new Error("Select a usable Orb workspace first.");
@@ -1017,7 +1022,10 @@ function registerIpc(): void {
     revokeDesktopOperations("a new conversation started");
     clearSelectionContext();
     try {
-      return await session.newConversation(validation.resolved);
+      const sessionId = await session.newConversation(validation.resolved);
+      defaultAccessPending = true;
+      grantDefaultAccess(sessionId, generation);
+      return sessionId;
     } catch (error) {
       throw new Error(describeError(error));
     }
@@ -1046,6 +1054,7 @@ function registerIpc(): void {
   });
 
   ipcMain.handle(IPC.openSessionHistory, async (_event, sessionId: unknown): Promise<OpenSessionHistoryResult> => {
+    const generation = generations.current;
     if (typeof sessionId !== "string" || sessionId.length === 0) return { ok: false, message: "Malformed session id." };
     const validation = config.orbWorkspace ? validateWorkspace(config.orbWorkspace) : null;
     if (!validation?.ok || !validation.resolved) return { ok: false, message: "Select a usable Orb workspace first." };
@@ -1055,6 +1064,8 @@ function registerIpc(): void {
       if (!isOrbWorkspace(snapshot.cwd, validation.resolved)) return { ok: false, message: "That session is outside the Orb workspace." };
       revokeDesktopOperations("a history session was opened");
       await session.openExistingSession(validation.resolved, sessionId);
+      defaultAccessPending = true;
+      grantDefaultAccess(sessionId, generation);
       return { ok: true, sessionId, messages: snapshot.messages };
     } catch (error) {
       return { ok: false, message: describeError(error) };
@@ -1084,7 +1095,7 @@ function registerIpc(): void {
   });
 
   /**
-   * Capture the window recorded before the orb took focus, for preview only.
+   * Select the topmost non-Orb window at request time and capture it for preview.
    *
    * Nothing is sent here. The image is held in the main process until the user
    * confirms that specific capture.
@@ -1096,6 +1107,9 @@ function registerIpc(): void {
       if (!parsed) return { ok: false, message: "Malformed capture request." };
       const check = generations.check(parsed.generation);
       if (!check.ok) return { ok: false, message: describeGenerationFailure(check.reason) };
+      // Select the current topmost non-Orb application at the user's screenshot request.
+      // This uses the reference Win32 window walk, so opening Orb by mouse or tray works too.
+      await recordedTarget.record();
       return screenshotFlow.start(parsed.text);
     },
   );
@@ -1191,6 +1205,7 @@ function registerIpc(): void {
     lastDesktopProblem = null;
     return session.ensureSession(config.orbWorkspace).then((sessionId) => {
       desktopBroker?.authorize({ sessionId, generation: parsed.generation, level: parsed.level });
+      defaultAccessPending = false;
       return desktopTaskStatus();
     });
   });
@@ -1341,6 +1356,7 @@ function quit(): void {
   shortcuts.releaseAll();
   // Shutdown must not leave an image waiting to be sent, nor a task grant a later run could inherit.
   revokeDesktopOperations("the shell is quitting");
+  if (window && !window.isDestroyed()) resetFloatingOverlayGuard(window);
   if (observationFrame && !observationFrame.isDestroyed()) observationFrame.destroy();
   void bridge?.close();
   removeHandshake(app.getPath("userData"));
@@ -1363,9 +1379,7 @@ void app.whenReady().then(async () => {
     emit: (event) => emit(event),
   });
   screenshotFlow = new ScreenshotFlow({
-    // The flow consumes the record taken before the orb took focus. It deliberately does not read
-    // the foreground window: at this point the orb holds focus, so a fresh lookup would always
-    // return the orb and the positive capture path could never run.
+    // captureScreenshot refreshes this snapshot on demand using the reference Win32 window walk.
     recordedTarget,
     capture: (target) => captureTargetWindow(target),
     send: (text, images) => session.prompt(text, images),
@@ -1396,20 +1410,22 @@ void app.whenReady().then(async () => {
   await startDesktop();
   await startBridge();
 
-  // Preserve the explicit screenshot preview's foreground snapshot.
-  await recordedTarget.record();
+  if (config.orbWorkspace && validateWorkspace(config.orbWorkspace).ok) {
+    try {
+      const generation = generations.current;
+      grantDefaultAccess(await session.ensureSession(config.orbWorkspace), generation);
+    } catch (error) {
+      console.warn(`[pi-orb] default Access unavailable: ${describeError(error)}`);
+    }
+  }
+
 });
 
 /**
- * Show the orb, recording the target window first.
- *
- * Used by the tray menu, where a label that says "Show" must not toggle. Recording before showing is
- * the same ordering rule the wake shortcut follows, because once the orb is in front the window the
- * user was looking at cannot be read any more.
+ * Show the orb without selecting a target. The screenshot button selects on demand.
  */
 async function showOrb(): Promise<void> {
   if (!window || window.isDestroyed()) return;
-  await recordedTarget.record();
   await presentOrb(window);
 }
 
