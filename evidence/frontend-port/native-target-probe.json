@@ -1,0 +1,10 @@
+{
+  "capturedAt": "2026-09-30T12:14:12.894Z",
+  "method": "direct authenticated bridge, real native input, no model inference",
+  "selectedDisposableTarget": true,
+  "targetReadback": [
+    "0,0"
+  ],
+  "freshObservation": true,
+  "passed": true
+}

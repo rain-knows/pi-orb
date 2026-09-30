@@ -2,8 +2,9 @@
 // This checks the integration boundary and captures the model, question and tool transcript states;
 // it does not claim to be a real model inference run.
 import { spawn } from "node:child_process";
+import { connect as connectPipe } from "node:net";
 import { createServer } from "node:http";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const repo = resolve(import.meta.dirname, "../..");
@@ -61,9 +62,11 @@ const server = createServer(async (request, response) => {
       observed.prompt = true;
       setTimeout(() => {
         emit({ type: "tool_execution_start", toolCallId: "tool-1", toolName: "orb_observe", args: { target: "Editor" } });
+      }, 150);
+      setTimeout(() => {
         emit({ type: "tool_execution_end", toolCallId: "tool-1", toolName: "orb_observe", isError: false });
         emit({ type: "extension_ui_request", id: "ask-1", method: "select", title: "Choose the next step", options: ["Continue (Recommended)", "Stop"] });
-      }, 150);
+      }, 1500);
     }
     if (command.type === "extension_ui_response") {
       observed.answered = command.id === "ask-1" && command.value === "Continue (Recommended)";
@@ -81,6 +84,50 @@ const port = server.address().port;
 const env = { ...process.env, PI_ORB_CONFIG: join(runRoot, "orb-config.json"), PI_ORB_PI_WEB_URL: `http://127.0.0.1:${port}` };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(executable, [`--user-data-dir=${join(runRoot, "userData")}`, "--remote-debugging-port=31995"], { env, stdio: "ignore" });
+let nativeTarget;
+
+// Real broker/native input; the disposable target's log is the ground truth.
+async function probeNativeTarget(cdp) {
+  const logPath = join(runRoot, "target.jsonl");
+  const geometryPath = join(runRoot, "geometry.json");
+  nativeTarget = spawn(join(repo, "node_modules/electron/dist/electron.exe"), [join(repo, "evidence/p1-05/target-app")], {
+    env: { ...env, P1_05_TARGET_LOG: logPath, P1_05_TARGET_GEOMETRY: geometryPath }, stdio: "ignore", windowsHide: true,
+  });
+  for (let i = 0; i < 60 && !existsSync(geometryPath); i++) await sleep(100);
+  if (!existsSync(geometryPath)) throw new Error("Disposable native input target did not start");
+  await sleep(300);
+  await cdp.send("Page.bringToFront"); // Orb focus, without any wake shortcut or saved target.
+  const state = await evaluate(cdp, "window.orb.getStatus()");
+  const handshake = JSON.parse(readFileSync(join(runRoot, "userData/bridge-token.json"), "utf8"));
+  const call = (request) => new Promise((resolve, reject) => {
+    const socket = connectPipe(handshake.pipePath);
+    const timer = setTimeout(() => socket.destroy(new Error("Native bridge timeout")), 5000);
+    let data = "";
+    socket.on("connect", () => socket.write(`${JSON.stringify({ ...request, token: handshake.token, sessionId: state.sessionId, generation: state.generation })}\n`));
+    socket.on("data", (chunk) => { data += chunk.toString(); });
+    socket.on("end", () => { clearTimeout(timer); try { resolve(JSON.parse(data.trim())); } catch (error) { reject(error); } });
+    socket.on("error", (error) => { clearTimeout(timer); reject(error); });
+  });
+  const observed = await call({ type: "observe" });
+  const observation = observed.result;
+  if (!observed.ok || !observation?.ok || observation.window?.title !== "P1-05 input target") {
+    throw new Error(`Native target was not selected: ${observed.reason ?? observation?.message ?? observation?.window?.title}`);
+  }
+  const geometry = JSON.parse(readFileSync(geometryPath, "utf8"));
+  const point = geometry.cellCentres[0].physicalScreenPoint;
+  const bounds = observation.window.bounds;
+  const action = { kind: "click", observationId: observation.observationId,
+    position: { x: 1000 * (point.x - bounds.x) / bounds.width, y: 1000 * (point.y - bounds.y) / bounds.height } };
+  const outcome = await call({ type: "act", action });
+  await sleep(200);
+  const received = readFileSync(logPath, "utf8").trim().split(/\r?\n/u).map((line) => JSON.parse(line)).filter((event) => event.kind === "cell-mousedown");
+  const report = { capturedAt: new Date().toISOString(), method: "direct authenticated bridge, real native input, no model inference",
+    selectedDisposableTarget: true, targetReadback: received.map((event) => event.cell),
+    freshObservation: Boolean(outcome.result?.observation?.observationId) && outcome.result.observation.observationId !== observation.observationId,
+    passed: outcome.ok && outcome.result?.ok && received.length === 1 && received[0].cell === "0,0" };
+  writeFileSync(join(import.meta.dirname, "native-target-probe.json"), `${JSON.stringify(report, null, 2)}\n`);
+  if (!report.passed || !report.freshObservation) throw new Error(`Native readback failed: ${JSON.stringify(report)}`);
+}
 
 async function connect(url) {
   const socket = new WebSocket(url);
@@ -147,7 +194,7 @@ try {
     const status = await evaluate(cdp, `window.orb.setWorkspace(${JSON.stringify(workspace)}, false)`);
     if (!status.configured) throw new Error(`Workspace failed: ${status.problem}`);
     await cdp.send("Page.reload");
-    await waitFor(cdp, "document.querySelector('#permission-label')?.textContent", (value) => value === "Orb access", "renderer ready");
+    await waitFor(cdp, "document.querySelector('#permission-label')?.textContent", (value) => value === "完全访问", "default Full Access");
     await waitFor(cdp, "document.querySelector('#composer')?.hidden", (value) => value === false, "composer ready");
     await evaluate(cdp, "document.body.dispatchEvent(new PointerEvent('pointerenter')); true");
     await waitFor(cdp, "document.body.classList.contains('expanded')", Boolean, "panel expanded");
@@ -159,11 +206,20 @@ try {
     await waitFor(cdp, "document.documentElement.hasAttribute('data-ds-dark-theme')", (value) => value === false, "light theme");
     await evaluate(cdp, "document.querySelector('#prompt').textContent='Check this\\nand that\\nand one more'; document.querySelector('#prompt').dispatchEvent(new Event('input', { bubbles: true })); true");
     await capture(cdp, "after-input.png");
+    await evaluate(cdp, "document.querySelector('#prompt').focus(); document.body.dispatchEvent(new PointerEvent('pointerleave')); true");
+    await sleep(280);
+    if (!await evaluate(cdp, "document.body.classList.contains('expanded')")) throw new Error("Draft collapsed while editing");
+    await evaluate(cdp, "document.querySelector('#prompt').blur(); true");
+    await sleep(280);
+    if (!await evaluate(cdp, "document.body.classList.contains('expanded')")) throw new Error("Unsent draft collapsed after blur");
     await evaluate(cdp, "document.querySelector('#prompt').textContent=''; document.querySelector('#prompt').dispatchEvent(new Event('input', { bubbles: true })); true");
-    await evaluate(cdp, "document.querySelector('#permission-button').click(); document.querySelector('#model-open').click(); true");
-    await waitFor(cdp, "document.querySelectorAll('#model-list button').length", (value) => value === 2, "model list");
-    await capture(cdp, "after-model.png");
-    await evaluate(cdp, "document.querySelector('#model-close').click(); document.querySelector('#prompt').textContent='Check this'; document.querySelector('#composer').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); true");
+    await evaluate(cdp, "document.querySelector('#permission-button').click(); true");
+    await capture(cdp, "after-access.png");
+    await evaluate(cdp, "document.querySelector('#permission-button').click(); document.querySelector('#prompt').textContent='Check this'; document.querySelector('#composer').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); true");
+    await waitFor(cdp, "Boolean(document.querySelector('.orb-tool--running'))", Boolean, "running tool card");
+    const runningStyle = await evaluate(cdp, "({ caret: getComputedStyle(document.querySelector('#prompt')).caretColor, stop: getComputedStyle(document.querySelector('#stop')).width, placeholder: getComputedStyle(document.querySelector('#prompt'), '::after').content })");
+    if (runningStyle.caret !== "rgba(0, 0, 0, 0)" || runningStyle.stop !== "36px" || runningStyle.placeholder !== '\"\"') throw new Error(`Running composer style: ${JSON.stringify(runningStyle)}`);
+    await capture(cdp, "after-tool-running.png");
     await waitFor(cdp, "document.querySelector('#question')?.hidden", (value) => value === false, "question card");
     await capture(cdp, "after-question.png");
     await evaluate(cdp, "document.querySelector('#question-options button').click(); document.querySelector('#question-continue').click(); true");
@@ -204,10 +260,12 @@ try {
     if (reducedMotion !== "none") throw new Error(`Reduced-motion dock animation still active: ${reducedMotion}`);
     await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "no-preference" }] });
     if (!observed.prompt || !observed.answered) throw new Error(`Wire fixture not completed: ${JSON.stringify(observed)}`);
-    writeFileSync(join(import.meta.dirname, "interaction-probe.json"), `${JSON.stringify({ passed: true, commands: observed.commands, reducedMotion, screenshots: ["after-ready.png", "after-dark.png", "after-input.png", "after-model.png", "after-question.png", "after-tool-thread.png", "after-history.png", "after-dock.png"], visualFixture: ["after-preview-fixture.png"] }, null, 2)}\n`);
+    await probeNativeTarget(cdp);
+    writeFileSync(join(import.meta.dirname, "interaction-probe.json"), `${JSON.stringify({ passed: true, commands: observed.commands, reducedMotion, draftStaysExpanded: true, runningStyle, screenshots: ["after-ready.png", "after-dark.png", "after-input.png", "after-access.png", "after-question.png", "after-tool-running.png", "after-tool-thread.png", "after-history.png", "after-dock.png"], visualFixture: ["after-preview-fixture.png"] }, null, 2)}\n`);
     console.log("Packaged renderer/Pi wire interaction probe passed");
   } finally { cdp.close(); }
 } finally {
+  nativeTarget?.kill();
   child.kill();
   server.close();
 }

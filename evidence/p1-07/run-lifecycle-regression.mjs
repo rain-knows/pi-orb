@@ -5,7 +5,8 @@
 // path rather than trusting the code shape:
 //
 //   - one session Access grant survives three queued turns and idle;
-//   - Stop, hide, workspace switch, and new session each revoke the grant;
+//   - Stop and hide revoke without silently regranting;
+//   - workspace and session changes replace the old grant with a new Full Access default;
 //   - a pi-web disconnect revokes the current session grant;
 //   - the session survives Stop and Access revocation.
 //
@@ -275,6 +276,8 @@ try {
 
   // The session id the bridge is addressed with.
   const sessionId = typeof ensured === "string" && !ensured.startsWith("ERR:") ? ensured : null;
+  const defaultStatus = await status();
+  check("new Orb session defaults to Full Access bound to its session and generation", defaultStatus.desktopTask?.authorized === true && defaultStatus.desktopTask?.level === "full-access" && defaultStatus.desktopTask?.sessionId === sessionId && defaultStatus.desktopTask?.generation === generation, safe(defaultStatus.desktopTask));
 
   /** The bridge handshake written by the shell, used to read state from the main process. */
   function handshake() {
@@ -357,6 +360,9 @@ try {
   report.stop = { runningBeforeStop: running.busy, stopped, status: afterStop };
   check("Stop was exercised while a prompt was running", running.busy === true && stopped === true, safe(report.stop).slice(0, 350));
   check("Stop revokes Access but preserves the Pi session and generation", afterStop.desktopTask?.authorized === false && afterStop.sessionId === sessionId && afterStop.generation === generation && afterStop.busy === false, safe(afterStop).slice(0, 350));
+  await evaluate("window.orb.ensureSession()");
+  const afterEnsure = await status();
+  check("ensuring the stopped session does not silently restore Full Access", afterEnsure.desktopTask?.authorized === false, safe(afterEnsure.desktopTask));
 
   // -------------------------------------------------------------------------
   // Collapse revokes. The collapse is triggered through the window's own control, which is the
@@ -392,22 +398,22 @@ try {
     (report.collapse.bridgeAuthorizedAfter === false || collapseResult.authorized === false);
   check("collapsing the orb revokes session Access", revokedByCollapse, safe(report.collapse));
 
-  // A workspace switch starts a new session/generation and cannot inherit Access.
+  // A workspace switch replaces the old grant with the new session's default.
   const beforeWorkspaceSwitch = await status();
   await setAccess(beforeWorkspaceSwitch.generation);
   await evaluate(`window.orb.setWorkspace(${JSON.stringify(nextWorkspace)}, true)`);
   const afterWorkspaceSwitch = await status();
   report.workspaceSwitch = { before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch };
-  check("workspace switch revokes Access and starts a new session generation", afterWorkspaceSwitch.desktopTask?.authorized === false && afterWorkspaceSwitch.workspace === nextWorkspace && afterWorkspaceSwitch.sessionId !== sessionId && afterWorkspaceSwitch.generation !== generation, safe({ before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch }).slice(0, 500));
+  check("workspace switch replaces the old grant with Full Access for the new session generation", afterWorkspaceSwitch.desktopTask?.authorized === true && afterWorkspaceSwitch.desktopTask?.level === "full-access" && afterWorkspaceSwitch.desktopTask?.sessionId === afterWorkspaceSwitch.sessionId && afterWorkspaceSwitch.desktopTask?.generation === afterWorkspaceSwitch.generation && afterWorkspaceSwitch.workspace === nextWorkspace && afterWorkspaceSwitch.sessionId !== sessionId && afterWorkspaceSwitch.generation !== generation, safe({ before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch }).slice(0, 500));
 
-  // A new conversation also changes the session and clears its grant.
+  // A new conversation also changes the session and receives its own default grant.
   const workspaceSessionId = afterWorkspaceSwitch.sessionId;
   const workspaceGeneration = afterWorkspaceSwitch.generation;
   await setAccess(workspaceGeneration);
   await evaluate("window.orb.newConversation()");
   const afterNewSession = await status();
   report.newSession = afterNewSession;
-  check("new conversation revokes Access and changes the Pi session", afterNewSession.desktopTask?.authorized === false && afterNewSession.sessionId !== workspaceSessionId && afterNewSession.generation === workspaceGeneration, safe(afterNewSession).slice(0, 350));
+  check("new conversation replaces the old grant with its own Full Access default", afterNewSession.desktopTask?.authorized === true && afterNewSession.desktopTask?.level === "full-access" && afterNewSession.desktopTask?.sessionId === afterNewSession.sessionId && afterNewSession.sessionId !== workspaceSessionId && afterNewSession.generation === workspaceGeneration, safe(afterNewSession).slice(0, 350));
 
   check("the shell survived the lifecycle sequence", shell.exitCode === null, `exitCode=${shell.exitCode}`);
 

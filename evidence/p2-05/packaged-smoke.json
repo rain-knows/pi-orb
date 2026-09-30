@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-30T09:30:36.282Z",
+  "capturedAt": "2026-09-30T12:11:28.108Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790760636282",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790770288108",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -86,7 +86,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-10192\n[pi-orb] no foreground window to record; the orb must not take focus first",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/493e48a4-b723-4c12-918f-357fea7d20ff"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-23088",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/8297d30b-7d4e-4e51-a897-84a77379342b"
 }

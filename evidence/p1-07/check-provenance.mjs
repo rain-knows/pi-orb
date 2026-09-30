@@ -49,6 +49,7 @@ const PORTS = {
   "src/main/windows-selection-native.ts": "apps/desktop/src/windows-selection-native.ts",
   "src/main/selection-monitor.ts": "apps/desktop/src/selection-monitor.ts",
   "src/main/floating-geometry.ts": "apps/desktop/src/floating-window.ts",
+  "src/main/floating-overlay-guard.ts": "apps/desktop/src/floating-window.ts",
   "src/main/observation-frame.ts": "apps/desktop/src/observation-frame-window.ts",
 };
 

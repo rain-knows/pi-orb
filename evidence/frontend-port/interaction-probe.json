@@ -1,17 +1,23 @@
 {
   "passed": true,
   "commands": [
-    "get_state",
     "prompt",
     "extension_ui_response"
   ],
   "reducedMotion": "none",
+  "draftStaysExpanded": true,
+  "runningStyle": {
+    "caret": "rgba(0, 0, 0, 0)",
+    "stop": "36px",
+    "placeholder": "\"\""
+  },
   "screenshots": [
     "after-ready.png",
     "after-dark.png",
     "after-input.png",
-    "after-model.png",
+    "after-access.png",
     "after-question.png",
+    "after-tool-running.png",
     "after-tool-thread.png",
     "after-history.png",
     "after-dock.png"

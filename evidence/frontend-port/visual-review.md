@@ -20,6 +20,7 @@ the session flow uses a deterministic Pi Web HTTP/SSE fixture.
 | Pi model | — | [after](after-model.png) | Pi Web catalogue in reference-style popover. |
 | Pi screenshot preview | — | [visual fixture](after-preview-fixture.png) | Uses the Pi preview sheet and a synthetic editor image; this image does not prove native capture. |
 | Tool transcript | — | [after](after-tool-thread.png) | Pi Web tool events and assistant continuation render in the reference panel. |
+| Running tool and composer | — | [after](after-tool-running.png) | Compact Chinese status row; 36 px square stop icon; blank running input has transparent caret and no placeholder. |
 
 Before replacement: [ball](before-ball.png), [panel](before-panel.png).
 The old panel's setup screen, typography and controls diverged substantially

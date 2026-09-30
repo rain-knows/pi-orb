@@ -282,7 +282,7 @@ D:\workself\pi-orb\
 | 缺口 | 事实 | 影响 | 建议动作 |
 |---|---|---|---|
 | `coordinate-mode.ts` 只剩类型 | **已处理**：文件删除，像素模式未实现这一事实现在写在 `coordinates.ts` 的文件头里 | 像素编码（pixel 模式）在 pi-orb 不可表达 | 需要 pixel 时按固定提交恢复该文件与 `modelPositionToHid` 调用方，不要重新推导 |
-| 后端 7 个方法只声明未调用 | `inspectForeground`、`listApps`、`openApp`、`openInBrowser`、`openInFinder`、`copyImageToClipboard`、`backend.withGuiTurn` 无调用方（`ReferenceWindowsDriver` 只用 `listWindows`/`focusWindow` + `listScreens`/`capture`/`click`/`typeText`/`hotkey`/`longPress`/`drag`/`scroll`） | 模型拿不到 `inspectForeground` 的前台元数据（前台／非前台提示）；`list_apps`/`open_app`/`open_in_browser`/`open_in_finder`/`screenshot` 语义无落点 | 与 §7.1 的工具补齐一起做：先接进驱动与 Pi 工具，再接授权边界。`open_app` 另受 P2-04 的“目标重绑定规则确定后才开放”约束 |
+| 后端声明与实际调用范围 | `inspectForeground`、`listApps` 已接入；`openApp` 保留在 backend 合同，但 Pi 的切换应用使用 `activateApp`；`openInBrowser/openInFinder/copyImageToClipboard/backend.withGuiTurn` 不在生产调用链 | 这些未开放方法不构成已支持的工具；主进程自身 `withGuiTurn` 配对参考 overlay guard | 新增能力前查参考方法与授权边界，不把声明当成已接入 |
 | 捕获排除列表恒为空 | **已修复**：`ReferenceWindowsDriver.#withGuiTurn` 写入 Orb HWND 排除列表，主进程直接复用 `floating-window.ts:848-868,906-961` 的计数式 `contentProtection`／点击穿透；删除整窗隐藏路径 | 工具调用期间保留面板，不进入截图、不截获原生输入 | `floating-overlay-guard.ts` 及参考 5 项测试；Orb 前台下仍能观察原生目标 |
 | 前台提示文案被截断 | **已修复**：`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句，并由 `tests/reference-windows-input.test.ts` 钉住字面量 | — | 保持；该测试就是防止再次被简写的绊线 |
 | 观察新鲜度的实现方式不同 | 参考**没有** observation id／陈旧校验／限流（`grep observationId\|stale\|throttle` 无命中），靠“工具互斥 + 每次动作后重拍 + 策略禁止批式依赖动作”保证 | pi-orb 的 `observationId` + 拒绝原因 + session/generation 授权是**本项目新增**（旧 per-task 的 12 动作/5 分钟预算已删除），不是参考语义 | 保留（这是授权边界所需），但文档里必须继续标注为 pi-orb 新增，不得说成“参考项目语义” |
@@ -386,8 +386,8 @@ D:\workself\pi-orb\
 ### 7.5 `orb_open_app` 的目标重绑定规则（pi-orb 收窄，非参考语义）
 
 参考工具的语义是“把正在运行的应用前置，**或者启动它**”（`<REF>/src/windows.ts:398-404`：
-`activateApp` 失败即 `launch`）。pi-orb 只保留前半段：当用户记录了一个窗口并授权一次任务时，
-“启动一个新进程”是用户没有授予的原生权限，因此这条路径上 `launch` 必须不可达。
+`activateApp` 失败即 `launch`）。pi-orb 的当前工具合同只保留前半段：session 完全访问允许切换
+已运行应用，自动启动尚未开放，因此这条路径上 `launch` 不可达。
 
 判定顺序（三步全过才重绑定，任一步失败都保留原目标并使动作失败）：
 
@@ -411,7 +411,7 @@ D:\workself\pi-orb\
 |---|---|---|
 | overlay 隐藏/点透（capture 期间排除自身，HID 期间点透） | `floating-window.ts` 的 `applyFloatingOverlayGuard`（`:938`）、`overlayWindowExcludeIds`（`:897`） | 已用等价机制接入（`withGuiTurn`）；改动浮球时必须回归 overlay 排除 |
 | overlay 包裹后端调用 | `<REF>/src/overlay-guard.ts:102-153`（`wrapDesktopBackend`） | 参考实现把 `capture/listScreens/inspectForeground/HID/openApp/withGuiTurn` 统一包裹；pi-orb 目前只包裹 `withGuiTurn`，如需更细粒度按此扩展 |
-| 观察框显示/隐藏并在 turn 结束时收起 | `<REF>/src/plugin.ts:268-275`（`turn/end` → `setObservationFrame(null)`） | pi-orb 无观察框；若 P2 接入，必须同样在 turn 结束与异常路径收起 |
+| 观察框显示/隐藏并在 turn 结束时收起 | `<REF>/src/plugin.ts:268-275`（`turn/end` → `setObservationFrame(null)`） | 已接入 `observation-frame.ts`；主进程 `withGuiTurn` 的 finally 和撤权路径收起 |
 | 用户批准／提问 | `<REF>` 的 user-approval / user-questions 相关包 | Access 芯片直接选择 `Read Only / Workspace Write / Full Access`；grant 绑定 Orb session 与 generation，不搬自动审批或 DSH 用户提问实现 |
 | 取消传播 | 参考 backend 的 `AbortSignal` 语义 | pi-orb 已接通 broker → driver → backend；C6 取消探针见 `evidence/p1-05/reference-cancel.json` |
 
