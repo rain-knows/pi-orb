@@ -387,6 +387,15 @@ check(
   existsSync(join(repo, "tests/renderer-reference-parity.test.ts")),
   "the tokens, state vocabulary and ids need a regression net, not just a convention",
 );
+
+// Documentation that quotes evidence must quote the current evidence. Counts in prose rot every time
+// a probe gains a check (the p2-05 line said 10/10 long after the probe reached 15/15), and a release
+// whose own summary disagrees with its records is worse than one with no summary.
+check(
+  "the tests that hold documents to their recorded values exist",
+  existsSync(join(repo, "tests/playbook-constants.test.ts")) && existsSync(join(repo, "tests/documented-counts.test.ts")),
+  "a documented constant or count with no test is a claim, not a guarantee",
+);
 const agentInstructions = readFileSync(join(repo, "AGENTS.md"), "utf8");
 check(
   "the agent instructions record the local reference checkout and the playbook entry point",

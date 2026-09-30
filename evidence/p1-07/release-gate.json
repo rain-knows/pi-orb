@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-29T23:59:44.447Z",
+  "capturedAt": "2026-09-30T00:09:35.834Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "11093 ms"
+      "detail": "8550 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "7716 ms"
+      "detail": "5291 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "6533 ms"
+      "detail": "5305 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4783 ms"
+      "detail": "3750 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -161,6 +161,11 @@
       "name": "the renderer parity test exists",
       "ok": true,
       "detail": "the tokens, state vocabulary and ids need a regression net, not just a convention"
+    },
+    {
+      "name": "the tests that hold documents to their recorded values exist",
+      "ok": true,
+      "detail": "a documented constant or count with no test is a claim, not a guarantee"
     },
     {
       "name": "the agent instructions record the local reference checkout and the playbook entry point",
@@ -329,7 +334,7 @@
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 63,
+    "passed": 64,
     "skipped": 0,
     "failed": 0,
     "version": "0.1.0",

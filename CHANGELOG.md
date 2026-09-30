@@ -183,6 +183,19 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- `tests/documented-counts.test.ts`: the same protection for evidence counts that
+  `playbook-constants.test.ts` gives constants. Documents quote probe results as `25/25` and `15/15`,
+  and those numbers rot — the P2-05 line still said `10/10` several rounds after the packaged probe
+  reached 15/15, and `manual-acceptance.md` carried the same stale pair. Every count is now read from
+  the recorded JSON and compared against what the documents state next to the matching phrase.
+
+  The first version of this check was wrong in a way worth recording: it searched for the *recorded*
+  denominator (`\d+/15`) and so passed against the very drift it existed for, because the stale text
+  read `10/10` and contained no `15`. It now scans the number following each claim's own phrase, and a
+  test pins that exact case so the guard cannot quietly regress to the weaker form.
+
+  The release gate grows 63 → 64 to require both document-checking suites to exist.
+
 - `tests/playbook-constants.test.ts`: the loop that was missing when the collapse timing drifted.
   `doc/reference-playbook.md` §5.2/§5.3 pin the values that must match the reference project, and
   those tables were *correct* while the code said otherwise for several stages — the delay sat at
