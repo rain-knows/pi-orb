@@ -362,6 +362,47 @@ try {
       String(dismissed).slice(0, 160),
     );
 
+    // Off-screen recovery, part one: the packaged app really does re-clamp an orb that was dragged
+    // beyond every display. This drives `clampFloatingBall`, which is the same geometry the wake path
+    // runs — but note it is NOT the wake path itself.
+    //
+    // That distinction is deliberate and was learned the hard way: an earlier version of this check
+    // claimed to prove "the orb comes back on wake" while calling `clampFloatingBall` directly, so
+    // disabling the wake path's clamp left it passing. The wake itself is triggered from the tray, the
+    // global shortcut or the double-Alt gesture, none of which a CDP-driven probe can press, and
+    // adding a bridge method purely to be testable would be a product surface that exists for tests.
+    // The wake path's own behaviour is therefore pinned by `tests/floating-recovery.test.ts` and by
+    // the shared `presentOrb` helper, which both wake routes call.
+    const recovery = await evaluate(
+      client,
+      `(async () => {
+        await window.orb.moveFloatingBall(9000, 9000);
+        await new Promise((done) => setTimeout(done, 300));
+        const parked = { x: window.screenX, y: window.screenY };
+        await window.orb.clampFloatingBall();
+        await new Promise((done) => setTimeout(done, 600));
+        return JSON.stringify({
+          parked,
+          recovered: { x: window.screenX, y: window.screenY, width: window.outerWidth, height: window.outerHeight },
+          screen: { w: screen.availWidth, h: screen.availHeight },
+        });
+      })()`,
+    );
+    const recoveryValue = JSON.parse(recovery);
+    const back = recoveryValue.recovered;
+    const screenSize = recoveryValue.screen;
+    check(
+      "an orb dragged beyond every display is clamped back into the work area",
+      // It must be off-screen to begin with, or the check proves nothing, and inside the work area
+      // afterwards. A small tolerance covers the window frame's own insets.
+      recoveryValue.parked.x > screenSize.w &&
+        back.x >= 0 &&
+        back.y >= 0 &&
+        back.x + back.width <= screenSize.w + 200 &&
+        back.y + back.height <= screenSize.h + 200,
+      JSON.stringify(recoveryValue).slice(0, 260),
+    );
+
     // The ported dock gesture: drag the ball past the edge, then let go, and confirm the window
     // *slides* off rather than snapping. Docking only happens once the ball is past an edge, so the
     // probe reproduces that pre-condition first; without it the call is a no-op and a snap and a

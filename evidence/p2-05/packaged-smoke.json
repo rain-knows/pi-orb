@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-30T00:57:04.747Z",
+  "capturedAt": "2026-09-30T01:08:31.853Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790729824747",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790730511853",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -79,6 +79,11 @@
       "detail": "ok"
     },
     {
+      "name": "an orb dragged beyond every display is clamped back into the work area",
+      "ok": true,
+      "detail": "{\"parked\":{\"x\":8988,\"y\":8988},\"recovered\":{\"x\":1673,\"y\":971,\"width\":35,\"height\":89},\"screen\":{\"w\":1707,\"h\":1067}}"
+    },
+    {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
       "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
@@ -86,7 +91,7 @@
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
       "ok": true,
-      "detail": "{\"expanded\":false,\"horizontal\":\"right\",\"vertical\":\"up\"}"
+      "detail": "{\"expanded\":false,\"horizontal\":\"left\",\"vertical\":\"up\"}"
     },
     {
       "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
@@ -105,6 +110,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-77888\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/340408ae-3887-4167-b33f-7cf1f9782969"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-17388\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/1677d4da-dfcb-48af-aaaf-a9604d88eaab"
 }

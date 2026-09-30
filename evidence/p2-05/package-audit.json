@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-30T00:57:04.570Z",
+  "capturedAt": "2026-09-30T01:08:31.644Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
@@ -41,7 +41,7 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 9319719,
+    "asarBytes": 9319944,
     "unpackedNativeBytes": 2658109,
     "archiveEntryCount": 137
   },

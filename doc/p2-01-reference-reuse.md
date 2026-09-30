@@ -175,7 +175,7 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
 | 项 | 证据 |
 |---|---|
 | 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（17 条，含时序常量与收起守卫集合） |
-| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（20/20，含本节新增 4 条） |
+| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（21/21，含本节新增 4 条） |
 | **观察框内孔落在观察矩形上**、贴边裁剪不位移、整数像素、CSS 变量齐全 | `tests/observation-frame.test.ts`（7 条） |
 | **观察框不挡输入、不动画、窗口无脚本** | `evidence/p2-05/packaged-smoke.json`（3 条；把 `pointer-events` 改回 `auto` 即失败） |
 | **停靠滑动真的在动**（拖动到边缘后 dock，采样到 9 帧不同位置，从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 同上，`the dock gesture slides the window off the edge instead of snapping it` |

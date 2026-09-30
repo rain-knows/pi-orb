@@ -676,9 +676,10 @@ function attachWakeController(win: BrowserWindow): void {
         // desktop tool path cannot disagree about which window the user means.
         await syncDesktopTargetFromRecord();
       }
-      if (win.isMinimized()) win.restore();
-      win.show();
-      win.focus();
+      // The reposition-then-show sequence is shared with `showOrb` rather than repeated here: the two
+      // paths had already diverged once on exactly this step (neither clamped), and a second copy is
+      // how the next divergence would start.
+      await presentOrb(win);
     },
     collapse: () => {
       lifecycle?.collapse();
@@ -1428,9 +1429,35 @@ async function showOrb(): Promise<void> {
   if (!window || window.isDestroyed()) return;
   const outcome = await recordedTarget.record();
   if (outcome.ok) await syncDesktopTargetFromRecord();
-  if (window.isMinimized()) window.restore();
-  window.show();
-  window.focus();
+  await presentOrb(window);
+}
+
+/**
+ * Reposition the orb into the current display layout, then show and focus it.
+ *
+ * Shared by both wake paths — the `WakeController` callback and `showOrb` behind the tray menu and the
+ * double-Alt gesture — because they had diverged on exactly this step: neither re-clamped, so an orb
+ * parked on a monitor that was later unplugged came back at coordinates that exist on no display:
+ * invisible and unreachable, with no way to summon it again since every wake route led here. A second
+ * copy of the sequence is how the next divergence would start, which is why there is one.
+ *
+ * The clamp is awaited rather than fired and forgotten: it can animate a dock slide, and showing
+ * first would park the orb at the old coordinates for the duration and then jump it.
+ *
+ * Failure is contained. A shell that cannot reposition itself must still show the window, because
+ * refusing to appear is worse than appearing in the wrong place.
+ */
+async function presentOrb(win: BrowserWindow): Promise<void> {
+  if (win.isDestroyed()) return;
+  try {
+    await clampFloatingWindow(win);
+  } catch (error) {
+    console.warn(`[pi-orb] could not reposition the orb on wake: ${describeError(error)}`);
+  }
+  if (win.isDestroyed()) return;
+  if (win.isMinimized()) win.restore();
+  win.show();
+  win.focus();
 }
 
 /**

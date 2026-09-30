@@ -38,7 +38,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 `app.asar` 9 291 054 B、解包原生二进制合计 2 658 109 B、asar 条目 135。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
 
-## 2. 启动探测：`packaged-smoke.json`（20/20 通过）
+## 2. 启动探测：`packaged-smoke.json`（21/21 通过）
 
 以真实 `release/<version>/win-unpacked/pi-orb.exe` 启动，独立 `--user-data-dir` 与
 `PI_ORB_CONFIG`，指向一个未使用的 pi-web 端口，通过 Chrome DevTools Protocol 驱动 renderer。

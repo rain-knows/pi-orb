@@ -12,6 +12,36 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ### Fixed
 
+- **An orb left on a disconnected monitor could not be brought back.** P2-01's criterion is that the
+  floating orb "stays findable" across multi-display, DPI and work-area changes, and the wake paths
+  violated it: `showOrb` and the `WakeController` callback both called `window.show()` without
+  re-clamping first. Unplug the display the orb was parked on — or shrink the work area, or change the
+  DPI — and it returned at coordinates that exist on no screen: invisible, unclickable, and impossible
+  to summon again because the tray, the global shortcut and the double-Alt gesture all lead there.
+
+  The reference has no display-change handling either, so this was not a reuse gap but pi-orb's own
+  requirement unmet, which is why the fix lives in the shell's show path rather than in the ported
+  geometry. Both routes now call one shared `presentOrb`, which re-clamps into the current layout
+  before showing. That sharing is the point: the two paths had already diverged on exactly this step,
+  and the file's own comments record an earlier instance of the same problem with two hide paths.
+
+  Two details worth stating: the clamp is awaited, because it can animate a dock slide and showing
+  first would park the orb at the old coordinates and then jump it; and a clamp failure is caught and
+  logged, because a shell that cannot reposition itself must still appear — refusing to show is worse
+  than showing in the wrong place.
+
+  Verified in the packaged app: parked at `x=8988` (beyond every display), the clamp returns it to
+  `x=1673,y=971` inside the real `1707×1067` work area. Pinned by `tests/floating-recovery.test.ts`
+  (removed display, surviving second display, shrunk work area, and a property check over hostile
+  coordinates) plus a packaged-probe check.
+
+  A correction to that probe check, worth recording: my first version claimed "an orb parked off every
+  display comes back **on wake**" while calling `clampFloatingBall` directly. Disabling the wake path's
+  clamp left it passing — it was testing the IPC handler, not the wake. The probe cannot press the
+  tray, the shortcut or the double-Alt gesture, and adding a bridge method purely to be testable would
+  be a product surface that exists for tests. The check is renamed to say what it actually covers
+  (the shared geometry), and the wake sequence itself is documented as covered by the unit test.
+
 - **Three interaction behaviours in the floating shell had drifted from the reference's state
   machine**, found by comparing the renderer against `floating.js` the way the stylesheet and the
   window geometry were compared:
