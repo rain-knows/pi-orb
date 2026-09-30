@@ -183,6 +183,43 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- **The shell has a context menu, which fixes a real editing defect rather than adding polish.**
+  Electron windows have no default context menu, so before this there was **no way to cut, copy or
+  paste in the composer with the mouse** — right-clicking the field did nothing at all. The playbook
+  had carried the reference's `floatingContextMenuTemplate` as "pending evaluation", which is how a
+  missing capability sat unnoticed behind a product-sounding note.
+
+  Ported the reference's structure (`floating-window.ts:55-129`):
+
+  - the edit block on top — `cut`/`copy`/`paste`/`selectAll` as platform **roles**, so labels,
+    accelerators and behaviour come from Electron rather than being re-spelled and re-localised;
+  - each role's `enabled` from the focused field's own command flags, so a Paste with an empty
+    clipboard is visibly unavailable instead of silently doing nothing. The flags are read in the
+    renderer (`document.queryCommandEnabled`, the only place Chromium reports them) and narrowed with
+    `=== true` in the main process, so a malformed payload disables an item rather than reaching the
+    menu template as a truthy string;
+  - the shell actions the reference keeps: `Hide orb` in place of `Open Main Window` (pi-orb has no
+    main window of its own, and this still routes through the lifecycle call so it revokes desktop
+    authority), `Remove attached selection` only while context is attached, and `Quit pi-orb`.
+
+  Deliberately not ported, per AGENTS.md: the Agent model settings and the selection-toolbar and
+  millifraction toggles. pi-orb does not own model configuration and has neither surface, so there is
+  no counterpart to adapt.
+
+  One difference from the reference that had to be handled: **`Menu.popup` does not replace a visible
+  popup**, and on Windows an open native menu holds the window's message pump. This was found by
+  hitting it — three `openShellMenu` calls left the window stalled and the *dock slide* probe then
+  failed with the ball only reaching `x=-12` instead of `-52`. Stacking is not merely untidy, it
+  wedges the shell behind the first menu. The reference avoids it through dsh's outer window
+  lifecycle; pi-orb refuses to open a menu while one is open, resetting via `popup`'s callback.
+
+  Verified: 7 unit tests cover the template (edit block only when editable, per-role enabling, roles
+  rather than labels, the selection item's condition, the action set, no stacking, and a destroyed
+  window); the packaged probe gains 2 checks (20/20) driving the real IPC path. Falsified by forcing
+  the request validation to throw — the probe then fails with
+  `ERR:Error invoking remote method 'orb:shell-menu'`. The first falsification attempt silently did
+  not apply (shell escaping), which is why the injection was checked before the result was believed.
+
 - **The observation frame — P2-01's "observation border" — is now implemented instead of being
   recorded as a design choice.** Once the Orb hides for a desktop task, nothing on screen said which
   window the next action would land on; the panel named the target, but a name is not a place. The

@@ -51,6 +51,7 @@ import {
   raiseOverlayAboveObservationFrame,
   showObservationFrame,
 } from "./observation-frame";
+import { showShellMenu, type ShellMenuRequest } from "./shell-menu";
 import {
   IPC,
   type DesktopTaskStatus,
@@ -786,6 +787,43 @@ function registerIpc(): void {
     // window revokes desktop operations just like the shortcut and the tray.
     lifecycle?.collapse();
     return desktopTaskStatus();
+  });
+
+  /**
+   * Show the shell's context menu.
+   *
+   * The renderer reports the focused field's `editFlags`, because those are the only place Chromium
+   * exposes "is there a selection to copy" and "does the clipboard hold anything pasteable" — the
+   * main process cannot ask for them directly. They are coerced to booleans here so a malformed or
+   * missing field disables an item rather than throwing inside the menu.
+   */
+  ipcMain.handle(IPC.shellMenu, (event, candidate: unknown) => {
+    const current = window;
+    if (!current || current.isDestroyed()) return false;
+    // Only the shell may open a menu over the shell; any other sender has no business drawing chrome
+    // in this window.
+    if (event.sender !== current.webContents) return false;
+    const request = (typeof candidate === "object" && candidate !== null ? candidate : {}) as Partial<ShellMenuRequest>;
+    showShellMenu(
+      current,
+      {
+        isEditable: request.isEditable === true,
+        canCut: request.canCut === true,
+        canCopy: request.canCopy === true,
+        canPaste: request.canPaste === true,
+        canSelectAll: request.canSelectAll === true,
+        hasSelectionContext: selectionContext !== null,
+      },
+      {
+        onCollapse: () => lifecycle?.collapse(),
+        onQuit: () => quit(),
+        onClearSelectionContext: () => {
+          clearSelectionContext();
+          current.webContents.send(IPC.selectionContext, null);
+        },
+      },
+    );
+    return true;
   });
 
   ipcMain.handle(IPC.setShortcut, (_event, candidate: unknown) => {

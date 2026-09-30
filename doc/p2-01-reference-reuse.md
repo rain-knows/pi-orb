@@ -81,7 +81,31 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
 状态描述的是停下后的窗口，而不是动画途中的某一帧。
 
 核对方式：把参考 48 个导出与 pi-orb 逐名比对，30 个保持参考名，几何常量全部一致；差异项
-（overlay guard、右键菜单、观察框、`createFloatingWindow`）与未移植原因见本文件末节。
+（overlay guard、`createFloatingWindow`）与未移植原因见本文件末节。
+
+### 右键菜单（本轮补齐）
+
+参考的浮球有右键菜单（`floatingContextMenuTemplate`，`floating-window.ts:55-129`），pi-orb 此前
+**一个菜单都没有**。这不是观感问题：**Electron 窗口没有默认右键菜单**，所以在 composer 上右键
+既不能剪切、也不能复制粘贴——输入框根本无法用鼠标编辑。
+
+现按参考结构移植（`src/main/shell-menu.ts`）：
+
+- **可编辑时置顶 `cut` / `copy` / `paste` / `selectAll` 角色块**，其下才是壳层动作。用角色的理由与
+  参考一致：标签、快捷键和平台行为都由 Electron 提供，自己写一套等于再本地化一遍。
+- **每项 `enabled` 取自焦点字段自己的 flag**，所以「剪贴板为空」的粘贴显示为不可用，而不是点了没反应。
+  取值在 renderer 用 `document.queryCommandEnabled` 读（只有那里知道有没有选区、剪贴板里有没有东西），
+  主进程按 `=== true` 收窄成布尔——**不信任传入值**。
+- **壳层动作**：`Hide orb`（对应参考的 Open Main Window；pi-orb 没有自有主窗，且它仍走生命周期出口，
+  所以照样撤权）、`Remove attached selection`（仅在挂着选区时出现）、`Quit pi-orb`。
+- **不移植**：Agent 模型设置、选区工具栏开关、毫坐标开关——pi-orb 不另立模型配置，也没有后两者。
+  按 AGENTS.md 不自行增加参考没有对应物的设置项。
+
+一处与参考不同、必须说明的差异：**`Menu.popup` 不会替换已显示的菜单**，而 Windows 在原生菜单打开
+期间占用该窗口的消息泵。叠加菜单不只是不整洁，会把壳卡在第一个菜单后面——这是写打包探测时**真实
+撞到**的（连续三次 `openShellMenu` 之后，后续 `moveFloatingBall` 只走到 `x=-12`，停靠滑动检查因此
+失败）。参考由 dsh 更外层的窗口生命周期规避了这一点；pi-orb 用「已有菜单打开时拒绝再开」的守卫
+（`popup` 的 `callback` 复位），并由 `tests/shell-menu.test.ts` 钉住。
 
 ### renderer（本次改为真移植）
 
@@ -151,7 +175,7 @@ P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：O
 | 项 | 证据 |
 |---|---|
 | 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（17 条，含时序常量与收起守卫集合） |
-| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（18/18，含本节新增 4 条） |
+| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（20/20，含本节新增 4 条） |
 | **观察框内孔落在观察矩形上**、贴边裁剪不位移、整数像素、CSS 变量齐全 | `tests/observation-frame.test.ts`（7 条） |
 | **观察框不挡输入、不动画、窗口无脚本** | `evidence/p2-05/packaged-smoke.json`（3 条；把 `pointer-events` 改回 `auto` 即失败） |
 | **停靠滑动真的在动**（拖动到边缘后 dock，采样到 9 帧不同位置，从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 同上，`the dock gesture slides the window off the edge instead of snapping it` |

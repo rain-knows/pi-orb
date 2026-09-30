@@ -22,6 +22,7 @@ import type {
   WorkspaceCandidateResult,
   WorkspaceStatus,
   FloatingWindowState,
+  ShellMenuEditFlags,
   ListSessionHistoryResult,
   OpenSessionHistoryResult,
   OrbSelectionContext,
@@ -36,6 +37,7 @@ export interface OrbBridge {
   clampFloatingBall(): Promise<FloatingWindowState>;
   unsnapFloatingBall(): Promise<FloatingWindowState>;
   collapseOrb(): Promise<DesktopTaskStatus>;
+  openShellMenu(flags: ShellMenuEditFlags): Promise<boolean>;
   authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
   revokeDesktopTask(): Promise<DesktopTaskStatus>;
   getDesktopTaskStatus(): Promise<DesktopTaskStatus>;

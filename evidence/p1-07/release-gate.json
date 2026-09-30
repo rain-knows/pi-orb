@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-30T00:25:05.793Z",
+  "capturedAt": "2026-09-30T00:46:28.423Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "11361 ms"
+      "detail": "11458 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "7904 ms"
+      "detail": "7920 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "6714 ms"
+      "detail": "6922 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4815 ms"
+      "detail": "4936 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -285,7 +285,7 @@
     {
       "name": "the recorded packaged-application probe passed and still lists real windows",
       "ok": true,
-      "detail": "{\"passed\":true,\"checks\":18}"
+      "detail": "{\"passed\":true,\"checks\":20}"
     },
     {
       "name": "the installer steps that cannot be automated are recorded as manual",

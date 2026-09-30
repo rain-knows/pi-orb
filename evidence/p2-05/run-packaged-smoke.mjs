@@ -325,6 +325,43 @@ try {
       await new Promise((done) => setTimeout(done, 1200));
     }
 
+    // The shell's context menu. Electron windows have no default menu, so without this there is no
+    // way to cut/copy/paste in the composer by mouse; the check is that the renderer's request
+    // reaches the main process and the menu builds without throwing.
+    //
+    // Only one popup is requested here. `Menu.popup` opens a real native menu that stays up until it
+    // is dismissed and blocks the window's message pump while it is open, so a probe that opened
+    // several would leave the rest of this run operating on a stalled window.
+    const menu = await evaluate(
+      client,
+      `(async () => {
+        const panel = document.getElementById('panel');
+        if (!panel) return JSON.stringify({ error: 'no panel' });
+        const accepted = await window.orb.openShellMenu({ isEditable: true, canCut: true, canCopy: true, canPaste: true, canSelectAll: true });
+        return JSON.stringify({ accepted, bridge: typeof window.orb.openShellMenu });
+      })()`,
+    );
+    const menuValue = JSON.parse(menu);
+    check(
+      "the shell context menu builds from a renderer request",
+      menuValue.accepted === true && menuValue.bridge === "function",
+      JSON.stringify(menuValue).slice(0, 200),
+    );
+    // Dismiss the popup so the rest of this run is not operating on a window whose message pump is
+    // held by a native menu, then confirm the shell is answering again.
+    await client.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
+    await client.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
+    await new Promise((done) => setTimeout(done, 400));
+    const dismissed = await evaluate(
+      client,
+      "window.orb.getStatus().then(() => 'ok').catch((e) => 'ERR:' + e.message)",
+    );
+    check(
+      "the shell keeps answering IPC after a context menu was opened",
+      dismissed === "ok",
+      String(dismissed).slice(0, 160),
+    );
+
     // The ported dock gesture: drag the ball past the edge, then let go, and confirm the window
     // *slides* off rather than snapping. Docking only happens once the ball is past an edge, so the
     // probe reproduces that pre-condition first; without it the call is a no-op and a snap and a

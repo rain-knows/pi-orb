@@ -154,7 +154,7 @@ D:\workself\pi-orb\
 | `apps/desktop/renderer/floating.html` | 浮球/面板 DOM 结构 | `src/renderer/App.tsx` | 已移植：参考 id（`#panel`/`#ball`/`#composer`/`#dock-tab`/`#prompt`/`#selection-chip`/`#transcript` 等）与「`#panel` 常驻、`hidden` 切换」的结构一致；参考专有界面面（`#question*`/`#tcc-*`/`#ball-gif`）无对应物 |
 | `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/styles.css` | 已移植：18 个同名设计令牌、`body.<state>` 布局状态词表、origin-based 展开动画、`html[data-ds-dark-theme]` 暗色；由 `tests/renderer-reference-parity.test.ts` 钉住 |
 | `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/App.tsx` | 视觉与状态约定移植（body 级 `pointerenter`/`pointerleave`、展开/收起时序）；宿主调用未搬 |
-| `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | 未移植 | 待评估：pi-orb 无 dsh 设置页，只保留可用项 |
+| `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | `src/main/shell-menu.ts` | **部分移植**：结构取自参考的 `floatingContextMenuTemplate`（`floating-window.ts:55-129`）——可编辑时置顶 `cut/copy/paste/selectAll` 角色块（由焦点字段的 `editFlags` 逐项 `enabled`），其下是壳层动作。参考的「打开主窗口」换成「隐藏浮球」（pi-orb 无自有主窗，pi-web 才是会话 UI），Quit 保留。**不移植**：Agent 模型设置（pi-orb 不另立模型配置）、选区工具栏开关与毫坐标开关（无对应物） |
 | `apps/desktop/src/orb-permission.ts` | 浮球权限模型（只读/编辑/完全访问） | 未移植 | 不适用：pi-orb 用 pi-web 自身权限与会话模型 |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
 | `apps/desktop/src/orb-avatar.ts` | 自定义头像（GIF/PNG/WebP，2 MB 上限） | `src/renderer/orb-avatar.png` 静态资源 | 未移植；如需自定义再按此实现 |
@@ -209,6 +209,8 @@ D:\workself\pi-orb\
 | 观察框几何 | stroke `8px`、glow `28px`、outset `36px`；窗口 = 区域外扩 outset 后与 work area 求交；内孔 = 外扩减去实际每边 inset；**贴边被裁时 stroke 画在边内侧**（`edgePadding` 先扣 stroke，余量为 glow） | `observation-frame-window.ts:5-15`、`:73-91`、`:117-139` |
 | 观察框窗口属性 | 点击穿透 `setIgnoreMouseEvents(true, { forward: true })`；不进用户截图 `setContentProtection(true)`（win32）；`focusable:false` + `showInactive()` 不抢焦点；`roundedCorners:false` 防止贴边描边被圆角裁掉 | `observation-frame-window.ts:213-244`、`:252-262` |
 | 观察框不得有动画 | 参考的 `observation-frame-window.spec.ts` 断言该 CSS 无 `animation`/`@keyframes`——它标记的是**区域**而不是活动，闪烁会被读成「正在工作」 | `apps/desktop/tests/observation-frame-window.spec.ts` |
+| 右键菜单结构 | 可编辑时：`cut/copy/paste` 角色 + 分隔 + `selectAll` + 分隔 + 壳层动作；每项 `enabled` 取自焦点字段 `editFlags`；不可编辑时只有壳层动作。**Electron 窗口没有默认右键菜单**，所以不接这条就等于输入框无法用鼠标剪切/复制/粘贴 | `floating-window.ts:55-129`、`:122-128` |
+| 弹出菜单不得叠加 | `Menu.popup` 不会替换已显示的菜单；Windows 在菜单打开期间占用该窗口的消息泵，叠加会卡住壳。pi-orb 因此加了「已有菜单打开时拒绝再开」的守卫（参考由 dsh 更外层的窗口生命周期避免） | pi-orb `src/main/shell-menu.ts` |
 | 停靠滑出／滑回时长 | 滑出 `FLOATING_DOCK_SLIDE_OFF_MS = 250` + `easeInOutCubic`；滑回 `FLOATING_DOCK_SLIDE_IN_MS = 300` + `easeOutCubic` | `floating-window.ts:207-213`、`:461-471`、`:836-845` |
 | 减少动效 | `systemPreferences.getAnimationSettings().prefersReducedMotion`；测试模式（`VITEST`）与窗口已销毁时同样直接落位 | `floating-window.ts:376-381`、`:407-420` |
 

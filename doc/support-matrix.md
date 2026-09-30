@@ -94,7 +94,7 @@ P1 未完成前**没有**可发布的支持行。已完成并有证据的能力�
 | **P2-04 桌面操作扩展**：参考项目热键、长按、同窗口拖拽、动作后回图与显式截图导出 | 已接入（broker/schema/driver、Pi image block、截图导出字节校验和参考 backend 取消释放测试通过；真实桌面动作、目标像素、保存对话框与剪贴板仍未人工验收） | `tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows.test.ts`、`tests/screenshot-export.test.ts`、`src/main/screenshot-export.ts`、`evidence/p2-04/README.md` |
 | **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 已验证（`release/0.1.0/pi-orb-0.1.0-win-x64.exe` 构建成功；配置沿用参考形态） | `electron-builder.config.mjs`、`doc/p2-05-distribution.md` |
 | **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留 | 已验证（25/25） | `evidence/p2-05/package-audit.json` |
-| **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、`orb:list-desktop-windows` 返回真实窗口（koffi 从 `app.asar.unpacked` 加载） | 已验证（18/18，并做过删除原生二进制后必须失败、以及强制瞬移后滑动检查必须失败的反向对照） | `evidence/p2-05/packaged-smoke.json` |
+| **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、`orb:list-desktop-windows` 返回真实窗口（koffi 从 `app.asar.unpacked` 加载） | 已验证（20/20，并做过删除原生二进制后必须失败、以及强制瞬移后滑动检查必须失败的反向对照） | `evidence/p2-05/packaged-smoke.json` |
 | **参考项目 Windows 后端自带的规格测试已移植**：窗口选择 10 条不变量 + 输入 13 条（键映射、UIPI 拒绝、剪贴板顺序、滚轮档位、PNG 头等） | 已验证（23/23，逐条对应参考 spec） | `tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts` |
 | **`orb_open_app` 的收窄语义**：只激活已在运行的应用、不启动进程；`name` 拒绝路径／参数片段／shell 元字符；激活后必须验证前台窗口确属该应用才重绑定 | 已验证（自动化：前置检查失败、前台不匹配、`launch` 不可达三条失败路径均有断言） | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`evidence/p1-06/tool-exposure.json` |
 

@@ -1,28 +1,28 @@
 {
-  "capturedAt": "2026-09-30T00:25:51.820Z",
+  "capturedAt": "2026-09-30T00:43:57.334Z",
   "steps": [
     {
       "name": "build and package the unpacked Windows app",
       "ok": true,
-      "ms": 25929,
+      "ms": 28461,
       "output": "  • downloaded electron zip extracted successfully  output=D:\\workself\\pi-orb\\release\\0.1.0\\win-unpacked |   • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • updating asar integrity executable resource  executablePath=release\\0.1.0\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0\\win-unpacked\\pi-orb.exe"
     },
     {
       "name": "audit the packaged artifact",
       "ok": true,
-      "ms": 221,
+      "ms": 247,
       "output": "  }, |   \"failed\": [], |   \"passedCount\": 25 | }"
     },
     {
       "name": "start the packaged application and drive its renderer",
       "ok": true,
-      "ms": 6215,
+      "ms": 6794,
       "output": "      \"detail\": \"none\" |     } |   ] | }"
     }
   ],
   "passed": true,
   "artifactAudit": {
-    "capturedAt": "2026-09-30T00:26:17.909Z",
+    "capturedAt": "2026-09-30T00:44:25.971Z",
     "version": "0.1.0",
     "appRoot": "release/0.1.0/win-unpacked",
     "entries": {
@@ -64,7 +64,7 @@
     ],
     "sizes": {
       "executableBytes": 246090752,
-      "asarBytes": 9316169,
+      "asarBytes": 9319719,
       "unpackedNativeBytes": 2658109,
       "archiveEntryCount": 137
     },
@@ -102,7 +102,7 @@
       {
         "name": "the archive contains the built renderer assets",
         "ok": true,
-        "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-SPBuL9wt.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
+        "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-CKXGaqEc.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
       },
       {
         "name": "the archive ships no src/ files",
@@ -198,9 +198,9 @@
     "passed": true
   },
   "packagedSmoke": {
-    "capturedAt": "2026-09-30T00:26:18.092Z",
+    "capturedAt": "2026-09-30T00:44:26.152Z",
     "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790727978092",
+    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790729066152",
     "checks": [
       {
         "name": "the packaged application stays alive",
@@ -268,9 +268,19 @@
         "detail": "script tags: 0"
       },
       {
+        "name": "the shell context menu builds from a renderer request",
+        "ok": true,
+        "detail": "{\"accepted\":true,\"bridge\":\"function\"}"
+      },
+      {
+        "name": "the shell keeps answering IPC after a context menu was opened",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
         "name": "the dock gesture slides the window off the edge instead of snapping it",
         "ok": true,
-        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
+        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
       },
       {
         "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -294,8 +304,8 @@
       }
     ],
     "passed": true,
-    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-63404\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/f37b58d3-f92b-496e-88e0-9106a0d76f32"
+    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-58432\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/6fa8e267-03db-4e20-a8cf-217c98a79ddc"
   },
   "installer": "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
 }

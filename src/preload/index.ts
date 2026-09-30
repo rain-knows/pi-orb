@@ -30,6 +30,7 @@ import {
   type WorkspaceCandidateResult,
   type WorkspaceStatus,
   type FloatingWindowState,
+  type ShellMenuEditFlags,
   type ListSessionHistoryResult,
   type OpenSessionHistoryResult,
   type OrbSelectionContext,
@@ -44,6 +45,12 @@ export interface OrbBridge {
   clampFloatingBall(): Promise<FloatingWindowState>;
   unsnapFloatingBall(): Promise<FloatingWindowState>;
   collapseOrb(): Promise<DesktopTaskStatus>;
+  /**
+   * Open the shell's context menu. `editFlags` are the focused field's own flags from
+   * `document.queryCommandEnabled`, which is the only way to learn whether there is a selection to
+   * copy or a clipboard to paste from; the main process coerces them to booleans.
+   */
+  openShellMenu(flags: ShellMenuEditFlags): Promise<boolean>;
   authorizeDesktopTask(request: AuthorizeDesktopTaskRequest): Promise<DesktopTaskStatus>;
   revokeDesktopTask(): Promise<DesktopTaskStatus>;
   getDesktopTaskStatus(): Promise<DesktopTaskStatus>;
@@ -78,6 +85,7 @@ const bridge: OrbBridge = {
   clampFloatingBall: () => ipcRenderer.invoke(IPC.clampFloatingBall),
   unsnapFloatingBall: () => ipcRenderer.invoke(IPC.unsnapFloatingBall),
   collapseOrb: () => ipcRenderer.invoke(IPC.collapseOrb),
+  openShellMenu: (flags: ShellMenuEditFlags) => ipcRenderer.invoke(IPC.shellMenu, flags),
   authorizeDesktopTask: (request: AuthorizeDesktopTaskRequest) =>
     ipcRenderer.invoke(IPC.authorizeDesktopTask, request),
   revokeDesktopTask: () => ipcRenderer.invoke(IPC.revokeDesktopTask),

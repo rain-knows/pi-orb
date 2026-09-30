@@ -330,6 +330,22 @@ export function App() {
       id="panel"
       hidden={panelHidden}
       onPointerEnter={() => clearCollapseTimer()}
+      // Electron windows have no default context menu, so without this there is no way to cut, copy
+      // or paste in the composer by mouse. The flags come from the document's own command state,
+      // which is the only place Chromium reports "is there a selection" and "is there anything to
+      // paste"; the main process builds the menu from them (see `shell-menu.ts`).
+      onContextMenu={(event) => {
+        event.preventDefault();
+        const target = event.target as HTMLElement | null;
+        const editable = target?.isContentEditable === true || target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement;
+        void bridge.openShellMenu({
+          isEditable: editable,
+          canCut: editable && document.queryCommandEnabled("cut"),
+          canCopy: document.queryCommandEnabled("copy"),
+          canPaste: editable && document.queryCommandEnabled("paste"),
+          canSelectAll: document.queryCommandEnabled("selectAll"),
+        });
+      }}
     >
       <button id="history" type="button" onClick={() => void loadHistory()} title="Conversation history" aria-label="Conversation history">◷</button>
       <div id="permission">

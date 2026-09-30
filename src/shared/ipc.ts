@@ -30,6 +30,15 @@ export const IPC = {
    * desktop operations exactly like the other routes.
    */
   collapseOrb: "orb:collapse",
+  /**
+   * Renderer -> main: show the shell's context menu at a point in the window.
+   *
+   * The menu is built in the main process because Electron has no default context menu: without one,
+   * right-clicking the composer offers no cut/copy/paste at all. The reference builds the equivalent
+   * surface the same way (`floatingContextMenuTemplate`), and its first block is the same
+   * text-editing set, enabled from the focused field's `editFlags`.
+   */
+  shellMenu: "orb:shell-menu",
   /** Renderer -> main: read the Orb configuration and workspace status. */
   getStatus: "orb:get-status",
   /** Renderer -> main: validate a candidate workspace directory (read-only). */
@@ -87,6 +96,20 @@ export interface FloatingWindowState {
   readonly horizontal: "left" | "right";
   readonly vertical: "up" | "down";
   readonly docked: "left" | "right" | undefined;
+}
+
+/**
+ * The focused field's editing capabilities, read in the renderer and forwarded when the shell's menu
+ * opens. `isEditable` decides whether the edit block is offered at all; the rest enable individual
+ * roles so a disabled item shows that there is nothing to cut or paste, rather than doing nothing
+ * when clicked.
+ */
+export interface ShellMenuEditFlags {
+  readonly isEditable: boolean;
+  readonly canCut: boolean;
+  readonly canCopy: boolean;
+  readonly canPaste: boolean;
+  readonly canSelectAll: boolean;
 }
 
 export interface WorkspaceStatus {
