@@ -169,3 +169,5 @@ trademark rights.
   repositories of the dependencies.
 - A component that declares a license in `package.json` but ships no license text is recorded as
   such rather than assumed to be either MIT or MPL beyond its own declaration.
+
+工具提速的批量提示与动作后截图语义参考并适配自 `packages/experimental/tool-computer-use/src/policy.ts:20-30` 与 `plugin.ts:330-360`，固定提交 `72f1d738458a223696685a909e806b683eff5885`，Copyright (c) 2026 DeepSeek，MIT。Pi 批量桥接为运行时边界适配，不搬 dsh 调度器。

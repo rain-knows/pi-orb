@@ -718,3 +718,7 @@ application:
 - A release records its verified combination (pi-orb, Node, Electron, Pi SDK, pi-web,
   desktop driver, OS) in the support matrix. Verified rows are evidence-backed; see the
   linked file under `evidence/`.
+
+## 工具速度阶段 2
+
+- 新增 orb_batch 顺序批量，协议 v2、整批预检、取消传播、按工作量超时和中文逐步进度。10 批真实点击读回通过；不宣称降低每步原生等待。

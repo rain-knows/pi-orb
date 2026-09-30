@@ -50,7 +50,7 @@ describe("Orb tool naming", () => {
 
   it("exposes reference actions supported by the Windows backend", () => {
     expect(Object.values(ORB_TOOLS)).toEqual([
-      "orb_observe", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app", "orb_wait", "orb_long_wait", "orb_list_apps",
+      "orb_observe", "orb_batch", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app", "orb_wait", "orb_long_wait", "orb_list_apps",
     ]);
   });
 });

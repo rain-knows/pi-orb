@@ -417,7 +417,7 @@ D:\workself\pi-orb\
 
 **不可让步的三条**（pi-orb 的宿主授权边界）：
 
-1. 每次 observe 按参考规则选择前台或最上层合格原生应用并排除 Orb；每个 action 只能使用最新 observation，动作前目标身份变化时必须重新观察，动作后采用新的观察结果。
+1. 每次 observe 按参考规则选择前台或最上层合格原生应用并排除 Orb；单步 action 只能使用最新 observation；orb_batch 整批绑定初始观察、仅包含初始可见且独立的目标，由宿主逐步采用新的观察；动作前目标身份变化时必须重新观察，批次内观察区域或身份变化时停止后续动作。
 2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话默认完全访问，Stop／hide／断连后不静默重授。截图消息必须另经用户预览确认。唤醒、cwd 匹配、`/orb` 字符串都不构成授权。
 3. 断连、换 workspace/session、收起、Stop、退出都必须撤权并释放按键／鼠标／监听器；turn idle 与普通回复完成不撤权。
 

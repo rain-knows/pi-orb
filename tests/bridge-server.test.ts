@@ -8,6 +8,7 @@ function fakeExecutor(options: { readonly live?: boolean; readonly fail?: string
   const calls: string[] = [];
   return {
     calls,
+    batch: async () => ({ ok: true, completed: 2, steps: [] }),
     observe: async () => {
       calls.push("observe");
       return { observationId: "obs-1" };
@@ -31,7 +32,7 @@ function fakeExecutor(options: { readonly live?: boolean; readonly fail?: string
 /** One newline-delimited request, one line of JSON back. */
 function send(pipePath: string, payload: unknown): Promise<{ raw: string; parsed: Record<string, unknown> }> {
   return new Promise((resolve, reject) => {
-    const socket = connect(pipePath, () => socket.write(`${JSON.stringify(payload)}\n`));
+    const socket = connect(pipePath, () => socket.write(`${JSON.stringify(typeof payload === "object" && payload !== null ? { version: BRIDGE_PROTOCOL_VERSION, requestId: "test-request", ...payload } : payload)}\n`));
     let data = "";
     socket.on("data", (chunk) => (data += chunk.toString("utf8")));
     socket.on("end", () => {
@@ -127,7 +128,8 @@ describe("bridge admission rules", () => {
     const pipePath = "\\\\.\\pipe\\pi-orb-test-" + process.pid + "-" + unique;
     const executor = {
       calls: [] as string[],
-      observe: async () => ({}),
+      batch: async () => ({ ok: true, completed: 2, steps: [] }),
+    observe: async () => ({}),
       act: async () => ({}),
       status: () => ({}),
       revoke: () => {},
@@ -229,7 +231,8 @@ describe("bridge admission rules", () => {
       pipePath,
       token,
       executor: {
-        observe: async () => ({ ok: false, refused: true, reason: "no-target", message: "nothing to observe" }),
+        batch: async () => ({ ok: true, completed: 2, steps: [] }),
+    observe: async () => ({ ok: false, refused: true, reason: "no-target", message: "nothing to observe" }),
         act: async () => ({ ok: false, refused: true, reason: "no-task-authorization", message: "not approved" }),
         status: () => ({}),
         revoke: () => {},

@@ -31,9 +31,10 @@ export const MAX_BRIDGE_FRAME_BYTES = Math.ceil(MAX_SCREENSHOT_BYTES * 1.5) + 25
 
 export interface BridgeExecutor {
   /** Perform an observation. Returns a JSON-serializable result. */
-  observe(input: { readonly sessionId: string; readonly generation: number }): Promise<unknown>;
+  observe(input: { readonly sessionId: string; readonly generation: number; readonly signal?: AbortSignal }): Promise<unknown>;
   /** Perform one action. Returns a JSON-serializable result. */
-  act(action: unknown, sessionId: string, generation: number): Promise<unknown>;
+  act(action: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown>;
+  batch(value: unknown, sessionId: string, generation: number, signal?: AbortSignal, progress?: (step: number, total: number) => void): Promise<unknown>;
   /** Report the task state for the session. */
   status(): unknown;
   /** Revoke the current session desktop Access grant. */
@@ -82,21 +83,27 @@ export class BridgeServer {
       const server = createServer((socket) => {
         this.#connections += 1;
         let buffer = "";
+        let handled = false;
+        let finished = false;
+        const controller = new AbortController();
+        const cancel = () => { if (!finished) controller.abort(new Error("Bridge client disconnected.")); };
+        socket.on("end", cancel);
         socket.on("data", (chunk) => {
+          if (handled) return;
           buffer += chunk.toString("utf8");
           const newline = buffer.indexOf("\n");
+          if (buffer.length > MAX_BRIDGE_FRAME_BYTES) { handled = true; socket.end(`${JSON.stringify(refuse("malformed", "Request frame too large."))}\n`); return; }
           if (newline === -1) {
             // A request must be a single newline-terminated JSON object. Refusing an
             // oversized frame keeps a misbehaving client from growing this buffer forever.
-            if (buffer.length > MAX_BRIDGE_FRAME_BYTES) {
-              socket.end(`${JSON.stringify(refuse("malformed", "Request frame too large."))}\n`);
-            }
             return;
           }
+          handled = true;
           const frame = buffer.slice(0, newline);
           buffer = buffer.slice(newline + 1);
-          const requestId = (() => { try { return JSON.parse(frame).requestId ?? randomUUID(); } catch { return randomUUID(); } })();
-          void withToolTiming(requestId, entry => this.#log(entry), () => timeToolPhase("executor-total", () => this.#handle(frame))).then((response) => {
+          const requestId = (() => { try { const id = JSON.parse(frame).requestId; return typeof id === "string" && /^[a-zA-Z0-9-]{1,128}$/.test(id) ? id : randomUUID(); } catch { return randomUUID(); } })();
+          void withToolTiming(requestId, entry => this.#log(entry), () => timeToolPhase("executor-total", () => this.#handle(frame, controller.signal, (step, total) => { if (!socket.destroyed) socket.write(`${JSON.stringify({ type: "progress", requestId, step, total })}\n`); }))).then((response) => {
+            finished = true;
             socket.end(`${JSON.stringify(response)}\n`);
           });
         });
@@ -104,6 +111,7 @@ export class BridgeServer {
           // A client that vanishes mid-request is not an error worth surfacing.
         });
         socket.on("close", () => {
+          cancel();
           this.#connections = Math.max(0, this.#connections - 1);
         });
       });
@@ -123,7 +131,7 @@ export class BridgeServer {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 
-  async #handle(frame: string): Promise<BridgeResponse> {
+  async #handle(frame: string, signal: AbortSignal, progress: (step: number, total: number) => void): Promise<BridgeResponse> {
     let request: Record<string, unknown>;
     try {
       request = JSON.parse(frame) as Record<string, unknown>;
@@ -146,13 +154,14 @@ export class BridgeServer {
       return refuse("bad-token", "The bridge token is missing or wrong.");
     }
 
-    if (request.version !== undefined && request.version !== BRIDGE_PROTOCOL_VERSION) {
+    if (request.version !== BRIDGE_PROTOCOL_VERSION) {
       return refuse(
         "version-mismatch",
         `Bridge protocol version ${String(request.version)} is not supported (expected ${BRIDGE_PROTOCOL_VERSION}).`,
       );
     }
 
+    if (typeof request.requestId !== "string" || request.requestId.length < 1 || request.requestId.length > 128) return refuse("malformed", "Request correlation ID required.");
     const sessionId = typeof request.sessionId === "string" ? request.sessionId : "";
     const generation = typeof request.generation === "number" ? request.generation : -1;
 
@@ -161,6 +170,7 @@ export class BridgeServer {
         return { ok: true, result: { version: BRIDGE_PROTOCOL_VERSION } };
       case "observe":
       case "act":
+      case "batch":
       case "status":
       case "revoke": {
         const admission = this.#options.executor.accepts(sessionId, generation);
@@ -177,13 +187,14 @@ export class BridgeServer {
         }
         try {
           if (type === "observe") {
-            const result = await this.#options.executor.observe({ sessionId, generation });
+            const result = await this.#options.executor.observe({ sessionId, generation, signal });
             return promoteRefusal(result);
           }
           if (type === "act") {
-            const result = await this.#options.executor.act(request.action, sessionId, generation);
+            const result = await this.#options.executor.act(request.action, sessionId, generation, signal);
             return promoteRefusal(result);
           }
+          if (type === "batch") return { ok: true, result: await this.#options.executor.batch(request.batch, sessionId, generation, signal, progress) };
           if (type === "revoke") {
             this.#options.executor.revoke();
             return { ok: true, result: { revoked: true } };

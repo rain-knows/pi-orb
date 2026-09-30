@@ -17,7 +17,6 @@ import { readFileSync, existsSync } from "node:fs";
 import type {
   BridgeRefusal,
   BridgeRequestBody,
-  BridgeResponse,
   BridgeTokenFile,
 } from "../../src/shared/bridge-protocol.js";
 import { BRIDGE_PROTOCOL_VERSION, BRIDGE_TOKEN_FILENAME } from "../../src/shared/bridge-protocol.js";
@@ -111,10 +110,11 @@ readToken(): BridgeTokenFile | null {
 }
 
   /** Send one request and await the single line of JSON the shell replies with. */
-  async call(request: BridgeRequestBody, handshake: BridgeTokenFile): Promise<BridgeCallResult> {
-    const requestId = randomUUID();
-    const payload = `${JSON.stringify({ ...request, requestId, token: handshake.token })}\n`;
-    const timeoutMs = this.#options.timeoutMs ?? 30_000;
+  async call(request: BridgeRequestBody, handshake: BridgeTokenFile, signal?: AbortSignal, onProgress?: (step: number, total: number) => void): Promise<BridgeCallResult> {
+    const requestId = request.requestId ?? randomUUID();
+    if (signal?.aborted) return { ok: false, reason: "cancelled", message: "Request cancelled." };
+    const payload = `${JSON.stringify({ version: BRIDGE_PROTOCOL_VERSION, ...request, requestId, token: handshake.token })}\n`;
+    const timeoutMs = this.#options.timeoutMs ?? bridgeTimeoutMs(request);
     const target = handshake.pipePath || this.#options.pipePath;
     if (!target) {
       return {
@@ -130,6 +130,7 @@ readToken(): BridgeTokenFile | null {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
+        signal?.removeEventListener("abort", cancel);
         socket.destroy();
         resolve(value);
       };
@@ -144,28 +145,23 @@ readToken(): BridgeTokenFile | null {
       }, timeoutMs);
 
       socket.on("connect", () => socket.write(payload));
+      const cancel = () => finish({ ok: false, reason: "cancelled", message: "Request cancelled." });
+      signal?.addEventListener("abort", cancel, { once: true });
+      if (signal?.aborted) cancel();
       let data = "";
       socket.on("data", (chunk) => {
         data += chunk.toString("utf8");
-      });
-      socket.on("end", () => {
-        const line = data.split(/\r?\n/).find((entry) => entry.trim().startsWith("{"));
-        if (!line) {
-          finish({ ok: false, reason: "malformed", message: "The Orb shell returned no JSON response." });
-          return;
-        }
-        try {
-          const parsed = JSON.parse(line) as BridgeResponse;
-          if (parsed.ok) finish({ ok: true, result: parsed.result });
-          else finish({ ok: false, reason: parsed.reason, message: parsed.message });
-        } catch (error) {
-          finish({
-            ok: false,
-            reason: "malformed",
-            message: `The Orb shell response could not be parsed: ${(error as Error).message}`,
-          });
+        while (data.includes("\n")) {
+          const newline = data.indexOf("\n"); const line = data.slice(0, newline); data = data.slice(newline + 1);
+          try {
+            const parsed = JSON.parse(line);
+            if (parsed.type === "progress") { if (parsed.requestId === requestId) onProgress?.(parsed.step, parsed.total); continue; }
+            if (parsed.ok) finish({ ok: true, result: parsed.result });
+            else finish({ ok: false, reason: parsed.reason, message: parsed.message });
+          } catch { finish({ ok: false, reason: "malformed", message: "Invalid bridge response." }); }
         }
       });
+      socket.on("end", () => { if (!settled) finish({ ok: false, reason: "malformed", message: "Bridge closed without a result." }); });
       socket.on("error", (error) => {
         // A missing pipe is the normal "shell is not running" case, not an exception to
         // propagate into the model's tool call.
@@ -177,4 +173,17 @@ readToken(): BridgeTokenFile | null {
       });
     })));
   }
+}
+
+/** Declared waits must outlive their work; batches budget each native action independently. */
+export function bridgeTimeoutMs(request: BridgeRequestBody): number {
+  if (request.type === "batch") {
+    const count = (request.batch as { actions?: unknown[] } | null)?.actions?.length ?? 1;
+    return 30_000 * Math.min(8, Math.max(1, count));
+  }
+  if (request.type === "act") {
+    const action = request.action as { kind?: string; waitSeconds?: number } | null;
+    if (action?.kind === "longWait" && typeof action.waitSeconds === "number" && Number.isFinite(action.waitSeconds)) return 30_000 + Math.min(120, Math.max(0, action.waitSeconds)) * 1000;
+  }
+  return 30_000;
 }

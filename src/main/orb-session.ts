@@ -92,6 +92,7 @@ export class OrbSessionController {
     this.#pendingQuestionId = null;
     this.#promptQueue = [];
     this.#generation = generation;
+    this.#modelInterval = 0; this.#toolStarts.clear();
   }
 
   /**
@@ -284,27 +285,30 @@ export class OrbSessionController {
         this.#handleMessageUpdate(record);
         return;
       case "tool_execution_start":
+      case "tool_execution_update":
       case "tool_execution_end": {
         const id = typeof record.toolCallId === "string" ? record.toolCallId : "";
         const name = typeof record.toolName === "string" ? record.toolName : "";
         if (!id || !name) return;
-        const phase = type === "tool_execution_start" ? "start" : "end";
+        const phase = type === "tool_execution_start" ? "start" : type === "tool_execution_update" ? "update" : "end";
         if (phase === "start") {
           if (this.#modelInterval) this.#deps.log?.({ event: "model-response-interval", durationMs: performance.now() - this.#modelInterval });
           this.#modelInterval = 0;
           this.#toolStarts.set(id, performance.now());
-        } else {
+        } else if (phase === "end") {
           const start = this.#toolStarts.get(id);
           if (start !== undefined) this.#deps.log?.({ event: "tool-through-sse", toolCallId: id, durationMs: performance.now() - start });
           this.#toolStarts.delete(id);
           this.#modelInterval = performance.now();
         }
+        const timing = (record.result as { details?: { timing?: { requestId?: string; extensionReturnedAt?: number } } } | undefined)?.details?.timing;
         this.#deps.emit({
           type: "tool",
+          ...(typeof timing?.extensionReturnedAt === "number" ? { extensionReturnedAt: timing.extensionReturnedAt, requestId: timing.requestId } : {}),
           phase,
           id,
           name,
-          detail: phase === "start" ? summarizeToolArgs(record.args) : record.isError === true ? "Failed" : "Completed",
+          detail: phase === "start" ? summarizeToolArgs(record.args) : phase === "update" ? extractText((record.partialResult as { content?: unknown } | undefined)?.content) : record.isError === true ? "Failed" : "Completed",
           isError: phase === "end" && record.isError === true,
         });
         return;
@@ -398,6 +402,7 @@ export class OrbSessionController {
       const delta = updateRecord.delta;
       if (typeof delta !== "string" || delta.length === 0) return;
       if (!this.#accumulator) this.#accumulator = { text: "" };
+      if (this.#modelInterval) { this.#deps.log?.({ event: "model-response-interval", durationMs: performance.now() - this.#modelInterval }); this.#modelInterval = 0; }
       this.#accumulator.text += delta;
       this.#deps.emit({ type: "assistant-delta", text: delta });
       return;

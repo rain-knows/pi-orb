@@ -103,7 +103,7 @@ async function probeNativeTarget(cdp) {
     const socket = connectPipe(handshake.pipePath);
     const timer = setTimeout(() => socket.destroy(new Error("Native bridge timeout")), 5000);
     let data = "";
-    socket.on("connect", () => socket.write(`${JSON.stringify({ ...request, token: handshake.token, sessionId: state.sessionId, generation: state.generation })}\n`));
+    socket.on("connect", () => socket.write(`${JSON.stringify({ version: 2, requestId: `probe-${Date.now()}`, ...request, token: handshake.token, sessionId: state.sessionId, generation: state.generation })}\n`));
     socket.on("data", (chunk) => { data += chunk.toString(); });
     socket.on("end", () => { clearTimeout(timer); try { resolve(JSON.parse(data.trim())); } catch (error) { reject(error); } });
     socket.on("error", (error) => { clearTimeout(timer); reject(error); });

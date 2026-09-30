@@ -346,14 +346,14 @@ async function startDesktop(): Promise<void> {
       ops,
       backend: createWindowsDesktopBackend(ops),
       ownProcessId: process.pid,
-      withGuiTurn: async <T>(run: () => Promise<T>): Promise<T> => {
+      withGuiTurn: async <T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T> => {
         const current = window;
         if (!current || current.isDestroyed()) return run();
         // Reference cloak keeps the transcript visible and excludes it from GDI captures.
         // Counts pair overlapping turns; a capture finishing cannot restore hit testing during HID.
         applyFloatingOverlayGuard(current, "input", "begin");
         try {
-          await delay(OVERLAY_GUARD_INPUT_APPLY_MS, new AbortController().signal);
+          await delay(OVERLAY_GUARD_INPUT_APPLY_MS, signal ?? new AbortController().signal);
           showObservationFrameForTarget();
           return await run();
         } finally {
@@ -441,12 +441,13 @@ async function startBridge(): Promise<void> {
     executor: {
       observe: async (input) => {
         const broker = requireBroker();
-        return broker.observe(input.sessionId, input.generation);
+        return broker.observe(input.sessionId, input.generation, input.signal);
       },
-      act: async (action, sessionId, generation) => {
+      act: async (action, sessionId, generation, signal) => {
         const broker = requireBroker();
-        return broker.act(action, sessionId, generation);
+        return broker.act(action, sessionId, generation, signal);
       },
+      batch: (value, sessionId, generation, signal, progress) => requireBroker().batch(value, sessionId, generation, signal, progress),
       status: () => desktopTaskStatus(),
       revoke: () => desktopBroker?.revoke(),
       /**

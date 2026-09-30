@@ -684,7 +684,7 @@ async function main() {
         const name = document.createElement('strong')
         name.textContent = ({
           read: '读取文件', write: '写入文件', edit: '编辑文件', bash: '执行命令',
-          orb_observe: '观察桌面', orb_click: '点击', orb_type: '输入文字', orb_scroll: '滚动',
+          orb_batch: '批量操作', orb_observe: '观察桌面', orb_click: '点击', orb_type: '输入文字', orb_scroll: '滚动',
           orb_hotkey: '按键', orb_long_press: '长按', orb_drag: '拖动', orb_open_app: '切换应用',
           orb_list_apps: '查看应用', orb_wait: '等待', orb_long_wait: '等待任务',
         })[event.name] ?? event.name
@@ -695,13 +695,19 @@ async function main() {
         transcript.append(row)
         toolRows.set(event.id, row)
       }
-      row.classList.toggle('orb-tool--running', event.phase === 'start')
+      row.classList.toggle('orb-tool--running', event.phase !== 'end')
       row.classList.toggle('orb-tool--error', event.isError)
-      row.querySelector('.orb-tool-phase').textContent = event.phase === 'start' ? '进行中' : event.isError ? '失败' : '完成'
-      row.querySelector('p').textContent = event.phase === 'start'
+      row.querySelector('.orb-tool-phase').textContent = event.phase !== 'end' ? '进行中' : event.isError ? '失败' : '完成'
+      row.querySelector('p').textContent = event.phase !== 'end'
         ? (event.detail && event.detail !== 'Running' ? event.detail : '正在执行…')
         : event.isError ? (event.detail && event.detail !== 'Failed' ? event.detail : '调用失败') : ''
       transcript.scrollTop = transcript.scrollHeight
+      if (event.phase === 'end' && Number.isFinite(event.extensionReturnedAt)) {
+        window.requestAnimationFrame(() => {
+          const durationMs = window.performance.timeOrigin + window.performance.now() - event.extensionReturnedAt
+          if (durationMs >= 0) console.log('[pi-orb] extension-return-to-render (Pi image processing + event transport + render)', { requestId: event.requestId, durationMs })
+        })
+      }
     } else if (event.type === 'question') {
       pendingQuestion = { ...event, selected: undefined, value: event.prefill, error: undefined, busy: false }
       setHistoryOpen(false)

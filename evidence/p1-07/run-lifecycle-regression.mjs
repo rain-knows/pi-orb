@@ -303,7 +303,7 @@ try {
       }, 5000);
       socket.on("connect", () =>
         socket.write(
-          `${JSON.stringify({ type: "status", token: handshakeData.token, sessionId: session, generation: generationForStatus })}\n`,
+          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type: "status", token: handshakeData.token, sessionId: session, generation: generationForStatus })}\n`,
         ),
       );
       socket.on("data", (chunk) => (data += chunk.toString("utf8")));

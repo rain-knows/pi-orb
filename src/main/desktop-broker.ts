@@ -54,6 +54,70 @@ export class DesktopBroker {
   /** Session that owns the current driver observation. */
   #observationSessionId: string | null = null;
   #activeAction: AbortController | null = null;
+  #executing = false;
+
+  /** One desktop request owns the native driver until its cancellation has unwound. */
+  async #exclusive(run: (signal: AbortSignal) => Promise<unknown>, signal?: AbortSignal): Promise<unknown> {
+    if (this.#executing) return refusal("busy");
+    if (signal?.aborted) return { ok: false, reason: "cancelled", message: "Request cancelled before execution." };
+    this.#executing = true;
+    const controller = new AbortController();
+    this.#activeAction = controller;
+    const cancel = () => controller.abort(signal?.reason);
+    signal?.addEventListener("abort", cancel, { once: true });
+    try { return await run(controller.signal); }
+    finally {
+      signal?.removeEventListener("abort", cancel);
+      if (this.#activeAction === controller) this.#activeAction = null;
+      this.#executing = false;
+    }
+  }
+
+  observe(sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown> {
+    return this.#exclusive(abort => this.#observe(sessionId, generation, abort), signal);
+  }
+
+  act(action: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown> {
+    return this.#exclusive(abort => this.#act(action, sessionId, generation, abort), signal);
+  }
+
+  /** Pi adaptation of reference policy.ts:20: ordered independent targets from one frame. */
+  batch(value: unknown, sessionId: string, generation: number, signal?: AbortSignal,
+    progress?: (step: number, total: number) => void): Promise<unknown> {
+    return this.#exclusive(async abort => {
+      const batch = value as { observationId?: unknown; actions?: unknown[] } | null;
+      if (!batch || typeof batch.observationId !== "string" || !Array.isArray(batch.actions) || batch.actions.length < 2 || batch.actions.length > 8) {
+        return { ok: false, reason: "malformed", message: "Batch needs an observation and 2–8 actions.", completed: 0, steps: [] };
+      }
+      const initial = this.#currentObservation();
+      const actions: DesktopAction[] = [];
+      for (const input of batch.actions) {
+        if (!input || typeof input !== "object" || "observationId" in input) return { ok: false, reason: "malformed", message: "Batch steps do not supply observation IDs.", completed: 0, steps: [] };
+        const parsed = parseAction({ ...input, observationId: batch.observationId });
+        if (!parsed.ok || !["click", "type", "hotkey", "scroll", "longPress", "drag"].includes(parsed.action.kind)) {
+          return { ok: false, reason: "malformed", message: "Unsupported or malformed batch step.", completed: 0, steps: [] };
+        }
+        if (!this.#options.isLive(sessionId, generation)) return refusal("stale-generation");
+        const reason = this.#controller.check(parsed.action, initial, { sessionId, generation });
+        if (reason) return { ...refusal(reason) as object, completed: 0, steps: [] };
+        actions.push(parsed.action);
+      }
+      const steps: Record<string, unknown>[] = [];
+      const sameSurface = (next: DesktopObservation) => JSON.stringify([next.window, next.coordinateSpace]) === JSON.stringify([initial!.window, initial!.coordinateSpace]);
+      for (const [index, action] of actions.entries()) {
+        if (abort.aborted) return { ok: false, reason: "cancelled", message: "Batch cancelled; remaining actions were not executed.", completed: steps.length, steps };
+        progress?.(index + 1, actions.length);
+        const current = this.#currentObservation();
+        if (!current) return { ok: false, reason: "observation-unknown", completed: steps.length, steps };
+        const result = await this.#act({ ...action, observationId: current.observationId }, sessionId, generation, abort) as Record<string, unknown>;
+        if (result.ok !== true) return { ...result, completed: steps.length, steps };
+        steps.push(result);
+        const next = result.observation as DesktopObservation;
+        if (!sameSurface(next) && index + 1 < actions.length) return { ok: false, reason: "surface-changed", message: "Window or observation area changed; remaining actions were not executed. Use the latest observation.", completed: steps.length, steps, observation: next };
+      }
+      return { ok: true, completed: steps.length, steps, observation: this.#currentObservation() };
+    }, signal);
+  }
 
   constructor(options: DesktopBrokerOptions) {
     this.#options = options;
@@ -107,13 +171,14 @@ export class DesktopBroker {
   }
 
   /** The bridge executor entry point for an observation. */
-  async observe(sessionId: string, generation: number): Promise<unknown> {
+  async #observe(sessionId: string, generation: number, signal: AbortSignal): Promise<unknown> {
     if (!this.#options.isLive(sessionId, generation)) return refusal("stale-generation");
     const authorization = this.#controller.state.authorization;
     if (!authorization) return refusal("no-task-authorization");
     if (authorization.sessionId !== sessionId) return refusal("no-task-authorization");
     if (authorization.generation !== generation) return refusal("stale-generation");
-    const result = await this.#options.driver.observe({ includeImage: true });
+    const result = await this.#options.driver.observe({ includeImage: true, signal });
+    if (signal.aborted) { this.#consumeObservation(); this.#controller.clearObservation(); return { ok: false, reason: "cancelled", message: "Observation cancelled." }; }
     if (this.#controller.state.authorization !== authorization || !this.#options.isLive(sessionId, generation)) {
       // An observation can finish after revoke/regrant. Clear only its own picture; a newer
       // request may already have replaced the driver's observation for the live grant.
@@ -157,7 +222,8 @@ export class DesktopBroker {
    * driver. A refusal must never reach the driver, so a refused action cannot have a side
    * effect even if the driver would have partially applied it.
    */
-  async act(action: unknown, sessionId: string, generation: number): Promise<unknown> {
+  async #act(action: unknown, sessionId: string, generation: number, signal: AbortSignal): Promise<unknown> {
+    if (signal.aborted) return { ok: false, reason: "cancelled", message: "Action cancelled." };
     const parsed = parseAction(action);
     if (!parsed.ok) {
       this.#log({ event: "act-refused", reason: "malformed", detail: parsed.message });
@@ -191,20 +257,18 @@ export class DesktopBroker {
     });
 
     const grant = this.#controller.state.authorization;
-    const actionController = new AbortController();
-    this.#activeAction = actionController;
     let result: ActResult;
     try {
-      result = await this.#options.driver.act(parsed.action, observation!, actionController.signal);
+      result = await this.#options.driver.act(parsed.action, observation!, signal);
     } catch (error) {
       result = {
         ok: false,
         refused: false,
         error: error instanceof Error ? error.message : String(error),
       };
-    } finally {
-      if (this.#activeAction === actionController) this.#activeAction = null;
     }
+
+    if (signal.aborted) result = { ok: false, refused: false, error: "Action cancelled." };
 
     // A revoke or replacement may have happened while the native action was unwinding. Do not
     // account that old result against a new grant or consume the new grant's observation.

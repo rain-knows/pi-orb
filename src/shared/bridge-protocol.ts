@@ -14,7 +14,7 @@
  */
 
 /** Protocol version. Both sides refuse a mismatch instead of guessing. */
-export const BRIDGE_PROTOCOL_VERSION = 1;
+export const BRIDGE_PROTOCOL_VERSION = 2;
 
 /** Designates the token file inside the Orb data directory. */
 export const BRIDGE_TOKEN_FILENAME = "bridge-token.json";
@@ -62,7 +62,7 @@ export interface BridgeTokenFile {
   readonly createdAt: string;
 }
 
-export type BridgeRequest =
+export type BridgeRequest = ({ readonly version?: number; readonly requestId?: string }) & (
   | { readonly type: "hello"; readonly version: number; readonly token: string }
   | {
       readonly type: "observe";
@@ -77,8 +77,9 @@ export type BridgeRequest =
       readonly generation: number;
       readonly action: unknown;
     }
+  | { readonly type: "batch"; readonly token: string; readonly sessionId: string; readonly generation: number; readonly batch: unknown }
   | { readonly type: "status"; readonly token: string; readonly sessionId: string; readonly generation: number }
-  | { readonly type: "revoke"; readonly token: string; readonly sessionId: string; readonly generation: number };
+  | { readonly type: "revoke"; readonly token: string; readonly sessionId: string; readonly generation: number });
 
 /**
  * `Omit` over a union type collapses the result to the members' common keys, which would

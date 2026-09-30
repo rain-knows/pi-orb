@@ -243,7 +243,7 @@ export type OrbSessionEvent =
   | { readonly type: "assistant-delta"; readonly text: string }
   | { readonly type: "assistant-message"; readonly text: string }
   | { readonly type: "error"; readonly message: string }
-  | { readonly type: "tool"; readonly phase: "start" | "end"; readonly id: string; readonly name: string; readonly detail: string; readonly isError: boolean }
+  | { readonly type: "tool"; readonly phase: "start" | "update" | "end"; readonly id: string; readonly name: string; readonly detail: string; readonly isError: boolean; readonly extensionReturnedAt?: number; readonly requestId?: string }
   | { readonly type: "question"; readonly id: string; readonly method: "select" | "confirm" | "input" | "editor"; readonly title: string; readonly message: string; readonly options: readonly string[]; readonly prefill: string }
   | { readonly type: "question-closed"; readonly id: string }
   | { readonly type: "idle"; readonly stopReason: string | null };

@@ -29,7 +29,7 @@ export interface ReferenceWindowsDriverOptions {
   readonly ops: WindowsDesktopOps;
   readonly ownProcessId: number;
   /** Hide or cloak the Orb while the target is captured or receives HID input. */
-  readonly withGuiTurn?: <T>(run: () => Promise<T>) => Promise<T>;
+  readonly withGuiTurn?: <T>(run: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
   /**
    * Called after `orb_open_app` moved the task to another application's window.
    *
@@ -131,24 +131,26 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     };
   }
 
-  async observe(input: { readonly includeImage?: boolean }): Promise<ObserveResult> {
+  async observe(input: { readonly includeImage?: boolean; readonly signal?: AbortSignal }): Promise<ObserveResult> {
     try {
       const result = await this.#withGuiTurn(async () => {
+        input.signal?.throwIfAborted();
         const target = this.#findForegroundTarget();
         if (!target) throw new Error("No application window is available to observe.");
-        const screens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens());
+        const screens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens(input.signal));
         const screen = screens.find((candidate) => candidate.windowId === target.windowId) ?? screens[0];
         if (!screen || screen.windowId !== target.windowId) {
           throw new Error("The reference backend did not select the recorded target window.");
         }
-        const captured = await timeToolPhase("capture", () => this.#options.backend.capture(screen));
+        const captured = await timeToolPhase("capture", () => this.#options.backend.capture(screen, input.signal));
         const observation = this.#makeObservation(target, screen, captured, input.includeImage === true,
-          await timeToolPhase("inspectForeground", () => this.#options.backend.inspectForeground()));
+          await timeToolPhase("inspectForeground", () => this.#options.backend.inspectForeground(input.signal)));
         this.#target = target;
         this.#screen = screen;
         this.#observation = observation;
         return observation;
-      });
+      }, input.signal);
+      input.signal?.throwIfAborted();
       return { ok: true, observation: result, error: null };
     } catch (error) {
       this.consumeObservation();
@@ -214,7 +216,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         this.#screen = nextScreen;
         this.#observation = nextObservation;
         return nextObservation;
-      });
+      }, signal);
+      abort.throwIfAborted();
       return { ok: true, refused: false, error: null, observation: observationAfterAction, ...(apps ? { apps } : {}) };
     } catch (error) {
       return { ok: false, refused: false, error: message(error) };
@@ -348,7 +351,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           zIndex: BigInt(0),
         });
         return next;
-      });
+      }, signal);
+      abort.throwIfAborted();
       return { ok: true, refused: false, error: null, observation: adopted };
     } catch (error) {
       return { ok: false, refused: false, error: message(error) };
@@ -380,13 +384,13 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       foreground.title === expected.title;
   }
 
-  #withGuiTurn<T>(run: () => Promise<T>): Promise<T> {
+  #withGuiTurn<T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T> {
     const withExcludedOrb = () => {
       const ownIds = timeToolSync("window-enumeration", () => this.#options.ops.listWindows()).windows
         .filter((window) => window.pid === this.#options.ownProcessId)
         .map((window) => window.hwnd);
       return runWithCaptureExcludeWindowIds(ownIds, run);
     };
-    return this.#options.withGuiTurn ? this.#options.withGuiTurn(withExcludedOrb) : withExcludedOrb();
+    return this.#options.withGuiTurn ? this.#options.withGuiTurn(withExcludedOrb, signal) : withExcludedOrb();
   }
 }

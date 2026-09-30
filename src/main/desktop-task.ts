@@ -126,7 +126,7 @@ export type ActResult =
     };
 
 export interface DesktopDriver {
-  observe(input: { readonly includeImage?: boolean }): Promise<ObserveResult>;
+  observe(input: { readonly includeImage?: boolean; readonly signal?: AbortSignal }): Promise<ObserveResult>;
   act(action: DesktopAction, observation: DesktopObservation, signal?: AbortSignal): Promise<ActResult>;
   consumeObservation?(): void;
   resetActionContext?(): void;

@@ -3,6 +3,7 @@ import { app } from "electron";
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
+import { DesktopBroker } from "../../src/main/desktop-broker";
 import { ReferenceWindowsDriver } from "../../src/main/reference-windows-driver";
 import { createWindowsDesktopBackend } from "../../src/main/reference-windows/windows";
 import { createProductionWindowsOps } from "../../src/main/reference-windows/windows-native";
@@ -29,6 +30,7 @@ async function main() {
     const act=async(action:DesktopAction)=>{const result=await driver.act(action,observation);if(!result.ok)throw new Error(result.error??'Action failed');observation=result.observation;};
     const measure=async(name:string,run:()=>Promise<void>)=>{const start=performance.now();await withToolTiming(`${name}-${records.length}`,e=>records.push(e),run);(samples[name]??=[]).push(performance.now()-start);};
     await measure('cold-observe',observe);
+    if(!process.argv.includes("--batch")) {
     for(let i=0;i<10;i++) {
       const before=events().filter(e=>e.kind==='click'&&e.id==='a').length;
       await measure('click',()=>act({kind:'click',observationId:observation.observationId,position:point('a')}));
@@ -39,9 +41,23 @@ async function main() {
       await measure('three-controls',async()=>{for(const id of ['a','b','c'])await act({kind:'click',observationId:observation.observationId,position:point(id)});});
     }
     for(let i=0;i<20;i++)await measure('warm-observe',observe);
+    }
+    if(process.argv.includes('--batch')) {
+      const broker=new DesktopBroker({driver,isLive:()=>true});broker.authorize({sessionId:'native',generation:1,level:'full-access'});
+      for(let i=0;i<10;i++) {
+        await broker.observe('native',1);observation=driver.lastObservation!;
+        const before=events().filter(e=>e.kind==='click').length;
+        await measure('batch-three-controls',async()=>{
+          const result=await broker.batch({observationId:observation.observationId,actions:['a','b','c'].map(id=>({kind:'click',position:point(id)}))},'native',1) as {ok:boolean;completed:number};
+          if(!result.ok||result.completed!==3)throw new Error('Native batch incomplete');
+        });
+        const received=events().filter(e=>e.kind==='click').slice(before).map(e=>e.id);
+        if(received.join(',')!=='a,b,c')throw new Error('Native batch order failed');
+      }
+    }
     const stats=Object.fromEntries(Object.entries(samples).map(([name,values])=>{const sorted=[...values].sort((a,b)=>a-b);return [name,{n:values.length,p50:sorted[Math.ceil(sorted.length*.5)-1],p95:sorted[Math.ceil(sorted.length*.95)-1]}];}));
     const report={at:new Date().toISOString(),method:'direct production native adapter; excludes Orb overlay, Pi, bridge and model; no pixels persisted',model:null,thinkingLevel:null,stats,samples,records,passed:true};
-    writeFileSync(resolve('evidence/tool-speed/native-baseline.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(stats));
+    writeFileSync(resolve(process.argv.includes('--batch')?'evidence/tool-speed/native-batch.json':'evidence/tool-speed/native-baseline.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(stats));
   } finally {if(target.pid)spawn('taskkill',['/PID',String(target.pid),'/T','/F'],{windowsHide:true,stdio:'ignore'});}
 }
 void app.whenReady().then(main).then(()=>app.quit(),e=>{console.error(e);app.exit(1);});

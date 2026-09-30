@@ -3,10 +3,31 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createServer } from "node:net";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { BridgeClient } from "../pi-package/extensions/bridge-client";
+import { BridgeClient, bridgeTimeoutMs } from "../pi-package/extensions/bridge-client";
+import { BridgeServer } from "../src/main/bridge-server";
 import { BRIDGE_PROTOCOL_VERSION } from "@shared/bridge-protocol";
 
 let dir = "";
+
+it("budgets declared waits and batches", () => {
+  expect(bridgeTimeoutMs({type:"act",sessionId:"s",generation:1,action:{kind:"longWait",waitSeconds:120}})).toBe(150_000);
+  expect(bridgeTimeoutMs({type:"batch",sessionId:"s",generation:1,batch:{actions:[{}, {}, {}]}})).toBe(90_000);
+});
+
+it("streams correlated progress and cancels a disconnected execution", async () => {
+  const pipePath=`\\\\.\\pipe\\orb-cancel-${process.pid}-${Date.now()}`;
+  let cancelled=false;let entered!:()=>void;const started=new Promise<void>(r=>entered=r);
+  const server=new BridgeServer({pipePath,token:"a".repeat(64),executor:{accepts:()=>true,status:()=>({}),revoke:()=>{},observe:async()=>({}),act:async()=>({}),batch:async(_batch,_id,_generation,signal,progress)=>{progress?.(1,2);entered();await new Promise<void>(r=>signal?.addEventListener("abort",()=>{cancelled=true;r();},{once:true}));return {ok:false,completed:0};}}});
+  await server.listen();
+  const handshake={version:2,token:"a".repeat(64),pid:1,workspace:dir,pipePath,generation:1,createdAt:"now"};
+  const controller=new AbortController();const updates:number[]=[];
+  try {
+    const client=new BridgeClient({pipePath,tokenFile:"unused"});
+    const pending=client.call({type:"batch",sessionId:"s",generation:1,batch:{actions:[{},{}]}},handshake,controller.signal,(step)=>updates.push(step));
+    await started;await new Promise(r=>setTimeout(r,20));expect(updates).toEqual([1]);controller.abort();
+    expect(await pending).toMatchObject({reason:"cancelled"});await new Promise(r=>setTimeout(r,20));expect(cancelled).toBe(true);
+  } finally {await server.close();}
+});
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), "pi-orb-handshake-"));
