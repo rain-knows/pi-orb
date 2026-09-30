@@ -1,0 +1,232 @@
+{
+  "capturedAt": "2026-09-30T09:31:30.165Z",
+  "checks": [
+    {
+      "name": "a session exists before Access is granted",
+      "ok": true,
+      "detail": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f"
+    },
+    {
+      "name": "Workspace Write binds to the current session and generation",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a0f1a7-dc0d-7353-8e0a-36f522d1501f\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "three queued prompts used the local Pi model",
+      "ok": true,
+      "detail": "requests=3"
+    },
+    {
+      "name": "the same session and Workspace Write grant survive queued turns and idle",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1790760690161\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":\"01a0f1a7-dc0d-7353-8e0a-36f522d1501f\",\"piWeb\":{\"baseUrl…"
+    },
+    {
+      "name": "Stop was exercised while a prompt was running",
+      "ok": true,
+      "detail": "{\"runningBeforeStop\":true,\"stopped\":true,\"status\":{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1790760690161\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":\"01a0f…"
+    },
+    {
+      "name": "Stop revokes Access but preserves the Pi session and generation",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1790760690161\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":\"01a0f1a7-dc0d-7353-8e0a-36f522d1501f\",\"piWeb\":{\"baseUrl…"
+    },
+    {
+      "name": "collapsing the orb revokes session Access",
+      "ok": true,
+      "detail": "{\"beforeAuthorized\":true,\"bridgeAuthorizedBefore\":true,\"collapseResponse\":\"{\\\"authorized\\\":false,\\\"level\\\":null,\\\"sessionId\\\":null,\\\"generation\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridgeReady\\\":true}\",\"bridgeAuthorizedAfter\":false,\"bridgeStatusAfter\":\"{\\\"ok\\\"…"
+    },
+    {
+      "name": "workspace switch revokes Access and starts a new session generation",
+      "ok": true,
+      "detail": "{\"before\":{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1790760690161\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":\"01a0f1a7-dc0d-7353-8e0a-36f522d1501f\",\"piWeb\"…"
+    },
+    {
+      "name": "new conversation revokes Access and changes the Pi session",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1790760690161\\\\orb-workspace-next\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":2,\"busy\":false,\"sessionId\":\"01a0f1a7-e69f-7353-8e0a-36f926287e2d\",\"piWeb\":{\"ba…"
+    },
+    {
+      "name": "the shell survived the lifecycle sequence",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "losing the pi-web connection revokes desktop authority",
+      "ok": true,
+      "detail": "{\"regranted\":\"\\\"{\\\\\\\"authorized\\\\\\\":true,\\\\\\\"level\\\\\\\":\\\\\\\"workspace-write\\\\\\\",\\\\\\\"sessionId\\\\\\\":\\\\\\\"01a0f1a7-e69f-7353-8e0a-36f926287e2d\\\\\\\",\\\\\\\"generation\\\\\\\":2,\\\\\\\"stopped\\\\\\\":false,\\\\\\\"stoppedReason\\\\\\\":null,\\\\\\\"lastObservationId\\\\\\\":null,\\\\\\\"bridge\",\"bridgeAuthorizedBefore\":true,\"piWebPid\":3274…"
+    }
+  ],
+  "passed": true,
+  "environment": {
+    "generation": 1,
+    "ensureResult": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f",
+    "piWebReachable": true
+  },
+  "access": {
+    "authorized": true,
+    "level": "workspace-write",
+    "sessionId": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f",
+    "generation": 1,
+    "stopped": false,
+    "stoppedReason": null,
+    "lastObservationId": null,
+    "bridgeReady": true
+  },
+  "queuedTurns": {
+    "modelRequestCount": 3,
+    "status": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1790760690161\\orb-workspace",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": true,
+        "level": "workspace-write",
+        "sessionId": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f",
+        "generation": 1,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    }
+  },
+  "stop": {
+    "runningBeforeStop": true,
+    "stopped": true,
+    "status": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1790760690161\\orb-workspace",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    }
+  },
+  "collapse": {
+    "beforeAuthorized": true,
+    "bridgeAuthorizedBefore": true,
+    "collapseResponse": "{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}",
+    "bridgeAuthorizedAfter": false,
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+  },
+  "workspaceSwitch": {
+    "before": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1790760690161\\orb-workspace",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": "01a0f1a7-dc0d-7353-8e0a-36f522d1501f",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "after": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1790760690161\\orb-workspace-next",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 2,
+      "busy": false,
+      "sessionId": "01a0f1a7-e5fd-7353-8e0a-36f68744bb1a",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    }
+  },
+  "newSession": {
+    "configured": true,
+    "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1790760690161\\orb-workspace-next",
+    "problem": null,
+    "shortcut": "CommandOrControl+Shift+Space",
+    "shortcutRegistered": true,
+    "shortcutProblem": null,
+    "generation": 2,
+    "busy": false,
+    "sessionId": "01a0f1a7-e69f-7353-8e0a-36f926287e2d",
+    "piWeb": {
+      "baseUrl": "http://127.0.0.1:31422",
+      "reachable": true,
+      "problem": null
+    },
+    "desktopTask": {
+      "authorized": false,
+      "level": null,
+      "sessionId": null,
+      "generation": null,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    }
+  },
+  "disconnect": {
+    "regranted": "\"{\\\"authorized\\\":true,\\\"level\\\":\\\"workspace-write\\\",\\\"sessionId\\\":\\\"01a0f1a7-e69f-7353-8e0a-36f926287e2d\\\",\\\"generation\\\":2,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridge",
+    "bridgeAuthorizedBefore": true,
+    "piWebPid": 32748,
+    "sessionId": "01a0f1a7-e69f-7353-8e0a-36f926287e2d",
+    "generation": 2,
+    "refreshResult": "\"{\\\"authorized\\\":false,\\\"level\\\":null,\\\"sessionId\\\":null,\\\"generation\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridgeReady\\\":true}\"",
+    "bridgeAuthorizedAfter": false,
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+  }
+}

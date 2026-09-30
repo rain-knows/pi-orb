@@ -44,43 +44,40 @@ const testCase = process.argv[2] ?? "c7";
 const caseConfig = {
   c7: {
     slug: "real-c7",
-    output: "real-model-c7-reference-backend.json",
+    output: "real-model-c7-session-access.json",
     what: "real model observes a disposable grid, clicks cell 0,0, then observes again",
-    scope: "observe and click the cell marked 0,0 once",
     instruction: [
       "看刚才收到的目标窗口截图。先调用 orb_observe。",
       "然后根据截图中左上角标记为 0,0 的格子，调用一次 orb_click。",
       "x/y 使用截图相对的 0–1000 坐标，不要使用屏幕绝对坐标，也不要点击别处。",
-      "动作后再次调用 orb_observe。",
+      "动作返回后直接使用它附带的新截图和 observation_id，不要重复观察。",
     ].join("\n"),
     targetEvent: "cell-mousedown",
     expectedTool: "orb_click",
   },
   "d6-scroll": {
     slug: "real-d6-scroll",
-    output: "real-model-d6-scroll-reference-backend.json",
+    output: "real-model-d6-scroll-session-access.json",
     what: "real model observes a disposable target and scrolls its labelled strip",
-    scope: "observe and scroll down inside the labelled strip once",
     instruction: [
       "看刚才收到的目标窗口截图。先调用 orb_observe。",
       "根据截图找到标注为 s0-s9 的窄滚动区域，在该区域内向下滚动 3 格。",
       "使用 orb_scroll 的截图相对 0–1000 坐标，把位置放在滚动区域内部；不要点击或输入。",
-      "动作后再次调用 orb_observe。",
+      "动作返回后直接使用它附带的新截图和 observation_id，不要重复观察。",
     ].join("\n"),
     targetEvent: "wheel",
     expectedTool: "orb_scroll",
   },
   "d8-type": {
     slug: "real-d8-type",
-    output: "real-model-d8-type-reference-backend.json",
+    output: "real-model-d8-type-session-access.json",
     what: "real model observes a disposable target, focuses its text field, and types a synthetic marker",
-    scope: "click the labelled disposable text field and type P1ORBD8TEST once",
     instruction: [
       "看刚才收到的目标窗口截图。先调用 orb_observe。",
-      "只对截图中标注 type here 的输入框操作：先用 orb_click 点击输入框中心，然后重新调用 orb_observe。",
+      "只对截图中标注 type here 的输入框操作：先用 orb_click 点击输入框中心，然后使用这个动作返回的新 observation_id。",
       "这个输入框位于网格下方的 controls 区域，在滚动条上方；不要点击窗口底部或网格单元格。",
       "再调用 orb_type 输入且只输入这串无敏感测试文本：P1ORBD8TEST。",
-      "动作后再次调用 orb_observe。不要点其它位置。",
+      "orb_type 返回后直接使用它附带的新截图，不要重复观察。不要点其它位置。",
     ].join("\n"),
     targetEvent: "text-input",
     expectedTool: "orb_type",
@@ -137,10 +134,12 @@ const safe = (value, max = 600) => {
 const report = {
   capturedAt: new Date().toISOString(),
   testCase,
-  scope: {
+  verification: {
     what: caseConfig.what,
     chain: "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
     backend: "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
+    accessLevel: "workspace-write",
+    targetSelection: "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically",
   },
   isolation: {
     shellUserDataDir: shellDataDir,
@@ -457,6 +456,17 @@ function foregroundAndWake(hwnd) {
       return { ok: false, reason: "helper failed", message: String(error?.message ?? error).slice(0, 300) };
     }
   }
+}
+
+function getMainWindowHandle(processId) {
+  const script = `$ErrorActionPreference = 'Stop'; (Get-Process -Id ${Number(processId)}).MainWindowHandle.ToInt64()`;
+  const output = execFileSync(
+    "powershell.exe",
+    ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script],
+    { encoding: "utf8", timeout: 30000, windowsHide: true },
+  );
+  const handle = Number(output.trim().split(/\r?\n/).filter(Boolean).at(-1));
+  return Number.isSafeInteger(handle) && handle > 0 ? handle : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -779,33 +789,18 @@ try {
     );
   }
 
-  // The desktop-tool target, chosen from the driver's own list. Match by PROCESS ID, not title: the
-  // desktop also holds IME/text-input surfaces, and a title match can pick the wrong one. The driver's
-  // `windowId` is the Win32 handle in the same id space (verified for P1-06), so it also foregrounds
-  // the window below.
-  let listResult = await orb(client, `window.orb.listDesktopWindows()`);
-  let choice = Array.isArray(listResult?.windows) ? listResult.windows.find((w) => w.pid === grid.pid) : undefined;
-  for (let attempt = 0; attempt < 20 && !choice; attempt += 1) {
-    await sleep(1000);
-    listResult = await orb(client, `window.orb.listDesktopWindows()`);
-    choice = Array.isArray(listResult?.windows) ? listResult.windows.find((w) => w.pid === grid.pid) : undefined;
+  let targetHandle = null;
+  for (let attempt = 0; attempt < 20 && !targetHandle; attempt += 1) {
+    targetHandle = getMainWindowHandle(grid.pid);
+    if (!targetHandle) await sleep(1000);
   }
-  report.steps.windowChoice = choice ?? null;
-  report.steps.windowCandidates = Array.isArray(listResult?.windows)
-    ? listResult.windows.map((w) => ({ pid: w.pid, title: w.title, appName: w.appName }))
-    : null;
-  if (
-    !check(
-      "the driver lists the disposable target, identified by process id",
-      Boolean(choice),
-      `grid pid=${grid.pid} candidates=${safe(report.steps.windowCandidates, 400)}`,
-    )
-  ) {
-    throw new Error("target not listed by the driver");
+  report.steps.testTarget = { pid: grid.pid, handle: targetHandle, selection: "test harness only" };
+  if (!check("the harness can foreground its disposable target by process id", targetHandle !== null, safe(report.steps.testTarget))) {
+    throw new Error("target window handle not available");
   }
 
-  // Record the target: bring the disposable window to the front, then press the real wake chord. The
-  // record happens inside the product, before it takes focus, so it can only be this window.
+  // Foreground the disposable window and wake the Orb. The shell records the screenshot target before
+  // it takes focus; desktop tools independently observe the current foreground window on each call.
   //
   // This is the first step that needs a real interactive desktop: while the session is locked no window
   // can be foregrounded, so the product would record the lock screen and then correctly refuse to
@@ -826,28 +821,13 @@ try {
         "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
     );
   }
-  const wake = foregroundAndWake(choice.windowId);
+  const wake = foregroundAndWake(targetHandle);
   report.steps.wake = wake;
   await sleep(3000);
 
-  const afterWake = await orb(client, `window.orb.getStatus()`);
-  report.steps.recordedTarget = afterWake?.desktopTask?.target ?? null;
-  check(
-    "the product recorded the disposable target, not the user's desktop",
-    afterWake?.desktopTask?.target?.title === targetTitle,
-    safe(report.steps.recordedTarget),
-  );
-
-  const setTarget = await orb(client, `window.orb.setDesktopTarget(${JSON.stringify(choice.windowId)})`);
-  check("the desktop target was set to the disposable window", setTarget?.ok === true && setTarget?.target?.title === targetTitle, safe(setTarget));
-
-  // Authorize the one action this run is allowed to take.
-  const approved = await orb(
-    client,
-    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: ${JSON.stringify(caseConfig.scope)} })`,
-  );
-  report.steps.approved = { authorized: approved?.authorized, scope: approved?.scope, target: approved?.target?.title };
-  check("the desktop task was approved through the product's UI path", approved?.authorized === true, safe(approved));
+  const access = await orb(client, `window.orb.setOrbAccess({ generation: ${generation}, level: 'workspace-write' })`);
+  report.steps.access = { authorized: access?.authorized, level: access?.level, sessionId: access?.sessionId };
+  check("Workspace Write is granted to the isolated Orb session", access?.authorized === true && access?.level === "workspace-write", safe(report.steps.access));
 
   const instruction = caseConfig.instruction;
 
@@ -911,7 +891,7 @@ try {
           headers: { "content-type": "application/json", authorization: authHeader },
           body: JSON.stringify({
             type: "prompt",
-            message: "Continue the already approved disposable-window task. The input field has been clicked and a fresh orb_observe was returned. Now call orb_type with exactly P1ORBD8TEST, then call orb_observe once. Do not click or type anywhere else.",
+            message: "Continue the disposable-window task under the same session Access grant. The input field was clicked and that action returned a fresh observation. Use its observation_id for orb_type with exactly P1ORBD8TEST. Do not call orb_observe again or click/type anywhere else.",
           }),
         });
         report.steps.d8FollowUp = { status: response.status, accepted: response.ok };
@@ -978,19 +958,30 @@ try {
   }
   report.sessionFiles = sessionFiles.map((file) => file.replace(agentDir, "<agentDir>"));
   const calls = [];
+  const toolResults = [];
   for (const file of sessionFiles) {
     for (const entry of readJsonl(file)) {
-      const content = entry?.message?.content;
+      const message = entry?.message;
+      const content = message?.content;
+      if (message?.role === "toolResult" && Array.isArray(content)) {
+        toolResults.push({
+          toolName: message.toolName ?? null,
+          toolCallId: message.toolCallId ?? null,
+          text: content.filter((part) => part?.type === "text").map((part) => part.text ?? "").join("\n"),
+          imageCount: content.filter((part) => part?.type === "image").length,
+        });
+      }
       if (!Array.isArray(content)) continue;
       for (const block of content) {
         if (block?.type !== "toolCall") continue;
         const name = typeof block.name === "string" ? block.name : typeof block.toolName === "string" ? block.toolName : null;
         if (!name) continue;
-        calls.push({ toolName: name, arguments: block.arguments ?? null });
+        calls.push({ toolName: name, toolCallId: block.id ?? null, arguments: block.arguments ?? null });
       }
     }
   }
   report.modelToolCalls = calls;
+  report.modelToolResults = toolResults;
   const observeCalls = calls.filter((call) => call.toolName === "orb_observe");
   const actionCalls = calls.filter((call) => call.toolName === caseConfig.expectedTool);
   const firstActionIndex = calls.findIndex((call) => call.toolName === caseConfig.expectedTool);
@@ -998,19 +989,33 @@ try {
   check("the real model called orb_observe on its own", observeCalls.length > 0, safe(observeCalls.slice(0, 2)));
   check(`the real model called ${caseConfig.expectedTool} on its own`, actionCalls.length > 0, safe(actionCalls.slice(0, 2)));
   check("the model observed before acting", firstObserveIndex >= 0 && firstObserveIndex < firstActionIndex, safe(calls.map((call) => call.toolName)));
+  const actionCallIds = new Set(actionCalls.map((call) => call.toolCallId).filter(Boolean));
+  const actionResults = toolResults.filter((result) => actionCallIds.has(result.toolCallId));
   check(
-    "the model observed again after its action",
-    actionCalls.some((action) => {
-      const actionIndex = calls.indexOf(action);
-      return calls.slice(actionIndex + 1).some((next) => next.toolName === "orb_observe");
-    }),
-    safe(calls.map((call) => call.toolName)),
+    "the action tool result includes its fresh observation and screenshot",
+    actionResults.some((result) => result.imageCount > 0 && /action: .* completed/i.test(result.text) && /observation_id:/i.test(result.text)),
+    safe(actionResults),
   );
   if (testCase === "d8-type") {
     const clickIndex = calls.findIndex((call) => call.toolName === "orb_click");
     const typeIndex = calls.findIndex((call) => call.toolName === "orb_type");
     check("D8: the model clicked the disposable field before typing", clickIndex >= 0 && clickIndex < typeIndex, safe(calls.map((call) => call.toolName)));
-    check("D8: the model observed again between focus click and text input", clickIndex >= 0 && typeIndex > clickIndex && calls.slice(clickIndex + 1, typeIndex).some((call) => call.toolName === "orb_observe"), safe(calls.map((call) => call.toolName)));
+    const clickObservationId = calls[clickIndex]?.arguments?.observation_id;
+    const typeObservationId = calls[typeIndex]?.arguments?.observation_id;
+    const clickCallId = calls[clickIndex]?.toolCallId;
+    const clickResult = toolResults.find((result) => result.toolCallId === clickCallId);
+    const freshObservationId = clickResult?.text.match(/(?:^|\n)observation_id:\s*([^\s]+)/u)?.[1] ?? null;
+    check(
+      "D8: the focus click returned a fresh observation and screenshot",
+      typeof clickObservationId === "string" && typeof freshObservationId === "string" &&
+        freshObservationId !== clickObservationId && (clickResult?.imageCount ?? 0) > 0,
+      safe({ clickObservationId, freshObservationId, imageCount: clickResult?.imageCount ?? 0, clickResult: clickResult?.text }),
+    );
+    check(
+      "D8: typing uses exactly the fresh observation returned by the focus click",
+      typeof freshObservationId === "string" && typeObservationId === freshObservationId,
+      safe({ freshObservationId, typeObservationId }),
+    );
   }
   if (testCase === "c7" || testCase === "d6-scroll") {
     const positionAction = actionCalls.find((call) => call.toolName === "orb_click" || call.toolName === "orb_scroll");

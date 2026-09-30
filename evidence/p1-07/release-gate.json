@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-30T04:01:41.110Z",
+  "capturedAt": "2026-09-30T10:11:42.056Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "11525 ms"
+      "detail": "10004 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "8864 ms"
+      "detail": "6974 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "12944 ms"
+      "detail": "12377 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4608 ms"
+      "detail": "4021 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -293,9 +293,9 @@
       "detail": "{\"passed\":true,\"checks\":25}"
     },
     {
-      "name": "the recorded packaged-application probe passed and still lists real windows",
+      "name": "the recorded packaged-application probe passed and verifies the session Access preload contract",
       "ok": true,
-      "detail": "{\"passed\":true,\"checks\":21}"
+      "detail": "{\"passed\":true,\"checks\":22}"
     },
     {
       "name": "the installer steps that cannot be automated are recorded as manual",

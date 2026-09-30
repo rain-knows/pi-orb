@@ -1,14 +1,16 @@
-// P1-07 lifecycle regression: collapse, stop and disconnect must all revoke desktop authority.
+// P1-07 lifecycle regression for session-level Access and queued Pi turns.
 //
-// The rules in doc/pi-orb-development-goals.md §6.1/§6.2 make desktop authority perishable. This
-// script checks the shipped build actually behaves that way, rather than trusting the code shape:
+// The current contract keeps Access across normal turn completion, and revokes it on Stop, hide,
+// workspace/session changes, and disconnect. This script exercises the shipped Electron/Pi Web
+// path rather than trusting the code shape:
 //
-//   - approving a task grants authority;
-//   - collapsing the window (via the real wake/collapse path) revokes it;
-//   - an explicit stop revokes it;
-//   - an unconfirmed screenshot is dropped by the same events;
-//   - the chat session survives a revoke, so stopping desktop operations does not kill the
-//     conversation.
+//   - one session Access grant survives three queued turns and idle;
+//   - Stop, hide, workspace switch, and new session each revoke the grant;
+//   - a pi-web disconnect revokes the current session grant;
+//   - the session survives Stop and Access revocation.
+//
+// The old lifecycle-regression.json is kept as historical evidence for the former per-task API.
+// This run writes session-access-regression.json.
 //
 // Run: node evidence/p1-07/run-lifecycle-regression.mjs
 
@@ -24,8 +26,7 @@ const runRoot = join("D:\\pi-orb-p1-runs", `p1-07-lifecycle-${Date.now()}`);
 const shellDataDir = join(runRoot, "shell-data");
 const configPath = join(runRoot, "orb-config.json");
 const workspace = join(runRoot, "orb-workspace");
-const gridLogPath = join(runRoot, "grid.jsonl");
-const gridGeometryPath = join(runRoot, "geometry.json");
+const nextWorkspace = join(runRoot, "orb-workspace-next");
 const electronBinary = join(repo, "node_modules", "electron", "dist", "electron.exe");
 
 const DEBUG_PORT = 31421;
@@ -41,10 +42,13 @@ const homeDir = join(runRoot, "home");
 mkdirSync(runRoot, { recursive: true });
 mkdirSync(shellDataDir, { recursive: true });
 mkdirSync(workspace, { recursive: true });
+mkdirSync(nextWorkspace, { recursive: true });
 for (const path of [agentDir, sessionDir, homeDir]) mkdirSync(path, { recursive: true });
 
 let piWeb = null;
 let modelServer = null;
+let modelRequestCount = 0;
+let modelResponseDelayMs = 150;
 
 /**
  * Start pi-web and a local model provider.
@@ -75,14 +79,18 @@ async function startPiWebAndProvider() {
       const chunks = [];
       for await (const chunk of req) chunks.push(chunk);
       const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-      res.writeHead(200, {
-        "content-type": body.stream ? "text/event-stream" : "application/json",
-        "cache-control": "no-cache",
-      });
-      res.write(
-        `data: ${JSON.stringify({ id: "p1", object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000), model: "p1-model", choices: [{ index: 0, delta: { role: "assistant", content: "ok" }, finish_reason: "stop" }] })}\n\n`,
-      );
-      res.end("data: [DONE]\n\n");
+      modelRequestCount += 1;
+      setTimeout(() => {
+        if (res.destroyed) return;
+        res.writeHead(200, {
+          "content-type": body.stream ? "text/event-stream" : "application/json",
+          "cache-control": "no-cache",
+        });
+        res.write(
+          `data: ${JSON.stringify({ id: "p1", object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000), model: "p1-model", choices: [{ index: 0, delta: { role: "assistant", content: "ok" }, finish_reason: "stop" }] })}\n\n`,
+        );
+        res.end("data: [DONE]\n\n");
+      }, modelResponseDelayMs);
     });
     server.listen(MODEL_PORT, "127.0.0.1", () => done(server));
   });
@@ -190,27 +198,12 @@ async function connectCdp(url) {
   return { send, close: () => socket.close() };
 }
 
-let grid = null;
 let shell = null;
 let shellErr = "";
 
 try {
-  // pi-web first: a desktop task is bound to a session, so the session must exist before the
-  // collapse-revokes rule can be exercised rather than merely asserted.
+  // pi-web first: Access grants are bound to a real Pi session and generation.
   await startPiWebAndProvider();
-
-  // The target window is what desktop authority would act on.
-  grid = spawn(electronBinary, [join(repo, "evidence/p1-05/target-app")], {
-    cwd: repo,
-    env: { ...process.env, P1_05_TARGET_LOG: gridLogPath, P1_05_TARGET_GEOMETRY: gridGeometryPath },
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    await sleep(500);
-    if (existsSync(gridGeometryPath) || grid.exitCode !== null) break;
-  }
-  if (!existsSync(gridGeometryPath)) throw new Error("the target app did not start");
-  await sleep(1200);
 
   writeFileSync(
     configPath,
@@ -272,8 +265,7 @@ try {
   const initial = await status();
   const generation = initial.generation;
 
-  // A session must exist before a task can be bound to one. This environment has no pi-web, so the
-  // absence of a session is recorded rather than treated as a failure of the rules under test.
+  // Establish the session before granting Access. The session is then kept across ordinary turns.
   const ensured = await evaluate("window.orb.ensureSession().then((id) => id).catch((e) => 'ERR:' + e.message)");
   report.environment = {
     generation,
@@ -281,8 +273,7 @@ try {
     piWebReachable: initial.piWeb?.reachable ?? null,
   };
 
-  // The session id the bridge is addressed with. Without pi-web there is none, so the bridge cannot
-  // be used to grant authority here; that limitation is recorded rather than hidden.
+  // The session id the bridge is addressed with.
   const sessionId = typeof ensured === "string" && !ensured.startsWith("ERR:") ? ensured : null;
 
   /** The bridge handshake written by the shell, used to read state from the main process. */
@@ -292,7 +283,7 @@ try {
   }
 
   /**
-   * Ask the bridge (main process) for the desktop task state.
+   * Ask the bridge (main process) for the Access grant state.
    *
    * This goes through the named pipe rather than the renderer on purpose: once the window is hidden
    * its renderer can be suspended, so a renderer-based read would never resolve after a collapse.
@@ -329,52 +320,43 @@ try {
     });
   }
 
-  const windowList = JSON.parse(await evaluate("window.orb.listDesktopWindows().then((r) => JSON.stringify(r))"));
-  const gridChoice = Array.isArray(windowList.windows)
-    ? windowList.windows.find((entry) => entry.pid === grid.pid)
-    : undefined;
+  const setAccess = async (runGeneration = generation) => JSON.parse(await evaluate(
+    `window.orb.setOrbAccess({ generation: ${runGeneration}, level: 'workspace-write' }).then((s) => JSON.stringify(s))`,
+  ));
+  const access = await setAccess();
+  report.access = access;
+  check("a session exists before Access is granted", sessionId !== null, String(ensured).slice(0, 120));
+  check("Workspace Write binds to the current session and generation", access.authorized === true && access.level === "workspace-write" && access.sessionId === sessionId && access.generation === generation, safe(access).slice(0, 250));
 
-  check("the shell lists its desktop targets", windowList.ok === true && gridChoice !== undefined, safe(gridChoice ?? windowList).slice(0, 200));
-
-  if (gridChoice) {
-    await evaluate(`window.orb.setDesktopTarget(${JSON.stringify(gridChoice.windowId)}).then((r) => JSON.stringify(r))`);
+  // Queue three prompts in one session; normal idle must keep the selected Access grant.
+  for (const text of ["first queued turn", "second queued turn", "third queued turn"]) {
+    await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: ${JSON.stringify(text)} })`);
   }
+  let sawBusy = false;
+  let afterQueue = await status();
+  for (let attempt = 0; attempt < 120; attempt += 1) {
+    sawBusy ||= afterQueue.busy === true;
+    if (sawBusy && afterQueue.busy === false && modelRequestCount >= 3) break;
+    await sleep(100);
+    afterQueue = await status();
+  }
+  report.queuedTurns = { modelRequestCount, status: afterQueue };
+  check("three queued prompts used the local Pi model", modelRequestCount >= 3, `requests=${modelRequestCount}`);
+  check("the same session and Workspace Write grant survive queued turns and idle", afterQueue.sessionId === sessionId && afterQueue.generation === generation && afterQueue.busy === false && afterQueue.desktopTask?.authorized === true && afterQueue.desktopTask?.level === "workspace-write", safe(afterQueue).slice(0, 350));
 
-  // -------------------------------------------------------------------------
-  // A task approval requires a session, which pi-web provides.
-  // -------------------------------------------------------------------------
-  const approved = JSON.parse(
-    await evaluate(
-      `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'lifecycle test' }).then((s) => JSON.stringify(s))`,
-    ),
-  );
-  report.approval = approved;
-
-  check("a session exists so authority can be granted", sessionId !== null, String(ensured).slice(0, 120));
-  check("approving a desktop task grants authority", approved.authorized === true, safe(approved).slice(0, 200));
-
-  // -------------------------------------------------------------------------
-  // Explicit stop revokes, and does not disturb the chat session.
-  // -------------------------------------------------------------------------
-  const beforeStop = await status();
-  const revoked = JSON.parse(await evaluate("window.orb.revokeDesktopTask().then((s) => JSON.stringify(s))"));
+  // Stop a live turn. The stub delays its response long enough for the real Stop route to cancel it.
+  modelResponseDelayMs = 5000;
+  await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: "stop this turn" })`);
+  let running = await status();
+  for (let attempt = 0; attempt < 40 && !running.busy; attempt += 1) {
+    await sleep(50);
+    running = await status();
+  }
+  const stopped = await evaluate(`window.orb.abort({ generation: ${generation} }).then(() => true).catch(() => false)`);
   const afterStop = await status();
-  check("an explicit stop clears the authorization", revoked.authorized === false, safe(revoked).slice(0, 200));
-  check(
-    "the stop leaves no target or bridge inconsistency behind",
-    afterStop.desktopTask?.bridgeReady === beforeStop.desktopTask?.bridgeReady,
-    safe({ before: beforeStop.desktopTask?.bridgeReady, after: afterStop.desktopTask?.bridgeReady }),
-  );
-  check(
-    "stopping desktop operations does not end the chat session",
-    afterStop.sessionId === beforeStop.sessionId,
-    `before=${String(beforeStop.sessionId)} after=${String(afterStop.sessionId)}`,
-  );
-  check(
-    "the run generation is unchanged by a desktop stop",
-    afterStop.generation === beforeStop.generation,
-    `before=${beforeStop.generation} after=${afterStop.generation}`,
-  );
+  report.stop = { runningBeforeStop: running.busy, stopped, status: afterStop };
+  check("Stop was exercised while a prompt was running", running.busy === true && stopped === true, safe(report.stop).slice(0, 350));
+  check("Stop revokes Access but preserves the Pi session and generation", afterStop.desktopTask?.authorized === false && afterStop.sessionId === sessionId && afterStop.generation === generation && afterStop.busy === false, safe(afterStop).slice(0, 350));
 
   // -------------------------------------------------------------------------
   // Collapse revokes. The collapse is triggered through the window's own control, which is the
@@ -384,16 +366,13 @@ try {
   // Important: once the window is hidden its renderer can be suspended, so the effect is read back
   // through the *bridge* (main process), which cannot be suspended by the window being hidden.
   // -------------------------------------------------------------------------
-  await evaluate(
-    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'about to be collapsed' }).then((s) => JSON.stringify(s))`,
-  );
+  await setAccess();
   const beforeCollapse = await status();
   const bridgeStatusBefore = await bridgeStatus(sessionId, generation);
 
   report.collapse = {
     beforeAuthorized: beforeCollapse.desktopTask?.authorized ?? null,
     bridgeAuthorizedBefore: bridgeStatusBefore?.result?.authorized ?? null,
-    bridgeTargetBefore: bridgeStatusBefore?.result?.target?.title ?? null,
   };
 
   // The window's own hide control. The call returns the post-collapse state from the main process,
@@ -408,23 +387,27 @@ try {
   report.collapse.bridgeAuthorizedAfter = bridgeStatusAfter?.result?.authorized ?? null;
   report.collapse.bridgeStatusAfter = safe(bridgeStatusAfter).slice(0, 300);
 
-  // If no authority existed to revoke, the rule cannot be exercised in this environment, and that is
-  // recorded rather than asserted as passing.
   const revokedByCollapse =
     report.collapse.bridgeAuthorizedBefore === true &&
     (report.collapse.bridgeAuthorizedAfter === false || collapseResult.authorized === false);
-  if (revokedByCollapse) {
-    check("collapsing the orb revokes desktop authority", true, safe(report.collapse));
-  } else if (report.collapse.bridgeAuthorizedBefore !== true) {
-    check(
-      "collapsing the orb revokes desktop authority",
-      report.collapse.bridgeAuthorizedAfter !== true && collapseResult.authorized !== true,
-      `not exercised: no task authorization existed to revoke (${safe(report.collapse)})`,
-    );
-    report.collapse.note = "not exercised: no task authorization existed to revoke in this environment";
-  } else {
-    check("collapsing the orb revokes desktop authority", false, safe(report.collapse));
-  }
+  check("collapsing the orb revokes session Access", revokedByCollapse, safe(report.collapse));
+
+  // A workspace switch starts a new session/generation and cannot inherit Access.
+  const beforeWorkspaceSwitch = await status();
+  await setAccess(beforeWorkspaceSwitch.generation);
+  await evaluate(`window.orb.setWorkspace(${JSON.stringify(nextWorkspace)}, true)`);
+  const afterWorkspaceSwitch = await status();
+  report.workspaceSwitch = { before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch };
+  check("workspace switch revokes Access and starts a new session generation", afterWorkspaceSwitch.desktopTask?.authorized === false && afterWorkspaceSwitch.workspace === nextWorkspace && afterWorkspaceSwitch.sessionId !== sessionId && afterWorkspaceSwitch.generation !== generation, safe({ before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch }).slice(0, 500));
+
+  // A new conversation also changes the session and clears its grant.
+  const workspaceSessionId = afterWorkspaceSwitch.sessionId;
+  const workspaceGeneration = afterWorkspaceSwitch.generation;
+  await setAccess(workspaceGeneration);
+  await evaluate("window.orb.newConversation()");
+  const afterNewSession = await status();
+  report.newSession = afterNewSession;
+  check("new conversation revokes Access and changes the Pi session", afterNewSession.desktopTask?.authorized === false && afterNewSession.sessionId !== workspaceSessionId && afterNewSession.generation === workspaceGeneration, safe(afterNewSession).slice(0, 350));
 
   check("the shell survived the lifecycle sequence", shell.exitCode === null, `exitCode=${shell.exitCode}`);
 
@@ -441,15 +424,19 @@ try {
       sleep(5000).then(() => "TIMEOUT"),
     ]);
 
-  // Re-grant first so there is authority for the disconnect to revoke.
+  // Re-grant to the new session so the disconnect revocation is observable.
+  const current = await status();
   const regranted = await guardedEvaluate(
-    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'disconnect test' }).then((s) => JSON.stringify(s))`,
+    `window.orb.setOrbAccess({ generation: ${current.generation}, level: 'workspace-write' }).then((s) => JSON.stringify(s))`,
   );
-  const bridgeBeforeDisconnect = await bridgeStatus(sessionId, generation);
+  const currentSessionId = current.sessionId;
+  const bridgeBeforeDisconnect = await bridgeStatus(currentSessionId, current.generation);
   report.disconnect = {
     regranted: safe(regranted).slice(0, 200),
     bridgeAuthorizedBefore: bridgeBeforeDisconnect?.result?.authorized ?? null,
     piWebPid: piWeb?.pid ?? null,
+    sessionId: currentSessionId,
+    generation: current.generation,
   };
 
   if (report.disconnect.bridgeAuthorizedBefore === true) {
@@ -466,7 +453,7 @@ try {
     );
     report.disconnect.refreshResult = safe(refreshed).slice(0, 250);
 
-    const bridgeAfterDisconnect = await bridgeStatus(sessionId, generation);
+    const bridgeAfterDisconnect = await bridgeStatus(currentSessionId, current.generation);
     report.disconnect.bridgeAuthorizedAfter = bridgeAfterDisconnect?.result?.authorized ?? null;
     report.disconnect.bridgeStatusAfter = safe(bridgeAfterDisconnect).slice(0, 250);
 
@@ -480,7 +467,7 @@ try {
       report.disconnect.bridgeAuthorizedAfter !== true,
       `not exercised: no authority existed to revoke (${safe(report.disconnect)})`,
     );
-    report.disconnect.note = "not exercised: no task authorization existed to revoke in this environment";
+    report.disconnect.note = "not exercised: no session Access grant existed to revoke in this environment";
   }
 
   cdp.close();
@@ -493,13 +480,6 @@ try {
     shell?.kill();
     await sleep(1000);
     if (shell && shell.exitCode === null) shell.kill("SIGKILL");
-  } catch {
-    // Best effort.
-  }
-  try {
-    grid?.kill();
-    await sleep(800);
-    if (grid && grid.exitCode === null) grid.kill("SIGKILL");
   } catch {
     // Best effort.
   }
@@ -518,7 +498,7 @@ try {
 
   report.passed = report.checks.length > 0 && report.checks.every((entry) => entry.ok);
   mkdirSync(import.meta.dirname, { recursive: true });
-  writeFileSync(join(import.meta.dirname, "lifecycle-regression.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  writeFileSync(join(import.meta.dirname, "session-access-regression.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ passed: report.passed, checks: report.checks }, null, 2));
 }
 

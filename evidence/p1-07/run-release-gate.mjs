@@ -297,10 +297,10 @@ const requiredEvidence = [
   { path: "evidence/p1-03/result.json", what: "wake shortcut registration on the real OS" },
   { path: "evidence/p1-04/result.json", what: "screenshot authorization and refusal paths" },
   { path: "evidence/p1-05/input-verification.json", what: "real-machine input acceptance" },
-  { path: "evidence/p1-06/loop-verification.json", what: "desktop tool loop" },
+  { path: "evidence/p1-06/loop-verification-session-access.json", what: "desktop tool loop and session Access" },
   { path: "evidence/p1-06/tool-exposure.json", what: "Orb tool exposure" },
   { path: "evidence/p2-04/README.md", what: "P2-04 action scope and unverified image-return boundary" },
-  { path: "evidence/p1-07/lifecycle-regression.json", what: "collapse, stop and generation lifecycle" },
+  { path: "evidence/p1-07/session-access-regression.json", what: "session access and lifecycle" },
   { path: "evidence/p1-07/license-inventory.json", what: "third-party license inventory" },
   { path: "evidence/p1-07/CONTRACT-MATRIX.md", what: "N1-N8 and §7.1 contract cross-check" },
 ];
@@ -588,9 +588,10 @@ const packagedSmoke = existsSync(join(repo, "evidence/p2-05/packaged-smoke.json"
   ? JSON.parse(readFileSync(join(repo, "evidence/p2-05/packaged-smoke.json"), "utf8"))
   : null;
 check(
-  "the recorded packaged-application probe passed and still lists real windows",
+  "the recorded packaged-application probe passed and verifies the session Access preload contract",
   packagedSmoke?.passed === true &&
-    (packagedSmoke.checks ?? []).some((entry) => entry.name.includes("lists real windows") && entry.ok),
+    (packagedSmoke.checks ?? []).some((entry) => entry.name.includes("session Access bridge") && entry.ok) &&
+    (packagedSmoke.checks ?? []).some((entry) => entry.name.includes("no target picker") && entry.ok),
   JSON.stringify({ passed: packagedSmoke?.passed, checks: packagedSmoke?.checks?.length ?? 0 }),
 );
 const manual = readFileSync(join(repo, "doc/manual-acceptance.md"), "utf8");

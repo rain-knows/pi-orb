@@ -2,25 +2,25 @@
 //
 // Answers the P1-06 acceptance items in doc/pi-orb-development-goals.md §5 (M3) as far as
 // this environment allows:
-//   - the desktop tools are reachable only through the authorized path: a tool call without a
-//     task authorization is refused, and a refused call has NO side effect on the target;
+//   - the desktop tools are reachable only through session Access: a tool call without a grant is
+//     refused, and a refused call has NO side effect on the target;
 //   - a task can only run one action per observation: an action referencing a superseded
 //     observation is refused;
 //   - a failed action stops the batch instead of letting a plan continue clicking;
 //   - a real click reaches a real window through the whole chain
 //     (bridge -> broker -> ReferenceWindowsDriver -> reference Windows backend -> target application);
-//   - revoking, or starting a new run generation, removes the authority.
+//   - revoking or starting a new conversation removes the authority needed by the old session.
 //
 // The chain under test is the product's own code, not a simulation:
 //   evidence/p1-05/target-app  (a real Electron window that self-reports what it received)
 //     ^ src/main/reference-windows-driver.ts
 //     ^ src/main/reference-windows/ (GDI + SendInput + clipboard)
-//     ^ src/main/desktop-broker.ts  (policy: authorization, budget, freshness, batch stop)
+//     ^ src/main/desktop-broker.ts  (policy: session Access, freshness, failed-action stop)
 //     ^ src/main/bridge-server.ts   (Windows named pipe, per-run token, generation check)
 //     ^ the handshake file the Pi extension reads
 //
-// The user's approval is granted through the real UI path over CDP
-// (`window.orb.authorizeDesktopTask`), so the authorization under test is the product one.
+// Session Access is granted through the real UI bridge over CDP (`window.orb.setOrbAccess`),
+// while the disposable target is focused by the harness. pi-orb itself discovers it as foreground.
 //
 // NOT verified here, and recorded as such: the model-facing tool registration ending in a real
 // click. That needs a model in the loop, which this environment does not have. The tools'
@@ -73,6 +73,30 @@ function activateWindow(hwnd) {
     }
   }
 }
+
+function activateProcess(pid) {
+  const numericPid = Number(pid);
+  if (!Number.isInteger(numericPid) || numericPid <= 0) return { ok: false, reason: "invalid-process-id" };
+  try {
+    const raw = execFileSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        `$process = Get-Process -Id ${numericPid} -ErrorAction Stop; [string]$process.MainWindowHandle`,
+      ],
+      { encoding: "utf8", timeout: 30000, windowsHide: true },
+    );
+    const hwnd = Number(raw.trim());
+    if (!Number.isInteger(hwnd) || hwnd <= 0) return { ok: false, reason: "no-main-window", pid: numericPid };
+    return { ...activateWindow(String(hwnd)), pid: numericPid, hwnd };
+  } catch (error) {
+    return { ok: false, reason: "activation-helper-failed", pid: numericPid, message: String(error?.message ?? error).slice(0, 200) };
+  }
+}
 const runRoot = join("D:\\pi-orb-p1-runs", `p1-06-${Date.now()}`);
 const electronBinary = join(repo, "node_modules", "electron", "dist", "electron.exe");
 const gridLogPath = join(runRoot, "grid.jsonl");
@@ -117,7 +141,8 @@ const report = {
   scope: {
     chain: "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge-server <- handshake file",
     backend: "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
-    approvalPath: "real UI path over CDP (window.orb.authorizeDesktopTask)",
+    accessPath: "real UI bridge over CDP (window.orb.setOrbAccess)",
+    targetSelection: "the harness focuses only its disposable process; pi-orb observes the foreground automatically",
   },
   safety: {
     inputOnlyToDisposableTarget: true,
@@ -538,60 +563,11 @@ try {
   check("a session exists for the workspace", typeof sessionId === "string" && sessionId.length > 0, String(sessionId));
 
   // -------------------------------------------------------------------------
-  // 4. Choose the target window explicitly through the product's own picker.
+  // 4. Grant session Access and let the driver discover the foreground target.
   //
-  //    The orb refuses to guess a target, so the target has to be named. This is the same path
-  //    the UI uses, and it also proves the driver's window list is reachable from the shell.
-  //    It runs before the policy checks because a window has to exist before anything can be
-  //    observed or acted on.
+  //    The harness focuses only its disposable process to establish a known desktop state. No
+  //    window identity is sent to pi-orb: observe() must report that process from the foreground.
   // -------------------------------------------------------------------------
-  const listResult = JSON.parse(
-    await evaluate("window.orb.listDesktopWindows().then((r) => JSON.stringify(r))"),
-  );
-  report.policy.windowList = {
-    ok: listResult.ok,
-    count: Array.isArray(listResult.windows) ? listResult.windows.length : 0,
-    message: listResult.message ?? null,
-  };
-  check("the shell can list desktop windows", listResult.ok === true, safe(listResult).slice(0, 250));
-
-  const gridChoice = Array.isArray(listResult.windows)
-    ? listResult.windows.find((entry) => entry.pid === grid.pid)
-    : undefined;
-  report.policy.gridWindowChoice = gridChoice ?? null;
-  check(
-    "the target window is offered by the picker, identified by process id",
-    gridChoice !== undefined,
-    `grid pid=${grid.pid} candidates=${safe((listResult.windows ?? []).map((entry) => ({ pid: entry.pid, title: entry.title })))}`,
-  );
-
-  if (gridChoice) {
-    const setTarget = JSON.parse(
-      await evaluate(
-        `window.orb.setDesktopTarget(${JSON.stringify(gridChoice.windowId)}).then((r) => JSON.stringify(r))`,
-      ),
-    );
-    report.policy.setTarget = setTarget;
-    check("the target window can be selected", setTarget.ok === true, safe(setTarget).slice(0, 250));
-    check(
-      "the selected target is reported back to the user",
-      setTarget.ok === true && setTarget.target?.pid === grid.pid,
-      safe(setTarget.target ?? null).slice(0, 200),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // 5. Policy: without an approved task, an action is refused and has no side effect.
-  // -------------------------------------------------------------------------
-  const observeBeforeApproval = await bridgeCall({ type: "observe", sessionId, generation });
-  report.policy.observeBeforeApproval = {
-    ok: observeBeforeApproval.ok,
-    observationId: observeBeforeApproval.result?.observationId ?? null,
-    reasoning: "observing is read-only, so it is allowed before approval; it must be, or the model could not decide what to ask for",
-  };
-  check("an observation is allowed before a task is approved (read-only)", observeBeforeApproval.ok === true, safe(observeBeforeApproval).slice(0, 200));
-
-  const observationId = observeBeforeApproval.result?.observationId;
   const cell = geometry.cellCentres.find((entry) => entry.cell === "1,2");
 
   /**
@@ -613,6 +589,7 @@ try {
   /** The cell's own centre as a screenshot fraction — the number a model would produce. */
   const cellFraction = () => fractionOfScreenDip(cell.dipScreenPoint);
 
+  // No Access grant must reject an action before the driver can touch the target.
   const eventsBeforeRefusal = readGrid().length;
   const refusedAct = await bridgeCall({
     type: "act",
@@ -620,7 +597,7 @@ try {
     generation,
     action: {
       kind: "click",
-      observationId,
+      observationId: "obs-without-access",
       position: cellFraction(),
     },
   });
@@ -647,72 +624,70 @@ try {
   );
 
   // -------------------------------------------------------------------------
-  // 6. Approve through the real UI path, then run a real click through the whole chain.
+  // 5. Read Only grants observation but cannot perform input.
+  // -------------------------------------------------------------------------
+  const targetActivation = activateProcess(grid.pid);
+  await sleep(1000);
+  report.policy.targetActivation = targetActivation;
+  check("the harness focused its disposable target process", targetActivation.ok === true, safe(targetActivation));
+
+  const readOnly = JSON.parse(
+    await evaluate(
+      `window.orb.setOrbAccess({ generation: ${generation}, level: 'read-only' }).then((s) => JSON.stringify(s))`,
+    ),
+  );
+  report.policy.readOnly = readOnly;
+  check(
+    "Read Only is granted to this session and generation",
+    readOnly.authorized === true && readOnly.level === "read-only" && readOnly.sessionId === sessionId && readOnly.generation === generation,
+    safe(readOnly),
+  );
+  const readOnlyObservation = await bridgeCall({ type: "observe", sessionId, generation });
+  report.policy.readOnlyObservation = safe(readOnlyObservation);
+  check("Read Only can observe the automatically selected foreground app", readOnlyObservation.ok === true && readOnlyObservation.result?.window?.pid === grid.pid, safe(readOnlyObservation.result?.window));
+  const readOnlyClick = await bridgeCall({
+    type: "act",
+    sessionId,
+    generation,
+    action: { kind: "click", observationId: readOnlyObservation.result?.observationId, position: cellFraction() },
+  });
+  report.policy.readOnlyClick = safe(readOnlyClick);
+  check("Read Only refuses input actions", readOnlyClick.ok === false && readOnlyClick.reason === "access-level", safe(readOnlyClick));
+
+  // -------------------------------------------------------------------------
+  // 6. Workspace Write enables the same session to act on the current foreground app.
   // -------------------------------------------------------------------------
   const approved = JSON.parse(
     await evaluate(
-      `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'click the highlighted cell in the test window' }).then((s) => JSON.stringify(s))`,
+      `window.orb.setOrbAccess({ generation: ${generation}, level: 'workspace-write' }).then((s) => JSON.stringify(s))`,
     ),
   );
   report.policy.approved = approved;
-  check("the desktop task can be approved through the UI path", approved.authorized === true, safe(approved).slice(0, 250));
-  check("the approval records what it is for", typeof approved.scope === "string" && approved.scope.length > 0, String(approved.scope));
-
-  // A blank scope must not approve anything, so it is checked while no task is in force: the
-  // request is refused and the previous approval is untouched.
-  await evaluate("window.orb.revokeDesktopTask().then((s) => JSON.stringify(s))");
-  const blankScope = JSON.parse(
-    await evaluate(
-      `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: '   ' }).then((s) => JSON.stringify(s))`,
-    ),
-  );
-  report.policy.blankScope = blankScope;
-  check(
-    "a blank approval scope does not create a task",
-    blankScope.authorized === false,
-    safe(blankScope).slice(0, 200),
-  );
-  check(
-    "a blank approval scope is reported as a problem",
-    statusNow.problem !== undefined,
-    "checked via the status snapshot below",
-  );
-
-  // Re-approve for the loop.
-  await evaluate(
-    `window.orb.authorizeDesktopTask({ generation: ${generation}, scope: 'click the highlighted cell' }).then((s) => JSON.stringify(s))`,
-  );
-  const targetRestored = await evaluate(
-    `window.orb.setDesktopTarget(${JSON.stringify(gridChoice.windowId)}).then((s) => JSON.stringify(s))`,
-  );
-  check(
-    "the target is explicitly reselected after revocation",
-    JSON.parse(targetRestored)?.ok === true,
-    targetRestored,
-  );
+  check("Workspace Write is granted through the Access control", approved.authorized === true && approved.level === "workspace-write", safe(approved).slice(0, 250));
+  check("changing Access keeps the current Orb session and generation", approved.sessionId === sessionId && approved.generation === generation, safe(approved));
 
   // -------------------------------------------------------------------------
-  // 7. Stale observation is refused.
+  // 7. Replaced observations are refused, even within the same foreground window.
   // -------------------------------------------------------------------------
-  const freshObservation = await bridgeCall({ type: "observe", sessionId, generation });
+  const staleObservation = await bridgeCall({ type: "observe", sessionId, generation });
+  const currentObservation = await bridgeCall({ type: "observe", sessionId, generation });
   const staleAct = await bridgeCall({
     type: "act",
     sessionId,
     generation,
-    action: { kind: "click", observationId: "obs-from-a-previous-turn", position: cellFraction() },
+    action: { kind: "click", observationId: staleObservation.result?.observationId, position: cellFraction() },
   });
-  report.policy.staleObservation = { response: safe(staleAct) };
+  report.policy.staleObservation = { staleId: staleObservation.result?.observationId, currentId: currentObservation.result?.observationId, response: safe(staleAct) };
   check(
     "an action against a superseded observation is refused",
     staleAct.ok === false && (staleAct.reason ?? staleAct.result?.reason) === "stale-observation",
     safe(staleAct).slice(0, 200),
   );
-  void freshObservation;
 
   // -------------------------------------------------------------------------
-  // 8. The real loop: approve -> observe -> click -> the target reports the cell.
+  // 8. The real loop: auto-observe -> click -> consume the returned fresh observation.
   // -------------------------------------------------------------------------
-  const observation = await bridgeCall({ type: "observe", sessionId, generation });
+  const observation = currentObservation;
   const currentObservationId = observation.result?.observationId;
   report.clickLoop.observation = {
     ok: observation.ok,
@@ -777,9 +752,11 @@ try {
     `down=${report.clickLoop.mouseDown} up=${report.clickLoop.mouseUp}`,
   );
   check(
-    "the action result tells the model to observe again",
-    typeof authorizedClick.next === "string" && /observe/i.test(authorizedClick.next),
-    safe(authorizedClick).slice(0, 200),
+    "the action result carries a fresh screenshot and observation for the next action",
+    authorizedClick.observation?.observationId !== currentObservationId &&
+      authorizedClick.observation?.image?.mimeType === "image/png" &&
+      typeof authorizedClick.next === "string" && /fresh observation/i.test(authorizedClick.next),
+    safe({ observationId: authorizedClick.observation?.observationId, image: authorizedClick.observation?.image?.mimeType, next: authorizedClick.next }),
   );
 
   // -------------------------------------------------------------------------
@@ -799,7 +776,7 @@ try {
   //
   // The product itself must activate the target. This helper only records the pre-action state and
   // never turns a backend acknowledgement into a delivery verdict.
-  const activationForScroll = activateWindow(String(gridChoice.windowId));
+  const activationForScroll = activateProcess(grid.pid);
   await sleep(1500);
   const scrollResponse = await bridgeCall({
     type: "act",
@@ -827,7 +804,7 @@ try {
     wheelEvents: wheelEvents.length,
     lastObservedScrollTop: scrollEvents.at(-1)?.scrollTop ?? null,
     note:
-      "the point is a screenshot fraction mapped by the reference backend onto the selected physical window rect; target wheel and scroll logs are the only delivery evidence.",
+      "the point is a screenshot fraction mapped onto the window recorded by the automatic foreground observation; target wheel and scroll logs are the delivery evidence.",
   };
   check(
     "a scroll issued through the orb tool path is accepted by the broker",
@@ -869,17 +846,17 @@ try {
   );
 
   // -------------------------------------------------------------------------
-  // 10. Budget: the action count is reported and enforced.
+  // 10. Session Access remains selected across ordinary actions.
   // -------------------------------------------------------------------------
   const statusAfterClick = JSON.parse(await evaluate("window.orb.getStatus().then((s) => JSON.stringify(s.desktopTask))"));
-  report.policy.budget = statusAfterClick;
-  check("the task state reports the actions used", statusAfterClick.actionsUsed >= 1, safe(statusAfterClick).slice(0, 200));
-  check("the task state reports an action limit", typeof statusAfterClick.actionLimit === "number" && statusAfterClick.actionLimit > 0, String(statusAfterClick.actionLimit));
+  report.policy.sessionAccessAfterActions = statusAfterClick;
+  check("Workspace Write remains bound to the same session after actions", statusAfterClick.authorized === true && statusAfterClick.level === "workspace-write" && statusAfterClick.sessionId === sessionId && statusAfterClick.generation === generation, safe(statusAfterClick).slice(0, 250));
+  check("the latest action result observation is now the current broker observation", statusAfterClick.lastObservationId === scrollResponse.result?.observation?.observationId, safe({ status: statusAfterClick, freshObservationId: scrollResponse.result?.observation?.observationId }).slice(0, 300));
 
   // -------------------------------------------------------------------------
   // 11. Revocation: stopping removes authority immediately.
   // -------------------------------------------------------------------------
-  const revoked = JSON.parse(await evaluate("window.orb.revokeDesktopTask().then((s) => JSON.stringify(s))"));
+  const revoked = JSON.parse(await evaluate("window.orb.revokeOrbAccess().then((s) => JSON.stringify(s))"));
   const afterRevoke = await bridgeCall({
     type: "act",
     sessionId,
@@ -895,25 +872,33 @@ try {
   );
 
   // -------------------------------------------------------------------------
-  // 12. A new run generation invalidates both the token scope and the action path.
+  // 12. Starting a new conversation drops the grant and invalidates the old session path.
   // -------------------------------------------------------------------------
-  await evaluate(`window.orb.setShortcut("Control+Alt+F12").then((s) => JSON.stringify(s))`).catch(() => {});
-  const newGenerationStatus = JSON.parse(await evaluate("window.orb.getStatus().then((s) => JSON.stringify(s))"));
-  const staleRunAct = await bridgeCall({
+  const newSession = await evaluate("window.orb.newConversation().then((id) => id)");
+  const afterNewSession = JSON.parse(await evaluate("window.orb.getStatus().then((s) => JSON.stringify(s))"));
+  const staleSessionAct = await bridgeCall({
     type: "act",
     sessionId,
-    generation: generation,
+    generation,
     action: { kind: "click", observationId: currentObservationId, position: cellFraction() },
   });
-  report.revocation.newGeneration = {
-    generationBefore: generation,
-    generationAfter: newGenerationStatus.generation,
-    response: safe(staleRunAct),
+  report.revocation.newSession = {
+    oldSessionId: sessionId,
+    newSessionId: newSession,
+    generation,
+    generationAfter: afterNewSession.generation,
+    authorizedAfter: afterNewSession.desktopTask?.authorized ?? null,
+    response: safe(staleSessionAct),
   };
   check(
-    "a request from an earlier run generation is refused",
-    generation === newGenerationStatus.generation || staleRunAct.ok === false,
-    safe(report.revocation.newGeneration).slice(0, 250),
+    "a new conversation clears the old session grant",
+    afterNewSession.sessionId === newSession && afterNewSession.sessionId !== sessionId && afterNewSession.desktopTask?.authorized === false,
+    safe(report.revocation.newSession).slice(0, 300),
+  );
+  check(
+    "a request from the previous session is refused",
+    staleSessionAct.ok === false && staleSessionAct.reason === "unknown-session",
+    safe(staleSessionAct).slice(0, 250),
   );
 
   // -------------------------------------------------------------------------
@@ -974,16 +959,18 @@ try {
     verified: [
       "the bridge handshake is written with a per-run token, a pipe path and the workspace",
       "the bridge refuses a request that names no live session",
-      "a desktop action without an approved task is refused, with no side effect on the target",
-      "an observation is allowed before approval, since observing is read-only",
-      "the task can be approved through the real UI path, and a blank scope is refused",
+      "a desktop action without a session Access grant is refused, with no side effect on the target",
+      "Read Only grants observation and refuses input actions",
+      "Workspace Write is granted to the current Orb session and generation",
+      "the foreground application is discovered automatically without a target picker",
       "an action against a superseded observation is refused",
       "an authorized click reaches a real window through the whole product chain and lands on the intended cell",
       "an authorized scroll is accepted and escalated by the product chain; whether the wheel physically lands is OS-gated and was observed to vary, so it is recorded rather than asserted",
       "replaying one observation is refused (one action per observation)",
-      "the action result reminds the model to observe again",
-      "the task state reports the actions used against a limit",
-      "revoking clears the authorization and the next action is refused",
+      "the action result contains its fresh screenshot and observation id for the next action",
+      "the session Access grant remains active across ordinary actions",
+      "revoking clears Access and the next action is refused",
+      "starting a new conversation clears the old grant and session path",
       "a browser-shaped request is refused even with a valid token",
     ],
     unverified: [
@@ -997,7 +984,7 @@ try {
   report.piWebLogTail = piWebLog.slice(-800);
 
   mkdirSync(import.meta.dirname, { recursive: true });
-  writeFileSync(join(import.meta.dirname, "loop-verification-reference-backend.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  writeFileSync(join(import.meta.dirname, "loop-verification-session-access.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ passed: report.passed, checks: report.checks, summary: report.summary }, null, 2));
 }
 

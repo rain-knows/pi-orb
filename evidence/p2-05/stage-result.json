@@ -1,28 +1,28 @@
 {
-  "capturedAt": "2026-09-30T03:44:58.907Z",
+  "capturedAt": "2026-09-30T09:30:14.829Z",
   "steps": [
     {
       "name": "build and package the unpacked Windows app",
       "ok": true,
-      "ms": 24946,
+      "ms": 21182,
       "output": "  • downloaded electron zip extracted successfully  output=D:\\workself\\pi-orb\\release\\0.1.0\\win-unpacked |   • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • updating asar integrity executable resource  executablePath=release\\0.1.0\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0\\win-unpacked\\pi-orb.exe"
     },
     {
       "name": "audit the packaged artifact",
       "ok": true,
-      "ms": 228,
+      "ms": 179,
       "output": "  }, |   \"failed\": [], |   \"passedCount\": 25 | }"
     },
     {
       "name": "start the packaged application and drive its renderer",
       "ok": true,
-      "ms": 8122,
+      "ms": 7495,
       "output": "      \"detail\": \"none\" |     } |   ] | }"
     }
   ],
   "passed": true,
   "artifactAudit": {
-    "capturedAt": "2026-09-30T03:45:24.028Z",
+    "capturedAt": "2026-09-30T09:30:36.153Z",
     "version": "0.1.0",
     "appRoot": "release/0.1.0/win-unpacked",
     "entries": {
@@ -64,7 +64,7 @@
     ],
     "sizes": {
       "executableBytes": 246090752,
-      "asarBytes": 358604,
+      "asarBytes": 8067707,
       "unpackedNativeBytes": 2658109,
       "archiveEntryCount": 49
     },
@@ -102,7 +102,7 @@
       {
         "name": "the archive contains the built renderer assets",
         "ok": true,
-        "detail": "out/renderer/assets/index-CIMhhZBj.css, out/renderer/assets/index-DNbUuW9J.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
+        "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-C-vL-4BO.js, out/renderer/assets/index-L7xElpop.css, out/renderer/assets/observation-frame-CWh_eSAv.css"
       },
       {
         "name": "the archive ships no src/ files",
@@ -172,12 +172,12 @@
       {
         "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
         "ok": true,
-        "detail": "9704 bytes"
+        "detail": "9899 bytes"
       },
       {
         "name": "the packaged resources carry CHANGELOG.md",
         "ok": true,
-        "detail": "54781 bytes"
+        "detail": "55349 bytes"
       },
       {
         "name": "the shipped manifest carries the project version",
@@ -198,9 +198,9 @@
     "passed": true
   },
   "packagedSmoke": {
-    "capturedAt": "2026-09-30T03:45:24.189Z",
+    "capturedAt": "2026-09-30T09:30:36.282Z",
     "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790739924189",
+    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790760636282",
     "checks": [
       {
         "name": "the packaged application stays alive",
@@ -210,7 +210,7 @@
       {
         "name": "the packaged application creates its window",
         "ok": true,
-        "detail": ""
+        "detail": "pi-orb"
       },
       {
         "name": "the packaged preload bridge reaches the renderer",
@@ -293,9 +293,14 @@
         "detail": "{\"expanded\":false,\"horizontal\":\"left\",\"vertical\":\"up\"}"
       },
       {
-        "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
+        "name": "the packaged session Access bridge is present and starts unauthorized",
         "ok": true,
-        "detail": "7 windows, first=\"\""
+        "detail": "{\"state\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true},\"methods\":{\"setOrbAccess\":\"function\",\"revokeOrbAccess\":\"function\",\"listDesktopWindows\":\"undefined\",\"s"
+      },
+      {
+        "name": "the packaged bridge has no target picker or per-task scope APIs",
+        "ok": true,
+        "detail": "{\"setOrbAccess\":\"function\",\"revokeOrbAccess\":\"function\",\"listDesktopWindows\":\"undefined\",\"setDesktopTarget\":\"undefined\",\"authorizeDesktopTask\":\"undefined\"}"
       },
       {
         "name": "no desktop-driver failure was reported at startup",
@@ -309,8 +314,8 @@
       }
     ],
     "passed": true,
-    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-78976\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/54cd4a62-147c-4fa8-a0a5-c1f5ca2fb80d"
+    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-10192\n[pi-orb] no foreground window to record; the orb must not take focus first",
+    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/493e48a4-b723-4c12-918f-357fea7d20ff"
   },
   "installer": "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
 }

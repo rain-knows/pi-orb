@@ -1,0 +1,188 @@
+{
+  "capturedAt": "2026-09-30T08:39:29.132Z",
+  "testCase": "d6-scroll",
+  "verification": {
+    "what": "real model observes a disposable target and scrolls its labelled strip",
+    "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
+    "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
+    "accessLevel": "workspace-write",
+    "targetSelection": "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d6-scroll-agent-1790757569129",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "LockApp",
+      "title": "Windows Ĭ����������",
+      "inputDesktopAccessible": true
+    },
+    "targetPid": 12528,
+    "target": {
+      "pid": 12528,
+      "windowBoundsDip": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBoundsDip": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "scaleFactor": 1.5,
+      "cell00": {
+        "cell": "0,0",
+        "centreInContent": {
+          "x": 60,
+          "y": 45
+        },
+        "dipScreenPoint": {
+          "x": 187,
+          "y": 191
+        },
+        "physicalScreenPoint": {
+          "x": 281,
+          "y": 287
+        }
+      }
+    },
+    "piWeb": {
+      "ok": true,
+      "baseUrl": "http://127.0.0.1:41196",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:41196\n- Network:       http://127.0.0.1:41196\n✓ Ready in 495ms\n✓ Running next.config.ts took 153ms\n"
+    },
+    "handshake": {
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\shell-data\\bridge-token.json",
+      "pid": 24696,
+      "generation": 1,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-24696"
+    },
+    "rendererTarget": {
+      "title": "pi-orb",
+      "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
+    },
+    "shortcut": {
+      "registered": true,
+      "problem": null
+    },
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 2,
+      "busy": false,
+      "sessionId": "01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:41196",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "generation": 2,
+    "session": "01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56",
+    "model": {
+      "sessionId": "01a0f178-3fdb-71eb-8c0e-1d6d8c18c76a",
+      "selected": {
+        "provider": "TZcode",
+        "modelId": "deepseek-v4.1-flash"
+      },
+      "input": [
+        "text",
+        "image"
+      ],
+      "declaredImageCapable": true
+    },
+    "interactiveDesktopBeforeTarget": {
+      "process": "LockApp",
+      "title": "Windows Ĭ����������",
+      "inputDesktopAccessible": true
+    }
+  },
+  "checks": [
+    {
+      "name": "the isolated pi-web started",
+      "ok": true,
+      "detail": "http://127.0.0.1:41196"
+    },
+    {
+      "name": "the isolated shell published its own handshake",
+      "ok": true,
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\shell-data\\\\bridge-token.json\",\"pid\":24696,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-24696\"}"
+    },
+    {
+      "name": "the isolated shell's pipe accepts a connection",
+      "ok": true,
+      "detail": "\\\\.\\pipe\\pi-orb-24696"
+    },
+    {
+      "name": "the isolated shell is NOT the user's running orb",
+      "ok": true,
+      "detail": "handshake pid 24696"
+    },
+    {
+      "name": "the orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "{\"title\":\"pi-orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+    },
+    {
+      "name": "the wake shortcut registered",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:41196\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+    },
+    {
+      "name": "the isolated shell reports this run's workspace and a generation",
+      "ok": true,
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"generation\":2}"
+    },
+    {
+      "name": "the isolated shell created a real pi-web session",
+      "ok": true,
+      "detail": "\"01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56\""
+    },
+    {
+      "name": "the session is served by a model that declares image input",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a0f178-3fdb-71eb-8c0e-1d6d8c18c76a\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+    },
+    {
+      "name": "an interactive desktop is available before target enumeration",
+      "ok": false,
+      "detail": "{\"process\":\"LockApp\",\"title\":\"Windows Ĭ����������\",\"inputDesktopAccessible\":true}"
+    }
+  ],
+  "passed": false,
+  "error": "no interactive desktop: foreground is LockApp and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
+  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:41197/devtools/browser/fd31515a-6f8c-409d-82d4-9bc5a045462b\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-24696\n[pi-orb] desktop {\"at\":\"2026-09-30T08:39:35.631Z\",\"event\":\"revoke\"}\n[pi-orb] recorded target: pid 18188 \"Windows Ĭ����������\" (2560x1600, dpi 144)\n",
+  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:41196\n- Network:       http://127.0.0.1:41196\n✓ Ready in 495ms\n✓ Running next.config.ts took 153ms\n[pi-web] session_start dispatched to extensions for session 01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56\n[pi-web] session_start dispatched to extensions for session 01a0f178-3fdb-71eb-8c0e-1d6d8c18c76a\n"
+}

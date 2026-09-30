@@ -4,10 +4,11 @@
 > - `node evidence/p1-07/collect-licenses.mjs`（第三方许可清单）
 > - `node evidence/p1-07/check-provenance.mjs`（参考来源核对，见 §0）
 > - `node evidence/p1-07/run-release-gate.mjs`（发布门禁，66 项）
-> - `node evidence/p1-07/run-lifecycle-regression.mjs`（折叠/停止/断连/代次生命周期，10 项）
+> - `node evidence/p1-07/run-lifecycle-regression.mjs`（session Access、队列、Stop/隐藏/切换/断连）
 >
-> 原始结果：`license-inventory.json`、`provenance.json`、`release-gate.json`（66/66）、`lifecycle-regression.json`（10/10）
-> 状态：**门禁与生命周期通过**；**v0.1 尚不构成完整 M3 版本**，原因见 §6。
+> 历史结果：`license-inventory.json`、`provenance.json`、`release-gate.json`（66/66）、`lifecycle-regression.json`（10/10，旧 per-task Access）
+> 当前生命周期探针写入 `session-access-regression.json`；状态以该文件和 `doc/support-matrix.md` 为准。
+> **v0.1 尚不构成完整 M3 版本**，原因见 §6。
 
 ## 0. 参考来源核对：`check-provenance.mjs` → `provenance.json`
 
@@ -107,9 +108,11 @@
 
 五次均退出码 1，恢复后回到 32/32。
 
-## 4. 生命周期实测（10/10）
+## 4. 历史生命周期实测（10/10）
 
-规则来自 §6.1/§6.2：桌面授权必须是**易失**的。判定通过真实壳 + 真实 pi-web 会话 + 真实桥读取。
+下表来自 `lifecycle-regression.json`，对应已移除的 per-task Access API。它保留作为历史证据，
+不再代表当前 session Access 生命周期。当前实现由同名探针重新验证并写入
+`session-access-regression.json`。
 
 | 断言 | 实测 |
 |---|---|
@@ -117,7 +120,7 @@
 | 存在会话，因此可授予授权 | 通过（真实 pi-web 会话） |
 | 批准后授权生效 | `authorized=true` |
 | **显式停止清除授权** | 通过 |
-| **模型 turn 完成/失败后清除授权** | 主进程 `emit(idle/error)` 统一调用 `revokeDesktopOperations()`；自动化门禁与代码审计通过 |
+| **模型 turn 完成/失败后清除授权** | 历史策略；当前策略为正常 turn idle 保留 session Access |
 | 停止不破坏目标/桥的一致性 | 通过 |
 | **停止桌面操作不结束聊天会话** | `sessionId` 前后一致 |
 | **停止桌面操作不改变运行代次** | 前后均为 1 |
@@ -127,13 +130,21 @@
 
 折叠的验证方式值得记录：窗口一旦隐藏，其 renderer 可能被挂起，`getStatus()` 不再返回。因此折叠效果是**经桥（主进程）**读回的，不依赖被隐藏的 renderer——这也是为什么不把折叠效果断言写成"界面上的文字变了"。
 
+## 4.1 当前 session Access 生命周期实测（12/12）
+
+`session-access-regression.json` 是当前实现的有效结果，使用真实 Electron 壳、隔离 pi-web
+实例和 disposable target。它验证同一 session 的 Workspace Write grant 跨三条排队 prompt
+及 idle 保留，并验证 Stop、折叠、workspace 切换、新会话和 pi-web 断连均撤权；Stop 保留
+原 Pi session 与 generation。该结果替代旧 per-task 表作为当前生命周期门禁，旧 JSON 只用于
+追溯，不应与当前授权模型合并统计。
+
 ## 5. 本阶段发现并修复的真实缺陷
 
 ### 5.1 有多条隐藏路径绕开撤权（安全相关）
 
 原来有三处各自隐藏窗口：快捷键/收起的 wake controller、窗口 `close` 处理器、托盘菜单 "Hide orb"。规则只落在第一处，于是**用窗口关闭按钮或托盘菜单收起时，桌面授权会存活**——一个隐藏的悬浮窗仍能移动用户的鼠标键盘。
 
-修复：引入 `OrbWindowLifecycle` 作为**唯一**折叠入口（`hide()` + `revokeDesktopTask()` + `discardPendingCapture()` 严格配对），上述三处与新增的窗口收起控件全部走它。单测断言"任何一次 hide 都必须伴随一次 revoke/discard"，并用参数化用例覆盖三条路由。
+修复：引入 `OrbWindowLifecycle` 作为**唯一**折叠入口（`hide()` + `revokeOrbAccess()` + `discardPendingCapture()` 严格配对），上述三处与新增的窗口收起控件全部走它。单测断言"任何一次 hide 都必须伴随一次 revoke/discard"，并用参数化用例覆盖三条路由。
 
 ### 5.2 悬浮窗没有自己的收起控件
 
@@ -167,7 +178,7 @@ P1-06 的桥要求请求携带**当时的运行代次**，而扩展里的 `sessi
 
 修复：壳把运行代次写进扩展本来就会读的**同握手文件**（与令牌、管道路径并列），并在代次变化时重写（换工作区）。扩展每次 `readToken()` 都能拿到最新值；`readToken()` 现在要求 `generation` 必须存在且为整数，**不再默认成 0**（默认值会产生一个“看似策略拒绝”的结果）。
 
-新增证据：`evidence/p1-06/loop-verification.json` 新增三条断言——握手携带代次、用握手代次的请求能**通过代次校验**（而不是被报成陈旧）、旧代次仍被拒。`tests/bridge-client.test.ts`（新增）钉住了代次必填与重读行为。
+新增证据：`evidence/p1-06/loop-verification-session-access.json` 新增三条断言——握手携带代次、用握手代次的请求能**通过代次校验**（而不是被报成陈旧）、旧会话仍被拒。`tests/bridge-client.test.ts`（新增）钉住了代次必填与重读行为。
 
 ### 5.9 未知会话被报成“代次陈旧”（诊断误导）
 

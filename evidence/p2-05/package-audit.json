@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-30T03:45:24.028Z",
+  "capturedAt": "2026-09-30T09:30:36.153Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
@@ -41,7 +41,7 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 358604,
+    "asarBytes": 8067707,
     "unpackedNativeBytes": 2658109,
     "archiveEntryCount": 49
   },
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/index-CIMhhZBj.css, out/renderer/assets/index-DNbUuW9J.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
+      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-C-vL-4BO.js, out/renderer/assets/index-L7xElpop.css, out/renderer/assets/observation-frame-CWh_eSAv.css"
     },
     {
       "name": "the archive ships no src/ files",
@@ -149,12 +149,12 @@
     {
       "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
       "ok": true,
-      "detail": "9704 bytes"
+      "detail": "9899 bytes"
     },
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "54781 bytes"
+      "detail": "55349 bytes"
     },
     {
       "name": "the shipped manifest carries the project version",

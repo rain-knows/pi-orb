@@ -111,7 +111,7 @@ DeepSeek Orb 代码索引：
 1. **先搬已经验证的实现，再写适配。** Windows 桌面能力以参考项目 `packages/experimental/tool-computer-use/src/windows.ts`、`windows-native.ts`、`windows-foreground.ts`、`coordinates.ts` 和对应测试为源代码基线。pi-orb 只把它们接到自己的 `DesktopTaskController`、Pi 工具协议和 named-pipe bridge。
 2. **Cua 只做探针，不做长期 fallback。** P0/P1 的 Cua 探针保留为证据脚本；当参考 backend 覆盖桌面观察、点击、输入和滚动后，删除运行时 Cua action path、foreground escalation 和“失败后换另一后端”的兼容逻辑。Orb 的 Electron 截图预览仍是独立的用户确认边界。
 3. **同一能力只保留一个实现。** `SendInput`、窗口激活、剪贴板、坐标换算和滚轮投递不得同时存在 PowerShell、Cua、native 三套生产路径。替换完成后删除旧文件、旧选项和旧测试，不以 feature flag 或静默回退保留。
-4. **集成边界不能复制上游内部系统。** pi-web/Pi session、Orb 授权、代次、目标窗口记录和 bridge 是本项目边界；模型循环、桌面策略和平台输入实现来自上游并保持其语义。
+4. **集成边界不能复制上游内部系统。** pi-web/Pi session、Orb session/generation Access grant、当前前台 observation 和 bridge 是本项目边界；模型循环、桌面策略和平台输入实现来自上游并保持其语义。
 5. **验收以目标事实为准。** 上游函数返回成功只能证明调用完成；截图像素、目标事件日志和文本读回才是 pi-orb 的通过证据。D6 若目标没有 `wheel` 和 `scrollTop` 变化，必须保留失败并继续替换/修复唯一生产 backend。
 
 ## 4. 目标架构与责任划分
@@ -132,7 +132,7 @@ DeepSeek Orb 代码索引：
 
 - `orbWorkspace`：持久化路径配置；Electron 在**创建**会话之前传给现有 pi-web API。工作区切换应停止当前桌面任务并新建／选择正确 cwd 的会话，不在活跃会话里篡改路径。
 - `Orb 模式`：cwd 精确匹配后应用的提示与工具配置；普通 Web 或 CLI 若使用该 cwd，也可能进入此模式。用户已接受 cwd 标记路线，界面须解释这个结果；不以“来自哪个前端”作为模式识别的唯一依据。
-- `桌面授权`：仅本次本机壳连接、会话运行实例和用户批准任务有效；不写到会话日志作为可恢复权限。cwd 或 `/orb` 字符串匹配**不能授权**鼠标、键盘、截图上传。
+- `桌面授权`：用户在 Access 芯片选择 `Read Only / Workspace Write / Full Access`，grant 仅绑定当前本机壳、Orb session 与 generation，不写入会话日志或作为可恢复权限。cwd 或 `/orb` 字符串匹配**不能授权**鼠标、键盘；截图消息仍须逐张预览确认。
 - 首选验证按 `session_start` 的 `ctx.cwd` 条件注册额外资源，非匹配 cwd 不贡献模型工具／提示。若需项目 scope 资源配置，只对用户选中的目录、经确认安装，不覆盖已有 `.pi` 文件。两者先验证，再选择一种简单实现，不并行维护两套。
 - `before_agent_start` 只在匹配模式时应用工具／提示；普通 cwd 不主动改原资源。不能依靠启动时隐藏一遍抵抗 W1 自动追加行为。执行器每次校验授权、限额及状态，防止旧工具调用继续执行。
 - prompt 用独立结构化 section 追加，说明截图新鲜度、坐标空间、动作后核验、禁止将屏幕内容当授权、遇阻停下，不替换用户原始指令体系。
@@ -185,7 +185,7 @@ M1 完成定义：在批准的平台和依赖组合上，小窗能用共享 Pi �
 
 | ID／目的 | 前置 | 交付物和接入点 | 可观察验收 | 风险／不做事项 |
 |---|---|---|---|---|
-| P1-04 明确授权的截图上下文 | M1、P0-04 | 当前窗口截图＋应用／标题元数据、预览、删除、确认发送；P2/E2/D2 | 先记录用户原目标窗口再唤醒，不能截成 Orb 自己；预览对应发送图；取消无上传；text-only 模型拒绝图像任务；macOS 权限缺失有提示；确认后图片进入正确会话 | 标题／路径也可能敏感；不默认读取剪贴板／选中文字／浏览器 URL；没有当前窗口能力时明确报告，不静默改截整屏 |
+| P1-04 明确授权的截图上下文 | M1、P0-04 | 当前前台窗口截图＋应用／标题元数据、预览、删除、确认发送；P2/E2/D2 | 在 Orb 获取焦点前记录用户当前窗口，不能截成 Orb 自己；预览对应发送图；取消无上传；text-only 模型拒绝图像任务；确认后图片进入正确会话 | 标题／路径也可能敏感；不默认读取剪贴板／选中文字／浏览器 URL；没有当前窗口能力时明确报告，不静默改截整屏 |
 
 M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图不夹带 Orb 遮罩；图片大小上限明确且测试通过。每次截图先预览；自动执行中逐步回图的授权另属于 M3，不要求每帧弹窗重复确认。
 
@@ -206,8 +206,8 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | P2-01 Orb 风格体验 | M1；输入共存需 M3 | 贴边吸附、悬停展开、钉住、观察边框、主题；D1/overlay guard | 多屏／DPI／工作区切换保持可找回；overlay 不挡操作、不进入截图；关闭与收起语义清楚 | 不复制第三方品牌资产；不让视觉层拥有系统输入权限 |
 | P2-02 双 Alt 快捷手势 | P1-03 | 复用 `uiohook-napi` 物理左右 Alt keycode；双 Alt 触发后唤醒 Orb 并进入已有截图预览；D1/E1 | 区分左右 Alt；同步按、先后按、长按、重复、AltGr、焦点变化、锁屏／休眠恢复无卡键；不吞其他正常快捷键；同一按压只触发一次；退出卸载 hook | `deepseek-harness-orb` 没有双 Alt 产品手势，本项按本项目目标做最小适配，不宣称复刻 Codex 或参考项目内部行为；不全量记录按键；不自动上传截图 |
 | P2-03 选区与附加上下文 | M2、用户确认范围 | 已接入参考 history 会话入口（公开 session summary/detail）和参考项目同类 Windows UI Automation `TextPattern` 选区读取；选区结果以 composer chip 附加 | 历史按钮可列出当前 Orb workspace 会话并恢复 user/assistant transcript；选区文本只在用户发送时附加，并显示来源标签；真实 UIA、多屏/DPI、Esc/工具栏和其它平台仍需验收 | 不用模拟 Ctrl+C 静默覆盖用户剪贴板；应用标题不等于完整路径／URL；不 OCR 出文件路径再当可信 cwd |
-| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽、授权后的动作后回图和用户显式截图导出；**`open_app` 已按用户决定开放：只激活已在运行的应用，不启动进程** | 新动作复用任务授权和一动作一观察；截图导出只接受当前预览 observation，保存由系统对话框完成并使用 `wx` 防覆盖；`open_app` 必须「应用已在运行 → 激活成功 → 前台窗口确实属于该应用」三步全过才重绑定，否则动作失败且保留原目标；重绑定对用户可见且可随时 Revoke；真实动作及目标像素、真实保存/剪贴板体验仍待 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；**`open_app` 不启动任何进程**——启动属于用户未授予的原生权限，`launch` 在 open-app 路径上不可达 |
-| P2-05 额外平台与分发 | P1-07、确认平台 | Windows x64 已落地：electron-builder 每用户 NSIS 安装包与解包产物，形态复用参考配置（`apps/desktop/scripts/electron-builder-config.mjs`）；产物内容审计 25/25 与打包产物启动探测 21/21 通过。macOS 签名／TCC 归属与 Linux 目标未做 | 干净目标机安装、权限拒绝／撤销、升级、卸载可复现；声明支持矩阵 | 不用 Windows 通过推断 macOS/Linux 可用；不照搬 Electron 身份到 Node helper；未签名产物必须在文档与人工项中如实标注为未验证 |
+| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽、每个动作返回新图像与 observation、用户显式截图导出；**`open_app` 只激活已运行的应用，不启动进程** | Read Only 允许观察/应用列表/等待，Workspace Write 增加输入，Full Access 再允许 `open_app`；各动作复用 session grant、generation 和一动作一 observation；截图导出只接受当前预览 observation，保存由系统对话框完成并使用 `wx` 防覆盖；真实模型动作、跨应用切换及像素命中仍需 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；**`open_app` 不启动任何进程**——启动属于用户未授予的原生权限，`launch` 在 open-app 路径上不可达 |
+| P2-05 额外平台与分发 | P1-07、确认平台 | Windows x64 已落地：electron-builder 每用户 NSIS 安装包与解包产物，形态复用参考配置（`apps/desktop/scripts/electron-builder-config.mjs`）；产物内容审计 25/25 与打包产物启动探测 22/22 通过。macOS 签名／TCC 归属与 Linux 目标未做 | 干净目标机安装、权限拒绝／撤销、升级、卸载可复现；声明支持矩阵 | 不用 Windows 通过推断 macOS/Linux 可用；不照搬 Electron 身份到 Node helper；未签名产物必须在文档与人工项中如实标注为未验证 |
 | P2-06 原工具菜单上游集成 | P0-02 结论＋用户明确要求 | 通用可扩展模式接口的提案／可选 PR；W2/W3 | 关闭接口时普通行为不变；模式注册、工具校验、恢复／显示一致；合并与版本支持有记录 | 不是首版前提；上游不接受时不静默维护私有整仓 fork |
 | P2-07 后台任务衔接（可选） | v0.1、用户确认需求 | 复用已有 Pi 子代理／独立会话机制，结果通知回 Orb | 父子任务归属、独立停止、完成只通知一次、不得自动替用户批准问题 | 不将前期 DeepSeek 双轨当本项目刚性范围，不再造任务调度系统 |
 
@@ -217,7 +217,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 
 `未配置 cwd → 已配置但未连接 → Orb 会话可聊天 → 用户批准截图分享／批准桌面任务 → 单任务执行 → 完成或停止并撤权`。
 
-截图分享和自动桌面操作的同意分开：单次附图预览不授权后续自动截图／输入；自动化任务的授权须说明逐动作回图会持续发送窗口截图。授权记录包含会话运行代次、任务／目标范围、有效期和限额，不只保存一个 enabled=true。
+截图分享和自动桌面操作的同意分开：单次附图预览不授权后续工具操作；session Access grant 也不替代单张截图的确认。每个工具动作的回图随该次会话调用提供；grant 绑定 Orb session 与 generation，并在 hide、stop、disconnect、workspace/session 切换和退出时撤销，turn idle 时保留。
 
 恢复／fork／reload／切换会话／更换 cwd／壳断连／OS 锁屏／停止都取消未发动作并清空临时授权。持久化允许配置与任务轨迹，不持久化可恢复权限、锁或“最后截图仍可点击”的判断。纯收起行为按用户确认的产品规则实施；建议首版收起就撤销桌面操作。
 
@@ -295,7 +295,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | 两参考项目、MIT、第三方许可 | §3.1、P1-07 |
 | 细优先级、依赖、验收 | §5、§7.1 |
 
-截至 2026-09-30，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、授权 broker 和参考项目 Windows native backend 已接入；产品侧 C7 坐标闭环、生命周期与打包证据已通过，但真实模型 C7/D6/D8 的最新复跑未完整通过，失败 JSON 原样保留并按支持矩阵标为未验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。P2-02 已复用现有 `uiohook-napi` 左右 Alt keycode，双 Alt 只唤醒并打开原有截图预览，纯状态测试通过；真实键盘、AltGr、锁屏恢复和人工体验仍未验证。P2-03 已复用 pi-web 公开 session summary/detail API 实现当前 Orb workspace 的 history 列表和 transcript 恢复；选区真实 UIA、多屏/DPI 和原生工具栏仍未验收。P2-04 已从固定参考提交接入 Windows 热键、长按、同窗口拖拽、授权后的动作后 image block 和显式截图导出；`orb_open_app` 经用户决定后开放，但**收窄为只激活已在运行的应用、绝不启动进程**（运行前置检查 → 激活 → 前台确属该应用，三步全过才重绑定，否则保留原目标），并已有单测与工具暴露证据；真实桌面动作、目标像素、保存对话框、剪贴板与 open-app 真机效果待验收（`manual-acceptance.md` §9／§10）。P2-05 已按参考项目的打包形态（electron-builder + JS 配置模块、每用户 NSIS、`asarUnpack` 原生模块、无更新源）产出 Windows x64 安装包与解包产物，产物内容审计 25/25、打包产物启动探测 21/21（含一次真实桌面窗口枚举，证明 koffi 从 `app.asar.unpacked` 加载）；dsh 单体仓库的发布管道（随包 Node 运行时、自定义 NSIS 页面、签名链、上传与自动更新）明确未搬，理由见 [`p2-05-distribution.md`](./p2-05-distribution.md)。干净机安装／卸载／升级与 SmartScreen 属人工项（[`manual-acceptance.md`](./manual-acceptance.md) §9），当前保持未验证。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md)、[`lifecycle-and-delivery.md`](./lifecycle-and-delivery.md) 及 `evidence/` 为准。
+截至 2026-09-30，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、session Access broker 和参考项目 Windows native backend 已接入；产品侧 C7 坐标闭环、生命周期与打包证据已通过，但真实模型 C7/D6/D8 的最新复跑未完整通过，失败 JSON 原样保留并按支持矩阵标为未验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。P2-02 已复用现有 `uiohook-napi` 左右 Alt keycode，双 Alt 只唤醒并打开原有截图预览，纯状态测试通过；真实键盘、AltGr、锁屏恢复和人工体验仍未验证。P2-03 已复用 pi-web 公开 session summary/detail API 实现当前 Orb workspace 的 history 列表和 transcript 恢复；选区真实 UIA、多屏/DPI 和原生工具栏仍未验收。P2-04 已从固定参考提交接入 Windows 热键、长按、同窗口拖拽、session Access 后的动作后 image block 和显式截图导出；`orb_open_app` 经用户决定后开放，但**收窄为只激活已在运行的应用、绝不启动进程**（运行前置检查 → 激活 → 前台确属该应用，三步全过才重绑定，否则保留原目标），并已有单测与工具暴露证据；真实桌面动作、目标像素、保存对话框、剪贴板与 open-app 真机效果待验收（`manual-acceptance.md` §9／§10）。P2-05 已按参考项目的打包形态（electron-builder + JS 配置模块、每用户 NSIS、`asarUnpack` 原生模块、无更新源）产出 Windows x64 安装包与解包产物，产物内容审计 25/25、打包产物启动探测 22/22（验证 session Access preload 合同与参考壳层）；dsh 单体仓库的发布管道（随包 Node 运行时、自定义 NSIS 页面、签名链、上传与自动更新）明确未搬，理由见 [`p2-05-distribution.md`](./p2-05-distribution.md)。干净机安装／卸载／升级与 SmartScreen 属人工项（[`manual-acceptance.md`](./manual-acceptance.md) §9），当前保持未验证。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md)、[`lifecycle-and-delivery.md`](./lifecycle-and-delivery.md) 及 `evidence/` 为准。
 
 文档完成标准：全文回读；核对引用路径和固定提交；需求覆盖无遗漏；调用 Advisor 复核，有实质意见时落实修订。开发完成标准由各阶段验收决定，二者不得混淆。当前仍未完成的发布门槛是多显示器、高权限窗口、Chromium 内容输入、安装包在干净机上的安装／卸载／升级（P2-05 E 组）和部分人工交互体验。取消信号已接入 broker、driver 与 native backend，并由自动化竞态测试和真实 disposable target 日志验证。
 

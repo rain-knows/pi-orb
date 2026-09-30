@@ -16,7 +16,7 @@ P0 已就同一组不变量给出结论（见 [`../p0-01/README.md`](../p0-01/RE
 | **N4** 悬浮窗/网页共用后端；连接别人的已有 pi-web 不得擅自重启、升级或关闭它 | 连接/退出/崩溃/重复启动流程与进程归属 | `../p0-03/result.json`：壳退出后服务存活、会话仍可访问；P1 壳启动只探测与认证，无任何启动/停止服务的代码路径（`src/main/pi-web-client.ts` 仅有 probe/authenticate/会话命令） | **通过** |
 | **N5** 不让两个运行时同时写同一会话文件；控制任务只由一个入口持有 | 双客户端与重连测试 | `../p0-03/result.json`：双客户端同 sessionId、reload 后 sessionId 稳定、旧代次被拒；P1 新增运行代次与单任务锁（`src/main/generations.ts`，`tests/generations.test.ts`） | **通过**（本 P1 测试面） |
 | **N6** 安装/关闭/卸载不删除用户工作区文件或历史；不把用户已有源码改动纳入本项目 | 写入清单与源码 diff | `../p0-01/verify-baseline.mjs` 每次门禁重跑：pi-web HEAD 与 6 个既有改动文件哈希不变；写入面审计（见 N2） | **通过** |
-| **N7** 扩展与壳退出可清理资源；断连、重载、换会话、恢复后不继承桌面操作授权 | 权限失效、按键释放、锁释放、监听器注销 | `../p1-07/lifecycle-regression.json`（10/10）：折叠撤权、显式停止撤权、**杀掉 pi-web 后刷新即撤权**、撤权不结束会话/不改代次；`tests/window-lifecycle.test.ts` 断言"每次隐藏必伴随 revoke+discard" | **通过**（授权与锁）；**按键/鼠标释放见 §2「原生输入」** |
+| **N7** 扩展与壳退出可清理资源；断连、重载、换会话、恢复后不继承桌面操作授权 | 正常 turn idle 保留 grant；Stop、隐藏、断连、workspace/session 切换撤权 | `../p1-07/session-access-regression.json`（本轮探针）；`tests/window-lifecycle.test.ts` 断言隐藏必伴随撤权；旧 `lifecycle-regression.json` 仅为 per-task API 历史记录 | 以新 session Access 探针结果为准；**按键/鼠标释放见 §2「原生输入」** |
 | **N8** 明确版本与小型适配模块，不维护旧废弃路径、静默 fallback 或多版本兼容层 | 支持版本表、依赖锁、升级门禁 | `doc/support-matrix.md`、`package.json` 精确锁定（驱动 `0.30.1`、Electron `44.4.5`、Pi SDK `0.87.1`）；门禁校验三者一致；本阶段实际移除了被废弃的路径（`isStillForeground`、`TargetRecording`、helper 的 `-IsStillForeground`、适配器的"最前窗口"回退） | **通过** |
 
 **退出条件自查**：P1 未以「插件代码没改上游」代替非破坏性论证——每个不变量都有指向具体证据文件的引用；未修改 pi-web 源码、其 `node_modules` 或用户 6 个已有改动文件。
@@ -36,10 +36,10 @@ Pi 无条件加载**用户级** `$HOME/.agents/skills`，`HOME` 在运行时解�
 |---|---|---|
 | **普通 Web 非破坏性** | `../p1-06/tool-exposure.json`、`../p1-01/result.json`、`../p0-01/verify-baseline.mjs` | 通过。未覆盖 `read-only/default/full/configured` 等**预设切换**的逐项对比（P0-02 覆盖了 `set_tools` 置空与恢复）；**部分** |
 | **cwd 与模式** | `../p1-01/result.json`（精确匹配、子目录、前缀相似同级目录、大小写、junction）；`tests/workspace.test.ts`、`tests/orb-config.test.ts` | 通过。**未**验证"两个 cwd 同时运行"与网络路径实际访问 |
-| **生命周期** | `../p1-07/lifecycle-regression.json`；`../p0-03/result.json`（reload/resume/双客户端） | 通过。**未**覆盖 fork/换目录后的授权继承（换工作区已由 `src/main/index.ts` 撤权并留日志） |
+| **生命周期** | `../p1-07/session-access-regression.json`；`../p0-03/result.json`（reload/resume/双客户端） | 以新 session Access 探针结果为准；**未**覆盖 fork/换目录后的授权继承 |
 | **工具选择** | `../p1-06/tool-exposure.json`（模型实际收到的 schema）；`../p0-02/result.json`（W1 自动追加、reload、chat-only）；`tests/desktop-broker.test.ts`（终止同批后续动作）；`../p1-06/real-model-c7-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json` | 通过（模型看到的 schema 为准，非 UI 标签）；真实模型动作闭环历史记录存在，但最新复跑未完整通过，按支持矩阵保持未验证 |
 | **图像** | `../p1-04/result.json`（41/41：目标记录、句柄匹配、尺寸与真实像素测量、遮罩排除、丢弃零上传、确认字节与 provider 收到字节 hash 一致）；`tests/screenshot-flow.test.ts` | 通过（含正向截图→预览→确认发送）。**未**验证：多屏、被遮挡窗口、高权限窗口、截图前窗口被关闭/句柄复用 |
-| **原生输入** | `../p1-05/input-verification.json`（历史 Cua 基线）；`tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/desktop-broker.test.ts`；`../p1-06/loop-verification-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json` | **部分**：当前参考 backend 的滚动/输入目标日志已验证，撤权到 native action 的取消链由竞态测试覆盖；高权限窗口对比、真实前台中途撤销时序仍未验证。历史 Cua 适配器测试已删除，不能作为当前生产证据。 |
+| **原生输入** | `../p1-05/input-verification.json`（历史 Cua 基线）；`tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/desktop-broker.test.ts`；`../p1-06/loop-verification-session-access.json`、`real-model-d6-scroll-session-access.json`、`real-model-d8-type-session-access.json` | **部分**：当前 session Access backend 的滚动/点击目标日志已验证，撤权到 native action 的取消链由竞态测试覆盖；真实模型记录仍受唤醒/桌面环境限制，高权限窗口对比、真实前台中途撤销时序仍未验证。历史 Cua 适配器测试已删除，不能作为当前生产证据。 |
 | **快捷键** | `../p1-03/result.json`、`../p1-03/edge-guard-integration.json`（真实 Electron + native hook，合成 F24 长按）、`../p1-03/README.md`；`tests/shortcut-edge-guard.test.ts`、`../p2-02/README.md` | OS 注册链路和合成长按集成通过；P2-02 双 Alt detector 的纯状态测试通过；真实长按、双 Alt、AltGr/非 US 布局、锁屏恢复仍需运行中人工复测。托盘逻辑已修复并有单测，但需运行中人工复测 |
 | **进程与认证** | `../p0-03/result.json`（401/403/伪造 Host、壳退出不杀服务、旧代次拒绝）；`tests/bridge-server.test.ts`（令牌、浏览器来源、代次、策略拒绝上抛） | 通过。**未**验证 LAN 请求与真实 Electron 跨 origin cookie/SameSite 细节 |
 | **打包／卸载** | `THIRD_PARTY_NOTICES.md`、`../p1-07/license-inventory.json`、门禁的写入面审计（N6） | **部分**：许可与写入面已审计；**未**构建真实安装包，**未**做安装/卸载实测 |

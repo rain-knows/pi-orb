@@ -7,8 +7,8 @@
 > - `node evidence/p1-06/run-real-model-c7.mjs d6-scroll`（真实模型 D6；**需解锁的交互式桌面**）
 > - `node evidence/p1-06/run-real-model-c7.mjs d8-type`（真实模型 D8；**需解锁的交互式桌面**）
 >
-> 历史结果：旧版 `tool-exposure.json`（7/7）、`loop-verification.json`（迁移前）、`real-model-c7.json`；当前工具暴露记录由同名脚本重新生成，当前参考 backend harness 输出独立写入 `loop-verification-reference-backend.json`、`real-model-c7-reference-backend.json`、`real-model-d6-scroll-reference-backend.json`、`real-model-d8-type-reference-backend.json`。
-> 状态：工具暴露 11/11、桌面策略闭环和生命周期自动化已通过；真实模型 C7/D6/D8 的最新复跑分别为 18/24、24/25、24/25，失败 JSON 原样保留，暂不宣称稳定通过。旧 Cua 链路只作迁移基线，不代表最终生产后端。
+> 历史结果：旧版 `tool-exposure.json`（7/7）、`loop-verification.json`（迁移前）、`loop-verification-reference-backend.json`（旧授权模型）与 `real-model-*-reference-backend.json`；当前 session Access 闭环由脚本写入 `loop-verification-session-access.json`。真实模型新合同结果独立写入 `real-model-*-session-access.json`，不覆盖历史记录。
+> 状态：工具暴露 11/11；session Access 桌面闭环及生命周期按当前探针结果记录。新 session-access 真实模型记录中，C7 在截图前失败、D6 因 `LockApp`/不可交互桌面中止、D8 本轮未完成；失败或未完成 JSON 原样保留，暂不宣称稳定通过。旧 Cua 链路只作迁移基线，不代表最终生产后端。
 
 ## 1. 交付内容
 
@@ -41,12 +41,10 @@
 
 ## 3. 历史产品侧闭环（迁移前 Cua，38/38）
 
-本节保留迁移前的产品侧基线，不能单独代表当前生产 backend；当前 backend 的目标证据见
-`loop-verification-reference-backend.json` 和 §5.1 的真实模型记录。
+本节保留迁移前的产品侧基线，不能单独代表当前生产 backend；旧 session Access 前的参考 backend 记录也仅供追溯。当前产品闭环由
+`loop-verification-session-access.json` 和 §5.1 的新真实模型记录证明。
 
-当前参考 backend 的同类闭环记录为 `loop-verification-reference-backend.json`（41 项检查，
-全部通过）；其中未把“模型实际调用工具”、Chromium 内容输入、真实驱动失败批次停止和多会话任务锁
-伪装成通过，分别由真实模型证据、当前支持矩阵和单测/后续验收覆盖。
+此前参考 backend 闭环记录 `loop-verification-reference-backend.json`（41 项检查）使用已移除的逐任务 scope 与选窗 API，属于历史证据。新脚本使用 Read Only / Workspace Write、自动前台观察和 session grant；运行后以新文件实际结果为准。其中“模型实际调用工具”、Chromium 内容输入、真实驱动失败批次停止和多会话任务锁仍由真实模型证据、当前支持矩阵和单测分别覆盖。
 
 被测链路是产品自己的代码，不是模拟：
 
@@ -141,10 +139,11 @@ broker 对策略拒绝返回 `{ ok:false, refused:true, reason }`，而桥服务
 
 因此工具集注册了 `orb_type` 与 `orb_scroll`，在这类窗口上被驱动拒绝时会**如实报回**给模型与用户，不会静默成功；`orb_scroll` 可以按驱动规定请求前台升级，但目标是否实际收到滚轮需逐次核验。
 
-## 5.1 真实模型 C7 验收：最新复跑未通过
+## 5.1 真实模型 C7 验收：本轮在截图前失败
 
-2026-09-29 的记录曾通过（24/24），但 2026-09-30 最新复跑为 18/24：真实模型没有产生 Orb
-工具调用，目标没有收到点击。失败结果已写入 `real-model-c7-reference-backend.json`，因此本节不把旧记录当作当前稳定结论。
+旧记录曾通过，但本轮新合同在截图前失败：唤醒快捷键未触发目标记录，截图请求被拒，真实模型没有产生
+Orb 工具调用。结果写入 `real-model-c7-session-access.json`；`real-model-c7-reference-backend.json`
+仍保留为历史，因此本节不把旧记录当作当前稳定结论。
 
 ```powershell
 node evidence/p1-06/run-real-model-c7.mjs
@@ -185,16 +184,17 @@ node evidence/p1-06/run-real-model-c7.mjs
 | D2 | 随后发起 `orb_click`，坐标来自该次观察（分数 0–1000） | **失败（最新复跑）** | 最新运行没有产生点击调用 |
 | D3 | 每次动作后产生**新的观察**（一动作一观察） | **未验证（最新复跑未进入动作）** | 需重新取得同一运行内的 observe→click→observe |
 | D4 | 目标窗口报告**命中预期位置** | **失败（最新复跑）** | 目标日志没有 `cell-mousedown` |
-| D5 | 桌面任务面板显示状态且能 **Revoke**；撤销后不再执行 | **通过**（自动化 100% 覆盖该语义） | 真实 UI 路径 `revokeDesktopTask()` → 后续动作被拒 `no-task-authorization`：`loop-verification-reference-backend.json`；`tests/desktop-task.test.ts`。**人工点击**“Revoke”按钮的体验未验证 |
-| D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` 并动作后观察 | **失败（24/25）** | 目标日志收到 `wheel` 且 `scrollTop` 改变，但动作后没有再次 `orb_observe` |
+| D5 | Access 控件显示当前权限档；撤权后不再执行 | **产品探针通过；人工未验证** | 新探针走 `revokeOrbAccess()`，并断言后续动作被拒 `no-task-authorization`：`loop-verification-session-access.json`；`tests/desktop-task.test.ts`。**人工点击** Access 控件的体验未验证 |
+| D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` 并动作后观察 | **环境中止** | 前台为 `LockApp`/不可交互桌面，未向模型发送动作；结果见 `real-model-d6-scroll-session-access.json` |
 | D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；当前 Orb 会话获得 11 个：`tool-exposure.json`（11/11，判据是 provider **实收** schema，不是 UI 标签） |
-| D8 | 让模型输入非敏感文本（`orb_type`）并动作后观察 | **失败（24/25）** | 目标日志读回 `P1ORBD8TEST`，但动作后没有再次观察 |
+| D8 | 让模型输入非敏感文本（`orb_type`）并动作后观察 | **本轮未完成** | 没有生成新的 session-access JSON；旧记录仅作历史 |
 
 小结：工具注册、授权、目标日志中的滚动/输入动作和普通会话隔离已通过；最新真实模型 C7/D6/D8
 闭环均未完整通过，不能把一次动作成功写成稳定的模型闭环。旧 Cua JSON 仅用于迁移对照。
 
-D6 的动作到达判据是当前 backend 的目标自身日志看到 `wheel` 且 `scrollTop` 改变；最新复跑满足这一部分，
-但完整模型合同还要求动作后 `orb_observe`，本次缺失。因此不能把驱动或 `SendInput` 返回成功摘要替代完整证据。
+D6 的动作到达判据是 backend 的目标自身日志看到 `wheel` 且 `scrollTop` 改变；旧
+`reference-backend` 记录满足这一部分，但本轮 session-access 运行在 `LockApp`/不可交互桌面中止，
+未向模型发送动作。因此不能把旧驱动成功摘要替代当前真实模型证据。
 
 2026-09-29 复核：`node evidence/p1-06/probe-native-wheel.mjs` 已启动并清理 disposable Electron 目标，但
 `activate-window.ps1` 返回前台为“Windows 默认锁屏界面”（`reason=could-not-foreground`）。本次没有产生

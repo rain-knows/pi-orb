@@ -94,13 +94,13 @@ koffi import library 的做法同类，只是范围更大。审计从 129 个解
 1. **构建**：`npm run build` + electron-builder 出解包目录；
 2. **内容审计**（25 项）：产品文件在 asar 内的运行时路径上、许可证随包、仓库源码／测试／证据／
    凭据／密钥／其它平台二进制／构建残留一律不在包内、原生模块确实在 `app.asar.unpacked`；
-3. **打包产物启动探测**（10 项）：真实启动 `release/.../pi-orb.exe`，证明 preload 桥可用、
-   renderer 无 Node 权限、构建后的 renderer 与其素材确实从 asar 里加载出来，并且
-   `orb:list-desktop-windows` 真的枚举到了桌面窗口——也就是 koffi 确实从 `app.asar.unpacked`
-   加载成功。这一条是关键：它把「打包后原生模块还能用」从推断变成了观测。
+3. **打包产物启动探测**（22 项）：真实启动 `release/.../pi-orb.exe`，证明 preload 桥可用、
+   renderer 无 Node 权限、构建后的 renderer 与其素材确实从 asar 里加载出来、参考壳层与
+   session Access 合同已生效。桌面 native action 的真实闭环另由
+   `evidence/p1-06/loop-verification-session-access.json` 观测，不再用旧选窗 API 作为证据。
 
-该探测做过反向对照：删掉 `app.asar.unpacked` 里的 `koffi.node` 后，窗口枚举检查与
-「无桌面驱动失败」检查都会失败，恢复后重新通过。
+该探测仍检查启动日志没有 native driver 失败和模块解析错误；桌面驱动的动作结果由 P1-06
+真实 Electron/native backend 闭环单独验证。
 
 ## 6. 自动化没有证明什么（人工项）
 
@@ -113,8 +113,8 @@ koffi import library 的做法同类，只是范围更大。审计从 129 个解
 | 卸载后工作区与 pi-web 不被删除 | 需要一次真实的「安装 → 使用 → 卸载」全流程 |
 | 安装后的浮球观感、真实按键、多屏 | 属于 P2-01/P1 的人工项，不因打包而改变 |
 
-因此 P2-05 的当前结论是：**Windows x64 产物可构建、内容可审计、打包后可启动并完成一次真实
-桌面枚举；干净机安装／卸载／升级与 SmartScreen 体验未验证**。`support-matrix.md` 按此记录，
+因此 P2-05 的当前结论是：**Windows x64 产物可构建、内容可审计、打包后可启动并通过 session
+Access preload 合同探测；干净机安装／卸载／升级与 SmartScreen 体验未验证**。`support-matrix.md` 按此记录，
 不提升为「已支持」。
 
 ## 7. 与发布门槛的关系

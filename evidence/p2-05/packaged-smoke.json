@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-30T03:45:24.189Z",
+  "capturedAt": "2026-09-30T09:30:36.282Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790739924189",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790760636282",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": ""
+      "detail": "pi-orb"
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -94,9 +94,14 @@
       "detail": "{\"expanded\":false,\"horizontal\":\"left\",\"vertical\":\"up\"}"
     },
     {
-      "name": "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
+      "name": "the packaged session Access bridge is present and starts unauthorized",
       "ok": true,
-      "detail": "7 windows, first=\"\""
+      "detail": "{\"state\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true},\"methods\":{\"setOrbAccess\":\"function\",\"revokeOrbAccess\":\"function\",\"listDesktopWindows\":\"undefined\",\"s"
+    },
+    {
+      "name": "the packaged bridge has no target picker or per-task scope APIs",
+      "ok": true,
+      "detail": "{\"setOrbAccess\":\"function\",\"revokeOrbAccess\":\"function\",\"listDesktopWindows\":\"undefined\",\"setDesktopTarget\":\"undefined\",\"authorizeDesktopTask\":\"undefined\"}"
     },
     {
       "name": "no desktop-driver failure was reported at startup",
@@ -110,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-78976\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/54cd4a62-147c-4fa8-a0a5-c1f5ca2fb80d"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-10192\n[pi-orb] no foreground window to record; the orb must not take focus first",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/493e48a4-b723-4c12-918f-357fea7d20ff"
 }

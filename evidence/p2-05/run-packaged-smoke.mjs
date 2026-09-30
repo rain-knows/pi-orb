@@ -11,8 +11,8 @@
 //   - the process stays alive (a missing preload or a crashed main process would not);
 //   - the sandboxed bridge is exposed and the renderer still has no Node access;
 //   - the status round trip over IPC works and reports the isolated, unconfigured state;
-//   - `orb:list-desktop-windows` returns a real window list, which is the only way to observe from
-//     outside that `koffi` loaded out of `app.asar.unpacked` and enumerated the desktop;
+//   - the session Access bridge is available, starts unauthorized, and has no target-picker or
+//     task-scope API;
 //   - stdout carries no `desktop driver unavailable` line, which is how `startDesktop()` reports a
 //     native-module failure.
 //
@@ -445,19 +445,30 @@ try {
       String(unsnap).slice(0, 200),
     );
 
-    // The decisive native check: this call runs `koffi` out of `app.asar.unpacked` and enumerates
-    // real top-level windows through Win32.
-    const windows = await evaluate(
+    const access = await evaluate(
       client,
-      "window.orb.listDesktopWindows().then((r) => JSON.stringify(r)).catch((e) => 'ERR:' + e.message)",
+      `Promise.all([
+        window.orb.getOrbAccess(),
+        Promise.resolve({
+          setOrbAccess: typeof window.orb.setOrbAccess,
+          revokeOrbAccess: typeof window.orb.revokeOrbAccess,
+          listDesktopWindows: typeof window.orb.listDesktopWindows,
+          setDesktopTarget: typeof window.orb.setDesktopTarget,
+          authorizeDesktopTask: typeof window.orb.authorizeDesktopTask
+        })
+      ]).then(([state, methods]) => JSON.stringify({ state, methods }))`,
     );
-    const windowsValue = windows.startsWith("ERR:") ? null : JSON.parse(windows);
+    const accessValue = JSON.parse(access);
     check(
-      "the packaged desktop backend lists real windows (koffi loads from app.asar.unpacked)",
-      windowsValue?.ok === true && Array.isArray(windowsValue.windows) && windowsValue.windows.length > 0,
-      windowsValue?.ok
-        ? `${windowsValue.windows.length} windows, first="${windowsValue.windows[0]?.title ?? ""}"`
-        : String(windows).slice(0, 200),
+      "the packaged session Access bridge is present and starts unauthorized",
+      accessValue.state?.authorized === false && accessValue.state?.level === null &&
+        accessValue.methods.setOrbAccess === "function" && accessValue.methods.revokeOrbAccess === "function",
+      JSON.stringify({ state: accessValue.state, methods: accessValue.methods }).slice(0, 260),
+    );
+    check(
+      "the packaged bridge has no target picker or per-task scope APIs",
+      ["listDesktopWindows", "setDesktopTarget", "authorizeDesktopTask"].every((method) => accessValue.methods[method] === "undefined"),
+      JSON.stringify(accessValue.methods),
     );
 
     client.close();

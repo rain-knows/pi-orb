@@ -89,7 +89,7 @@ npm run build
 npm run start
 ```
 
-默认快捷键 `Ctrl+Shift+Space`（可在浮窗内 **Wake shortcut** 处修改并按 **Apply**）。
+默认快捷键 `Ctrl+Shift+Space`（右键浮窗后选择 **Change wake shortcut…** 修改）。
 
 | # | 操作 | 预期 | 结果 |
 |---|---|---|---|
@@ -121,7 +121,7 @@ A8 不依赖遮挡：直接在浮窗前台点击右上角关闭按钮，然后�
 
 | # | 操作 | 预期 | 结果 |
 |---|---|---|---|
-| B1 | 让目标窗口在前台，按唤醒快捷键，然后点 **Screenshot** | 出现预览；预览的是**你刚才那个目标窗口**，不是浮窗自己 |通过 |
+| B1 | 让目标窗口在前台，触发双 Alt 或唤醒后从浮窗右键菜单选择 **Capture screenshot** | 出现预览；预览的是**你刚才那个目标窗口**，不是浮窗自己 |通过 |
 | B2 | 检查预览图 | 不含 Orb 浮窗自身的遮挡（无遮罩、无浮窗边缘） | 通过|
 | B3 | 点 **Discard** | 不上传任何内容；会话里不得出现图片 | 通过|
 | B4 | 重新截图后点 **Send with message**（或 **Send**） | 图片进入**当前 Orb 会话**，不是别的会话 | 通过|
@@ -131,12 +131,7 @@ A8 不依赖遮挡：直接在浮窗前台点击右上角关闭按钮，然后�
 | B8 | （需你手动创建并授权）对一个**高权限**窗口重复 B1 | 行为可预期； 记录是否拒绝 | 未验证：现有记录只证明桌面动作目标匹配，不证明截图路径|
 | B9 | 用仅支持文本的模型发起截图任务 | 明确拒绝或说明不支持图像，**不得**静默发送图像 | 未验证：旧进程曾失败；修复后的隔离链路 43/43 通过，需重启当前 Orb 后复测|
 
-请用文字告诉我：
-
-1. 你的目标是什么（例如：操作窗口输入内容、读取文件、修改代码等）
-2. 如果是桌面操作，需要你明确授权，并说明要对哪个窗口、做什么操作
-
-或者直接把需要我做的内容用文字发给我即可。|
+桌面操作权限通过浮窗顶部 Access 选择；截图分享仍需单独预览并确认。Access 不要求填写自由文本 scope 或预选目标窗口。
 
 **证据落点**：`evidence/p1-04/README.md` §4.4 的表。
 
@@ -167,7 +162,7 @@ node evidence/p1-05/run-p1-05.mjs
 | C4 | 脚本结束后检查键盘 | 无卡键（脚本已用 OS 全局键态差分自检，可另按一次修饰键确认） | 通过|
 | C5 | 对一个**高权限**丢弃窗口重复输入测试 | 记录普通 vs 高权限的差异 | 未验证，不需要|
 | C6 | 在真实前台下构造「按下中途取消」 | 松开后无残留按下状态 | **通过**：`probe-reference-cancel.mjs` 真实 native 路径收到 `mouse-down=1`、`mouse-up=1`；结果见 `evidence/p1-05/reference-cancel.json` |
-| C7 | **截图点 ↔ 输入点一致性（联合断言）**：先截图，在预览里选一个明确的标记点（如网格某格中心），再让 Orb 在该点点击 | 目标报告**同一格**被命中 | 产品侧坐标闭环仍通过：`loop-verification-reference-backend.json`；真实模型最新复跑未通过（`real-model-c7-reference-backend.json`），需重新取得同一运行内的模型工具调用 |
+| C7 | **截图点 ↔ 输入点一致性（联合断言）**：先截图，在预览里选一个明确的标记点（如网格某格中心），再让 Orb 在该点点击 | 目标报告**同一格**被命中 | 当前 session Access 产品闭环：`loop-verification-session-access.json`；真实模型新 harness 因唤醒快捷键未触发、无法取得记录目标，结果保留在 `real-model-c7-session-access.json`，需重新取得同一运行内的模型工具调用 |
 
 C7 是当前唯一把「截图坐标」与「输入坐标」放在同一次运行里对照的检查，因此不得由
 B1/B7 与 C1 的分段结果代替。
@@ -178,12 +173,14 @@ B1/B7 与 C1 的分段结果代替。
 
 ```powershell
 npm run build
-node evidence/p1-06/run-real-model-c7.mjs
+node evidence/p1-06/run-real-model-c7.mjs c7
+node evidence/p1-06/run-real-model-c7.mjs d6-scroll
+node evidence/p1-06/run-real-model-c7.mjs d8-type
 ```
 
 它使用**真实 pi-web + 真实模型**（隔离 workspace、隔离 `--user-data-dir`、真实 agent 配置以硬链接/符号链接接入，**不复制凭据**）。
 前置：**必须先解锁工作站**——锁屏下任何窗口都无法被前置，harness 会在发送任何消息前停下并说明原因。
-结果读 `evidence/p1-06/real-model-c7-reference-backend.json`。
+结果读 `evidence/p1-06/real-model-c7-session-access.json`。
 
 **手工做法**（与 harness 等价，但需要你自己看界面）：在一个新的 PowerShell 窗口启动丢弃式网格目标，日志落在临时目录：
 
@@ -193,12 +190,12 @@ $env:P1_05_TARGET_GEOMETRY = Join-Path $env:TEMP 'pi-orb-c7-geometry.json'
 & .\node_modules\electron\dist\electron.exe .\evidence\p1-05\target-app
 ```
 
-让网格窗口位于前台，用快捷键唤醒 Orb。先在桌面任务面板确认 **Target window** 是
-`P1-05 input target`（否则点 **Choose target window…** 选它），将授权范围填为
-「点击这张截图中左上角 `0,0` 单元格中心一次」并点 **Approve desktop task**。
+让网格窗口位于前台，用快捷键唤醒 Orb。在顶部 **Access** 菜单选择 **Workspace Write**；
+产品会在每次 `orb_observe` 自动使用当前前台应用，不需要选窗口或填写授权范围。
 在消息框输入「看刚才的目标窗口截图。先调用 `orb_observe`，再根据截图中左上角标记 `0,0`
 的格子位置调用一次 `orb_click`。x/y 使用截图相对的 0–1000 坐标，不要用屏幕绝对坐标，
-也不要点别处」，然后点 **Screenshot**。在预览里确认左上角单元格确实标记为 `0,0`，
+也不要点别处」，然后在目标窗口触发双 Alt，或从浮窗右键菜单选择 **Capture screenshot**。
+在预览里确认左上角单元格确实标记为 `0,0`，
 再点 **Send with message**。完成后读目标自身日志：
 
 ```powershell
@@ -217,7 +214,8 @@ Get-Content (Join-Path $env:TEMP 'pi-orb-c7-grid.jsonl') -Tail 30
 历史自动化已证明：普通会话拿不到 orb 工具、Orb 会话当前获得 11 个工具、工具 schema 由 provider 实收（11/11 断言，含 `orb_open_app`）。
 当前实现已扩展为 11 个工具，新的 provider schema 数量和真实模型闭环必须按本节重新执行；
 授权/预算/新鲜度/拒绝零副作用仍由自动化覆盖。真实模型脚本曾在解锁桌面通过 C7、D6、D8，
-但 2026-09-30 最新复跑分别为 18/24、24/25、24/25；失败 JSON 保留，暂不把模型侧闭环列为稳定支持。
+但本轮新 session-access 合同没有形成完整闭环：C7 在截图前因唤醒快捷键未触发目标记录而失败，
+D6 因 `LockApp`/不可交互桌面中止，D8 本轮未完成；结果 JSON 保留，暂不把模型侧闭环列为稳定支持。
 
 1. 在浮窗里选好 Orb 工作区（精确匹配该目录，见 §1）。
 2. 为验收新建一个**丢弃式**目标窗口，放在前台。可用的已入仓目标：
@@ -225,30 +223,32 @@ Get-Content (Join-Path $env:TEMP 'pi-orb-c7-grid.jsonl') -Tail 30
    - 记事本 + 一个临时文件（原生文本框，最适合文本输入验证）
 
    P1-06 的自动化脚本也是复用 `evidence/p1-05/target-app`。
-3. 在浮窗里按 **Screenshot** 并发送，然后提出一个**明确、低风险、单步**的要求，例如
+3. 在浮窗的 **Access** 菜单选择 **Workspace Write**；需要跨应用切换时选择 **Full Access**。
+   在目标窗口触发双 Alt 预览截图并确认发送，然后提出一个**明确、低风险、单步**的要求，例如
    「看一下当前窗口，然后点一下最左上角的格子」。
 
 > **前置：解锁工作站。** 锁屏下任何窗口都无法被前置，唤醒路径无法记录目标窗口，
 > 截图授权链在第一步就断掉（且产品会报成「目标窗口已被替换」，对用户是误导）。
-> 已入仓的 `evidence/p1-06/run-real-model-c7.mjs` 会自动完成 D1–D4 并生成
-> `real-model-c7-reference-backend.json`，
+> 已入仓的 `evidence/p1-06/run-real-model-c7.mjs` 会自动完成当前场景并生成
+> `real-model-*-session-access.json`，
 > 但它同样需要解锁；可先跑它以节省时间。
 
 4. 观察：
 
 | # | 观察 | 预期 | 结果 |
 |---|---|---|---|
-| D1 | 模型是否**实际发起** `orb_observe` 调用 | 是；你应看到一次观察结果回来 | 历史运行通过；最新 C7 复跑没有 Orb 工具调用，见 `real-model-c7-reference-backend.json` |
-| D2 | 随后是否发起 `orb_click`，且**坐标**来自刚才的观察（分数 0–1000） | 是 | 当前参考 backend 已通过，参数在 0–1000 截图空间 |
-| D3 | 每次动作之后是否产生**新的观察** | 是（一动作一观察） | 当前参考 backend 已通过：工具序列 `orb_observe → orb_click → orb_observe` |
-| D4 | 目标窗口是否报告命中了预期位置 | 是 | 当前参考 backend 已通过：目标日志命中 `0,0` |
-| D5 | 浮窗里的桌面任务面板是否显示状态，且能 **Revoke** | 能撤销；撤销后不再执行 | 通过：自动化闭环已验证 |
-| D6 | 让模型尝试滚动（`orb_scroll`） | 目标收到 `wheel`；若被 OS 拒绝，产品须如实报失败，**不得**报成功；动作后再观察 | 最新复跑目标有 `wheel` 且 `scrollTop` 改变，但缺少动作后观察（24/25） |
+| D1 | 模型是否**实际发起** `orb_observe` 调用 | 是；你应看到一次观察结果回来 | 本轮 C7 未产生调用，D6 因环境中止，D8 未完成；旧结果保留在历史 JSON |
+| D2 | 随后是否发起 `orb_click`，且**坐标**来自刚才的观察（分数 0–1000） | 是 | 当前参考 backend 与产品侧闭环已通过；真实模型本轮未进入点击调用 |
+| D3 | 动作结果是否包含**新的 observation id 与截图**，下一动作是否直接使用它 | 是；不需要为获取动作后状态额外调用 `orb_observe` | broker/扩展自动化已验证；真实模型新版本仍未验证 |
+| D4 | 目标窗口是否报告命中了预期位置 | 是 | 当前参考 backend 已通过：目标日志命中 `0,0`；本轮 C7 未产生目标点击 |
+| D5 | Access 芯片是否显示当前权限档；切换为 Read Only 后写入动作是否拒绝 | 当前档清楚可见，能力按三档限制 | session Access 探针与 UI/权限自动化覆盖；真实模型侧仍未验证 |
+| D6 | 让模型尝试滚动（`orb_scroll`） | 目标收到 `wheel`；若被 OS 拒绝，产品须如实报失败；动作结果附新 observation | 本轮因 `LockApp`/不可交互桌面中止，未向模型发送动作；记录见 `real-model-d6-scroll-session-access.json` |
 | D7 | 在**普通（非 Orb）**会话里要求模型操作桌面 | 无 orb 工具可用，模型无法调用 | 通过：普通会话无 `orb_*` 工具 |
-| D8 | 让模型输入一段非敏感文本（`orb_type`） | 落到丢弃式目标的文本区；由目标日志读回 marker，并在动作后再观察 | 最新复跑读回 `P1ORBD8TEST`，但缺少动作后观察（24/25） |
+| D8 | 让模型输入一段非敏感文本（`orb_type`） | 落到丢弃式目标的文本区；目标日志读回 marker；下一动作使用 type 的动作结果 observation | 本轮未完成，没有新的 session-access JSON；旧 `reference-backend` 记录仅作历史 |
 
-> 当前 D8 采用参考项目同类 clipboard + Ctrl+V 的 Win32 native input；目标自身日志已读回
-> `P1ORBD8TEST`。驱动摘要不作为证据，历史 Cua 路径仅作迁移对照。
+> 当前 D8 采用参考项目同类 clipboard + Ctrl+V 的 Win32 native input。以目标自身日志和 session
+> tool call/result 记录为准；动作结果中的 fresh observation 是下一动作的来源，不要求额外 observe。
+> 历史 Cua 路径仅作迁移对照。
 > 用在原生文本框（如记事本）上更容易得到定论。
 
 **证据落点**：`evidence/p1-06/README.md` §6 的表。
@@ -266,7 +266,9 @@ node evidence/p1-04/run-p1-04.mjs
 node evidence/p1-05/run-p1-05.mjs
 node evidence/p1-06/run-p1-06-tools.mjs
 node evidence/p1-06/run-p1-06.mjs
-node evidence/p1-06/run-real-model-c7.mjs
+node evidence/p1-06/run-real-model-c7.mjs c7
+node evidence/p1-06/run-real-model-c7.mjs d6-scroll
+node evidence/p1-06/run-real-model-c7.mjs d8-type
 node evidence/p1-07/run-lifecycle-regression.mjs
 node evidence/p1-07/run-release-gate.mjs
 
@@ -274,7 +276,7 @@ node evidence/p1-07/run-release-gate.mjs
 node evidence/p2-05/run-p2-05.mjs
 ```
 
-> 后两个（`run-real-model-c7.mjs`、以及依赖真实前台的部分）需要**解锁的交互式桌面**；其余可随时重跑。
+> 真实模型 C7/D6/D8 需要**解锁的交互式桌面**与已配置模型；生命周期探针使用隔离的本地模型服务。
 
 1. 把每条结果写回对应的 `evidence/p1-0X/README.md` 表。
 2. 同步 `doc/support-matrix.md`：验证通过的项从 §3 **移出**，加入 §2（不得两处同时存在）。
@@ -297,7 +299,7 @@ node evidence/p2-05/run-p2-05.mjs
 ## 9. E 组：安装包在干净环境上的行为（P2-05）
 
 自动化已经证明的：产物可构建、内容可审计、打包后能启动并完成一次真实桌面枚举
-（`evidence/p2-05/`，25/25 + 21/21）。**未**证明的是安装行为本身——它写 HKCU 与用户目录，
+（`evidence/p2-05/`，25/25 + 22/22）。**未**证明的是安装行为本身——它写 HKCU 与用户目录，
 在已经装过的开发机上做不可复现，因此必须由人在干净环境（干净用户账户、或另一台机器、
 或一次性快照虚拟机）上执行。
 

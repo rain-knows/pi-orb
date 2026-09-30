@@ -74,7 +74,7 @@ git -C D:\pi-orb-ref\deepseek-harness-orb status --porcelain   # 期望：无输
 | A 产品壳与交互 | 浮球窗口、展开面板、右键菜单、停靠、观察框、选区工具栏 | 直接复用几何／DOM／CSS／状态机，只替换会话与宿主调用 | §5 |
 | B 桌面能力后端 | `windows.ts` / `windows-native.ts` / `windows-foreground.ts` / `coordinates.ts` / `capture-exclude.ts` | 已移植为 `src/main/reference-windows/`，作为唯一生产 backend | §6 |
 | C 工具契约与提示 | `plugin.ts` 的 13 个工具、`policy.ts`、`config.ts` | 工具名与语义按参考对齐，改用 Pi 扩展注册；仅保留 pi-orb 授权边界 | §7 |
-| D 授权与生命周期 | `overlay-guard.ts`、`policy.ts`、宿主 overlay 排除、turn 结束隐藏观察框 | 原则复用；授权主体换成 pi-orb 的任务授权与代次 | §8 |
+| D 授权与生命周期 | `overlay-guard.ts`、`policy.ts`、宿主 overlay 排除、turn 结束隐藏观察框 | Access 三档语义直接复用；grant 绑定 Orb session 与 run generation，并保留显式撤权边界 | §8 |
 | E 工程与验证资产 | 测试规格、`vi`/`tsdown` 配置、Windows 打包与签名脚本 | 测试不变量与失败模式优先移植；打包链路在 P2-05 评估 | §9 |
 | F 文档与流程约定 | `AGENTS.md` 系列、`docs/testing.md`、`docs/agent-lifecycle.md` | 取写法与门禁思路，落到 pi-orb 的 `doc/` 与 `evidence/` | §9.3 |
 
@@ -95,7 +95,7 @@ git -C D:\pi-orb-ref\deepseek-harness-orb status --porcelain   # 期望：无输
 | Cordis 装配与 `ctx.*` 服务模型 | `@deepseek-ai/cordis` `Context`、`ctx.tools.register`、`ctx.on('agent/pre-step')` | 换成 Pi 扩展的 `pi.registerTool` / `pi.on('session_start' \| 'before_agent_start')` |
 | dsh 会话、事件、附件持久化 | `@deepseek-ai/dsh-session`、`dsh/session` 事件映射、`@deepseek-ai/dsh-attachment` | 换成 pi-web HTTP + SSE 与 Pi `ImageContent` |
 | 自动前置观察与自动附图 | `plugin.ts` 的 `agent/pre-step` 瀑布、`observeDesktop` 自动附图 | pi-orb 由模型显式 `orb_observe`；不自动截屏、不自动上传 |
-| 自动选择“最前台窗口”作为目标 | `backend.listScreens()` 自动选窗 + overlay 排除 | pi-orb 目标由用户记录并授权，驱动不猜目标 |
+| 自动选择“最前台窗口”作为目标 | `backend.listScreens()` 自动选窗 + overlay 排除 | 每次 observe 读取当前前台应用并排除 Orb；action 绑定该 observation，前台变化即拒绝。截图分享另经用户预览确认 |
 | 后台 `code_agent` 双轨 | `code-agent.ts`、`presets/computer-use/agent.cordis.yml` | 属于 dsh 编排；pi-orb 用 Pi 会话／子代理另行评估（P2-07） |
 | 私有工作区包依赖 | `package.json` 的 `peerDependencies: @deepseek-ai/dsh-*@workspace:^`、`"private": true`；`paths.ts:4` 的 `@deepseek-ai/dsh-home-paths`、`project-manager.ts` 的 `@deepseek-ai/dsh-app-boot` | 不能作为 npm 依赖安装；只能移植源码 + 保留 MIT 通知 |
 | 浮球 renderer 的宿主协议 | `dsh-app://app/api/<method>` 的 `client-request`/`server-response` RPC（`floating.js:15-31`）、`dsh-app://app/.dsh/remote-stream` NDJSON（`floating.js:7`、`:1046-1062`）、历史面板 iframe `dsh-app://app/index.html?surface=overlay` + `postMessage`（`floating.js:34-37`、`main.ts:786-788`）、模型目录 `/api/session/modelCatalog`（`main.ts:750-770`） | pi-orb 只移植 DOM/CSS/交互层；会话、历史、模型全部走 pi-web 公开 API |
@@ -155,9 +155,9 @@ D:\workself\pi-orb\
 | `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/floating.css` | **直接移植**布局、设计令牌、交互状态、暗色及动效；删除 DSH iframe/TCC 专用选择器；Pi 表面补丁在 `orb-surface.css` |
 | `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/floating.js` | **移植状态机**及输入行为；`window.dshDesktop`、RPC、NDJSON 和 iframe 转为现有 `window.orb` 及 Pi Web 会话事件，无 dsh 兼容层 |
 | `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | `src/main/shell-menu.ts` | **部分移植**：结构取自参考的 `floatingContextMenuTemplate`（`floating-window.ts:55-129`）——可编辑时置顶 `cut/copy/paste/selectAll` 角色块（由焦点字段的 `editFlags` 逐项 `enabled`），其下是壳层动作。参考的「打开主窗口」换成「隐藏浮球」（pi-orb 无自有主窗，pi-web 才是会话 UI），Quit 保留。**不移植**：Agent 模型设置（pi-orb 不另立模型配置）、选区工具栏开关与毫坐标开关（无对应物） |
-| `apps/desktop/src/orb-permission.ts` | 浮球权限模型（只读/编辑/完全访问） | 未移植 | 不适用：pi-orb 用 pi-web 自身权限与会话模型 |
+| `apps/desktop/src/orb-permission.ts` | 浮球权限模型与 `read-only` / `workspace-write` / `danger-full-access` presets | `src/main/desktop-task.ts`、`src/shared/ipc.ts` | **复用能力等级语义，适配授权主体**：不持久化参考项目的 profile preset；用户在 Access 芯片显式选择并绑定 Orb session/generation；`Full Access` 对应参考 `danger-full-access` |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
-| `apps/desktop/src/orb-avatar.ts` | 自定义头像（GIF/PNG/WebP，2 MB 上限） | `src/renderer/orb-avatar.png` 静态资源 | 未移植；如需自定义再按此实现 |
+| `apps/desktop/renderer/deepseek-avatar-square.gif` | 浮球 GIF 动效资源 | `src/renderer/deepseek-avatar-square.gif` | **直接复用**固定提交的 MIT 素材；pi-orb 按浮球状态播放/冻结，不移植 `orb-avatar.ts` 的用户自定义头像存储 |
 | `apps/desktop/src/observation-frame-window.ts` | 观察框原生 overlay（点透、不进截图） | `src/main/observation-frame.ts`、`src/renderer/observation-frame.{html,css}` | **已移植**：几何（stroke 8 / glow 28 / outset 36、work-area 裁剪不位移、DIP 换算）、窗口构造（`setIgnoreMouseEvents(true,{forward:true})` 点透、`contentProtection` 不进截图、`showInactive` 不抢焦点、`roundedCorners:false`）、renderer 渐变遮罩挖空。宿主调用面不同：pi-orb 在 `withGuiTurn` 里画、在统一撤权出口隐藏，参考由 dsh 的 observation lifecycle 驱动 |
 | `apps/desktop/src/selection-monitor.ts`、`selection-toolbar-*.ts`、`windows-selection*.ts` | 选区读取与原生工具栏 | `src/main/selection-monitor.ts`、`windows-selection*.ts` | 已移植读取路径；原生工具栏未移植 |
 | `apps/desktop/src/windows-layout.ts`、`owned-directory.ts` | 窗口布局常量、专属目录归属 | 无对应 | `owned-directory.ts` 的“专属目录”思路可对照 pi-orb 的 Orb workspace |
@@ -243,7 +243,7 @@ D:\workself\pi-orb\
   + `blur`，按 capture/input 引用计数，`floating-window.ts:909-924`）；`setContentProtection`
   仅 Windows（同段）。观察框是常驻点透（`forward:true`，`:234`、`:251`）。
 - pi-orb 差异：历史数据来自 pi-web 公开 session API，不复制参考项目的 DSH overlay history RPC；
-  权限浮层内容改为 pi-orb 自己的桌面授权，不搬参考项目的 Access 三档语义。
+  Access 三档标签与动作能力映射沿用参考语义，grant 由 pi-orb 绑定当前 session 和 generation；工具及 workspace/session 生命周期仍由 Pi 主进程管理。
 
 ## 6. B 面：桌面能力后端（当前复用最成熟的部分）
 
@@ -397,10 +397,10 @@ D:\workself\pi-orb\
 2. **激活**：调用 `ops.activateApp(match)`（返回 `false` 不启动任何东西，与 `backend.openApp`
    不同）。失败即动作失败。
 3. **前台验证**：激活后前台窗口的应用必须仍等于请求的应用；否则说明前置的不是它，
-   动作失败且**不采纳**前台窗口——驱动绝不“顺手采用当前前台”，那是被禁止的驱动自选目标。
+   动作失败且不改变当前 observation。
 
-通过后的行为：adopted 窗口成为该任务的新目标，并通过 `onTargetChanged` 上报壳层，面板显示
-新目标标题，用户可随时 Revoke；用户重新选择或记录窗口、以及任何撤权路径都会清掉这个覆盖。
+通过后的行为：adopted 窗口成为动作返回的新 observation，并通过 `onTargetChanged` 上报壳层；
+后续普通 observe 仍以当时的前台应用为准。用户可随时 Revoke；任何撤权路径都会清除 grant。
 模型侧 `name` 参数在 `validateAction` 里已拒绝路径、参数样片段、shell 元字符与控制字符，
 `src/main/reference-windows-driver.ts` 的 `#openApp` 是唯一实现点，单测为
 `tests/reference-windows-open-app.test.ts`（含“未运行必须失败且不调用 launch”）。
@@ -412,14 +412,14 @@ D:\workself\pi-orb\
 | overlay 隐藏/点透（capture 期间排除自身，HID 期间点透） | `floating-window.ts` 的 `applyFloatingOverlayGuard`（`:938`）、`overlayWindowExcludeIds`（`:897`） | 已用等价机制接入（`withGuiTurn`）；改动浮球时必须回归 overlay 排除 |
 | overlay 包裹后端调用 | `<REF>/src/overlay-guard.ts:102-153`（`wrapDesktopBackend`） | 参考实现把 `capture/listScreens/inspectForeground/HID/openApp/withGuiTurn` 统一包裹；pi-orb 目前只包裹 `withGuiTurn`，如需更细粒度按此扩展 |
 | 观察框显示/隐藏并在 turn 结束时收起 | `<REF>/src/plugin.ts:268-275`（`turn/end` → `setObservationFrame(null)`） | pi-orb 无观察框；若 P2 接入，必须同样在 turn 结束与异常路径收起 |
-| 用户批准／提问 | `<REF>` 的 user-approval / user-questions 相关包 | pi-orb 用自有授权（任务、代次、目标、限额），**不搬自动审批** |
+| 用户批准／提问 | `<REF>` 的 user-approval / user-questions 相关包 | Access 芯片直接选择 `Read Only / Workspace Write / Full Access`；grant 绑定 Orb session 与 generation，不搬自动审批或 DSH 用户提问实现 |
 | 取消传播 | 参考 backend 的 `AbortSignal` 语义 | pi-orb 已接通 broker → driver → backend；C6 取消探针见 `evidence/p1-05/reference-cancel.json` |
 
-**不可让步的三条**（与参考项目的最大产品差异，任何“参考项目就是这样”都不能推翻）：
+**不可让步的三条**（pi-orb 的宿主授权边界）：
 
-1. 目标窗口必须由用户记录并授权，驱动不得自动选择前台窗口。
-2. 截图与桌面操作必须显式授权；唤醒、cwd 匹配、`/orb` 字符串都不构成授权。
-3. 断连、重载、换会话、锁屏、收起、退出都必须撤权并释放按键／鼠标／监听器。
+1. 每次 observe 读取当前前台应用并排除 Orb；每个 action 只能使用最新 observation，前台身份变化时必须重新观察。
+2. 桌面工具必须有当前 Orb session 的 Access grant；截图消息必须另经用户预览确认。唤醒、cwd 匹配、`/orb` 字符串都不构成授权。
+3. 断连、换 workspace/session、收起、Stop、退出都必须撤权并释放按键／鼠标／监听器；turn idle 与普通回复完成不撤权。
 
 ## 9. E/F 面：工程、验证与文档约定
 
@@ -543,9 +543,10 @@ D:\workself\pi-orb\
 
 1. 读 `<REF>/src/plugin.ts` 的 turn 结束处理与 `<REF>/src/overlay-guard.ts` 的 abort 语义。
 2. 对照 pi-orb 的单一撤权出口（`src/main/index.ts`、`src/main/window-lifecycle.ts`）。
-3. 必须覆盖：折叠、停止、turn 完成/失败、断连、换工作区、退出。
-4. 回归 `tests/window-lifecycle.test.ts`、`tests/desktop-broker.test.ts`，并更新
-   `evidence/p1-07/lifecycle-regression.json` 类记录。
+3. 必须覆盖：折叠、Stop、断连、换工作区、换 session、退出；正常 turn idle 必须保留 session Access。
+4. 回归 `tests/window-lifecycle.test.ts`、`tests/desktop-broker.test.ts`、`tests/orb-session.test.ts`，并运行
+   `evidence/p1-07/run-lifecycle-regression.mjs`。新结果写入 `session-access-regression.json`；
+   `lifecycle-regression.json` 是旧 per-task Access API 的历史记录，不再是当前实现的验证结果。
 
 ### 10.5 参考项目代码如何进仓
 

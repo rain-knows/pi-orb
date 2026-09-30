@@ -1,0 +1,651 @@
+{
+  "capturedAt": "2026-09-30T08:12:15.530Z",
+  "scope": {
+    "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge-server <- handshake file",
+    "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
+    "accessPath": "real UI bridge over CDP (window.orb.setOrbAccess)",
+    "targetSelection": "the harness focuses only its disposable process; pi-orb observes the foreground automatically"
+  },
+  "safety": {
+    "inputOnlyToDisposableTarget": true,
+    "noCredentials": true,
+    "pixelsWrittenToDisk": 0,
+    "typedTextSynthetic": true
+  },
+  "environment": {
+    "piWeb": {
+      "baseUrl": "http://127.0.0.1:31402",
+      "snapshot": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-p0-head-src",
+      "head": "95a58744532c7fccaa933aa7757a1419ace67ed2"
+    },
+    "targetGeometry": {
+      "windowBounds": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBounds": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "displayBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1707,
+        "height": 1067
+      },
+      "displayWorkArea": {
+        "x": 0,
+        "y": 0,
+        "width": 1707,
+        "height": 1067
+      },
+      "scaleFactor": 1.5,
+      "grid": {
+        "columns": 4,
+        "rows": 3,
+        "cellWidth": 120,
+        "cellHeight": 90
+      },
+      "cellCentres": [
+        {
+          "cell": "0,0",
+          "centreInContent": {
+            "x": 60,
+            "y": 45
+          },
+          "dipScreenPoint": {
+            "x": 187,
+            "y": 191
+          },
+          "physicalScreenPoint": {
+            "x": 281,
+            "y": 287
+          }
+        },
+        {
+          "cell": "0,1",
+          "centreInContent": {
+            "x": 180,
+            "y": 45
+          },
+          "dipScreenPoint": {
+            "x": 307,
+            "y": 191
+          },
+          "physicalScreenPoint": {
+            "x": 461,
+            "y": 287
+          }
+        },
+        {
+          "cell": "0,2",
+          "centreInContent": {
+            "x": 300,
+            "y": 45
+          },
+          "dipScreenPoint": {
+            "x": 427,
+            "y": 191
+          },
+          "physicalScreenPoint": {
+            "x": 641,
+            "y": 287
+          }
+        },
+        {
+          "cell": "0,3",
+          "centreInContent": {
+            "x": 420,
+            "y": 45
+          },
+          "dipScreenPoint": {
+            "x": 547,
+            "y": 191
+          },
+          "physicalScreenPoint": {
+            "x": 821,
+            "y": 287
+          }
+        },
+        {
+          "cell": "1,0",
+          "centreInContent": {
+            "x": 60,
+            "y": 135
+          },
+          "dipScreenPoint": {
+            "x": 187,
+            "y": 281
+          },
+          "physicalScreenPoint": {
+            "x": 281,
+            "y": 422
+          }
+        },
+        {
+          "cell": "1,1",
+          "centreInContent": {
+            "x": 180,
+            "y": 135
+          },
+          "dipScreenPoint": {
+            "x": 307,
+            "y": 281
+          },
+          "physicalScreenPoint": {
+            "x": 461,
+            "y": 422
+          }
+        },
+        {
+          "cell": "1,2",
+          "centreInContent": {
+            "x": 300,
+            "y": 135
+          },
+          "dipScreenPoint": {
+            "x": 427,
+            "y": 281
+          },
+          "physicalScreenPoint": {
+            "x": 641,
+            "y": 422
+          }
+        },
+        {
+          "cell": "1,3",
+          "centreInContent": {
+            "x": 420,
+            "y": 135
+          },
+          "dipScreenPoint": {
+            "x": 547,
+            "y": 281
+          },
+          "physicalScreenPoint": {
+            "x": 821,
+            "y": 422
+          }
+        },
+        {
+          "cell": "2,0",
+          "centreInContent": {
+            "x": 60,
+            "y": 225
+          },
+          "dipScreenPoint": {
+            "x": 187,
+            "y": 371
+          },
+          "physicalScreenPoint": {
+            "x": 281,
+            "y": 557
+          }
+        },
+        {
+          "cell": "2,1",
+          "centreInContent": {
+            "x": 180,
+            "y": 225
+          },
+          "dipScreenPoint": {
+            "x": 307,
+            "y": 371
+          },
+          "physicalScreenPoint": {
+            "x": 461,
+            "y": 557
+          }
+        },
+        {
+          "cell": "2,2",
+          "centreInContent": {
+            "x": 300,
+            "y": 225
+          },
+          "dipScreenPoint": {
+            "x": 427,
+            "y": 371
+          },
+          "physicalScreenPoint": {
+            "x": 641,
+            "y": 557
+          }
+        },
+        {
+          "cell": "2,3",
+          "centreInContent": {
+            "x": 420,
+            "y": 225
+          },
+          "dipScreenPoint": {
+            "x": 547,
+            "y": 371
+          },
+          "physicalScreenPoint": {
+            "x": 821,
+            "y": 557
+          }
+        }
+      ],
+      "scroller": {
+        "centreInContent": {
+          "x": 244,
+          "y": 393
+        },
+        "dipScreenPoint": {
+          "x": 371,
+          "y": 539
+        },
+        "physicalScreenPoint": {
+          "x": 557,
+          "y": 809
+        },
+        "reachability": {
+          "viewport": {
+            "width": 488,
+            "height": 467
+          },
+          "elementAtCentre": "DIV",
+          "centreResolvesToScroller": true,
+          "stripFitsViewport": true,
+          "scrollerScrollHeight": 300,
+          "scrollerClientHeight": 60,
+          "isScrollable": true
+        }
+      }
+    },
+    "session": {
+      "sessionId": "01a0f15f-d618-7499-8a84-c582e86dc781",
+      "generation": 1,
+      "ensureResult": "01a0f15f-d618-7499-8a84-c582e86dc781"
+    }
+  },
+  "bridge": {
+    "shellExitCode": null,
+    "handshakePath": "D:\\pi-orb-p1-runs\\p1-06-1790755935525\\shell-data\\bridge-token.json",
+    "candidatePaths": [
+      "D:\\pi-orb-p1-runs\\p1-06-1790755935525\\shell-data\\bridge-token.json",
+      "D:\\pi-orb-p1-runs\\p1-06-1790755935525\\shell-data\\pi-orb\\bridge-token.json"
+    ],
+    "shellStdoutTail": "[pi-orb] desktop {\"at\":\"2026-09-30T08:13:05.095Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.297Z\",\"event\":\"authorize\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"level\":\"read-only\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.402Z\",\"event\":\"observe\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"observationId\":\"obs-muntvonn-1\",\"windowId\":\"526706\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.461Z\",\"event\":\"act-refused\",\"reason\":\"access-level\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.513Z\",\"event\":\"authorize\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"level\":\"workspace-write\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.591Z\",\"event\":\"observe\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"observationId\":\"obs-muntvosz-2\",\"windowId\":\"526706\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.727Z\",\"event\":\"observe\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"observationId\":\"obs-muntvowq-3\",\"windowId\":\"526706\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.788Z\",\"event\":\"act-refused\",\"reason\":\"stale-observation\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:09.847Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-muntvowq-3\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:10.681Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muntvowq-3\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:12.321Z\",\"event\":\"observe\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"observationId\":\"obs-muntvqwq-5\",\"windowId\":\"526706\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:15.677Z\",\"event\":\"act-observation\",\"kind\":\"scroll\",\"observationId\":\"obs-muntvqwq-5\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:16.491Z\",\"event\":\"act\",\"kind\":\"scroll\",\"observationId\":\"obs-muntvqwq-5\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:18.566Z\",\"event\":\"act-refused\",\"reason\":\"stale-observation\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:18.627Z\",\"event\":\"revoke\"}\n[pi-orb] desktop operations revoked: the user stopped desktop operations\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:18.630Z\",\"event\":\"act-refused\",\"reason\":\"no-task-authorization\",\"kind\":\"click\"}\n[pi-orb] desktop {\"at\":\"2026-09-30T08:13:18.685Z\",\"event\":\"revoke\"}\n[pi-orb] bridge {\"at\":\"2026-09-30T08:13:18.866Z\",\"event\":\"refused\",\"type\":\"act\",\"reason\":\"unknown-session\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1}\n[pi-orb] bridge {\"at\":\"2026-09-30T08:13:18.918Z\",\"event\":\"refused\",\"type\":\"observe\",\"reason\":\"browser-originated-request\"}",
+    "handshake": {
+      "version": 1,
+      "hasToken": true,
+      "pipePath": "\\\\.\\pipe\\pi-orb-31220",
+      "pid": 31220,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-1790755935525\\orb-workspace"
+    },
+    "hello": "{\"ok\":true,\"result\":{\"version\":1}}",
+    "generationProbe": "{\"ok\":false,\"reason\":\"unknown-session\",\"message\":\"That session does not belong to this Orb run. Start the Orb session first.\"}",
+    "statusBeforeSession": "{\"ok\":false,\"reason\":\"unknown-session\",\"message\":\"That session does not belong to this Orb run. Start the Orb session first.\"}",
+    "browserShaped": "{\"ok\":false,\"reason\":\"browser-originated-request\",\"message\":\"Browser-originated requests are not accepted.\"}"
+  },
+  "policy": {
+    "unapprovedAct": {
+      "response": "{\"ok\":false,\"reason\":\"no-task-authorization\",\"message\":\"Orb desktop access is not enabled for this session. Ask the user to choose an Access level before observing or acting.\"}",
+      "eventsBefore": 1,
+      "eventsAfter": 1
+    },
+    "targetActivation": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true,
+      "pid": 14584,
+      "hwnd": 526706
+    },
+    "readOnly": {
+      "authorized": true,
+      "level": "read-only",
+      "sessionId": "01a0f15f-d618-7499-8a84-c582e86dc781",
+      "generation": 1,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    },
+    "readOnlyObservation": "{\"ok\":true,\"result\":{\"ok\":true,\"observationId\":\"obs-muntvonn-1\",\"at\":1790755989395,\"window\":{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786}},\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"windowRect\":{\"x\":0,\"y\":0,\"width\":735,\"height\":786}},\"elements\":[],\"image\":{\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAt8AAAM…",
+    "readOnlyClick": "{\"ok\":false,\"reason\":\"access-level\",\"message\":\"The current Access level does not allow this desktop action. Current access: read-only; requested action: click.\"}",
+    "approved": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a0f15f-d618-7499-8a84-c582e86dc781",
+      "generation": 1,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    },
+    "staleObservation": {
+      "staleId": "obs-muntvosz-2",
+      "currentId": "obs-muntvowq-3",
+      "response": "{\"ok\":false,\"reason\":\"stale-observation\",\"message\":\"The observation this action was decided from has been superseded. Observe the window again before acting.\"}"
+    },
+    "sessionAccessAfterActions": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a0f15f-d618-7499-8a84-c582e86dc781",
+      "generation": 1,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": "obs-muntvu4i-6",
+      "bridgeReady": true
+    }
+  },
+  "clickLoop": {
+    "observation": {
+      "ok": true,
+      "observationId": "obs-muntvowq-3",
+      "elementCount": 0,
+      "elementsUnavailable": true,
+      "window": {
+        "id": "526706",
+        "pid": 14584,
+        "title": "P1-05 input target",
+        "appName": "electron",
+        "bounds": {
+          "x": 189,
+          "y": 135,
+          "width": 735,
+          "height": 786
+        }
+      },
+      "coordinateSpace": {
+        "action": "screenshot-fraction",
+        "space": 1000,
+        "windowRect": {
+          "x": 0,
+          "y": 0,
+          "width": 735,
+          "height": 786
+        }
+      }
+    },
+    "aimedCell": "1,2",
+    "aimedFraction": {
+      "x": 611.5537848605578,
+      "y": 360.377358490566
+    },
+    "aimedScreenDip": {
+      "x": 427,
+      "y": 281
+    },
+    "response": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muntvowq-3\",\"observation\":{\"observationId\":\"obs-muntvpn5-4\",\"at\":1790755990673,\"window\":{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786}},\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"windowRect\":{\"x\":0,\"y\":0,\"width\":735,\"height\":786…",
+    "landedCell": "1,2",
+    "landedOffsetInCell": {
+      "x": 58,
+      "y": 42
+    },
+    "mouseDown": 1,
+    "mouseUp": 1,
+    "replay": "{\"ok\":false,\"reason\":\"stale-observation\",\"message\":\"The observation this action was decided from has been superseded. Observe the window again before acting.\"}"
+  },
+  "revocation": {
+    "revoked": {
+      "authorized": false,
+      "level": null,
+      "sessionId": null,
+      "generation": null,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    },
+    "afterRevoke": "{\"ok\":false,\"reason\":\"no-task-authorization\",\"message\":\"Orb desktop access is not enabled for this session. Ask the user to choose an Access level before observing or acting.\"}",
+    "newSession": {
+      "oldSessionId": "01a0f15f-d618-7499-8a84-c582e86dc781",
+      "newSessionId": "01a0f160-0bf0-7499-8a84-c585f00f8ed5",
+      "generation": 1,
+      "generationAfter": 1,
+      "authorizedAfter": false,
+      "response": "{\"ok\":false,\"reason\":\"unknown-session\",\"message\":\"That session does not belong to this Orb run. Start the Orb session first.\"}"
+    }
+  },
+  "checks": [
+    {
+      "name": "the shell started",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "the bridge handshake is written with a token and a pipe path",
+      "ok": true,
+      "detail": "{\"version\":1,\"hasToken\":true,\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-31220\",\"pid\":31220,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-1790755935525\\\\orb-workspace\"}"
+    },
+    {
+      "name": "the handshake records the configured workspace",
+      "ok": true,
+      "detail": "D:\\pi-orb-p1-runs\\p1-06-1790755935525\\orb-workspace"
+    },
+    {
+      "name": "the handshake carries the shell's run generation",
+      "ok": true,
+      "detail": "generation=1"
+    },
+    {
+      "name": "the bridge pipe answers a hello handshake",
+      "ok": true,
+      "detail": "{\"ok\":true,\"result\":{\"version\":1}}"
+    },
+    {
+      "name": "a request using the handshake generation gets past the generation check",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"unknown-session\",\"message\":\"That session does not belong to this Orb run. Start the Orb session first.\"}"
+    },
+    {
+      "name": "the bridge refuses a request that names no live session",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"unknown-session\",\"message\":\"That session does not belong to this Orb run. Start the Orb session first.\"}"
+    },
+    {
+      "name": "a session exists for the workspace",
+      "ok": true,
+      "detail": "01a0f15f-d618-7499-8a84-c582e86dc781"
+    },
+    {
+      "name": "an action without an approved task is refused",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"no-task-authorization\",\"message\":\"Orb desktop access is not enabled for this session. Ask the user to choose an Access level before observing or acting.\"}"
+    },
+    {
+      "name": "the refusal reason is that no desktop task is authorized",
+      "ok": true,
+      "detail": "no-task-authorization"
+    },
+    {
+      "name": "the refused action had no side effect on the target",
+      "ok": true,
+      "detail": "events before=1 after=1"
+    },
+    {
+      "name": "the harness focused its disposable target process",
+      "ok": true,
+      "detail": "{\"title\":\"P1-05 input target\",\"ok\":true,\"foregrounded\":true,\"pid\":14584,\"hwnd\":526706}"
+    },
+    {
+      "name": "Read Only is granted to this session and generation",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"read-only\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "Read Only can observe the automatically selected foreground app",
+      "ok": true,
+      "detail": "{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786}}"
+    },
+    {
+      "name": "Read Only refuses input actions",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"access-level\",\"message\":\"The current Access level does not allow this desktop action. Current access: read-only; requested action: click.\"}"
+    },
+    {
+      "name": "Workspace Write is granted through the Access control",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "changing Access keeps the current Orb session and generation",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "an action against a superseded observation is refused",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"stale-observation\",\"message\":\"The observation this action was decided from has been superseded. Observe the window again before acting.\"}"
+    },
+    {
+      "name": "the observation reports the target window through the product path",
+      "ok": true,
+      "detail": "{\"ok\":true,\"observationId\":\"obs-muntvowq-3\",\"elementCount\":0,\"elementsUnavailable\":true,\"window\":{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786}},\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"windowRec"
+    },
+    {
+      "name": "the authorized action was executed by the broker",
+      "ok": true,
+      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"click\",\"observationId\":\"obs-muntvowq-3\",\"observation\":{\"observationId\":\"obs-muntvpn5-4\",\"at\":1790755990673,\"window\":{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":18"
+    },
+    {
+      "name": "the click reached the window through the whole chain",
+      "ok": true,
+      "detail": "landed=1,2 events=[\"key-up\",\"cell-mousedown\",\"mouse-down\",\"mouse-up\"]"
+    },
+    {
+      "name": "the click landed on the intended cell",
+      "ok": true,
+      "detail": "intended 1,2, landed 1,2"
+    },
+    {
+      "name": "C7: a position read off the screenshot lands on that same point in the target",
+      "ok": true,
+      "detail": "fraction={\"x\":611.5537848605578,\"y\":360.377358490566} resolved from the target's own rect {\"x\":427,\"y\":281}; landed 1,2"
+    },
+    {
+      "name": "the click delivered both a press and a release",
+      "ok": true,
+      "detail": "down=1 up=1"
+    },
+    {
+      "name": "the action result carries a fresh screenshot and observation for the next action",
+      "ok": true,
+      "detail": "{\"observationId\":\"obs-muntvpn5-4\",\"image\":\"image/png\",\"next\":\"Use this fresh observation for the next action.\"}"
+    },
+    {
+      "name": "a scroll issued through the orb tool path is accepted by the broker",
+      "ok": true,
+      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"scroll\",\"observationId\":\"obs-muntvqwq-5\",\"observation\":{\"observationId\":\"obs-muntvu4i-6\",\"at\":1790755996482,\"window\":{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786}},\"coordinateS"
+    },
+    {
+      "name": "the reference backend delivered a wheel event to the target",
+      "ok": true,
+      "detail": "[{\"at\":1790755995702,\"kind\":\"wheel\",\"clientPoint\":{\"x\":244,\"y\":388},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":0},{\"at\":1790755995737,\"kind\":\"wheel\",\"clientPoint\":{\"x\":244,\"y\":388},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":5.333333492279053},{\"at\":1790755995771,\"kind\":\"wheel\",\"clientPoint\":{\"x\":244,\"y\":388},\"deltaY\":100,\"over…"
+    },
+    {
+      "name": "the target scroll position changed",
+      "ok": true,
+      "detail": "[{\"at\":1790755995914,\"kind\":\"scroll\",\"scrollTop\":234.6666717529297},{\"at\":1790755995915,\"kind\":\"scroll\",\"scrollTop\":238.6666717529297},{\"at\":1790755995916,\"kind\":\"scroll\",\"scrollTop\":240}]"
+    },
+    {
+      "name": "replaying the same observation is refused (one action per observation)",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"stale-observation\",\"message\":\"The observation this action was decided from has been superseded. Observe the window again before acting.\"}"
+    },
+    {
+      "name": "Workspace Write remains bound to the same session after actions",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":\"obs-muntvu4i-6\",\"bridgeReady\":true}"
+    },
+    {
+      "name": "the latest action result observation is now the current broker observation",
+      "ok": true,
+      "detail": "{\"status\":{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":\"obs-muntvu4i-6\",\"bridgeReady\":true},\"freshObservationId\":\"obs-muntvu4i-6\"}"
+    },
+    {
+      "name": "revoking through the UI clears the authorization",
+      "ok": true,
+      "detail": "{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "an action after revocation is refused",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"no-task-authorization\",\"message\":\"Orb desktop access is not enabled for this session. Ask the user to choose an Access level before observing or acting.\"}"
+    },
+    {
+      "name": "a new conversation clears the old session grant",
+      "ok": true,
+      "detail": "{\"oldSessionId\":\"01a0f15f-d618-7499-8a84-c582e86dc781\",\"newSessionId\":\"01a0f160-0bf0-7499-8a84-c585f00f8ed5\",\"generation\":1,\"generationAfter\":1,\"authorizedAfter\":false,\"response\":\"{\\\"ok\\\":false,\\\"reason\\\":\\\"unknown-session\\\",\\\"message\\\":\\\"That session does not belong to this Orb run. Start the Orb s"
+    },
+    {
+      "name": "a request from the previous session is refused",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"unknown-session\",\"message\":\"That session does not belong to this Orb run. Start the Orb session first.\"}"
+    },
+    {
+      "name": "a browser-originated request is refused even with a valid token",
+      "ok": true,
+      "detail": "{\"ok\":false,\"reason\":\"browser-originated-request\",\"message\":\"Browser-originated requests are not accepted.\"}"
+    },
+    {
+      "name": "the shell is still alive at the end",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "the target is still alive at the end",
+      "ok": true,
+      "detail": "exitCode=null"
+    }
+  ],
+  "passed": true,
+  "scrollLoop": {
+    "observationId": "obs-muntvqwq-5",
+    "fraction": {
+      "x": 500,
+      "y": 847.1698113207548
+    },
+    "screenDip": {
+      "x": 371,
+      "y": 539
+    },
+    "activation": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true,
+      "pid": 14584,
+      "hwnd": 526706
+    },
+    "response": "{\"ok\":true,\"result\":{\"ok\":true,\"action\":\"scroll\",\"observationId\":\"obs-muntvqwq-5\",\"observation\":{\"observationId\":\"obs-muntvu4i-6\",\"at\":1790755996482,\"window\":{\"id\":\"526706\",\"pid\":14584,\"title\":\"P1-05 input target\",\"appName\":\"electron\",\"bounds\":{\"x\":189,\"y\":135,\"width\":735,\"height\":786}},\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"windowRect\":{\"x\":0,\"y\":0,\"width\":735,\"height\":78…",
+    "scrollEventsBefore": 0,
+    "scrollEventsAfter": 25,
+    "wheelEvents": 3,
+    "lastObservedScrollTop": 240,
+    "note": "the point is a screenshot fraction mapped onto the window recorded by the automatic foreground observation; target wheel and scroll logs are the delivery evidence."
+  },
+  "summary": {
+    "verified": [
+      "the bridge handshake is written with a per-run token, a pipe path and the workspace",
+      "the bridge refuses a request that names no live session",
+      "a desktop action without a session Access grant is refused, with no side effect on the target",
+      "Read Only grants observation and refuses input actions",
+      "Workspace Write is granted to the current Orb session and generation",
+      "the foreground application is discovered automatically without a target picker",
+      "an action against a superseded observation is refused",
+      "an authorized click reaches a real window through the whole product chain and lands on the intended cell",
+      "an authorized scroll is accepted and escalated by the product chain; whether the wheel physically lands is OS-gated and was observed to vary, so it is recorded rather than asserted",
+      "replaying one observation is refused (one action per observation)",
+      "the action result contains its fresh screenshot and observation id for the next action",
+      "the session Access grant remains active across ordinary actions",
+      "revoking clears Access and the next action is refused",
+      "starting a new conversation clears the old grant and session path",
+      "a browser-shaped request is refused even with a valid token"
+    ],
+    "unverified": [
+      "the model-facing tool registration actually invoking a tool: this environment has no model in the loop, so the tool definitions are verified by the separate pi-web check rather than by a real model call",
+      "typing through the orb tools: the driver refuses background text delivery to Chromium content, and the foreground escalation for typing was not exercised here (typing is verified directly in P1-05 against a native application)",
+      "a refused action stopping the batch was exercised by unit tests (tests/desktop-broker.test.ts) rather than by a failing real driver action here",
+      "the orb refusing a second GUI task while one is running in a second session (the task lock is unit-tested and the single-session case is exercised)"
+    ]
+  },
+  "piWebLogTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:31402\n- Network:       http://127.0.0.1:31402\n✓ Ready in 4.5s\n✓ Running next.config.ts took 474ms\n[pi-web] session_start dispatched to extensions for session 01a0f15f-d618-7499-8a84-c582e86dc781\n[pi-web] session_start dispatched to extensions for session 01a0f160-0bf0-7499-8a84-c585f00f8ed5\n"
+}

@@ -1,0 +1,233 @@
+{
+  "capturedAt": "2026-09-30T08:16:30.072Z",
+  "testCase": "c7",
+  "verification": {
+    "what": "real model observes a disposable grid, clicks cell 0,0, then observes again",
+    "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
+    "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
+    "accessLevel": "workspace-write",
+    "targetSelection": "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790756190030\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790756190030\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-c7-agent-1790756190030",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "chrome",
+      "title": "TZCODE - Google Chrome",
+      "inputDesktopAccessible": true
+    },
+    "targetPid": 2600,
+    "target": {
+      "pid": 2600,
+      "windowBoundsDip": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBoundsDip": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "scaleFactor": 1.5,
+      "cell00": {
+        "cell": "0,0",
+        "centreInContent": {
+          "x": 60,
+          "y": 45
+        },
+        "dipScreenPoint": {
+          "x": 187,
+          "y": 191
+        },
+        "physicalScreenPoint": {
+          "x": 281,
+          "y": 287
+        }
+      }
+    },
+    "piWeb": {
+      "ok": true,
+      "baseUrl": "http://127.0.0.1:40212",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:40212\n- Network:       http://127.0.0.1:40212\n✓ Ready in 581ms\n✓ Running next.config.ts took 184ms\n"
+    },
+    "handshake": {
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790756190030\\shell-data\\bridge-token.json",
+      "pid": 16220,
+      "generation": 1,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790756190030\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-16220"
+    },
+    "rendererTarget": {
+      "title": "pi-orb",
+      "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
+    },
+    "shortcut": {
+      "registered": true,
+      "problem": null
+    },
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-c7-1790756190030\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 2,
+      "busy": false,
+      "sessionId": "01a0f163-3569-7611-b2a4-9e7e0a5eab42",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:40212",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "generation": 2,
+    "session": "01a0f163-3569-7611-b2a4-9e7e0a5eab42",
+    "model": {
+      "sessionId": "01a0f163-3e10-7611-b2a4-9e81bd22e007",
+      "selected": {
+        "provider": "TZcode",
+        "modelId": "deepseek-v4.1-flash"
+      },
+      "input": [
+        "text",
+        "image"
+      ],
+      "declaredImageCapable": true
+    },
+    "interactiveDesktopBeforeTarget": {
+      "process": "electron",
+      "title": "pi-orb",
+      "inputDesktopAccessible": true
+    },
+    "testTarget": {
+      "pid": 2600,
+      "handle": 918898,
+      "selection": "test harness only"
+    },
+    "interactiveDesktopAtWake": {
+      "process": "electron",
+      "title": "pi-orb",
+      "inputDesktopAccessible": true
+    },
+    "wake": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true,
+      "chordSent": "ctrl+alt+f11"
+    },
+    "access": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a0f163-3569-7611-b2a4-9e7e0a5eab42"
+    },
+    "capture": {
+      "ok": false,
+      "message": "No target window has been recorded yet. Bring the window you want to share to the front, then wake the orb with the shortcut so it can record it before it takes focus."
+    }
+  },
+  "checks": [
+    {
+      "name": "the isolated pi-web started",
+      "ok": true,
+      "detail": "http://127.0.0.1:40212"
+    },
+    {
+      "name": "the isolated shell published its own handshake",
+      "ok": true,
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790756190030\\\\shell-data\\\\bridge-token.json\",\"pid\":16220,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790756190030\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-16220\"}"
+    },
+    {
+      "name": "the isolated shell's pipe accepts a connection",
+      "ok": true,
+      "detail": "\\\\.\\pipe\\pi-orb-16220"
+    },
+    {
+      "name": "the isolated shell is NOT the user's running orb",
+      "ok": true,
+      "detail": "handshake pid 16220"
+    },
+    {
+      "name": "the orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "{\"title\":\"pi-orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+    },
+    {
+      "name": "the wake shortcut registered",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790756190030\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:40212\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+    },
+    {
+      "name": "the isolated shell reports this run's workspace and a generation",
+      "ok": true,
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790756190030\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-c7-1790756190030\\\\orb-workspace\",\"generation\":2}"
+    },
+    {
+      "name": "the isolated shell created a real pi-web session",
+      "ok": true,
+      "detail": "\"01a0f163-3569-7611-b2a4-9e7e0a5eab42\""
+    },
+    {
+      "name": "the session is served by a model that declares image input",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a0f163-3e10-7611-b2a4-9e81bd22e007\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+    },
+    {
+      "name": "an interactive desktop is available before target enumeration",
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-orb\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the harness can foreground its disposable target by process id",
+      "ok": true,
+      "detail": "{\"pid\":2600,\"handle\":918898,\"selection\":\"test harness only\"}"
+    },
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-orb\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "Workspace Write is granted to the isolated Orb session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a0f163-3569-7611-b2a4-9e7e0a5eab42\"}"
+    },
+    {
+      "name": "a screenshot of the recorded target was captured for preview",
+      "ok": false,
+      "detail": "{\"ok\":false,\"message\":\"No target window has been recorded yet. Bring the window you want to share to the front, then wake the orb with the shortcut so it can record it before it takes focus.\"}"
+    }
+  ],
+  "passed": false,
+  "error": "capture failed",
+  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:40213/devtools/browser/0e9d8300-f9aa-45e0-81a9-17a7d3b8e956\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-16220\n[pi-orb] desktop {\"at\":\"2026-09-30T08:16:36.358Z\",\"event\":\"revoke\"}\n[pi-orb] recorded target: pid 2600 \"P1-05 input target\" (753x795, dpi 144)\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] desktop {\"at\":\"2026-09-30T08:16:55.623Z\",\"event\":\"authorize\",\"sessionId\":\"01a0f163-3569-7611-b2a4-9e7e0a5eab42\",\"generation\":2,\"level\":\"workspace-write\"}\n",
+  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:40212\n- Network:       http://127.0.0.1:40212\n✓ Ready in 581ms\n✓ Running next.config.ts took 184ms\n[pi-web] session_start dispatched to extensions for session 01a0f163-3569-7611-b2a4-9e7e0a5eab42\n[pi-web] session_start dispatched to extensions for session 01a0f163-3e10-7611-b2a4-9e81bd22e007\n"
+}

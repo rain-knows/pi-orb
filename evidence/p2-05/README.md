@@ -38,7 +38,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 `app.asar` 9 291 054 B、解包原生二进制合计 2 658 109 B、asar 条目 135。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
 
-## 2. 启动探测：`packaged-smoke.json`（21/21 通过）
+## 2. 启动探测：`packaged-smoke.json`（22/22 通过）
 
 以真实 `release/<version>/win-unpacked/pi-orb.exe` 启动，独立 `--user-data-dir` 与
 `PI_ORB_CONFIG`，指向一个未使用的 pi-web 端口，通过 Chrome DevTools Protocol 驱动 renderer。
@@ -61,7 +61,8 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | **观察框窗口无脚本**（独立入口，不带壳的 bridge） | 通过（`scriptCount: 0`） |
 | **停靠滑动真的在动**（拖到边缘后 dock，采样到 9 帧不同位置：从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 通过（强制瞬移的反向对照下 2 帧即失败） |
 | **取消停靠恢复球并清除 dock 状态** | 通过 |
-| **`orb:list-desktop-windows` 返回真实窗口列表**（koffi 从 `app.asar.unpacked` 加载成功） | 通过（本次运行 8–11 个窗口） |
+ | **session Access bridge 存在且初始未授权**（`setOrbAccess`/`revokeOrbAccess` 可用） | 通过 |
+ | **旧选窗和逐任务授权 API 不存在**（`listDesktopWindows`/`setDesktopTarget`/`authorizeDesktopTask` 均未暴露） | 通过 |
 | 启动日志中没有 `desktop driver unavailable` | 通过 |
 | 没有模块解析错误 | 通过 |
 
@@ -73,12 +74,9 @@ node evidence/p2-05/run-packaged-smoke.mjs
 > 「CSS 文件下载成功」与「移植的参考设计系统真的生效」的地方，也是本书开头那次前端漂移
 > （自称复用参考、实为自创 `orb__*` 样式）能被发现的原因。
 >
-> 最后三项中的窗口枚举是这一阶段唯一能**从外部观测**「打包后原生模块仍然可用」的手段：
-> `koffi` 由主进程懒加载，因此只有真的调用一次桌面枚举才能证明 asar 解包路径正确。
->
-> 该检查做过反向对照：删除 `app.asar.unpacked/node_modules/koffi/build/koffi/win32_x64/koffi.node`
-> 后，「窗口枚举」与「无桌面驱动失败」两项都失败（`The desktop driver is unavailable`），恢复文件后
-> 重新通过。
+ > 打包探针不再通过选窗 API 验证 native backend；实际桌面闭环由
+ > `evidence/p1-06/loop-verification-session-access.json` 证明，打包探针只验证安装产物的
+ > preload 合同、参考壳层和启动时无 native driver 失败。
 
 ## 3. 明确未验证
 
