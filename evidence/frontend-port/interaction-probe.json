@@ -5,10 +5,18 @@
     "prompt",
     "extension_ui_response"
   ],
+  "reducedMotion": "none",
   "screenshots": [
     "after-ready.png",
+    "after-dark.png",
+    "after-input.png",
     "after-model.png",
     "after-question.png",
-    "after-tool-thread.png"
+    "after-tool-thread.png",
+    "after-history.png",
+    "after-dock.png"
+  ],
+  "visualFixture": [
+    "after-preview-fixture.png"
   ]
 }

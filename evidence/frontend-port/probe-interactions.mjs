@@ -29,6 +29,12 @@ const server = createServer(async (request, response) => {
     ] }));
     return;
   }
+  if (path === "/api/sessions") {
+    response.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ sessions: [
+      { id: "fixture-session", cwd: workspace, name: "Reference flow", firstMessage: "Check this", modified: "2026-09-30T00:00:00Z", messageCount: 2 },
+    ] }));
+    return;
+  }
   if (path === "/api/agent/new") {
     response.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ sessionId: "fixture-session" }));
     return;
@@ -146,6 +152,14 @@ try {
     await evaluate(cdp, "document.body.dispatchEvent(new PointerEvent('pointerenter')); true");
     await waitFor(cdp, "document.body.classList.contains('expanded')", Boolean, "panel expanded");
     await capture(cdp, "after-ready.png");
+    await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }] });
+    await waitFor(cdp, "document.documentElement.hasAttribute('data-ds-dark-theme')", Boolean, "dark theme");
+    await capture(cdp, "after-dark.png");
+    await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
+    await waitFor(cdp, "document.documentElement.hasAttribute('data-ds-dark-theme')", (value) => value === false, "light theme");
+    await evaluate(cdp, "document.querySelector('#prompt').textContent='Check this\\nand that\\nand one more'; document.querySelector('#prompt').dispatchEvent(new Event('input', { bubbles: true })); true");
+    await capture(cdp, "after-input.png");
+    await evaluate(cdp, "document.querySelector('#prompt').textContent=''; document.querySelector('#prompt').dispatchEvent(new Event('input', { bubbles: true })); true");
     await evaluate(cdp, "document.querySelector('#permission-button').click(); document.querySelector('#model-open').click(); true");
     await waitFor(cdp, "document.querySelectorAll('#model-list button').length", (value) => value === 2, "model list");
     await capture(cdp, "after-model.png");
@@ -155,8 +169,42 @@ try {
     await evaluate(cdp, "document.querySelector('#question-options button').click(); document.querySelector('#question-continue').click(); true");
     await waitFor(cdp, "document.querySelector('.orb-message--assistant p')?.textContent", (value) => value === "Finished the check.", "assistant reply");
     await capture(cdp, "after-tool-thread.png");
+    await evaluate(cdp, "document.querySelector('#history').click(); true");
+    await waitFor(cdp, "document.querySelectorAll('#history-list button').length", (value) => value === 1, "history list");
+    await capture(cdp, "after-history.png");
+    await evaluate(cdp, `(() => {
+      document.querySelector('#history').click();
+      document.querySelector('#preview-target').textContent='Editor';
+      document.querySelector('#preview-meta').textContent='320 × 180 · not sent yet';
+      const illustration = '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="#e8e8ec"/><rect x="13" y="12" width="294" height="156" rx="9" fill="#fff"/><rect x="13" y="12" width="294" height="22" rx="9" fill="#c7c9d0"/><rect x="28" y="52" width="90" height="8" rx="4" fill="#8995a5"/><rect x="28" y="72" width="248" height="5" rx="2" fill="#d5d9e0"/><rect x="28" y="86" width="220" height="5" rx="2" fill="#d5d9e0"/><rect x="28" y="114" width="108" height="29" rx="8" fill="#4f6685"/></svg>';
+      document.querySelector('#preview-image').src='data:image/svg+xml,' + encodeURIComponent(illustration);
+      document.querySelector('#preview-sheet').hidden=false;
+      return true;
+    })()`);
+    await capture(cdp, "after-preview-fixture.png");
+    await evaluate(cdp, "document.querySelector('#preview-sheet').hidden=true; document.body.dispatchEvent(new PointerEvent('pointerleave')); true");
+    await waitFor(cdp, "document.body.classList.contains('expanded')", (value) => value === false, "panel collapsed");
+    await sleep(400);
+    const dock = await evaluate(cdp, "window.orb.moveFloatingBall(-60, 200).then(() => window.orb.clampFloatingBall())");
+    if (dock.docked !== "left") throw new Error(`Dock state failed: ${JSON.stringify(dock)}`);
+    await evaluate(cdp, "window.orb.unsnapFloatingBall().then(() => true)");
+    await evaluate(cdp, `new Promise(resolve => {
+      const ball = document.querySelector('#ball');
+      const rect = ball.getBoundingClientRect();
+      ball.setPointerCapture = () => {};
+      const start = { pointerId: 1, button: 0, buttons: 1, screenX: window.screenX + rect.left + 36, screenY: 200, clientX: rect.left + 36, clientY: rect.top + 36 };
+      ball.dispatchEvent(new PointerEvent('pointerdown', start));
+      ball.dispatchEvent(new PointerEvent('pointermove', { ...start, screenX: -24 }));
+      setTimeout(() => { ball.dispatchEvent(new PointerEvent('pointerup', { ...start, screenX: -24 })); setTimeout(resolve, 700); }, 300);
+    })`);
+    await waitFor(cdp, "document.body.classList.contains('docked-left')", Boolean, "renderer dock state");
+    await capture(cdp, "after-dock.png");
+    await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
+    const reducedMotion = await evaluate(cdp, "getComputedStyle(document.querySelector('#dock-tab')).animationName");
+    if (reducedMotion !== "none") throw new Error(`Reduced-motion dock animation still active: ${reducedMotion}`);
+    await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "no-preference" }] });
     if (!observed.prompt || !observed.answered) throw new Error(`Wire fixture not completed: ${JSON.stringify(observed)}`);
-    writeFileSync(join(import.meta.dirname, "interaction-probe.json"), `${JSON.stringify({ passed: true, commands: observed.commands, screenshots: ["after-ready.png", "after-model.png", "after-question.png", "after-tool-thread.png"] }, null, 2)}\n`);
+    writeFileSync(join(import.meta.dirname, "interaction-probe.json"), `${JSON.stringify({ passed: true, commands: observed.commands, reducedMotion, screenshots: ["after-ready.png", "after-dark.png", "after-input.png", "after-model.png", "after-question.png", "after-tool-thread.png", "after-history.png", "after-dock.png"], visualFixture: ["after-preview-fixture.png"] }, null, 2)}\n`);
     console.log("Packaged renderer/Pi wire interaction probe passed");
   } finally { cdp.close(); }
 } finally {

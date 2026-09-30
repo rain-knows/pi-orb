@@ -16,7 +16,9 @@ function harness(configured = true) {
   const dom = new JSDOM(html, { runScripts: "outside-only", url: "https://orb.local/index.html" });
   openDoms.push(dom);
   const win = dom.window;
-  Object.defineProperty(win, "matchMedia", { value: () => ({ matches: false, addEventListener: vi.fn() }) });
+  const themeListeners: Array<() => void> = [];
+  const media = { matches: false, addEventListener: (_name: string, listener: () => void) => themeListeners.push(listener) };
+  Object.defineProperty(win, "matchMedia", { value: () => media });
   Object.defineProperty(win.HTMLElement.prototype, "setPointerCapture", { value: vi.fn() });
   Object.defineProperty(win.HTMLElement.prototype, "releasePointerCapture", { value: vi.fn() });
   let status = {
@@ -47,7 +49,7 @@ function harness(configured = true) {
     onDoubleAltGesture: vi.fn((listener: typeof onDoubleAlt) => { onDoubleAlt = listener; return () => {}; }),
     setFloatingExpanded: vi.fn(async (expanded: boolean) => ({ expanded, horizontal: "left", vertical: "up", docked: undefined })),
     moveFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined })),
-    clampFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined })),
+    clampFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined as "left" | "right" | undefined })),
     unsnapFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined })),
     chooseWorkspace: vi.fn(async () => ({ ok: true, resolved: "C:\\orb" })),
     setWorkspace: vi.fn(async () => { status = { ...status, configured: true }; return status; }),
@@ -77,7 +79,7 @@ function harness(configured = true) {
   runInContext(script, dom.getInternalVMContext());
   const document = win.document;
   const byId = (id: string) => document.getElementById(id)!;
-  return { dom, win, document, byId, api, emit: (event: Record<string, unknown>) => onEvent(event), select: (value: unknown) => onSelection(value), doubleAlt: () => onDoubleAlt() };
+  return { dom, win, document, byId, api, emit: (event: Record<string, unknown>) => onEvent(event), select: (value: unknown) => onSelection(value), doubleAlt: () => onDoubleAlt(), setDark: (dark: boolean) => { media.matches = dark; for (const listener of themeListeners) listener(); } };
 }
 
 afterEach(() => { for (const dom of openDoms.splice(0)) dom.window.close(); });
@@ -120,6 +122,31 @@ it("sends with the existing Pi bridge and displays streamed replies", async () =
   expect(h.document.querySelector(".orb-message--assistant p")?.textContent).toBe("Hello");
   h.emit({ type: "idle", stopReason: null });
   expect(h.document.body.classList.contains("running")).toBe(false);
+});
+
+it("keeps keyboard editing in the composer and submits only a plain Enter", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  const prompt = h.byId("prompt");
+  h.byId("composer").click();
+  expect(h.document.activeElement).toBe(prompt);
+  prompt.textContent = "Two lines";
+  prompt.dispatchEvent(new h.win.KeyboardEvent("keydown", { key: "Enter", shiftKey: true, bubbles: true }));
+  prompt.dispatchEvent(new h.win.KeyboardEvent("keydown", { key: "Enter", isComposing: true, bubbles: true }));
+  expect(h.api.sendPrompt).not.toHaveBeenCalled();
+  prompt.dispatchEvent(new h.win.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  await expect.poll(() => h.api.sendPrompt.mock.calls.length).toBe(1);
+  expect(h.api.sendPrompt).toHaveBeenCalledWith({ generation: 1, text: "Two lines" });
+});
+
+it("offers the host edit menu when right-clicking the focused composer", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  const prompt = h.byId("prompt");
+  prompt.focus();
+  prompt.dispatchEvent(new h.win.MouseEvent("contextmenu", { bubbles: true, cancelable: true }));
+  await expect.poll(() => h.api.openShellMenu.mock.calls.length).toBe(1);
+  expect(h.api.openShellMenu.mock.calls[0]?.[0]).toMatchObject({ isEditable: true });
 });
 
 it("opens history and restores its messages into the actual transcript", async () => {
@@ -191,4 +218,33 @@ it("supports Pi confirm, input and model selection through the restricted bridge
   (h.document.querySelector("#model-list button") as HTMLElement).click();
   await expect.poll(() => h.api.setModel.mock.calls.length).toBe(1);
   expect(h.api.setModel).toHaveBeenCalledWith({ generation: 1, provider: "test", id: "one" });
+});
+
+it("moves only after the four-pixel drag threshold and docks through the host state", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  const ball = h.byId("ball");
+  ball.dispatchEvent(new h.win.MouseEvent("pointerdown", { button: 0, screenX: 100, screenY: 100, clientX: 10, clientY: 10 }));
+  ball.dispatchEvent(new h.win.MouseEvent("pointermove", { buttons: 1, screenX: 103, screenY: 100 }));
+  expect(h.api.moveFloatingBall).not.toHaveBeenCalled();
+  ball.dispatchEvent(new h.win.MouseEvent("pointermove", { buttons: 1, screenX: 110, screenY: 100 }));
+  await expect.poll(() => h.api.moveFloatingBall.mock.calls.length).toBeGreaterThan(0);
+  h.api.clampFloatingBall.mockResolvedValueOnce({ expanded: false, horizontal: "left", vertical: "up", docked: "left" });
+  ball.dispatchEvent(new h.win.MouseEvent("pointerup", { button: 0, screenX: 110, screenY: 100 }));
+  await expect.poll(() => h.document.body.classList.contains("docked-left")).toBe(true);
+  expect(h.byId("dock-tab").hidden).toBe(false);
+});
+
+it("follows theme changes and removes the selected-text chip through the host", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.setDark(true);
+  expect(h.document.documentElement.hasAttribute("data-ds-dark-theme")).toBe(true);
+  expect(h.document.documentElement.style.colorScheme).toBe("dark");
+  h.select({ text: "Selected text", sourceLabel: "Editor" });
+  expect(h.byId("selection-chip").hidden).toBe(false);
+  expect(h.document.body.classList.contains("has-selection-chip")).toBe(true);
+  h.byId("selection-chip-dismiss").click();
+  await expect.poll(() => h.api.clearSelectionContext.mock.calls.length).toBe(1);
+  expect(h.byId("selection-chip").hidden).toBe(true);
 });

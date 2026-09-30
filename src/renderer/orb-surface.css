@@ -38,6 +38,7 @@
   z-index: 3;
   inset: 0;
   overflow: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -61,6 +62,8 @@ body.expand-down .orb-sheet { padding-top: 20px; padding-bottom: 36px; }
 #target-list button, #model-list button { text-align: left; border-radius: 12px; overflow-wrap: anywhere; }
 #target-list button[aria-selected="true"], #model-list button[aria-selected="true"] { background: var(--input-bg); border-color: var(--black); }
 #preview-image { width: 100%; max-height: 210px; object-fit: contain; border: 1px solid var(--border); border-radius: 12px; }
+#preview-image { box-sizing: border-box; }
+.history-row small { display: block; margin-top: 4px; color: var(--pin); }
 #preview-meta { color: var(--pin); }
 #status:not(:empty) { position: absolute; z-index: 5; left: 24px; right: 24px; bottom: calc(var(--composer-height) + 16px); border-radius: 12px; padding: 6px 10px; color: var(--black); background: var(--input-bg); box-shadow: var(--panel-shadow); }
 body.expand-down #status:not(:empty) { bottom: auto; top: calc(var(--composer-height) + 16px); }

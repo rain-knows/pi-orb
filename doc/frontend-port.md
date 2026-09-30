@@ -14,7 +14,7 @@ The 344 × 444 pixel comparison is in `evidence/frontend-port/`:
 |---|---|
 | `before-ball.png` | Packaged pi-orb 0.1.0, isolated unconfigured profile, collapsed |
 | `before-panel.png` | Same packaged app, hover-expanded setup panel |
-| `reference-panel.png` | Pinned reference HTML/CSS/image, expanded up-left, dark attribute and host labels supplied by the capture script |
+| `reference-panel.png` | Pinned reference HTML/CSS/image, expanded up-left in the light theme; host labels supplied by the capture script |
 
 `capture-baseline.mjs` makes these captures. The reference frame is a visual
 renderer fixture because its DSH host does not run inside pi-orb; it does not
@@ -86,3 +86,27 @@ response ID, plus the resumed assistant reply. `interaction-probe.json` records
 the command sequence; `after-{ready,model,question,tool-thread}.png` are actual
 packaged-window captures. The fixture does not stand in for the real-model
 closed-loop acceptance gate in stage 6.
+
+## Stage 4: frontend completion gate
+
+`evidence/frontend-port/visual-review.md` records the state-by-state comparison
+at the reference window sizes. `capture-baseline.mjs --reference` renders the
+actual pinned reference DOM/CSS/image with fixture host state;
+`probe-interactions.mjs` captures the packaged pi-orb window while exercising
+its real preload/main-process boundary against a deterministic Pi Web wire
+fixture. The access gate and screenshot preview use Pi-specific UI, so their
+comparison is against the same shell tokens and geometry. The preview image
+is explicitly synthetic.
+
+The applicable reference renderer interaction tests have been adapted to
+JSDOM. They check hover, pin, delayed collapse, the 4 px drag threshold,
+docking, history, question cards, selection, theme, keyboard editing and
+right-click editing behavior through the actual page DOM. The packaged probe
+checks reduced-motion dock styling with emulated media. Reference
+`setTextEditing` and `restoreFrontApp` exist to return focus to the previous
+macOS app during a running DSH task; the Windows Pi Orb keeps keyboard focus
+in its composer.
+
+The frontend is accepted for the next stage after the full test suite,
+lint, packaged smoke and interaction probe pass. Real model inference and a
+native screenshot flow remain stage 6 evidence gates.
