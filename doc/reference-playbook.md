@@ -639,3 +639,7 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
   属于产品边界变更，必须先经用户确认。
 - 参考项目缺少 pi-orb 必需能力：先在本文件补一节“参考项目没有此能力”的记录，
   再写最小实现，并在证据中说明为何不能复用。
+
+## 16. 工具调用提速适配
+
+参考没有 Pi observation_id 批量桥接和请求关联计时。实现差异、源码来源及阶段验收归属 `tool-speed-optimization.md`；不复制 dsh 调度器或图片存储。

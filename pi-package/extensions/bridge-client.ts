@@ -10,6 +10,8 @@
  * the shell is what holds the user's authorization decision.
  */
 
+import { randomUUID } from "node:crypto";
+import { timeToolPhase, withToolTiming } from "../../src/shared/tool-timing.js";
 import { connect } from "node:net";
 import { readFileSync, existsSync } from "node:fs";
 import type {
@@ -110,7 +112,8 @@ readToken(): BridgeTokenFile | null {
 
   /** Send one request and await the single line of JSON the shell replies with. */
   async call(request: BridgeRequestBody, handshake: BridgeTokenFile): Promise<BridgeCallResult> {
-    const payload = `${JSON.stringify({ ...request, token: handshake.token })}\n`;
+    const requestId = randomUUID();
+    const payload = `${JSON.stringify({ ...request, requestId, token: handshake.token })}\n`;
     const timeoutMs = this.#options.timeoutMs ?? 30_000;
     const target = handshake.pipePath || this.#options.pipePath;
     if (!target) {
@@ -121,7 +124,7 @@ readToken(): BridgeTokenFile | null {
       };
     }
 
-    return new Promise<BridgeCallResult>((resolve) => {
+    return withToolTiming(requestId, entry => console.log(`[pi-orb] timing ${JSON.stringify(entry)}`), () => timeToolPhase("bridge-roundtrip", () => new Promise<BridgeCallResult>((resolve) => {
       let settled = false;
       const finish = (value: BridgeCallResult) => {
         if (settled) return;
@@ -172,6 +175,6 @@ readToken(): BridgeTokenFile | null {
           message: `The Orb shell is not reachable on its bridge: ${(error as NodeJS.ErrnoException).code ?? error.message}`,
         });
       });
-    });
+    })));
   }
 }

@@ -1,3 +1,4 @@
+import { timeToolSync } from "@shared/tool-timing";
 /**
  * Windows desktop capture (GDI) and HID input (`SendInput`).
  * Observation bounds, capture, and pointer input share physical pixels.
@@ -369,7 +370,8 @@ export function createWindowsDesktopBackend(ops?: WindowsDesktopOps): DesktopBac
     async capture(screen, signal): Promise<CapturedScreen> {
       signal?.throwIfAborted()
       try {
-        const data = (await use()).capturePng(screen.bounds)
+        const host = await use()
+        const data = timeToolSync("capture-and-png", () => host.capturePng(screen.bounds))
         return { data, mediaType: 'image/png' }
       } catch (error: unknown) {
         if (error instanceof Error && error.message.startsWith('computer-use:')) throw error

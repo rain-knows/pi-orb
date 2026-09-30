@@ -1,3 +1,4 @@
+import { timeToolPhase, timeToolSync, logToolMetric } from "@shared/tool-timing";
 import type {
   DesktopAction,
   DesktopObservation,
@@ -89,7 +90,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
   }
 
   listWindows(): ReferenceWindowInfo[] {
-    const snapshot = this.#options.ops.listWindows();
+    const snapshot = timeToolSync("window-enumeration", () => this.#options.ops.listWindows());
     return snapshot.windows
       .map((window, index) => ({
         windowId: window.hwnd,
@@ -116,7 +117,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
 
   /** Current topmost non-Orb window for the explicit screenshot preview. */
   captureTarget(): CaptureTarget | null {
-    const snapshot = this.#options.ops.listWindows();
+    const snapshot = timeToolSync("window-enumeration", () => this.#options.ops.listWindows());
     const ownIds = snapshot.windows.filter((window) => window.pid === this.#options.ownProcessId).map((window) => window.hwnd);
     const selected = selectWindowsObservation(snapshot, ownIds);
     const owner = snapshot.windows.find((window) => window.hwnd === selected?.windowId);
@@ -135,14 +136,14 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       const result = await this.#withGuiTurn(async () => {
         const target = this.#findForegroundTarget();
         if (!target) throw new Error("No application window is available to observe.");
-        const screens = await this.#options.backend.listScreens();
+        const screens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens());
         const screen = screens.find((candidate) => candidate.windowId === target.windowId) ?? screens[0];
         if (!screen || screen.windowId !== target.windowId) {
           throw new Error("The reference backend did not select the recorded target window.");
         }
-        const captured = await this.#options.backend.capture(screen);
+        const captured = await timeToolPhase("capture", () => this.#options.backend.capture(screen));
         const observation = this.#makeObservation(target, screen, captured, input.includeImage === true,
-          await this.#options.backend.inspectForeground());
+          await timeToolPhase("inspectForeground", () => this.#options.backend.inspectForeground()));
         this.#target = target;
         this.#screen = screen;
         this.#observation = observation;
@@ -173,42 +174,42 @@ export class ReferenceWindowsDriver implements DesktopDriver {
           throw new Error("The foreground window changed after the observation. Observe again before acting.");
         }
         if (action.kind === "click") {
-          await this.#options.backend.click({ screen, position: positionOf(action.position), button: action.button ?? "left", count: action.count ?? 1,
-            ...(action.modifiers ? { modifiers: action.modifiers } : {}) }, signal);
+          await timeToolPhase("native-input", () => this.#options.backend.click({ screen, position: positionOf(action.position), button: action.button ?? "left", count: action.count ?? 1,
+            ...(action.modifiers ? { modifiers: action.modifiers } : {}) }, signal));
         } else if (action.kind === "type") {
-          await this.#options.backend.typeText({ screen, position: positionOf(action.position), text: action.text, replace: action.replace ?? false, submit: action.submit ?? false }, signal);
+          await timeToolPhase("native-input", () => this.#options.backend.typeText({ screen, position: positionOf(action.position), text: action.text, replace: action.replace ?? false, submit: action.submit ?? false }, signal));
         } else if (action.kind === "hotkey") {
-          await this.#options.backend.hotkey({ keys: action.keys }, signal);
+          await timeToolPhase("native-input", () => this.#options.backend.hotkey({ keys: action.keys }, signal));
         } else if (action.kind === "longPress") {
-          await this.#options.backend.longPress({
+          await timeToolPhase("native-input", () => this.#options.backend.longPress({
             screen,
             position: positionOf(action.position),
             durationSeconds: action.durationSeconds,
-          }, signal);
+          }, signal));
         } else if (action.kind === "drag") {
-          await this.#options.backend.drag({
+          await timeToolPhase("native-input", () => this.#options.backend.drag({
             startScreen: screen,
             startPosition: positionOf(action.startPosition),
             endScreen: screen,
             endPosition: positionOf(action.endPosition),
-          }, signal);
+          }, signal));
         } else if (action.kind === "scroll") {
-          await this.#options.backend.scroll({
+          await timeToolPhase("native-input", () => this.#options.backend.scroll({
             screen,
             position: positionOf(action.position),
             direction: action.direction,
             scrollLevel: action.amount,
-          }, signal);
+          }, signal));
         }
-        if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await delay(POST_ACTION_WAIT_MS, abort);
+        if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await timeToolPhase("post-action-wait", () => delay(POST_ACTION_WAIT_MS, abort));
         const nextTarget = this.#findForegroundTarget();
         if (!nextTarget) throw new Error("No application window is available after the action.");
-        const nextScreens = await this.#options.backend.listScreens(signal);
+        const nextScreens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens(signal));
         const nextScreen = nextScreens.find((candidate) => candidate.windowId === nextTarget.windowId);
         if (!nextScreen) throw new Error("The new application window could not be observed.");
-        const captured = await this.#options.backend.capture(nextScreen, signal);
+        const captured = await timeToolPhase("capture", () => this.#options.backend.capture(nextScreen, signal));
         const nextObservation = this.#makeObservation(nextTarget, nextScreen, captured, true,
-          await this.#options.backend.inspectForeground(signal));
+          await timeToolPhase("inspectForeground", () => this.#options.backend.inspectForeground(signal)));
         this.#target = nextTarget;
         this.#screen = nextScreen;
         this.#observation = nextObservation;
@@ -244,11 +245,12 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     let image: ScreenshotImage | undefined;
     if (includeImage) {
       image = {
-        data: Buffer.from(captured.data).toString("base64"),
+        data: timeToolSync("base64", () => Buffer.from(captured.data).toString("base64")),
         mimeType: captured.mediaType,
         width: Math.round(screen.bounds.width),
         height: Math.round(screen.bounds.height),
       };
+      logToolMetric("image", { bytes: captured.data.byteLength, width: image.width, height: image.height });
       const validation = validateCapture(image);
       if (!validation.ok) throw new Error(validation.message);
     }
@@ -319,20 +321,20 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         // Match the reference tool's post-action settle before inspecting and recapturing the
         // newly activated application. Without this delay a slow window manager can return the
         // previous foreground surface as the "fresh" observation.
-        await delay(POST_ACTION_WAIT_MS, abort);
+        await timeToolPhase("post-action-wait", () => delay(POST_ACTION_WAIT_MS, abort));
         const foreground = this.#findForegroundTarget();
         if (!foreground || !sameApp(foreground.appName, match)) {
           throw new Error(
             `"${requested}" did not become the foreground window, so the target was left unchanged.`,
           );
         }
-        const screens = await this.#options.backend.listScreens(abort);
+        const screens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens(abort));
         const screen = screens.find((candidate) => candidate.windowId === foreground.windowId);
         if (!screen) throw new Error(`No observation surface is available for "${requested}".`);
-        const captured = await this.#options.backend.capture(screen, abort);
+        const captured = await timeToolPhase("capture", () => this.#options.backend.capture(screen, abort));
         abort.throwIfAborted();
         const next = this.#makeObservation(foreground, screen, captured, true,
-          await this.#options.backend.inspectForeground(abort));
+          await timeToolPhase("inspectForeground", () => this.#options.backend.inspectForeground(abort)));
         this.#target = foreground;
         this.#screen = screen;
         this.#observation = next;
@@ -355,7 +357,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
 
   /** Select the reference backend's frontmost operable window, excluding Orb chrome. */
   #findForegroundTarget(): TargetWindow | null {
-    const snapshot = this.#options.ops.listWindows();
+    const snapshot = timeToolSync("window-enumeration", () => this.#options.ops.listWindows());
     const ownIds = snapshot.windows.filter((window) => window.pid === this.#options.ownProcessId).map((window) => window.hwnd);
     const selected = selectWindowsObservation(snapshot, ownIds);
     if (!selected) return null;
@@ -380,7 +382,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
 
   #withGuiTurn<T>(run: () => Promise<T>): Promise<T> {
     const withExcludedOrb = () => {
-      const ownIds = this.#options.ops.listWindows().windows
+      const ownIds = timeToolSync("window-enumeration", () => this.#options.ops.listWindows()).windows
         .filter((window) => window.pid === this.#options.ownProcessId)
         .map((window) => window.hwnd);
       return runWithCaptureExcludeWindowIds(ownIds, run);

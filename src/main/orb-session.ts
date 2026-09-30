@@ -21,6 +21,7 @@ export interface OrbSessionDeps {
   readonly client: PiWebClient;
   readonly emit: (event: OrbSessionEvent) => void;
   readonly now?: () => number;
+  readonly log?: (entry: Record<string, unknown>) => void;
 }
 
 interface AssistantAccumulator {
@@ -42,6 +43,8 @@ export class OrbSessionController {
   #accumulator: AssistantAccumulator | null = null;
   #pendingQuestionId: string | null = null;
   #promptQueue: QueuedPrompt[] = [];
+  #modelInterval = 0;
+  #toolStarts = new Map<string, number>();
   #creating: { workspace: string; promise: Promise<string> } | null = null;
   constructor(deps: OrbSessionDeps) {
     this.#deps = deps;
@@ -233,6 +236,7 @@ export class OrbSessionController {
     try {
       await this.#subscribe(sessionId);
       this.#accumulator = { text: "" };
+      this.#modelInterval = performance.now();
       this.#deps.emit({ type: "turn-start" });
       await this.#deps.client.prompt(sessionId, next.text, next.images, this.#workspace ?? undefined);
     } catch (error) {
@@ -285,6 +289,16 @@ export class OrbSessionController {
         const name = typeof record.toolName === "string" ? record.toolName : "";
         if (!id || !name) return;
         const phase = type === "tool_execution_start" ? "start" : "end";
+        if (phase === "start") {
+          if (this.#modelInterval) this.#deps.log?.({ event: "model-response-interval", durationMs: performance.now() - this.#modelInterval });
+          this.#modelInterval = 0;
+          this.#toolStarts.set(id, performance.now());
+        } else {
+          const start = this.#toolStarts.get(id);
+          if (start !== undefined) this.#deps.log?.({ event: "tool-through-sse", toolCallId: id, durationMs: performance.now() - start });
+          this.#toolStarts.delete(id);
+          this.#modelInterval = performance.now();
+        }
         this.#deps.emit({
           type: "tool",
           phase,

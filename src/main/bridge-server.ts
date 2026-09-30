@@ -12,7 +12,8 @@
  */
 
 import { createServer, type Server } from "node:net";
-import { randomBytes } from "node:crypto";
+import { withToolTiming, timeToolPhase } from "@shared/tool-timing";
+import { randomUUID, randomBytes } from "node:crypto";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -94,7 +95,8 @@ export class BridgeServer {
           }
           const frame = buffer.slice(0, newline);
           buffer = buffer.slice(newline + 1);
-          void this.#handle(frame).then((response) => {
+          const requestId = (() => { try { return JSON.parse(frame).requestId ?? randomUUID(); } catch { return randomUUID(); } })();
+          void withToolTiming(requestId, entry => this.#log(entry), () => timeToolPhase("executor-total", () => this.#handle(frame))).then((response) => {
             socket.end(`${JSON.stringify(response)}\n`);
           });
         });

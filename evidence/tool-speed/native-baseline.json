@@ -1,0 +1,5246 @@
+{
+  "at": "2026-09-30T13:40:38.328Z",
+  "method": "direct production native adapter; excludes Orb overlay, Pi, bridge and model; no pixels persisted",
+  "model": null,
+  "thinkingLevel": null,
+  "stats": {
+    "cold-observe": {
+      "n": 1,
+      "p50": 104.95609999999999,
+      "p95": 104.95609999999999
+    },
+    "click": {
+      "n": 10,
+      "p50": 844.6494000000021,
+      "p95": 883.5396000000001
+    },
+    "type": {
+      "n": 10,
+      "p50": 1077.6335,
+      "p95": 1103.6362000000008
+    },
+    "hotkey": {
+      "n": 10,
+      "p50": 727.7288999999982,
+      "p95": 745.3047000000006
+    },
+    "three-controls": {
+      "n": 10,
+      "p50": 2544.409599999999,
+      "p95": 2598.6328000000067
+    },
+    "warm-observe": {
+      "n": 20,
+      "p50": 73.28220000000147,
+      "p95": 98.06180000000313
+    }
+  },
+  "samples": {
+    "cold-observe": [
+      104.95609999999999
+    ],
+    "click": [
+      843.4848999999999,
+      850.5078999999996,
+      842.2817999999988,
+      843.1866999999984,
+      844.6494000000021,
+      883.5396000000001,
+      849.9190000000017,
+      862.8076000000001,
+      871.2153000000035,
+      840.238599999997
+    ],
+    "type": [
+      1077.6335,
+      1054.6798000000008,
+      1066.4135000000006,
+      1066.1900999999998,
+      1100.4663,
+      1084.0827999999965,
+      1088.4213000000018,
+      1103.6362000000008,
+      1067.2486999999965,
+      1083.3174
+    ],
+    "hotkey": [
+      718.3712999999998,
+      723.3269000000009,
+      734.0949999999993,
+      734.6419999999998,
+      727.7288999999982,
+      735.1274000000012,
+      743.0336000000025,
+      745.3047000000006,
+      726.3171000000002,
+      719.1085000000021
+    ],
+    "three-controls": [
+      2527.4102,
+      2576.1134999999995,
+      2556.3129999999983,
+      2527.750400000001,
+      2595.3801999999996,
+      2544.409599999999,
+      2570.320400000004,
+      2598.6328000000067,
+      2533.895900000003,
+      2519.1595000000016
+    ],
+    "warm-observe": [
+      76.71579999999813,
+      69.32800000000134,
+      65.06760000000213,
+      70.57579999999871,
+      71.47019999999611,
+      67.03889999999956,
+      67.54920000000129,
+      73.28220000000147,
+      77.77150000000256,
+      84.21259999999893,
+      100.75019999999495,
+      79.56200000000536,
+      82.65720000000147,
+      66.37920000000304,
+      73.33170000000246,
+      73.33980000000156,
+      65.23430000000371,
+      76.79099999999744,
+      70.92319999999745,
+      98.06180000000313
+    ]
+  },
+  "records": [
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "window-enumeration",
+      "durationMs": 17.33140000000003
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "window-enumeration",
+      "durationMs": 14.818599999999947
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "listScreens",
+      "durationMs": 14.157699999999977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "capture-and-png",
+      "durationMs": 44.443700000000035
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "capture",
+      "durationMs": 44.53219999999999
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "inspectForeground",
+      "durationMs": 12.256199999999922
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "base64",
+      "durationMs": 0.07169999999996435
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "cold-observe-0",
+      "phase": "image",
+      "bytes": 23663,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "window-enumeration",
+      "durationMs": 10.158699999999953
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "window-enumeration",
+      "durationMs": 14.172800000000052
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "native-input",
+      "durationMs": 145.0317
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "post-action-wait",
+      "durationMs": 606.7444
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "window-enumeration",
+      "durationMs": 10.414599999999837
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "listScreens",
+      "durationMs": 7.903300000000172
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "capture-and-png",
+      "durationMs": 35.09680000000003
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "capture",
+      "durationMs": 35.118400000000065
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "inspectForeground",
+      "durationMs": 13.003500000000031
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "base64",
+      "durationMs": 0.05960000000004584
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-8",
+      "phase": "image",
+      "bytes": 23366,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "window-enumeration",
+      "durationMs": 9.355299999999943
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "window-enumeration",
+      "durationMs": 8.737699999999904
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "native-input",
+      "durationMs": 383.84640000000013
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "post-action-wait",
+      "durationMs": 606.9825999999998
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "window-enumeration",
+      "durationMs": 9.975500000000011
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "listScreens",
+      "durationMs": 9.739799999999832
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "capture-and-png",
+      "durationMs": 36.1242000000002
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "capture",
+      "durationMs": 36.15220000000045
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "inspectForeground",
+      "durationMs": 12.266300000000228
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "base64",
+      "durationMs": 0.11560000000008586
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-19",
+      "phase": "image",
+      "bytes": 23593,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "window-enumeration",
+      "durationMs": 9.374299999999948
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "window-enumeration",
+      "durationMs": 12.884199999999964
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "native-input",
+      "durationMs": 25.94280000000026
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "post-action-wait",
+      "durationMs": 602.7714999999998
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "window-enumeration",
+      "durationMs": 10.41359999999986
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "listScreens",
+      "durationMs": 9.038900000000012
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "capture-and-png",
+      "durationMs": 36.97569999999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "capture",
+      "durationMs": 36.99389999999994
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "inspectForeground",
+      "durationMs": 10.403299999999945
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "base64",
+      "durationMs": 0.08510000000023865
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-30",
+      "phase": "image",
+      "bytes": 22797,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 15.221400000000358
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 10.385299999999916
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "native-input",
+      "durationMs": 144.61499999999978
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "post-action-wait",
+      "durationMs": 614.2550999999999
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 11.689300000000003
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "listScreens",
+      "durationMs": 11.736499999999978
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "capture-and-png",
+      "durationMs": 27.82170000000042
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "capture",
+      "durationMs": 27.842099999999846
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "inspectForeground",
+      "durationMs": 11.034999999999854
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "base64",
+      "durationMs": 0.049500000000080036
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "image",
+      "bytes": 22981,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 8.1871000000001
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 8.500700000000506
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "native-input",
+      "durationMs": 140.08919999999944
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "post-action-wait",
+      "durationMs": 605.5672000000004
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 12.598899999999958
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "listScreens",
+      "durationMs": 9.442700000000514
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "capture-and-png",
+      "durationMs": 33.966699999999946
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "capture",
+      "durationMs": 33.99380000000019
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "inspectForeground",
+      "durationMs": 10.040099999999256
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "base64",
+      "durationMs": 0.03719999999975698
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "image",
+      "bytes": 22628,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 9.689000000000306
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 8.190099999999802
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "native-input",
+      "durationMs": 157.8134
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "post-action-wait",
+      "durationMs": 611.8377
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "window-enumeration",
+      "durationMs": 11.665899999999965
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "listScreens",
+      "durationMs": 8.30749999999989
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "capture-and-png",
+      "durationMs": 31.98320000000058
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "capture",
+      "durationMs": 31.995100000000093
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "inspectForeground",
+      "durationMs": 11.242400000000089
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "base64",
+      "durationMs": 0.058299999999690044
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-41",
+      "phase": "image",
+      "bytes": 22329,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "window-enumeration",
+      "durationMs": 11.226599999999962
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "window-enumeration",
+      "durationMs": 9.21270000000004
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "native-input",
+      "durationMs": 149.52649999999994
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "post-action-wait",
+      "durationMs": 602.2415999999994
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "window-enumeration",
+      "durationMs": 12.760599999999613
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "listScreens",
+      "durationMs": 13.531799999999748
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "capture-and-png",
+      "durationMs": 36.378200000000106
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "capture",
+      "durationMs": 36.401599999999235
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "inspectForeground",
+      "durationMs": 15.080200000000332
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "base64",
+      "durationMs": 0.04510000000027503
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-74",
+      "phase": "image",
+      "bytes": 22377,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "window-enumeration",
+      "durationMs": 9.35319999999956
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "window-enumeration",
+      "durationMs": 9.274999999999636
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "native-input",
+      "durationMs": 354.48139999999967
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "post-action-wait",
+      "durationMs": 605.1593999999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "window-enumeration",
+      "durationMs": 11.92029999999977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "listScreens",
+      "durationMs": 12.92319999999927
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "capture-and-png",
+      "durationMs": 40.284599999999955
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "capture",
+      "durationMs": 40.300999999999476
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "inspectForeground",
+      "durationMs": 10.756899999999405
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "base64",
+      "durationMs": 0.04960000000028231
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-85",
+      "phase": "image",
+      "bytes": 22962,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "window-enumeration",
+      "durationMs": 9.972600000000057
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "window-enumeration",
+      "durationMs": 9.34900000000016
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "native-input",
+      "durationMs": 30.381800000000112
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "post-action-wait",
+      "durationMs": 607.0467000000008
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "window-enumeration",
+      "durationMs": 11.59020000000055
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "listScreens",
+      "durationMs": 8.69629999999961
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "capture-and-png",
+      "durationMs": 33.60859999999957
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "capture",
+      "durationMs": 33.63169999999991
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "inspectForeground",
+      "durationMs": 12.026499999999942
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "base64",
+      "durationMs": 0.09000000000014552
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-96",
+      "phase": "image",
+      "bytes": 22168,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 10.774499999999534
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 9.350300000000061
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "native-input",
+      "durationMs": 148.78000000000065
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "post-action-wait",
+      "durationMs": 613.2852999999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 9.41569999999956
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "listScreens",
+      "durationMs": 10.016500000001543
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "capture-and-png",
+      "durationMs": 37.50770000000011
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "capture",
+      "durationMs": 37.52219999999943
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "inspectForeground",
+      "durationMs": 10.355599999998958
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "base64",
+      "durationMs": 0.02719999999862921
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "image",
+      "bytes": 21952,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 12.065499999998792
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 8.813799999999901
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "native-input",
+      "durationMs": 155.00610000000052
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "post-action-wait",
+      "durationMs": 614.393
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 12.115300000001298
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "listScreens",
+      "durationMs": 9.813799999999901
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "capture-and-png",
+      "durationMs": 34.31549999999879
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "capture",
+      "durationMs": 34.32639999999992
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "inspectForeground",
+      "durationMs": 9.889499999999316
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "base64",
+      "durationMs": 0.028800000000046566
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "image",
+      "bytes": 22210,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 9.374399999998786
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 10.673899999999776
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "native-input",
+      "durationMs": 149.28499999999985
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "post-action-wait",
+      "durationMs": 608.0316999999995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "window-enumeration",
+      "durationMs": 17.04570000000058
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "listScreens",
+      "durationMs": 16.19130000000041
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "capture-and-png",
+      "durationMs": 40.55589999999938
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "capture",
+      "durationMs": 40.598799999999756
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "inspectForeground",
+      "durationMs": 17.567399999999907
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "base64",
+      "durationMs": 0.08820000000014261
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-107",
+      "phase": "image",
+      "bytes": 22455,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "window-enumeration",
+      "durationMs": 18.509000000000015
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "window-enumeration",
+      "durationMs": 12.237300000000687
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "native-input",
+      "durationMs": 134.6748000000007
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "post-action-wait",
+      "durationMs": 604.4938000000002
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "window-enumeration",
+      "durationMs": 11.204800000001342
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "listScreens",
+      "durationMs": 11.576900000000023
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "capture-and-png",
+      "durationMs": 35.13810000000012
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "capture",
+      "durationMs": 35.150800000001254
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "inspectForeground",
+      "durationMs": 13.895299999998315
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "base64",
+      "durationMs": 0.049700000001394073
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-140",
+      "phase": "image",
+      "bytes": 22533,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "window-enumeration",
+      "durationMs": 10.61739999999918
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "window-enumeration",
+      "durationMs": 10.21639999999934
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "native-input",
+      "durationMs": 366.2983999999997
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "post-action-wait",
+      "durationMs": 599.7051999999985
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "window-enumeration",
+      "durationMs": 12.952299999999013
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "listScreens",
+      "durationMs": 15.380600000000413
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "capture-and-png",
+      "durationMs": 38.14689999999973
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "capture",
+      "durationMs": 38.17439999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "inspectForeground",
+      "durationMs": 12.388499999999112
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "base64",
+      "durationMs": 0.09090000000105647
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-151",
+      "phase": "image",
+      "bytes": 23577,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "window-enumeration",
+      "durationMs": 9.460300000000643
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "window-enumeration",
+      "durationMs": 10.752800000000207
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "native-input",
+      "durationMs": 35.85349999999926
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "post-action-wait",
+      "durationMs": 607.0798999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "window-enumeration",
+      "durationMs": 13.369500000000698
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "listScreens",
+      "durationMs": 12.273599999998623
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "capture-and-png",
+      "durationMs": 33.06680000000051
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "capture",
+      "durationMs": 33.08719999999994
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "inspectForeground",
+      "durationMs": 11.705500000000029
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "base64",
+      "durationMs": 0.06179999999949359
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-162",
+      "phase": "image",
+      "bytes": 22797,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 10.756900000000314
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 13.775300000001153
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "native-input",
+      "durationMs": 154.7554
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "post-action-wait",
+      "durationMs": 614.3706999999995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 13.548099999999977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "listScreens",
+      "durationMs": 15.962400000000343
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "capture-and-png",
+      "durationMs": 36.60059999999976
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "capture",
+      "durationMs": 36.620600000000195
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "inspectForeground",
+      "durationMs": 16.88010000000031
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "base64",
+      "durationMs": 0.05670000000100117
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "image",
+      "bytes": 22793,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 16.509000000000015
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 15.148799999999028
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "native-input",
+      "durationMs": 145.83380000000034
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "post-action-wait",
+      "durationMs": 607.9471999999987
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 9.929000000000087
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "listScreens",
+      "durationMs": 8.912399999999252
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "capture-and-png",
+      "durationMs": 30.379699999999502
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "capture",
+      "durationMs": 30.394599999999627
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "inspectForeground",
+      "durationMs": 14.27889999999934
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "base64",
+      "durationMs": 0.04019999999945867
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "image",
+      "bytes": 22856,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 10.07300000000032
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 7.7862999999997555
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "native-input",
+      "durationMs": 141.94360000000052
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "post-action-wait",
+      "durationMs": 608.5620000000017
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "window-enumeration",
+      "durationMs": 10.221600000000763
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "listScreens",
+      "durationMs": 8.244000000002416
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "capture-and-png",
+      "durationMs": 31.804299999999785
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "capture",
+      "durationMs": 31.815699999999197
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "inspectForeground",
+      "durationMs": 10.444299999999203
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "base64",
+      "durationMs": 0.06550000000061118
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-173",
+      "phase": "image",
+      "bytes": 22913,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "window-enumeration",
+      "durationMs": 8.70720000000074
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "window-enumeration",
+      "durationMs": 12.581100000003062
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "native-input",
+      "durationMs": 150.2726999999977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "post-action-wait",
+      "durationMs": 603.9760999999999
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "window-enumeration",
+      "durationMs": 10.921200000000681
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "listScreens",
+      "durationMs": 10.73240000000078
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "capture-and-png",
+      "durationMs": 31.985199999999168
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "capture",
+      "durationMs": 32.00790000000052
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "inspectForeground",
+      "durationMs": 13.588400000000547
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "base64",
+      "durationMs": 0.03800000000046566
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-206",
+      "phase": "image",
+      "bytes": 22725,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "window-enumeration",
+      "durationMs": 9.457699999999022
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "window-enumeration",
+      "durationMs": 11.316200000001118
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "native-input",
+      "durationMs": 375.27679999999964
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "post-action-wait",
+      "durationMs": 606.2193000000007
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "window-enumeration",
+      "durationMs": 10.042100000002392
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "listScreens",
+      "durationMs": 8.77299999999741
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "capture-and-png",
+      "durationMs": 32.18549999999959
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "capture",
+      "durationMs": 32.20679999999993
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "inspectForeground",
+      "durationMs": 12.428099999997357
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "base64",
+      "durationMs": 0.042400000002089655
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-217",
+      "phase": "image",
+      "bytes": 23690,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "window-enumeration",
+      "durationMs": 13.449799999998504
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "window-enumeration",
+      "durationMs": 10.181300000000192
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "native-input",
+      "durationMs": 30.432300000000396
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "post-action-wait",
+      "durationMs": 615.0947999999989
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "window-enumeration",
+      "durationMs": 10.165000000000873
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "listScreens",
+      "durationMs": 11.19720000000234
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "capture-and-png",
+      "durationMs": 33.6391999999978
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "capture",
+      "durationMs": 33.65480000000025
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "inspectForeground",
+      "durationMs": 9.992699999998877
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "base64",
+      "durationMs": 0.04099999999743886
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-228",
+      "phase": "image",
+      "bytes": 22912,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 10.684499999999389
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 15.352900000001682
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "native-input",
+      "durationMs": 150.00179999999818
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "post-action-wait",
+      "durationMs": 604.6994999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 14.441999999999098
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "listScreens",
+      "durationMs": 11.072299999999814
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "capture-and-png",
+      "durationMs": 32.834100000000035
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "capture",
+      "durationMs": 32.84569999999803
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "inspectForeground",
+      "durationMs": 9.79109999999855
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "base64",
+      "durationMs": 0.03960000000006403
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "image",
+      "bytes": 23088,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 13.190299999998388
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 8.653600000001461
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "native-input",
+      "durationMs": 151.59569999999803
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "post-action-wait",
+      "durationMs": 603.0069000000003
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 10.367200000000594
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "listScreens",
+      "durationMs": 8.40190000000075
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "capture-and-png",
+      "durationMs": 37.98939999999857
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "capture",
+      "durationMs": 38.00699999999779
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "inspectForeground",
+      "durationMs": 16.656699999999546
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "base64",
+      "durationMs": 0.08770000000004075
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "image",
+      "bytes": 22895,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 12.672099999999773
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 11.57839999999851
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "native-input",
+      "durationMs": 136.80279999999766
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "post-action-wait",
+      "durationMs": 605.3081999999995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "window-enumeration",
+      "durationMs": 13.952700000001641
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "listScreens",
+      "durationMs": 9.992500000000291
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "capture-and-png",
+      "durationMs": 27.47399999999834
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "capture",
+      "durationMs": 27.48530000000028
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "inspectForeground",
+      "durationMs": 9.59860000000117
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "base64",
+      "durationMs": 0.036400000000867294
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-239",
+      "phase": "image",
+      "bytes": 22724,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "window-enumeration",
+      "durationMs": 8.917199999999866
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "window-enumeration",
+      "durationMs": 9.322699999996985
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "native-input",
+      "durationMs": 154.6388999999981
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "post-action-wait",
+      "durationMs": 607.7456999999995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "window-enumeration",
+      "durationMs": 10.694499999997788
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "listScreens",
+      "durationMs": 8.084500000000844
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "capture-and-png",
+      "durationMs": 34.137399999999616
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "capture",
+      "durationMs": 34.148699999997916
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "inspectForeground",
+      "durationMs": 10.657899999998335
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "base64",
+      "durationMs": 0.03920000000289292
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-272",
+      "phase": "image",
+      "bytes": 22656,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "window-enumeration",
+      "durationMs": 17.329499999999825
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "window-enumeration",
+      "durationMs": 8.007499999999709
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "native-input",
+      "durationMs": 387.45700000000215
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "post-action-wait",
+      "durationMs": 612.2284
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "window-enumeration",
+      "durationMs": 10.139999999999418
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "listScreens",
+      "durationMs": 9.50630000000092
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "capture-and-png",
+      "durationMs": 39.86880000000019
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "capture",
+      "durationMs": 39.881900000000314
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "inspectForeground",
+      "durationMs": 15.373300000002928
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "base64",
+      "durationMs": 0.11730000000170548
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-283",
+      "phase": "image",
+      "bytes": 23352,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "window-enumeration",
+      "durationMs": 13.8862999999983
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "window-enumeration",
+      "durationMs": 12.103499999997439
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "native-input",
+      "durationMs": 27.2329000000027
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "post-action-wait",
+      "durationMs": 602.9834999999985
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "window-enumeration",
+      "durationMs": 9.651300000001356
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "listScreens",
+      "durationMs": 17.130400000001828
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "capture-and-png",
+      "durationMs": 34.37329999999929
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "capture",
+      "durationMs": 34.387299999998504
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "inspectForeground",
+      "durationMs": 9.812300000001414
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "base64",
+      "durationMs": 0.034899999998742715
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-294",
+      "phase": "image",
+      "bytes": 22553,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 10.496999999999389
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 9.90899999999965
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "native-input",
+      "durationMs": 144.54750000000058
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "post-action-wait",
+      "durationMs": 614.6191000000035
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 13.025499999999738
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "listScreens",
+      "durationMs": 9.171500000000378
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "capture-and-png",
+      "durationMs": 43.03310000000056
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "capture",
+      "durationMs": 43.064399999999296
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "inspectForeground",
+      "durationMs": 13.128799999998591
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "base64",
+      "durationMs": 0.04589999999734573
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "image",
+      "bytes": 22650,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 9.33679999999731
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 8.751699999997072
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "native-input",
+      "durationMs": 153.0456000000013
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "post-action-wait",
+      "durationMs": 617.2712000000029
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 11.67280000000028
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "listScreens",
+      "durationMs": 8.555499999998574
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "capture-and-png",
+      "durationMs": 35.63960000000225
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "capture",
+      "durationMs": 35.65200000000186
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "inspectForeground",
+      "durationMs": 12.052699999996548
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "base64",
+      "durationMs": 0.07519999999931315
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "image",
+      "bytes": 22735,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 12.716199999998935
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 16.829100000002654
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "native-input",
+      "durationMs": 160.2576999999983
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "post-action-wait",
+      "durationMs": 601.6733999999997
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "window-enumeration",
+      "durationMs": 15.101599999998143
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "listScreens",
+      "durationMs": 16.56039999999848
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "capture-and-png",
+      "durationMs": 45.008200000000215
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "capture",
+      "durationMs": 45.025799999999435
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "inspectForeground",
+      "durationMs": 11.24880000000121
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "base64",
+      "durationMs": 0.06829999999899883
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-305",
+      "phase": "image",
+      "bytes": 22837,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "window-enumeration",
+      "durationMs": 16.17659999999887
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "window-enumeration",
+      "durationMs": 13.707099999999627
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "native-input",
+      "durationMs": 162.81429999999818
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "post-action-wait",
+      "durationMs": 600.4367999999995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "window-enumeration",
+      "durationMs": 14.168000000001484
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "listScreens",
+      "durationMs": 14.131099999998696
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "capture-and-png",
+      "durationMs": 44.72270000000208
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "capture",
+      "durationMs": 44.748899999998685
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "inspectForeground",
+      "durationMs": 16.687300000001414
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "base64",
+      "durationMs": 0.17929999999978463
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-338",
+      "phase": "image",
+      "bytes": 22516,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "window-enumeration",
+      "durationMs": 14.045200000000477
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "window-enumeration",
+      "durationMs": 11.643899999999121
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "native-input",
+      "durationMs": 376.10179999999673
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "post-action-wait",
+      "durationMs": 604.5256000000008
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "window-enumeration",
+      "durationMs": 11.487199999999575
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "listScreens",
+      "durationMs": 10.84309999999823
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "capture-and-png",
+      "durationMs": 37.191100000000006
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "capture",
+      "durationMs": 37.20820000000094
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "inspectForeground",
+      "durationMs": 17.700600000000122
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "base64",
+      "durationMs": 0.05040000000008149
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-349",
+      "phase": "image",
+      "bytes": 23445,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "window-enumeration",
+      "durationMs": 12.23660000000018
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "window-enumeration",
+      "durationMs": 13.208600000001752
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "native-input",
+      "durationMs": 24.76379999999699
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "post-action-wait",
+      "durationMs": 606.4994999999981
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "window-enumeration",
+      "durationMs": 12.749299999999494
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "listScreens",
+      "durationMs": 12.26810000000114
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "capture-and-png",
+      "durationMs": 37.78780000000188
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "capture",
+      "durationMs": 37.81500000000233
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "inspectForeground",
+      "durationMs": 15.017199999998411
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "base64",
+      "durationMs": 0.06130000000121072
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-360",
+      "phase": "image",
+      "bytes": 22662,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 14.832099999999627
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 13.160299999999552
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "native-input",
+      "durationMs": 151.78170000000318
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "post-action-wait",
+      "durationMs": 600.8477999999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 13.128000000000611
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "listScreens",
+      "durationMs": 8.915499999999156
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "capture-and-png",
+      "durationMs": 34.940199999997276
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "capture",
+      "durationMs": 34.95899999999892
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "inspectForeground",
+      "durationMs": 12.791000000001077
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "base64",
+      "durationMs": 0.043000000001484295
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "image",
+      "bytes": 22806,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 9.302100000000792
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 8.098399999998946
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "native-input",
+      "durationMs": 160.59979999999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "post-action-wait",
+      "durationMs": 601.4177999999993
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 10.63799999999901
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "listScreens",
+      "durationMs": 9.581999999998516
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "capture-and-png",
+      "durationMs": 32.87699999999677
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "capture",
+      "durationMs": 32.89719999999943
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "inspectForeground",
+      "durationMs": 11.841899999999441
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "base64",
+      "durationMs": 0.040000000000873115
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "image",
+      "bytes": 22924,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 11.30319999999847
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 10.479899999998452
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "native-input",
+      "durationMs": 162.4877000000015
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "post-action-wait",
+      "durationMs": 600.2656999999999
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "window-enumeration",
+      "durationMs": 10.1179000000011
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "listScreens",
+      "durationMs": 8.215299999999843
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "capture-and-png",
+      "durationMs": 35.844199999999546
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "capture",
+      "durationMs": 35.853399999999965
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "inspectForeground",
+      "durationMs": 9.651300000001356
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "base64",
+      "durationMs": 0.05069999999977881
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-371",
+      "phase": "image",
+      "bytes": 23029,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "window-enumeration",
+      "durationMs": 9.080100000002858
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "window-enumeration",
+      "durationMs": 8.549399999999878
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "native-input",
+      "durationMs": 136.1322
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "post-action-wait",
+      "durationMs": 614.7977000000028
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "window-enumeration",
+      "durationMs": 12.214799999994284
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "listScreens",
+      "durationMs": 13.03020000000106
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "capture-and-png",
+      "durationMs": 37.800600000002305
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "capture",
+      "durationMs": 37.81970000000001
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "inspectForeground",
+      "durationMs": 17.822399999997288
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "base64",
+      "durationMs": 0.038800000002083834
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-404",
+      "phase": "image",
+      "bytes": 23138,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "window-enumeration",
+      "durationMs": 8.991900000000896
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "window-enumeration",
+      "durationMs": 10.417199999996228
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "native-input",
+      "durationMs": 383.62369999999646
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "post-action-wait",
+      "durationMs": 613.5346999999965
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "window-enumeration",
+      "durationMs": 17.567300000002433
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "listScreens",
+      "durationMs": 8.43250000000262
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "capture-and-png",
+      "durationMs": 35.36559999999736
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "capture",
+      "durationMs": 35.37640000000101
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "inspectForeground",
+      "durationMs": 10.093000000000757
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "base64",
+      "durationMs": 0.02779999999620486
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-415",
+      "phase": "image",
+      "bytes": 24164,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "window-enumeration",
+      "durationMs": 8.435000000004948
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "window-enumeration",
+      "durationMs": 8.038699999997334
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "native-input",
+      "durationMs": 40.07449999999517
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "post-action-wait",
+      "durationMs": 610.8769000000029
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "window-enumeration",
+      "durationMs": 12.440099999999802
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "listScreens",
+      "durationMs": 11.620799999996962
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "capture-and-png",
+      "durationMs": 36.52320000000327
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "capture",
+      "durationMs": 36.55129999999917
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "inspectForeground",
+      "durationMs": 14.667300000000978
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "base64",
+      "durationMs": 0.03179999999701977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-426",
+      "phase": "image",
+      "bytes": 23332,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 10.415600000000268
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 11.684699999997974
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "native-input",
+      "durationMs": 139.373599999999
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "post-action-wait",
+      "durationMs": 619.0828000000038
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 12.229700000003504
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "listScreens",
+      "durationMs": 9.406100000000151
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "capture-and-png",
+      "durationMs": 36.22889999999461
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "capture",
+      "durationMs": 36.24630000000616
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "inspectForeground",
+      "durationMs": 11.972099999999045
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "base64",
+      "durationMs": 0.07390000000305008
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "image",
+      "bytes": 23090,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 16.162100000001374
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 12.860399999997753
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "native-input",
+      "durationMs": 154.99659999999858
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "post-action-wait",
+      "durationMs": 599.4069999999992
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 13.047000000005937
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "listScreens",
+      "durationMs": 11.315300000002026
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "capture-and-png",
+      "durationMs": 37.054400000000896
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "capture",
+      "durationMs": 37.06840000000375
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "inspectForeground",
+      "durationMs": 13.385699999998906
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "base64",
+      "durationMs": 0.06079999999928987
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "image",
+      "bytes": 22932,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 13.579400000002352
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 15.238399999994726
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "native-input",
+      "durationMs": 148.42169999999896
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "post-action-wait",
+      "durationMs": 606.8332000000009
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "window-enumeration",
+      "durationMs": 12.707399999999325
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "listScreens",
+      "durationMs": 10.400099999998929
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "capture-and-png",
+      "durationMs": 34.0656999999992
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "capture",
+      "durationMs": 34.090400000000955
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "inspectForeground",
+      "durationMs": 19.064900000004855
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "base64",
+      "durationMs": 0.030899999997927807
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-437",
+      "phase": "image",
+      "bytes": 22776,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "window-enumeration",
+      "durationMs": 9.792499999995925
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "window-enumeration",
+      "durationMs": 12.686399999998685
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "native-input",
+      "durationMs": 143.4282000000021
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "post-action-wait",
+      "durationMs": 614.1563000000024
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "window-enumeration",
+      "durationMs": 12.776199999992969
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "listScreens",
+      "durationMs": 13.096400000002177
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "capture-and-png",
+      "durationMs": 42.91339999999764
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "capture",
+      "durationMs": 42.9288000000015
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "inspectForeground",
+      "durationMs": 13.434800000002724
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "base64",
+      "durationMs": 0.08460000000195578
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-470",
+      "phase": "image",
+      "bytes": 22852,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "window-enumeration",
+      "durationMs": 14.553599999999278
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "window-enumeration",
+      "durationMs": 16.310199999999895
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "native-input",
+      "durationMs": 387.60599999999977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "post-action-wait",
+      "durationMs": 612.3951000000015
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "window-enumeration",
+      "durationMs": 13.828800000002957
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "listScreens",
+      "durationMs": 12.92450000000099
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "capture-and-png",
+      "durationMs": 29.535500000005413
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "capture",
+      "durationMs": 29.56090000000404
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "inspectForeground",
+      "durationMs": 15.770400000001246
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "base64",
+      "durationMs": 0.10399999999935972
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-481",
+      "phase": "image",
+      "bytes": 23512,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "window-enumeration",
+      "durationMs": 15.173799999996845
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "window-enumeration",
+      "durationMs": 15.02230000000418
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "native-input",
+      "durationMs": 27.034999999996217
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "post-action-wait",
+      "durationMs": 603.4910000000018
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "window-enumeration",
+      "durationMs": 12.20060000000376
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "listScreens",
+      "durationMs": 16.201600000000326
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "capture-and-png",
+      "durationMs": 39.96010000000388
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "capture",
+      "durationMs": 39.98410000000149
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "inspectForeground",
+      "durationMs": 15.595499999995809
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "base64",
+      "durationMs": 0.05939999999827705
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-492",
+      "phase": "image",
+      "bytes": 22750,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 15.215799999998126
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 10.949000000000524
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "native-input",
+      "durationMs": 151.24149999999645
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "post-action-wait",
+      "durationMs": 606.7737999999954
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 9.41519999999582
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "listScreens",
+      "durationMs": 13.408100000000559
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "capture-and-png",
+      "durationMs": 41.36420000000362
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "capture",
+      "durationMs": 41.39630000000034
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "inspectForeground",
+      "durationMs": 15.304700000000594
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "base64",
+      "durationMs": 0.1499000000039814
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "image",
+      "bytes": 22800,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 17.51799999999639
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 15.713999999999942
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "native-input",
+      "durationMs": 146.7523000000001
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "post-action-wait",
+      "durationMs": 605.0966999999946
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 14.798799999996845
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "listScreens",
+      "durationMs": 16.37399999999616
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "capture-and-png",
+      "durationMs": 35.57189999999537
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "capture",
+      "durationMs": 35.59440000000177
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "inspectForeground",
+      "durationMs": 19.749000000003434
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "base64",
+      "durationMs": 0.1036999999996624
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "image",
+      "bytes": 23013,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 15.843000000000757
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 12.377000000000407
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "native-input",
+      "durationMs": 136.84829999999783
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "post-action-wait",
+      "durationMs": 614.9377000000022
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "window-enumeration",
+      "durationMs": 12.910400000000664
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "listScreens",
+      "durationMs": 12.357300000003306
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "capture-and-png",
+      "durationMs": 37.91630000000441
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "capture",
+      "durationMs": 37.93789999999717
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "inspectForeground",
+      "durationMs": 18.2471000000005
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "base64",
+      "durationMs": 0.04910000000381842
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-503",
+      "phase": "image",
+      "bytes": 23246,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "window-enumeration",
+      "durationMs": 12.656200000004901
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "window-enumeration",
+      "durationMs": 13.834199999997509
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "native-input",
+      "durationMs": 151.06520000000455
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "post-action-wait",
+      "durationMs": 616.3058999999994
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "window-enumeration",
+      "durationMs": 12.92269999999553
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "listScreens",
+      "durationMs": 14.340700000000652
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "capture-and-png",
+      "durationMs": 32.71149999999761
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "capture",
+      "durationMs": 32.728900000001886
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "inspectForeground",
+      "durationMs": 16.894099999997707
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "base64",
+      "durationMs": 0.041199999999662396
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-536",
+      "phase": "image",
+      "bytes": 23015,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "window-enumeration",
+      "durationMs": 15.768400000000838
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "window-enumeration",
+      "durationMs": 13.487199999995937
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "native-input",
+      "durationMs": 352.35379999999714
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "post-action-wait",
+      "durationMs": 603.6927999999971
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "window-enumeration",
+      "durationMs": 15.050799999997253
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "listScreens",
+      "durationMs": 15.10450000000128
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "capture-and-png",
+      "durationMs": 34.944500000005064
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "capture",
+      "durationMs": 34.95999999999913
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "inspectForeground",
+      "durationMs": 16.348600000004808
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "base64",
+      "durationMs": 0.03280000000086147
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-547",
+      "phase": "image",
+      "bytes": 24146,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "window-enumeration",
+      "durationMs": 13.0028999999995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "window-enumeration",
+      "durationMs": 8.909299999999348
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "native-input",
+      "durationMs": 24.502000000000407
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "post-action-wait",
+      "durationMs": 613.9594999999972
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "window-enumeration",
+      "durationMs": 12.093199999995704
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "listScreens",
+      "durationMs": 11.308499999999185
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "capture-and-png",
+      "durationMs": 29.45140000000538
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "capture",
+      "durationMs": 29.461999999999534
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "inspectForeground",
+      "durationMs": 12.650200000003679
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "base64",
+      "durationMs": 0.04989999999816064
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-558",
+      "phase": "image",
+      "bytes": 23330,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 12.841599999999744
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 10.238900000003923
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "native-input",
+      "durationMs": 154.2459000000017
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "post-action-wait",
+      "durationMs": 608.544799999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 10.730799999997544
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "listScreens",
+      "durationMs": 10.108899999999267
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "capture-and-png",
+      "durationMs": 34.52499999999418
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "capture",
+      "durationMs": 34.53719999999885
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "inspectForeground",
+      "durationMs": 11.013200000001234
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "base64",
+      "durationMs": 0.04069999999774154
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "image",
+      "bytes": 23534,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 8.210599999998522
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 10.663800000002084
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "native-input",
+      "durationMs": 148.73019999999815
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "post-action-wait",
+      "durationMs": 606.6952000000019
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 13.894200000002456
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "listScreens",
+      "durationMs": 9.796000000002095
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "capture-and-png",
+      "durationMs": 27.200900000003458
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "capture",
+      "durationMs": 27.21059999999852
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "inspectForeground",
+      "durationMs": 10.648699999997916
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "base64",
+      "durationMs": 0.02950000000419095
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "image",
+      "bytes": 23471,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 9.221599999997125
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 10.96639999999752
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "native-input",
+      "durationMs": 160.30750000000262
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "post-action-wait",
+      "durationMs": 600.424500000001
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "window-enumeration",
+      "durationMs": 12.594899999996414
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "listScreens",
+      "durationMs": 10.169300000001385
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "capture-and-png",
+      "durationMs": 30.822100000004866
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "capture",
+      "durationMs": 30.83179999999993
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "inspectForeground",
+      "durationMs": 10.110000000000582
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "base64",
+      "durationMs": 0.07409999999799766
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-569",
+      "phase": "image",
+      "bytes": 23430,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "window-enumeration",
+      "durationMs": 9.125899999999092
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "window-enumeration",
+      "durationMs": 8.514900000001944
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "native-input",
+      "durationMs": 150.06409999999596
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "post-action-wait",
+      "durationMs": 606.6830999999947
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "window-enumeration",
+      "durationMs": 10.635999999998603
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "listScreens",
+      "durationMs": 12.984400000001187
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "capture-and-png",
+      "durationMs": 28.888299999998708
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "capture",
+      "durationMs": 28.902499999996508
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "inspectForeground",
+      "durationMs": 12.915200000003097
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "base64",
+      "durationMs": 0.09270000000105938
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "click-602",
+      "phase": "image",
+      "bytes": 23357,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "window-enumeration",
+      "durationMs": 13.735500000002503
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "window-enumeration",
+      "durationMs": 10.394500000002154
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "native-input",
+      "durationMs": 387.2030999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "post-action-wait",
+      "durationMs": 607.1009999999951
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "window-enumeration",
+      "durationMs": 11.281699999999546
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "listScreens",
+      "durationMs": 11.109900000003108
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "capture-and-png",
+      "durationMs": 31.454100000002654
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "capture",
+      "durationMs": 31.463199999998324
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "inspectForeground",
+      "durationMs": 10.607600000003004
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "base64",
+      "durationMs": 0.04890000000159489
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "type-613",
+      "phase": "image",
+      "bytes": 24207,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "window-enumeration",
+      "durationMs": 10.071100000001024
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "window-enumeration",
+      "durationMs": 9.325799999998708
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "native-input",
+      "durationMs": 25.527000000001863
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "post-action-wait",
+      "durationMs": 604.787599999996
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "window-enumeration",
+      "durationMs": 10.891300000002957
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "listScreens",
+      "durationMs": 11.193400000003749
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "capture-and-png",
+      "durationMs": 32.42349999999715
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "capture",
+      "durationMs": 32.44230000000243
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "inspectForeground",
+      "durationMs": 14.472999999998137
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "base64",
+      "durationMs": 0.07690000000002328
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "hotkey-624",
+      "phase": "image",
+      "bytes": 23395,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 14.683599999996659
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 16.29649999999674
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "native-input",
+      "durationMs": 143.3130999999994
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "post-action-wait",
+      "durationMs": 607.2604999999967
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 13.532999999995809
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "listScreens",
+      "durationMs": 10.569400000000314
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "capture-and-png",
+      "durationMs": 40.39719999999943
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "capture",
+      "durationMs": 40.41019999999844
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "inspectForeground",
+      "durationMs": 11.940999999998894
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "base64",
+      "durationMs": 0.03350000000500586
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "image",
+      "bytes": 23494,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 11.894100000004983
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 10.747999999999593
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "native-input",
+      "durationMs": 142.33870000000024
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "post-action-wait",
+      "durationMs": 607.8846999999951
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 9.843800000002375
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "listScreens",
+      "durationMs": 9.139899999994668
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "capture-and-png",
+      "durationMs": 30.70509999999922
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "capture",
+      "durationMs": 30.72040000000561
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "inspectForeground",
+      "durationMs": 11.680299999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "base64",
+      "durationMs": 0.04869999999937136
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "image",
+      "bytes": 23631,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 10.045200000000477
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 12.034200000001874
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "native-input",
+      "durationMs": 140.6776000000027
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "post-action-wait",
+      "durationMs": 600.1308999999965
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "window-enumeration",
+      "durationMs": 14.27110000000539
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "listScreens",
+      "durationMs": 9.088000000003376
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "capture-and-png",
+      "durationMs": 29.84429999999702
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "capture",
+      "durationMs": 29.853399999999965
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "inspectForeground",
+      "durationMs": 9.596799999999348
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "base64",
+      "durationMs": 0.046000000002095476
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "three-controls-635",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "window-enumeration",
+      "durationMs": 13.480999999999767
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "window-enumeration",
+      "durationMs": 9.724499999996624
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "listScreens",
+      "durationMs": 8.183300000004238
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "capture-and-png",
+      "durationMs": 32.595399999998335
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "capture",
+      "durationMs": 32.60670000000391
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "inspectForeground",
+      "durationMs": 12.307200000002922
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "base64",
+      "durationMs": 0.058700000001408625
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-668",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "window-enumeration",
+      "durationMs": 12.179299999996147
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "window-enumeration",
+      "durationMs": 8.404799999996612
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "listScreens",
+      "durationMs": 9.129399999997986
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "capture-and-png",
+      "durationMs": 29.44680000000517
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "capture",
+      "durationMs": 29.459600000001956
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "inspectForeground",
+      "durationMs": 9.860099999998056
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "base64",
+      "durationMs": 0.024600000004284084
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-676",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "window-enumeration",
+      "durationMs": 8.953099999998813
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "window-enumeration",
+      "durationMs": 12.21020000000135
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "listScreens",
+      "durationMs": 8.52270000000135
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "capture-and-png",
+      "durationMs": 25.48229999999603
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "capture",
+      "durationMs": 25.493500000004133
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "inspectForeground",
+      "durationMs": 9.573700000000827
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "base64",
+      "durationMs": 0.053899999998975545
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-684",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "window-enumeration",
+      "durationMs": 8.709100000000035
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "window-enumeration",
+      "durationMs": 9.385400000006484
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "listScreens",
+      "durationMs": 10.306499999998778
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "capture-and-png",
+      "durationMs": 31.92840000000433
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "capture",
+      "durationMs": 31.93989999999758
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "inspectForeground",
+      "durationMs": 9.886999999995169
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "base64",
+      "durationMs": 0.03139999999984866
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-692",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "window-enumeration",
+      "durationMs": 9.17489999999816
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "window-enumeration",
+      "durationMs": 11.348900000004505
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "listScreens",
+      "durationMs": 13.239699999998265
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "capture-and-png",
+      "durationMs": 28.469399999994494
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "capture",
+      "durationMs": 28.481599999999162
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "inspectForeground",
+      "durationMs": 8.922199999993609
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "base64",
+      "durationMs": 0.0441999999966356
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-700",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "window-enumeration",
+      "durationMs": 7.617799999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "window-enumeration",
+      "durationMs": 9.165399999998044
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "listScreens",
+      "durationMs": 8.724600000001374
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "capture-and-png",
+      "durationMs": 31.34100000000035
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "capture",
+      "durationMs": 31.35109999999986
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "inspectForeground",
+      "durationMs": 9.9149000000034
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "base64",
+      "durationMs": 0.028500000000349246
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-708",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "window-enumeration",
+      "durationMs": 8.4375
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "window-enumeration",
+      "durationMs": 9.521999999997206
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "listScreens",
+      "durationMs": 12.560299999997369
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "capture-and-png",
+      "durationMs": 26.648300000000745
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "capture",
+      "durationMs": 26.66259999999602
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "inspectForeground",
+      "durationMs": 10.046800000003714
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "base64",
+      "durationMs": 0.029099999999743886
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-716",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "window-enumeration",
+      "durationMs": 8.466899999999441
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "window-enumeration",
+      "durationMs": 10.269500000002154
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "listScreens",
+      "durationMs": 8.994200000001001
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "capture-and-png",
+      "durationMs": 34.257299999997485
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "capture",
+      "durationMs": 34.276099999995495
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "inspectForeground",
+      "durationMs": 10.990700000002107
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "base64",
+      "durationMs": 0.03389999999490101
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-724",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "window-enumeration",
+      "durationMs": 10.228900000001886
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "window-enumeration",
+      "durationMs": 8.585699999995995
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "listScreens",
+      "durationMs": 9.410400000000664
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "capture-and-png",
+      "durationMs": 32.77919999999722
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "capture",
+      "durationMs": 32.79359999999724
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "inspectForeground",
+      "durationMs": 16.45850000000064
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "base64",
+      "durationMs": 0.0385999999998603
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-732",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "window-enumeration",
+      "durationMs": 9.730799999997544
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "window-enumeration",
+      "durationMs": 11.179199999998673
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "listScreens",
+      "durationMs": 12.419600000001083
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "capture-and-png",
+      "durationMs": 35.05079999999725
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "capture",
+      "durationMs": 35.0708999999988
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "inspectForeground",
+      "durationMs": 15.422200000000885
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "base64",
+      "durationMs": 0.04110000000218861
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-740",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "window-enumeration",
+      "durationMs": 13.15520000000106
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "window-enumeration",
+      "durationMs": 12.239000000001397
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "listScreens",
+      "durationMs": 13.789300000004005
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "capture-and-png",
+      "durationMs": 44.04780000000028
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "capture",
+      "durationMs": 44.07749999999942
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "inspectForeground",
+      "durationMs": 15.373399999996764
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "base64",
+      "durationMs": 1.75619999999617
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-748",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "window-enumeration",
+      "durationMs": 10.607899999995425
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "window-enumeration",
+      "durationMs": 11.72950000000128
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "listScreens",
+      "durationMs": 9.947399999997288
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "capture-and-png",
+      "durationMs": 34.89259999999922
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "capture",
+      "durationMs": 34.91620000000694
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "inspectForeground",
+      "durationMs": 11.995699999999488
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "base64",
+      "durationMs": 0.0650999999998021
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-756",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "window-enumeration",
+      "durationMs": 9.514999999999418
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "window-enumeration",
+      "durationMs": 9.723599999997532
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "listScreens",
+      "durationMs": 8.637099999999919
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "capture-and-png",
+      "durationMs": 40.426699999996345
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "capture",
+      "durationMs": 40.44489999999496
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "inspectForeground",
+      "durationMs": 14.021600000000035
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "base64",
+      "durationMs": 0.04080000000249129
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-764",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "window-enumeration",
+      "durationMs": 13.798099999999977
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "window-enumeration",
+      "durationMs": 11.740000000005239
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "listScreens",
+      "durationMs": 7.506099999998696
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "capture-and-png",
+      "durationMs": 23.95839999999589
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "capture",
+      "durationMs": 23.96639999999752
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "inspectForeground",
+      "durationMs": 9.075299999996787
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "base64",
+      "durationMs": 0.03680000000167638
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-772",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "window-enumeration",
+      "durationMs": 8.854900000005728
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "window-enumeration",
+      "durationMs": 9.375
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "listScreens",
+      "durationMs": 8.453699999998207
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "capture-and-png",
+      "durationMs": 35.96259999999893
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "capture",
+      "durationMs": 35.97759999999835
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "inspectForeground",
+      "durationMs": 10.402499999996508
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "base64",
+      "durationMs": 0.026799999999639113
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-780",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "window-enumeration",
+      "durationMs": 8.860000000000582
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "window-enumeration",
+      "durationMs": 13.767200000002049
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "listScreens",
+      "durationMs": 8.697599999999511
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "capture-and-png",
+      "durationMs": 32.05780000000232
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "capture",
+      "durationMs": 32.07310000000143
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "inspectForeground",
+      "durationMs": 9.654500000004191
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "base64",
+      "durationMs": 0.056300000003830064
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-788",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "window-enumeration",
+      "durationMs": 9.895999999993364
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "window-enumeration",
+      "durationMs": 8.573899999995774
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "listScreens",
+      "durationMs": 8.443700000003446
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "capture-and-png",
+      "durationMs": 28.431400000001304
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "capture",
+      "durationMs": 28.440100000007078
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "inspectForeground",
+      "durationMs": 9.641700000000128
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "base64",
+      "durationMs": 0.030899999997927807
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-796",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "window-enumeration",
+      "durationMs": 9.843300000000454
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "window-enumeration",
+      "durationMs": 8.946100000001024
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "listScreens",
+      "durationMs": 13.66649999999936
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "capture-and-png",
+      "durationMs": 31.899499999999534
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "capture",
+      "durationMs": 31.91320000000269
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "inspectForeground",
+      "durationMs": 12.084399999999732
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "base64",
+      "durationMs": 0.08370000000286382
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-804",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "window-enumeration",
+      "durationMs": 8.917900000000373
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "window-enumeration",
+      "durationMs": 9.17779999999766
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "listScreens",
+      "durationMs": 9.077299999997194
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "capture-and-png",
+      "durationMs": 30.167600000000675
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "capture",
+      "durationMs": 30.177999999999884
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "inspectForeground",
+      "durationMs": 13.238799999999173
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "base64",
+      "durationMs": 0.04809999999997672
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-812",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "window-enumeration",
+      "durationMs": 13.14770000000135
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "window-enumeration",
+      "durationMs": 12.103699999999662
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "listScreens",
+      "durationMs": 25.601699999999255
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "capture-and-png",
+      "durationMs": 37.056799999998475
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "capture",
+      "durationMs": 37.076200000003155
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "inspectForeground",
+      "durationMs": 9.758699999998498
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "base64",
+      "durationMs": 0.025800000003073364
+    },
+    {
+      "event": "tool-timing",
+      "requestId": "warm-observe-820",
+      "phase": "image",
+      "bytes": 23779,
+      "width": 957,
+      "height": 1266
+    }
+  ],
+  "passed": true
+}

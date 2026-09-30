@@ -1,5 +1,9 @@
 # Changelog
 
+## 工具速度阶段 1
+
+- 增加请求关联计时与独立原生基线，记录耗时和图片大小，不记录内容。证据见 `evidence/tool-speed/native-baseline.json`。
+
 All notable changes to pi-orb are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).

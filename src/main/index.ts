@@ -1375,6 +1375,7 @@ void app.whenReady().then(async () => {
   }
 
   session = new OrbSessionController({
+    log: entry => console.log(`[pi-orb] session timing ${JSON.stringify(entry)}`),
     client,
     emit: (event) => emit(event),
   });
