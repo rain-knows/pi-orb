@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-30T12:11:28.108Z",
+  "capturedAt": "2026-09-30T15:31:19.042Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790770288108",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790782279042",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": "pi-orb"
+      "detail": ""
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-23088",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/8297d30b-7d4e-4e51-a897-84a77379342b"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-43992",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/6ba5a45f-b7c3-4fca-9e40-754bdc13b76e"
 }

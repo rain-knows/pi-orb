@@ -28,6 +28,8 @@ export interface ReferenceWindowsDriverOptions {
   readonly backend: DesktopBackend;
   readonly ops: WindowsDesktopOps;
   readonly ownProcessId: number;
+  /** Evidence runner injection only; production omits this and uses the reference default. */
+  readonly postActionWaitMs?: number;
   /** Hide or cloak the Orb while the target is captured or receives HID input. */
   readonly withGuiTurn?: <T>(run: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
   /**
@@ -173,7 +175,12 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       const apps = action.kind === "listApps" ? [...await this.#options.backend.listApps(abort)] : undefined;
       const observationAfterAction = await this.#withGuiTurn(async () => {
         if (!this.#isCurrentForeground(target)) {
-          throw new Error("The foreground window changed after the observation. Observe again before acting.");
+          // No input has run. Return the new surface so a batch can stop with a current
+          // screenshot, including when the window changed between completed steps.
+          const fresh = await this.observe({ includeImage: true, signal });
+          const error = new Error("The foreground window changed after the observation. Observe again before acting.");
+          if (fresh.ok && fresh.observation) return { surfaceChanged: fresh.observation, error };
+          throw error;
         }
         if (action.kind === "click") {
           await timeToolPhase("native-input", () => this.#options.backend.click({ screen, position: positionOf(action.position), button: action.button ?? "left", count: action.count ?? 1,
@@ -203,7 +210,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
             scrollLevel: action.amount,
           }, signal));
         }
-        if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await timeToolPhase("post-action-wait", () => delay(POST_ACTION_WAIT_MS, abort));
+        if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await timeToolPhase("post-action-wait", () => delay(this.#options.postActionWaitMs ?? POST_ACTION_WAIT_MS, abort));
         const nextTarget = this.#findForegroundTarget();
         if (!nextTarget) throw new Error("No application window is available after the action.");
         const nextScreens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens(signal));
@@ -218,6 +225,8 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         return nextObservation;
       }, signal);
       abort.throwIfAborted();
+      if ("surfaceChanged" in observationAfterAction) return { ok: false, refused: true,
+        reason: "surface-changed", error: observationAfterAction.error.message, observation: observationAfterAction.surfaceChanged };
       return { ok: true, refused: false, error: null, observation: observationAfterAction, ...(apps ? { apps } : {}) };
     } catch (error) {
       return { ok: false, refused: false, error: message(error) };
@@ -324,7 +333,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         // Match the reference tool's post-action settle before inspecting and recapturing the
         // newly activated application. Without this delay a slow window manager can return the
         // previous foreground surface as the "fresh" observation.
-        await timeToolPhase("post-action-wait", () => delay(POST_ACTION_WAIT_MS, abort));
+        await timeToolPhase("post-action-wait", () => delay(this.#options.postActionWaitMs ?? POST_ACTION_WAIT_MS, abort));
         const foreground = this.#findForegroundTarget();
         if (!foreground || !sameApp(foreground.appName, match)) {
           throw new Error(
@@ -378,10 +387,21 @@ export class ReferenceWindowsDriver implements DesktopDriver {
 
   #isCurrentForeground(expected: TargetWindow): boolean {
     const foreground = this.#findForegroundTarget();
-    return foreground !== null &&
+    const matches = foreground !== null &&
       foreground.windowId === expected.windowId &&
       foreground.pid === expected.pid &&
-      foreground.title === expected.title;
+      foreground.title === expected.title &&
+      foreground.bounds.x === expected.bounds.x &&
+      foreground.bounds.y === expected.bounds.y &&
+      foreground.bounds.width === expected.bounds.width &&
+      foreground.bounds.height === expected.bounds.height;
+    if (!matches) logToolMetric("window-validation", { matched: 0, expectedWindow: expected.windowId,
+      currentWindow: foreground?.windowId ?? 0, expectedPid: expected.pid, currentPid: foreground?.pid ?? 0,
+      expectedX: expected.bounds.x, currentX: foreground?.bounds.x ?? 0,
+      expectedY: expected.bounds.y, currentY: foreground?.bounds.y ?? 0,
+      expectedWidth: expected.bounds.width, currentWidth: foreground?.bounds.width ?? 0,
+      expectedHeight: expected.bounds.height, currentHeight: foreground?.bounds.height ?? 0 });
+    return matches;
   }
 
   #withGuiTurn<T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T> {

@@ -77,7 +77,7 @@
 | **历史 Cua 拒绝结果解析**：驱动拒绝不能被适配器误报为成功 | 历史探针已验证；当前 broker/参考 backend 有独立拒绝合同 | `tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts` |
 | **按键/鼠标无残留** | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
 | **C6：真实 native 按下中途取消释放** | 已验证；disposable target 自身日志收到 `mouse-down=1`、匹配 `mouse-up=1`，取消错误也正确上报 | `evidence/p1-05/reference-cancel.json`（5/5） |
-| **Orb 工具仅限 Orb 模式**：普通会话无 Orb 工具、Orb 会话获得当前 11 个工具（含 `orb_open_app`、等待和应用列表） | 自动化条件注册已验证；当前 schema 数量需用真实 Pi Web provider 重新实测 | `pi-package/extensions/orb.ts`、`tests/orb-tools.test.ts` |
+| **Orb 工具仅限 Orb 模式**：普通会话无 Orb 工具、Orb 会话获得当前 12 个工具（含 `orb_batch`、`orb_open_app`、等待和应用列表） | 12 个工具条件注册和 sequential 声明已验证；真实模型调用批量与单步见 `evidence/tool-speed/` | `pi-package/extensions/orb.ts`、`tests/orb-tools.test.ts` |
 | **桌面工具闭环**：session Access、新鲜度、拒绝零副作用、真实点击落点为目标格心 | **已验证（当前 session Access backend）**；自动前台观察、Read Only/Workspace Write、点击、滚动、撤权均由 disposable 目标与壳日志证明 | `evidence/p1-06/loop-verification-session-access.json` |
 | 桥准入：无会话/错误令牌/浏览器来源/旧代次均被拒 | 已验证 | `evidence/p1-06/` + `tests/bridge-server.test.ts` |
 | Orb 扩展仅凭握手文件连接壳的命名管道：无需额外设置 `PI_ORB_BRIDGE_PIPE` | 已验证（隔离管道测试 + 当前壳只读探针） | `tests/bridge-client.test.ts`；2026-09-28 `hello.ok=true`，无效会话返回 `unknown-session` |
@@ -145,3 +145,5 @@
 | Pi 无条件加载用户级 `~/.agents/skills`，`HOME` 运行时解析 | 该目录存在时会进入**所有**会话（含普通 cwd）的 prompt；Orb 只能承诺“不主动改变它” |
 | npm 11 默认拦截依赖安装脚本 | `electron` 与 `esbuild` 需显式 `npm approve-scripts`；`electron` 二进制经 `ELECTRON_MIRROR` 下载 |
 | 工作站锁屏时无法前置任何窗口 | 反射式唤醒路径无法把目标窗口记为“用户正在看的窗口”，截图授权链在第一步断掉；此时产品报「recorded window was replaced」对用户是**误导**（真正原因是没有可前置的窗口）。真实模型类验收必须在解锁的交互式桌面下进行。见 `evidence/p1-06/README.md` §5.1 |
+
+工具速度优化的完整边界和实测结果见 [实施记录](./tool-speed-optimization.md)：生产等待保留 600ms；大控件真实模型对照通过，小控件取点失败保留，不宣称普遍成功率或提速比例。

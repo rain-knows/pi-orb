@@ -47,6 +47,52 @@ const click = (observationId: string): DesktopAction => ({ kind: "click", observ
 const openApp = (observationId: string): DesktopAction => ({ kind: "openApp", observationId, name: "Notepad" });
 
 describe("DesktopBroker session access", () => {
+  it("returns a new surface captured before a later step without treating that step as completed", async () => {
+    let current = observation();
+    let calls = 0;
+    const driver: DesktopDriver = {
+      get lastObservation() { return current; },
+      async observe() { return { ok: true, observation: current, error: null }; },
+      async act() {
+        current = observation(`next-${++calls}`, true);
+        if (calls === 2) return { ok: false, refused: true, reason: "surface-changed", error: "changed", observation: current };
+        return { ok: true, refused: false, error: null, observation: current };
+      },
+    };
+    const broker = new DesktopBroker({ driver, isLive: () => true });
+    broker.authorize({ sessionId: "sess", generation: 1, level: "full-access" });
+    await broker.observe("sess", 1);
+    const step = { kind: "click", position: { x: 500, y: 500 } };
+    expect(await broker.batch({ observationId: "obs-1", actions: [step, step, step] }, "sess", 1)).toMatchObject({
+      ok: false, reason: "surface-changed", completed: 1, finalObservationId: "next-2", observationUsable: true,
+      observation: { observationId: "next-2" }, steps: [{ observation: { observationId: "next-1" } }],
+    });
+    expect(calls).toBe(2);
+  });
+  it("preserves completed screenshots after a later failure, without replaying or executing remaining steps", async () => {
+    let current: DesktopObservation | null = observation();
+    let calls = 0;
+    const driver: DesktopDriver = {
+      get lastObservation() { return current; },
+      async observe() { return { ok: true, observation: current, error: null }; },
+      async act() {
+        if (++calls === 2) return { ok: false, refused: false, error: "native failure" };
+        current = observation("completed-1", true);
+        return { ok: true, refused: false, error: null, observation: current };
+      },
+      consumeObservation() { current = null; },
+    };
+    const broker = new DesktopBroker({ driver, isLive: () => true });
+    broker.authorize({ sessionId: "sess", generation: 1, level: "full-access" });
+    await broker.observe("sess", 1);
+    const step = { kind: "click", position: { x: 500, y: 500 } };
+    expect(await broker.batch({ observationId: "obs-1", actions: [step, step, step] }, "sess", 1)).toMatchObject({
+      ok: false, completed: 1, finalObservationId: "completed-1", observationUsable: false,
+      steps: [{ observation: { image: { data: "AQID" } } }],
+    });
+    expect(calls).toBe(2);
+    expect(await broker.act(click("completed-1"), "sess", 1)).toMatchObject({ ok: false });
+  });
   it("prevalidates every batch step, advances internal observations and refuses stale single actions", async () => {
     const { broker, actions } = createBroker();
     broker.authorize({sessionId:"sess",generation:1,level:"full-access"});const observed = await broker.observe("sess",1) as { observationId: string };

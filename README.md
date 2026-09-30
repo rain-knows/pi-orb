@@ -215,6 +215,10 @@ When that directory exists it reaches the prompt of **every** session, including
 normal non-Orb ones. pi-orb therefore promises that it does not actively change those
 prompts — it cannot promise the prompt content is byte-identical.
 
+## 工具调用速度
+
+新增 `orb_batch`，一次提交 2–8 个初始截图中可见且互相独立的动作；宿主串行执行，返回各步截图。模型请求保留最近三张 Orb 工具图片，聊天历史不改。生产等待维持 600ms。真实模型对照及小控件定位限制见 [实施记录](./doc/tool-speed-optimization.md)。
+
 ## Licensing
 
 pi-orb is MIT licensed (see [`LICENSE`](./LICENSE)).

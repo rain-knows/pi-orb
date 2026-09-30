@@ -55,6 +55,21 @@ function backendFake(calls: unknown[]) {
 }
 
 describe("ReferenceWindowsDriver", () => {
+  it("refuses input if the observed window moves or resizes before execution", async () => {
+    for (const field of ["x", "y", "width", "height"] as const) {
+      const { ops } = opsFake();
+      const original = ops.listWindows;
+      let changed = false;
+      ops.listWindows = () => ({ ...original(), windows: original().windows.map(window => window.hwnd === 42 && changed
+        ? { ...window, frame: { ...window.frame, [field]: window.frame[field] + 10 } } : window) });
+      const calls: unknown[] = [];
+      const driver = new ReferenceWindowsDriver({ ops, backend: backendFake(calls), ownProcessId: 1 });
+      const observed = (await driver.observe({})).observation!;
+      changed = true;
+      expect(await driver.act({ kind: "click", observationId: observed.observationId, position: { x: 500, y: 500 } }, observed)).toMatchObject({ ok: false });
+      expect(calls).toEqual([]);
+    }
+  });
   it("observes the foreground window without a renderer-selected target", async () => {
     const { ops, calls } = opsFake();
     const driver = new ReferenceWindowsDriver({

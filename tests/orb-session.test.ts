@@ -49,15 +49,35 @@ function fakeClient(): FakeClient {
 function setup() {
   const client = fakeClient();
   const events: OrbSessionEvent[] = [];
+  const logs: Record<string, unknown>[] = [];
   const controller = new OrbSessionController({
     client: client as unknown as PiWebClient,
     emit: (event) => events.push(event),
+    log: (entry) => logs.push(entry),
   });
   controller.beginGeneration(1);
-  return { client, controller, events };
+  return { client, controller, events, logs };
 }
 
 describe("OrbSessionController", () => {
+  it("projects batch progress and measures new responses without counting same-response tool gaps", async () => {
+    const { controller, client, events, logs } = setup();
+    await controller.ensureSession("C:\\orb");
+    await controller.prompt("batch");
+    const deliver = client.delivered[0]!;
+    deliver(assistantMessageStart());
+    deliver({ type: "tool_execution_start", toolName: "orb_batch", toolCallId: "one", args: {} });
+    deliver({ type: "tool_execution_update", toolName: "orb_batch", toolCallId: "one", partialResult: { content: [{ type: "text", text: "执行第 2/3 步" }] } });
+    expect(events.at(-1)).toMatchObject({ type: "tool", phase: "update", detail: "执行第 2/3 步" });
+    deliver({ type: "tool_execution_end", toolName: "orb_batch", toolCallId: "one", result: { details: { timing: { requestId: "request-1", extensionReturnedAt: 123 } } } });
+    expect(events.at(-1)).toMatchObject({ requestId: "request-1", extensionReturnedAt: 123 });
+    deliver({ type: "tool_execution_start", toolName: "orb_wait", toolCallId: "two", args: {} });
+    expect(logs.filter(l => l.event === "model-response-interval")).toHaveLength(1);
+    deliver({ type: "tool_execution_end", toolName: "orb_wait", toolCallId: "two" });
+    deliver(assistantMessageStart());
+    deliver(textDelta("done"));
+    expect(logs.filter(l => l.event === "model-response-interval")).toHaveLength(2);
+  });
   it("shares concurrent creation so startup and a prompt cannot bind different sessions", async () => {
     const { client, controller, events } = setup();
     const ids = await Promise.all([controller.ensureSession("C:\\orb"), controller.ensureSession("C:\\orb")]);

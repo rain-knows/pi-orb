@@ -309,11 +309,12 @@ D:\workself\pi-orb\
 
 ### 7.1 参考工具面与 pi-orb 现状
 
-参考项目注册 13 个工具（`<REF>/src/plugin.ts:278-1013`），pi-orb 当前注册 11 个
+参考项目注册 13 个工具（`<REF>/src/plugin.ts:278-1013`），pi-orb 当前注册 12 个
 （`pi-package/extensions/orb.ts`）。下表按“可复用程度”排序：
 
 | 参考工具 | 参考参数要点 | pi-orb 对应 | 差距与建议 |
 |---|---|---|---|
+| 独立动作批量策略 | `policy.ts:20-30`（没有独立 batch 工具） | `orb_batch`（2–8 步） | Pi 必需适配：初始观察编号、内部推进、逐步截图及进度；菜单依赖禁止合批 |
 | `click` | `screen_index`、`position [x,y]`、`button(left/right)`、`count(1\|2)`、`modifiers` | `orb_click`（position） | 已对齐按钮、次数和修饰键；Windows backend 在 finally 中释放修饰键 |
 | `input_text` | `screen_index`、`position`、`text`、`replace`、`submit` | `orb_type`（position） | 已对齐；删除隐式上次点击位置 |
 | `scroll` | `position`、`direction(up/down)`、`scroll_level` | `orb_scroll`（`direction`、`amount`） | 已收窄为参考的纵向滚动 |
@@ -642,4 +643,4 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 
 ## 16. 工具调用提速适配
 
-参考没有 Pi observation_id 批量桥接和请求关联计时。实现差异、源码来源及阶段验收归属 `tool-speed-optimization.md`；不复制 dsh 调度器或图片存储。
+参考没有 Pi observation_id 批量桥接和请求关联计时。实现差异、源码来源及阶段验收见 [`tool-speed-optimization.md`](./tool-speed-optimization.md)。桥接仅 v2，所有桌面工具 sequential；保留最近三张请求截图，历史不改；1500 次等待对照不满足缩短条件，生产保留 600ms。不复制 dsh 调度器或图片存储。

@@ -44,6 +44,7 @@ export class OrbSessionController {
   #pendingQuestionId: string | null = null;
   #promptQueue: QueuedPrompt[] = [];
   #modelInterval = 0;
+  #afterToolsAt = 0;
   #toolStarts = new Map<string, number>();
   #creating: { workspace: string; promise: Promise<string> } | null = null;
   constructor(deps: OrbSessionDeps) {
@@ -92,7 +93,7 @@ export class OrbSessionController {
     this.#pendingQuestionId = null;
     this.#promptQueue = [];
     this.#generation = generation;
-    this.#modelInterval = 0; this.#toolStarts.clear();
+    this.#modelInterval = 0; this.#afterToolsAt = 0; this.#toolStarts.clear();
   }
 
   /**
@@ -238,6 +239,7 @@ export class OrbSessionController {
       await this.#subscribe(sessionId);
       this.#accumulator = { text: "" };
       this.#modelInterval = performance.now();
+      this.#afterToolsAt = 0;
       this.#deps.emit({ type: "turn-start" });
       await this.#deps.client.prompt(sessionId, next.text, next.images, this.#workspace ?? undefined);
     } catch (error) {
@@ -281,6 +283,12 @@ export class OrbSessionController {
     if (typeof type !== "string") return;
 
     switch (type) {
+      case "message_start":
+        if ((record.message as { role?: string } | undefined)?.role === "assistant" && this.#afterToolsAt) {
+          this.#modelInterval = this.#afterToolsAt;
+          this.#afterToolsAt = 0;
+        }
+        return;
       case "message_update":
         this.#handleMessageUpdate(record);
         return;
@@ -299,7 +307,9 @@ export class OrbSessionController {
           const start = this.#toolStarts.get(id);
           if (start !== undefined) this.#deps.log?.({ event: "tool-through-sse", toolCallId: id, durationMs: performance.now() - start });
           this.#toolStarts.delete(id);
-          this.#modelInterval = performance.now();
+          // Several sequential tools can belong to one response. Wait for a new assistant
+          // message before classifying the interval as another model response.
+          this.#afterToolsAt = performance.now();
         }
         const timing = (record.result as { details?: { timing?: { requestId?: string; extensionReturnedAt?: number } } } | undefined)?.details?.timing;
         this.#deps.emit({

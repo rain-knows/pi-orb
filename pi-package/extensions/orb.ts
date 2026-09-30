@@ -168,9 +168,8 @@ const LONG_WAIT_PARAMS = Type.Object({
   wait_seconds: Type.Union(LONG_WAIT_SECONDS.map((seconds) => Type.Literal(seconds)), { description: "10, 30, 60 or 120 seconds." }),
 }, { additionalProperties: false });
 
-/** Read the Orb configuration, or `null` when it is absent, unreadable or malformed. */
-export /** Pi batch transport of reference policy.ts:20; the existing parameter contracts are reused. */
-const BATCH_PARAMS = Type.Object({
+/** Pi batch transport of reference policy.ts:20; the existing parameter contracts are reused. */
+export const BATCH_PARAMS = Type.Object({
   observation_id: Type.String({ minLength: 1 }),
   actions: Type.Array(Type.Union([
     Type.Object({ ...Type.Omit(CLICK_PARAMS, ["observation_id"]).properties, kind: Type.Literal("click") }, { additionalProperties: false }),
@@ -182,6 +181,7 @@ const BATCH_PARAMS = Type.Object({
   ]), { minItems: 2, maxItems: 8 }),
 }, { additionalProperties: false });
 
+/** Read the Orb configuration, or `null` when it is absent, unreadable or malformed. */
 function readOrbConfig(path: string): OrbConfig | null {
   let raw: string;
   try {
@@ -666,10 +666,16 @@ function renderObservation(observation: DesktopObservation): string {
 export function formatToolResult(result: unknown) {
   const record = result as Record<string, unknown>;
   if (record && Array.isArray(record.steps)) {
-    const content = [{ type: "text" as const, text: `Batch ${record.ok ? "completed" : "stopped"}: ${record.completed} actions. ${record.message ?? record.reason ?? ""}` }, ...record.steps.flatMap(step => {
+    const content = [{ type: "text" as const, text: `Batch ${record.ok ? "completed" : "stopped"}: ${record.completed} actions. ${record.message ?? record.reason ?? ""}${record.observationUsable === false ? " Previous completed screenshots are for diagnosis only; their IDs cannot authorize more input." : ""}` }, ...record.steps.flatMap(step => {
       const observation = findObservation(step);
       return [{ type: "text" as const, text: renderResult(step) }, ...(observation?.image ? [{ type: "image" as const, data: observation.image.data, mimeType: observation.image.mimeType }] : [])];
     })];
+    const finalObservation = findObservation(record.observation);
+    const lastCompleted = findObservation(record.steps.at(-1));
+    if (finalObservation && finalObservation.observationId !== lastCompleted?.observationId) {
+      content.push({ type: "text", text: `Surface changed before input:\n${renderObservation(finalObservation)}` });
+      if (finalObservation.image) content.push({ type: "image", data: finalObservation.image.data, mimeType: finalObservation.image.mimeType });
+    }
     return { content, details: { ok: record.ok === true, result: removeImageData(result) } };
   }
   const observation = findObservation(result);

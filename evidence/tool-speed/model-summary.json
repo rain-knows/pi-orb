@@ -1,0 +1,71 @@
+{
+  "fixture": "large independent controls",
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash",
+    "thinking": "off"
+  },
+  "scope": "observed samples only; three pairs, not a general speed guarantee",
+  "summary": {
+    "single": {
+      "n": 3,
+      "successes": 3,
+      "p50Ms": 27638.322100000005,
+      "p95Ms": 32333.081799999996,
+      "modelResponses": [
+        5,
+        5,
+        5
+      ],
+      "outgoingOrbImageCounts": [
+        9,
+        9,
+        9
+      ],
+      "outgoingOrbEncodedBytes": [
+        266465,
+        263088,
+        258617
+      ],
+      "maxImagesPerRequest": 3
+    },
+    "batch": {
+      "n": 3,
+      "successes": 3,
+      "p50Ms": 17606.603899999995,
+      "p95Ms": 17859.5643,
+      "modelResponses": [
+        3,
+        3,
+        3
+      ],
+      "outgoingOrbImageCounts": [
+        4,
+        4,
+        4
+      ],
+      "outgoingOrbEncodedBytes": [
+        114357,
+        115776,
+        117477
+      ],
+      "maxImagesPerRequest": 3
+    },
+    "menu": {
+      "n": 1,
+      "successes": 1,
+      "p50Ms": 19770.507599999983,
+      "p95Ms": 19770.507599999983,
+      "modelResponses": [
+        4
+      ],
+      "outgoingOrbImageCounts": [
+        6
+      ],
+      "outgoingOrbEncodedBytes": [
+        186714
+      ],
+      "maxImagesPerRequest": 3
+    }
+  }
+}

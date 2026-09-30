@@ -1,7 +1,49 @@
-import { describe, expect, it } from "vitest";
-import { formatToolResult, renderResult } from "../pi-package/extensions/orb";
+import { describe, expect, it, vi } from "vitest";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import orbExtension, { formatToolResult, renderResult } from "../pi-package/extensions/orb";
 
 describe("Orb extension result rendering", () => {
+  it("appends the latest pre-input surface after completed step images without duplicating pixels in details", () => {
+    const observation = (id: string) => ({ observationId: id, window: { id: "42", pid: 24, title: "Target", appName: "test" },
+      coordinateSpace: { action: "screenshot-fraction", space: 1000 }, image: { data: "AQID", mimeType: "image/png" } });
+    const result = formatToolResult({ ok: false, completed: 1, reason: "surface-changed", steps: [{ ok: true, action: "click", observation: observation("one") }], observation: observation("two") });
+    expect(result.content.filter(c => c.type === "image")).toHaveLength(2);
+    expect(result.content.at(-2)).toMatchObject({ text: expect.stringContaining("observation_id: two") });
+    expect(JSON.stringify(result.details)).not.toContain("AQID");
+  });
+  it("scopes sequential desktop tools, context budgeting and refusal marking to the Orb workspace", () => {
+    const directory = mkdtempSync(join(tmpdir(), "orb-extension-test-"));
+    const config = join(directory, "config.json");
+    writeFileSync(config, JSON.stringify({ version: 1, orbWorkspace: directory, shortcut: "Control+Alt+F11", window: { alwaysOnTop: true, width: 445, height: 632 } }));
+    vi.stubEnv("PI_ORB_CONFIG", config);
+    const handlers = new Map<string, (event: never, ctx: ExtensionContext) => unknown>();
+    const tools: { name: string; executionMode: string }[] = [];
+    const api = { on: (name: string, callback: typeof handlers extends Map<string, infer F> ? F : never) => handlers.set(name, callback), registerTool: (tool: typeof tools[number]) => tools.push(tool), registerCommand: () => {} };
+    try {
+      orbExtension(api as unknown as ExtensionAPI);
+      const ordinary = { cwd: join(directory, "ordinary") } as ExtensionContext;
+      const orb = { cwd: directory } as ExtensionContext;
+      handlers.get("session_start")!({} as never, ordinary);
+      expect(tools).toHaveLength(0);
+      handlers.get("session_start")!({} as never, orb);
+      expect(tools).toHaveLength(12);
+      expect(tools.every(t => t.executionMode === "sequential")).toBe(true);
+      const messages = Array.from({ length: 5 }, (_, id) => ({ role: "toolResult", toolName: "orb_observe", content: [{ type: "image", data: String(id) }] }));
+      const before = JSON.stringify(messages);
+      expect(handlers.get("context")!({ messages } as never, ordinary)).toBeUndefined();
+      expect(handlers.get("context")!({ messages } as never, orb)).toHaveProperty("messages");
+      expect(JSON.stringify(messages)).toBe(before);
+      const failed = { toolName: "orb_batch", details: { ok: false } };
+      expect(handlers.get("tool_result")!(failed as never, ordinary)).toBeUndefined();
+      expect(handlers.get("tool_result")!(failed as never, orb)).toEqual({ isError: true });
+    } finally {
+      vi.unstubAllEnvs();
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
   it("renders an action result with an observation id as action JSON", () => {
     const result = {
       ok: true,

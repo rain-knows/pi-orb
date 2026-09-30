@@ -61,10 +61,13 @@ const server = createServer(async (request, response) => {
     if (command.type === "prompt") {
       observed.prompt = true;
       setTimeout(() => {
-        emit({ type: "tool_execution_start", toolCallId: "tool-1", toolName: "orb_observe", args: { target: "Editor" } });
+        emit({ type: "tool_execution_start", toolCallId: "tool-1", toolName: "orb_batch", args: { actions: [{ kind: "click" }, { kind: "click" }, { kind: "click" }] } });
       }, 150);
+      for (const step of [1, 2, 3]) setTimeout(() => {
+        emit({ type: "tool_execution_update", toolCallId: "tool-1", toolName: "orb_batch", partialResult: { content: [{ type: "text", text: `执行第 ${step}/3 步` }] } });
+      }, 250 + step * 200);
       setTimeout(() => {
-        emit({ type: "tool_execution_end", toolCallId: "tool-1", toolName: "orb_observe", isError: false });
+        emit({ type: "tool_execution_end", toolCallId: "tool-1", toolName: "orb_batch", isError: false });
         emit({ type: "extension_ui_request", id: "ask-1", method: "select", title: "Choose the next step", options: ["Continue (Recommended)", "Stop"] });
       }, 1500);
     }
@@ -217,6 +220,7 @@ try {
     await capture(cdp, "after-access.png");
     await evaluate(cdp, "document.querySelector('#permission-button').click(); document.querySelector('#prompt').textContent='Check this'; document.querySelector('#composer').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); true");
     await waitFor(cdp, "Boolean(document.querySelector('.orb-tool--running'))", Boolean, "running tool card");
+    await waitFor(cdp, "document.querySelector('.orb-tool--running p')?.textContent", (value) => value === "执行第 2/3 步", "Chinese batch progress");
     const runningStyle = await evaluate(cdp, "({ caret: getComputedStyle(document.querySelector('#prompt')).caretColor, stop: getComputedStyle(document.querySelector('#stop')).width, placeholder: getComputedStyle(document.querySelector('#prompt'), '::after').content })");
     if (runningStyle.caret !== "rgba(0, 0, 0, 0)" || runningStyle.stop !== "36px" || runningStyle.placeholder !== '\"\"') throw new Error(`Running composer style: ${JSON.stringify(runningStyle)}`);
     await capture(cdp, "after-tool-running.png");

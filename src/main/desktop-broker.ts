@@ -103,17 +103,20 @@ export class DesktopBroker {
         actions.push(parsed.action);
       }
       const steps: Record<string, unknown>[] = [];
+      const partial = (result: Record<string, unknown>) => ({ ...result, completed: steps.length, steps,
+        finalObservationId: (result.observation as DesktopObservation | undefined)?.observationId ?? (steps.at(-1)?.observation as DesktopObservation | undefined)?.observationId ?? null,
+        observationUsable: this.#controller.state.lastObservationId !== null && !this.#controller.state.stopped });
       const sameSurface = (next: DesktopObservation) => JSON.stringify([next.window, next.coordinateSpace]) === JSON.stringify([initial!.window, initial!.coordinateSpace]);
       for (const [index, action] of actions.entries()) {
-        if (abort.aborted) return { ok: false, reason: "cancelled", message: "Batch cancelled; remaining actions were not executed.", completed: steps.length, steps };
+        if (abort.aborted) return partial({ ok: false, reason: "cancelled", message: "Batch cancelled; remaining actions were not executed." });
         progress?.(index + 1, actions.length);
         const current = this.#currentObservation();
-        if (!current) return { ok: false, reason: "observation-unknown", completed: steps.length, steps };
+        if (!current) return partial({ ok: false, reason: "observation-unknown" });
         const result = await this.#act({ ...action, observationId: current.observationId }, sessionId, generation, abort) as Record<string, unknown>;
-        if (result.ok !== true) return { ...result, completed: steps.length, steps };
+        if (result.ok !== true) return partial(result);
         steps.push(result);
         const next = result.observation as DesktopObservation;
-        if (!sameSurface(next) && index + 1 < actions.length) return { ok: false, reason: "surface-changed", message: "Window or observation area changed; remaining actions were not executed. Use the latest observation.", completed: steps.length, steps, observation: next };
+        if (!sameSurface(next) && index + 1 < actions.length) return partial({ ok: false, reason: "surface-changed", message: "Window or observation area changed; remaining actions were not executed. Use the latest observation.", observation: next });
       }
       return { ok: true, completed: steps.length, steps, observation: this.#currentObservation() };
     }, signal);
@@ -275,6 +278,10 @@ export class DesktopBroker {
     if (this.#controller.state.authorization !== grant || !this.#options.isLive(sessionId, generation)) {
       return refusal("no-task-authorization");
     }
+    if (!result.ok && result.reason === "surface-changed" && result.observation) {
+      this.#controller.observe(result.observation.observationId);
+      return { ok: false, reason: "surface-changed", message: "The window or observation area changed before input; remaining actions were not executed. Use this new observation.", observation: result.observation };
+    }
     this.#controller.recordOutcome(result.ok, result.error);
     if (!result.ok) {
       // A failed action spends its input observation and cannot be retried from that picture.
@@ -286,7 +293,7 @@ export class DesktopBroker {
       return {
         ok: false,
         refused: result.refused,
-        reason: "action-failed",
+        reason: signal.aborted ? "cancelled" : "action-failed",
         message: `${result.error ?? "The action failed."}${suffix} The task was stopped; observe again and ask the user before continuing.`,
       };
     }

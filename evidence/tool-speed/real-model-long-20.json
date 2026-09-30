@@ -1,0 +1,274 @@
+{
+  "method": "real provider, Pi Web, product pipe/broker/native driver, disposable target readback",
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash",
+    "thinking": "off"
+  },
+  "rows": [
+    {
+      "mode": "long-20",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 30934.3245,
+      "modelResponses": 5,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 2,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 2,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 2,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 2,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 2,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 3,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 3,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 3,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 3,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 3,
+          "name": "orb_observe",
+          "arguments": {}
+        }
+      ],
+      "events": [],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0
+        },
+        {
+          "images": 3,
+          "bytes": 92031,
+          "base64Bytes": 122712
+        },
+        {
+          "images": 3,
+          "bytes": 92031,
+          "base64Bytes": 122712
+        },
+        {
+          "images": 3,
+          "bytes": 92058,
+          "base64Bytes": 122748
+        },
+        {
+          "images": 3,
+          "bytes": 92058,
+          "base64Bytes": 122748
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nqlj-1\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 31241
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nqum-2\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nr2n-3\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nraw-4\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nrj2-5\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nvyk-6\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nw6o-7\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nwel-8\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nwmo-9\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9nwu7-10\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30677
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o0qe-11\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o0y5-12\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30682
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o164-13\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o1dw-14\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o1lh-15\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o5s2-16\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o5zk-17\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o67e-18\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o6ez-19\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        },
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muo9o6m9-20\nwindow: \"Orb speed target\" (electron, pid 35048, window id 854804)\ncoordinate space for actions: x and y are fractions of the screenshot you can see, 0-1000 on each axis ([0,0] top-left, [1000,1000] bottom-right)\nthe screenshot covers this window (957x1266 px); a position is mapped onto it\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 30686
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "passed": true,
+  "fixture": "large independent controls",
+  "diagnostics": [],
+  "finishedAt": "2026-09-30T15:35:17.827Z"
+}

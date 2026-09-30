@@ -161,7 +161,7 @@ export class BridgeServer {
       );
     }
 
-    if (typeof request.requestId !== "string" || request.requestId.length < 1 || request.requestId.length > 128) return refuse("malformed", "Request correlation ID required.");
+    if (typeof request.requestId !== "string" || !/^[a-zA-Z0-9-]{1,128}$/.test(request.requestId)) return refuse("malformed", "Request correlation ID required.");
     const sessionId = typeof request.sessionId === "string" ? request.sessionId : "";
     const generation = typeof request.generation === "number" ? request.generation : -1;
 

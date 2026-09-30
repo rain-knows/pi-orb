@@ -1,9 +1,5 @@
 # Changelog
 
-## 工具速度阶段 1
-
-- 增加请求关联计时与独立原生基线，记录耗时和图片大小，不记录内容。证据见 `evidence/tool-speed/native-baseline.json`。
-
 All notable changes to pi-orb are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -13,6 +9,13 @@ Version numbers are meaningful only together with a row in
 verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
+
+### 工具调用提速（四阶段）
+
+- 请求关联计时、串行批量工具、协议 v2、取消与按动作数/声明等待计算的超时。
+- context 仅保留最近三张 Orb 工具截图；用户附件和持久历史保持不变。
+- 1500 次等待对照不满足缩短条件，保留 600ms。真实模型大控件对照中响应次数从 5 降至 3；小控件误点记录保留，不宣称普遍提速。
+- 453 测试、权限生命周期、原生 Stop/窗口变化及打包审计/启动通过。来源、原始数据和限制见 `doc/tool-speed-optimization.md`。
 
 ### Fixed
 

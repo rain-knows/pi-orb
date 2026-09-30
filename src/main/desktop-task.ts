@@ -123,6 +123,8 @@ export type ActResult =
       readonly ok: false;
       readonly error: string | null;
       readonly refused: boolean;
+      readonly reason?: "surface-changed";
+      readonly observation?: DesktopObservation;
     };
 
 export interface DesktopDriver {

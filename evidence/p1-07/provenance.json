@@ -12,12 +12,12 @@
       "file": "src/main/reference-windows/windows.ts",
       "reference": "packages/experimental/tool-computer-use/src/windows.ts",
       "status": "adapted",
-      "novelLines": 24,
+      "novelLines": 26,
       "provenanceHeader": true,
       "sample": [
+        "import { timeToolSync } from \"@shared/tool-timing\";",
         "* Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,",
-        "* `packages/experimental/tool-computer-use/src/windows.ts` (MIT). One deliberate change: the input",
-        "* paths release held keys and mouse buttons in a `finally` block, which the reference only does on"
+        "* `packages/experimental/tool-computer-use/src/windows.ts` (MIT). One deliberate change: the input"
       ]
     },
     {
