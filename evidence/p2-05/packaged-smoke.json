@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-29T23:50:47.755Z",
+  "capturedAt": "2026-09-30T00:26:18.092Z",
   "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790725847755",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790727978092",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -54,6 +54,21 @@
       "detail": "{\"ballSize\":\"72px\",\"ballRadius\":\"50%\"}"
     },
     {
+      "name": "the observation ribbon renders with the reference geometry",
+      "ok": true,
+      "detail": "{\"present\":true,\"glow\":\"28px,28px,28px,28px\",\"stroke\":\"8px,8px,8px,8px\",\"radius\":\"16px\",\"gradient\":true,\"glowFilter\":true,\"holePunched\":true,\"pointerEvents\":\"none\",\"animations\":\"none\",\"scripts\":0}"
+    },
+    {
+      "name": "the observation ribbon cannot block input or animate",
+      "ok": true,
+      "detail": "{\"pointerEvents\":\"none\",\"animations\":\"none\",\"holePunched\":true}"
+    },
+    {
+      "name": "the observation ribbon window carries no scripts",
+      "ok": true,
+      "detail": "script tags: 0"
+    },
+    {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
       "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
@@ -80,6 +95,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-17272\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/21e91874-ed2b-45fe-a5c1-85dc61897afa"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-63404\n[pi-orb] no foreground window to record; the orb must not take focus first\n[pi-orb] no foreground window was available to record as the desktop target",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/f37b58d3-f92b-496e-88e0-9106a0d76f32"
 }

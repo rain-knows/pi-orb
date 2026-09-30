@@ -1,0 +1,61 @@
+/*
+ * Observation-frame ribbon, ported from `deepseek-harness-orb` commit
+ * `72f1d738458a223696685a909e806b683eff5885`, `apps/desktop/renderer/observation-frame.css` (MIT —
+ * see `THIRD_PARTY_NOTICES.md` §3.5).
+ *
+ * The inner hole must land exactly on the observation rectangle. That is a two-part subtraction: the
+ * `body` padding holds the glow (so `drop-shadow` is not clipped by the window edge) and `#frame`'s
+ * padding holds the stroke. Both are driven by custom properties the main process writes after
+ * placing the window, and the fallbacks here are the flush-edge values the reference documents —
+ * keep them equal to `OBSERVATION_FRAME_GLOW_PX` / `OBSERVATION_FRAME_STROKE_PX`.
+ *
+ * There is deliberately no `animation` or `@keyframes` here. The reference's observation-frame test
+ * asserts the ribbon has none, because the ribbon marks a *region* rather than an activity: a pulsing
+ * border would read as "working" when the thing that matters is which pixels the grant covers.
+ *
+ * `pointer-events: none` and the window's own `setIgnoreMouseEvents(true, { forward: true })` are
+ * belt and braces on purpose: the criterion is that this overlay never blocks the action it marks.
+ */
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+body {
+  padding: var(--glow-top, 28px) var(--glow-right, 28px) var(--glow-bottom, 28px) var(--glow-left, 28px);
+}
+
+#frame {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  padding: var(--stroke-top, 8px) var(--stroke-right, 8px) var(--stroke-bottom, 8px) var(--stroke-left, 8px);
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(90, 250, 255, 1),
+    rgba(210, 170, 255, 1),
+    rgba(90, 250, 255, 1)
+  );
+  filter:
+    drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+    drop-shadow(0 0 8px rgba(80, 255, 255, 1))
+    drop-shadow(0 0 16px rgba(170, 150, 255, 0.95))
+    drop-shadow(0 0 28px rgba(48, 230, 255, 0.8));
+  /* The mask punches the middle out, leaving only the stroke: the ribbon marks the region without
+     tinting the window the user is reading. */
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}

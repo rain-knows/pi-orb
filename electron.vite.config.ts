@@ -73,7 +73,13 @@ export default defineConfig({
     build: {
       outDir: "out/renderer",
       rollupOptions: {
-        input: { index: resolve(__dirname, "src/renderer/index.html") },
+        // Two entries: the orb shell, and the observation-frame ribbon. The ribbon is a separate page
+        // because it is a second window with its own CSP and no script of its own — loading the React
+        // app into it would ship a bridge it must never have.
+        input: {
+          index: resolve(__dirname, "src/renderer/index.html"),
+          "observation-frame": resolve(__dirname, "src/renderer/observation-frame.html"),
+        },
       },
     },
     resolve: {

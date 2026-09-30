@@ -1,9 +1,9 @@
 {
-  "capturedAt": "2026-09-29T23:50:47.597Z",
+  "capturedAt": "2026-09-30T00:26:17.909Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
-    "count": 135,
+    "count": 137,
     "sample": [
       "node_modules",
       "node_modules/koffi",
@@ -41,9 +41,9 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 9305109,
+    "asarBytes": 9316169,
     "unpackedNativeBytes": 2658109,
-    "archiveEntryCount": 135
+    "archiveEntryCount": 137
   },
   "checks": [
     {
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-SPBuL9wt.js, out/renderer/assets/orb-avatar-BIleFNQm.png"
+      "detail": "out/renderer/assets/index-BTfEjuNK.css, out/renderer/assets/index-SPBuL9wt.js, out/renderer/assets/observation-frame-CWh_eSAv.css, out/renderer/assets/orb-avatar-BIleFNQm.png"
     },
     {
       "name": "the archive ships no src/ files",
@@ -154,7 +154,7 @@
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "40323 bytes"
+      "detail": "47125 bytes"
     },
     {
       "name": "the shipped manifest carries the project version",
@@ -169,7 +169,7 @@
     {
       "name": "no built file embeds a local user path or a credential",
       "ok": true,
-      "detail": "scanned 11 files"
+      "detail": "scanned 13 files"
     }
   ],
   "passed": true

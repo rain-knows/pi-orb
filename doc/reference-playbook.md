@@ -158,7 +158,7 @@ D:\workself\pi-orb\
 | `apps/desktop/src/orb-permission.ts` | 浮球权限模型（只读/编辑/完全访问） | 未移植 | 不适用：pi-orb 用 pi-web 自身权限与会话模型 |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
 | `apps/desktop/src/orb-avatar.ts` | 自定义头像（GIF/PNG/WebP，2 MB 上限） | `src/renderer/orb-avatar.png` 静态资源 | 未移植；如需自定义再按此实现 |
-| `apps/desktop/src/observation-frame-window.ts` | 观察框原生 overlay（点透、不进截图） | 未移植 | 未移植；见 `doc/p2-01-reference-reuse.md` 的说明 |
+| `apps/desktop/src/observation-frame-window.ts` | 观察框原生 overlay（点透、不进截图） | `src/main/observation-frame.ts`、`src/renderer/observation-frame.{html,css}` | **已移植**：几何（stroke 8 / glow 28 / outset 36、work-area 裁剪不位移、DIP 换算）、窗口构造（`setIgnoreMouseEvents(true,{forward:true})` 点透、`contentProtection` 不进截图、`showInactive` 不抢焦点、`roundedCorners:false`）、renderer 渐变遮罩挖空。宿主调用面不同：pi-orb 在 `withGuiTurn` 里画、在统一撤权出口隐藏，参考由 dsh 的 observation lifecycle 驱动 |
 | `apps/desktop/src/selection-monitor.ts`、`selection-toolbar-*.ts`、`windows-selection*.ts` | 选区读取与原生工具栏 | `src/main/selection-monitor.ts`、`windows-selection*.ts` | 已移植读取路径；原生工具栏未移植 |
 | `apps/desktop/src/windows-layout.ts`、`owned-directory.ts` | 窗口布局常量、专属目录归属 | 无对应 | `owned-directory.ts` 的“专属目录”思路可对照 pi-orb 的 Orb workspace |
 
@@ -206,6 +206,9 @@ D:\workself\pi-orb\
 | 面板常驻与切换 | `#panel` 始终在 DOM；展开先 `hidden=false` 再加 `body.expanded`，收起先移除类、动画后再 `hidden` | `floating.html:11`、`floating.js` 的 `applyExpanded` |
 | 暗色主题 | `html[data-ds-dark-theme]`（宿主决定并写入，**不是** `prefers-color-scheme`） | `floating.css:22-34` |
 | 停靠 tab 呼吸动画 | `1800ms`，`prefers-reduced-motion` 时关闭 | `floating.css:715`、`:723-728` |
+| 观察框几何 | stroke `8px`、glow `28px`、outset `36px`；窗口 = 区域外扩 outset 后与 work area 求交；内孔 = 外扩减去实际每边 inset；**贴边被裁时 stroke 画在边内侧**（`edgePadding` 先扣 stroke，余量为 glow） | `observation-frame-window.ts:5-15`、`:73-91`、`:117-139` |
+| 观察框窗口属性 | 点击穿透 `setIgnoreMouseEvents(true, { forward: true })`；不进用户截图 `setContentProtection(true)`（win32）；`focusable:false` + `showInactive()` 不抢焦点；`roundedCorners:false` 防止贴边描边被圆角裁掉 | `observation-frame-window.ts:213-244`、`:252-262` |
+| 观察框不得有动画 | 参考的 `observation-frame-window.spec.ts` 断言该 CSS 无 `animation`/`@keyframes`——它标记的是**区域**而不是活动，闪烁会被读成「正在工作」 | `apps/desktop/tests/observation-frame-window.spec.ts` |
 | 停靠滑出／滑回时长 | 滑出 `FLOATING_DOCK_SLIDE_OFF_MS = 250` + `easeInOutCubic`；滑回 `FLOATING_DOCK_SLIDE_IN_MS = 300` + `easeOutCubic` | `floating-window.ts:207-213`、`:461-471`、`:836-845` |
 | 减少动效 | `systemPreferences.getAnimationSettings().prefersReducedMotion`；测试模式（`VITEST`）与窗口已销毁时同样直接落位 | `floating-window.ts:376-381`、`:407-420` |
 

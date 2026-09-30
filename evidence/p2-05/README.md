@@ -38,7 +38,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 `app.asar` 9 291 054 B、解包原生二进制合计 2 658 109 B、asar 条目 135。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
 
-## 2. 启动探测：`packaged-smoke.json`（15/15 通过）
+## 2. 启动探测：`packaged-smoke.json`（18/18 通过）
 
 以真实 `release/<version>/win-unpacked/pi-orb.exe` 启动，独立 `--user-data-dir` 与
 `PI_ORB_CONFIG`，指向一个未使用的 pi-web 端口，通过 Chrome DevTools Protocol 驱动 renderer。
@@ -56,6 +56,9 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | **参考壳层已挂载**（`#panel`、`#ball`、`#dock-tab` 存在，`body` 带参考状态类） | 通过 |
 | **参考设计令牌解析为参考值**（`--ball: 72px`、`--chrome: 12px`、`--panel-radius: 36px`、`--composer-height` 解析为 `72px`） | 通过 |
 | **球按参考尺寸与形状渲染**（`72px`、`border-radius: 50%`） | 通过 |
+| **观察框按参考几何渲染**（glow `28px`、stroke `8px`、圆角 `16px`、渐变 + drop-shadow、遮罩挖空） | 通过 |
+| **观察框不挡输入、不动画**（`pointer-events: none`、`animation: none`） | 通过（改回 `auto` 即失败） |
+| **观察框窗口无脚本**（独立入口，不带壳的 bridge） | 通过（`scriptCount: 0`） |
 | **停靠滑动真的在动**（拖到边缘后 dock，采样到 9 帧不同位置：从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 通过（强制瞬移的反向对照下 2 帧即失败） |
 | **取消停靠恢复球并清除 dock 状态** | 通过 |
 | **`orb:list-desktop-windows` 返回真实窗口列表**（koffi 从 `app.asar.unpacked` 加载成功） | 通过（本次运行 8–11 个窗口） |

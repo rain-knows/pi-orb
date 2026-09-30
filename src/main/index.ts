@@ -46,6 +46,12 @@ import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from
 import { DesktopBroker } from "./desktop-broker";
 import { ReferenceWindowsDriver, type ReferenceWindowInfo } from "./reference-windows-driver";
 import {
+  createObservationFrameWindow,
+  hideObservationFrame,
+  raiseOverlayAboveObservationFrame,
+  showObservationFrame,
+} from "./observation-frame";
+import {
   IPC,
   type DesktopTaskStatus,
   type DesktopWindowChoice,
@@ -139,6 +145,7 @@ let configPath = "";
 let config: OrbConfig;
 let window: BrowserWindow | null = null;
 let tray: Tray | null = null;
+let observationFrame: BrowserWindow | null = null;
 let session: OrbSessionController;
 let wake: WakeController | null = null;
 let lifecycle: OrbWindowLifecycle | null = null;
@@ -388,12 +395,21 @@ async function startDesktop(): Promise<void> {
         const wasVisible = current.isVisible();
         current.setIgnoreMouseEvents(true, { forward: true });
         if (wasVisible) current.hide();
+        // Bracket the desktop action with the observation ribbon: the orb is hidden for the duration,
+        // and the ribbon is what tells the user which window the grant currently covers. It is shown
+        // here rather than around each action because every desktop operation already funnels through
+        // this turn, which is also the boundary the reference uses.
+        showObservationFrameForTarget();
         try {
           return await run();
         } finally {
+          hideObservationFrame(observationFrame ?? undefined);
           if (!current.isDestroyed()) {
             current.setIgnoreMouseEvents(false);
             if (wasVisible) current.showInactive();
+            // The ribbon's `showInactive` can restack same-level panels, so the orb's higher level is
+            // re-asserted after it comes back rather than only at creation.
+            raiseOverlayAboveObservationFrame(current);
           }
         }
       },
@@ -686,8 +702,36 @@ function revokeDesktopOperations(reason: string): void {
   recordedTarget.clear();
   desktopTarget = null;
   openAppTarget = null;
+  // The ribbon marks where the grant applies, so it goes away in the same breath as the grant. This
+  // is the single revoke exit (collapse, stop, turn end, disconnect), which is why the ribbon is
+  // hidden here rather than at each caller.
+  hideObservationFrame(observationFrame ?? undefined);
   if (hadAuthority || hadCapture) {
     console.log(`[pi-orb] desktop operations revoked: ${reason}`);
+  }
+}
+
+/**
+ * Draw the observation ribbon around the window the next desktop action will land on.
+ *
+ * Best effort by design: a ribbon that cannot be placed must never fail the action it is only
+ * annotating. It is skipped entirely when no target is recorded (nothing to mark) or when its bounds
+ * are empty, because a zero-area ribbon would read as a grant over nothing.
+ */
+function showObservationFrameForTarget(): void {
+  const bounds = referenceDriver?.targetBounds();
+  if (!bounds || bounds.width < 2 || bounds.height < 2) return;
+  try {
+    observationFrame ??= createObservationFrameWindow();
+    if (observationFrame.isDestroyed()) {
+      observationFrame = createObservationFrameWindow();
+    }
+    if (observationFrame.webContents.getURL() === "") {
+      void observationFrame.loadFile(join(__dirname, "../renderer/observation-frame.html"));
+    }
+    showObservationFrame(observationFrame, bounds);
+  } catch (error) {
+    console.warn(`[pi-orb] observation frame unavailable: ${describeError(error)}`);
   }
 }
 
@@ -1276,6 +1320,7 @@ function quit(): void {
   shortcuts.releaseAll();
   // Shutdown must not leave an image waiting to be sent, nor a task grant a later run could inherit.
   revokeDesktopOperations("the shell is quitting");
+  if (observationFrame && !observationFrame.isDestroyed()) observationFrame.destroy();
   void bridge?.close();
   removeHandshake(app.getPath("userData"));
   session.dispose();

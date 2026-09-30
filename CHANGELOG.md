@@ -183,6 +183,44 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 
 ### Added
 
+- **The observation frame — P2-01's "observation border" — is now implemented instead of being
+  recorded as a design choice.** Once the Orb hides for a desktop task, nothing on screen said which
+  window the next action would land on; the panel named the target, but a name is not a place. The
+  record had justified the omission as "no lifecycle contract yet, so we will not draw a fake border
+  that would end up in screenshots" — true at the time, but it described unfinished work as a
+  decision, which is the same failure this file already documents for the front end.
+
+  Ported from `observation-frame-window.ts` and `renderer/observation-frame.{html,css}`
+  (commit `72f1d73`):
+
+  - the geometry as pure functions — stroke 8px, glow 28px, outset 36px, the window intersected with
+    the work area (clipped, **not** translated, since a translated ribbon points at the wrong
+    pixels), and the inner hole derived from the *actual* per-edge insets. A flushed edge keeps its
+    stroke just inside that edge, as the reference documents: pushing the ribbon off-screen would lose
+    the mark entirely;
+  - the two window properties that *are* the acceptance criterion — `setIgnoreMouseEvents(true,
+    { forward: true })` so the action reaches the target app rather than this chrome, and
+    `setContentProtection(true)` so the ribbon stays out of the user's own screenshots. Plus
+    `focusable: false` with `showInactive()`, so showing it never steals focus from the window being
+    worked in;
+  - the renderer: gradient, drop-shadow and a `mask-composite: exclude` hole, so the ribbon outlines
+    the region without tinting it. It is a second build entry with **no script**, because it must
+    never carry the shell's bridge.
+
+  No animation, matching the reference's own rule and test: the ribbon marks a *region*, not an
+  activity, and a pulsing border would read as "working".
+
+  Wired into the host where the boundary already exists — shown inside `withGuiTurn` (the single entry
+  point for desktop actions) and hidden in `revokeDesktopOperations` (the single revoke exit), so the
+  ribbon cannot outlive the grant. The rectangle comes from the driver's own `TargetWindow.bounds`,
+  the same rectangle actions are mapped on, so the ribbon cannot drift from where input actually goes.
+
+  Verified: 7 unit tests pin the hole against the region, the clipping rule, integer pixels and the
+  DIP branch; the packaged probe gains three checks (18/18) that measure the rendered ribbon's
+  computed padding, `pointer-events`, `mask-composite` and script count in the built artifact.
+  Falsified by setting `pointer-events: auto` — the probe then fails with
+  `{"pointerEvents":"auto"}`.
+
 - `tests/documented-counts.test.ts`: the same protection for evidence counts that
   `playbook-constants.test.ts` gives constants. Documents quote probe results as `25/25` and `15/15`,
   and those numbers rot — the P2-05 line still said `10/10` several rounds after the packaged probe

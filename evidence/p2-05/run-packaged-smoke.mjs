@@ -257,6 +257,74 @@ try {
       JSON.stringify({ ballSize: render.ballSize, ballRadius: render.ballRadius }),
     );
 
+    // The observation ribbon is a second window that must never gain the bridge the shell has, and
+    // its inner hole has to land on the observed rectangle. Both are checked by navigating the
+    // packaged Chromium at the built frame page and reading the computed styles, which is the only
+    // way to see the mask/glow arithmetic actually take effect.
+    const framePage = join(repo, "out", "renderer", "observation-frame.html");
+    if (existsSync(framePage)) {
+      await client.send("Page.enable", {});
+      await client.send("Page.navigate", { url: `file:///${framePage.replaceAll("\\", "/")}` });
+      await new Promise((done) => setTimeout(done, 1200));
+      // The main process writes these after placing the window; the same values are written here so
+      // the renderer half is measured against the placement arithmetic the unit tests pin.
+      await evaluate(
+        client,
+        `(() => { const root = document.documentElement.style;
+          for (const [name, value] of [['--glow-top',28],['--glow-right',28],['--glow-bottom',28],['--glow-left',28],['--stroke-top',8],['--stroke-right',8],['--stroke-bottom',8],['--stroke-left',8]]) root.setProperty(name, value + 'px'); })()`,
+      );
+      const ribbon = JSON.parse(
+        await evaluate(
+          client,
+          `JSON.stringify((() => {
+            const frame = document.getElementById('frame');
+            if (!frame) return { present: false };
+            const style = getComputedStyle(frame);
+            const body = getComputedStyle(document.body);
+            return {
+              present: true,
+              glow: [body.paddingTop, body.paddingRight, body.paddingBottom, body.paddingLeft].join(','),
+              stroke: [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft].join(','),
+              radius: style.borderRadius,
+              gradient: style.backgroundImage.includes('gradient'),
+              glowFilter: style.filter.includes('drop-shadow'),
+              holePunched: (style.webkitMaskComposite || style.maskComposite || '').includes('exclude'),
+              pointerEvents: style.pointerEvents,
+              animations: style.animationName,
+              scripts: document.scripts.length,
+            };
+          })())`,
+        ),
+      );
+      check(
+        "the observation ribbon renders with the reference geometry",
+        ribbon.present === true &&
+          ribbon.glow === "28px,28px,28px,28px" &&
+          ribbon.stroke === "8px,8px,8px,8px" &&
+          ribbon.radius === "16px" &&
+          ribbon.gradient &&
+          ribbon.glowFilter,
+        JSON.stringify(ribbon).slice(0, 240),
+      );
+      check(
+        "the observation ribbon cannot block input or animate",
+        // "Does not block the action" is the acceptance criterion, and `pointer-events: none` is the
+        // renderer half of it (the window's `setIgnoreMouseEvents` is the other). No animation matches
+        // the reference's rule that the ribbon marks a region rather than an activity.
+        ribbon.pointerEvents === "none" && ribbon.animations === "none" && ribbon.holePunched === true,
+        JSON.stringify({ pointerEvents: ribbon.pointerEvents, animations: ribbon.animations, holePunched: ribbon.holePunched }),
+      );
+      check(
+        "the observation ribbon window carries no scripts",
+        // It is a separate page precisely so it never gets the shell's bridge; a script tag here would
+        // be the first step towards giving the overlay capabilities.
+        ribbon.scripts === 0,
+        `script tags: ${String(ribbon.scripts)}`,
+      );
+      await client.send("Page.navigate", { url: pageTarget.url });
+      await new Promise((done) => setTimeout(done, 1200));
+    }
+
     // The ported dock gesture: drag the ball past the edge, then let go, and confirm the window
     // *slides* off rather than snapping. Docking only happens once the ball is past an edge, so the
     // probe reproduces that pre-condition first; without it the call is a no-op and a snap and a

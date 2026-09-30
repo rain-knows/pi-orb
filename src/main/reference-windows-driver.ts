@@ -113,6 +113,18 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       .filter((window) => window.pid !== this.#options.ownProcessId && window.isOnScreen);
   }
 
+  /**
+   * The screen rectangle of the window the next action would land on, or undefined when no target is
+   * recorded.
+   *
+   * Exposed so the shell can draw the observation ribbon around the window the grant covers. The
+   * bounds are the driver's own `TargetWindow.bounds`, i.e. the same rectangle actions are mapped on,
+   * so the ribbon cannot drift from where input actually goes.
+   */
+  targetBounds(): { readonly x: number; readonly y: number; readonly width: number; readonly height: number } | undefined {
+    return this.#target?.bounds;
+  }
+
   async observe(input: { readonly windowId?: string; readonly includeImage?: boolean }): Promise<ObserveResult> {
     const target = this.#findTarget(input.windowId);
     if (!target) {

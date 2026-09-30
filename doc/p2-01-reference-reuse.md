@@ -30,7 +30,36 @@
 
 ## 当前复用（核对后）
 
-### 主进程（窗口几何与停靠动画）
+### 观察框（observation frame，本轮补齐）
+
+P2-01 的交付项里写着「观察边框」，此前是**未移植**状态：Orb 为桌面动作隐藏后，屏幕上没有任何
+东西说明下一次动作会落在哪个窗口——面板里有目标标题，但**名字不是位置**。
+
+现按参考 `observation-frame-window.ts` + `renderer/observation-frame.{html,css}` 移植：
+
+- **几何**（`src/main/observation-frame.ts`，纯函数、可测）：`stroke 8` / `glow 28` /
+  `outset 36`；窗口 = 区域外扩 outset 后与 work area **求交**（裁剪而非位移——位移会让丝带指向
+  错误的像素）；内孔由「外扩尺寸减去实际每边 inset」得出。
+  贴边被裁时的规则继承参考并已写进注释：**stroke 画在该边内侧**，因为把丝带推到屏幕外等于失去标记。
+- **窗口属性**（P2-01 验收项「overlay 不挡操作、不进入截图」的两条正解）：
+  `setIgnoreMouseEvents(true, { forward: true })` 保证动作落到目标应用而不是这层 chrome；
+  `setContentProtection(true)` 保证丝带不进用户自己的截图；`focusable: false` + `showInactive()`
+  保证显示丝带不会把焦点从用户正在操作的窗口抢走。
+- **renderer**：渐变 + `drop-shadow` + `mask-composite: exclude` 挖空，只留描边，不给目标窗口染色；
+  该页面**没有脚本**（`scriptCount: 0`）——它是独立入口，正是为了不把壳的 bridge 带进这个窗口。
+- **不得有动画**：参考的 observation-frame 规格测试断言该 CSS 无 `animation`/`@keyframes`，pi-orb 同样
+  （打包探测断言 `animations === "none"`）。丝带标记的是区域而非活动。
+
+宿主调用面不同，已记录原因：pi-orb 在既有的 `withGuiTurn`（桌面动作的唯一入口，也是参考用的边界）
+里显示，在**统一撤权出口** `revokeDesktopOperations` 里隐藏，所以丝带不会比授权活得更久；参考由 dsh
+的 observation lifecycle 驱动。目标矩形取自驱动的 `TargetWindow.bounds`——与动作映射用的是同一个矩形，
+丝带因此不会和输入实际落点漂移。
+
+证据：`tests/observation-frame.test.ts`（7 条，含内孔等于区域、贴边裁剪、整数像素、DIP 分支）、
+打包探测新增 3 条（geometry / 不挡输入且不动画 / 无脚本）。反向对照：把 `pointer-events` 改回 `auto`
+后该检查失败（17/18，detail 显示 `"pointerEvents":"auto"`）。
+
+
 
 沿用参考 `floating-window.ts` 的几何与状态机，落在 `src/main/floating-geometry.ts` 与
 `src/main/floating-window-controller.ts`：72px 球、344×444 含 chrome 的展开窗口、工作区方向选择、
@@ -104,8 +133,10 @@
   辅助功能授权门）、`#ball-gif`（参考用 GIF 头像）、`mandatory-update-frame.*`、`welcome.*`、
   `update-dialog.*`、`selection-toolbar.*`。pi-orb 没有这些产品概念，按 AGENTS.md 不自行增加，
   因此不移植；这也意味着 `styles.css` 比参考的 `floating.css` 少一批选择器。
-- **观察框**：参考 `observation-frame-window.ts` 是独立 click-through 原生 overlay；pi-orb 尚无
-  该生命周期契约，**不在 renderer 里画会挡截图的假边框**。这是 P2-01 仍未完成的一项。
+- **观察框**：已移植（见上文「观察框」节）。此前记的是「尚无生命周期契约，不在 renderer 里画会
+  挡截图的假边框」——那条理由本身没错，但它描述的是**当时的**状态，而 P2-01 的交付项写着「观察
+  边框」；把未完成项写成设计选择，是这个项目已经犯过一次的同一类问题（见「一次被更正的事实」）。
+  现在有了真的 click-through 原生 overlay，宿主边界由既有的 `withGuiTurn` + 统一撤权出口承担。
 - **头像**：参考在 Desktop profile 里持久化自定义头像；pi-orb 使用仓库内静态
   `src/renderer/orb-avatar.png`，不扩展 Pi 配置写入。
 - **桌面授权、历史、截图预览浮层**：参考没有对应产品面（它的 Access 三档权限与 pi-orb 的任务授权
@@ -120,7 +151,9 @@
 | 项 | 证据 |
 |---|---|
 | 令牌、状态词表、参考 id、无残留 `orb__*` | `tests/renderer-reference-parity.test.ts`（17 条，含时序常量与收起守卫集合） |
-| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（15/15，含本节新增 4 条） |
+| 打包产物中真的渲染出参考壳层、令牌解析为参考值、球为 72px/50% | `evidence/p2-05/packaged-smoke.json`（18/18，含本节新增 4 条） |
+| **观察框内孔落在观察矩形上**、贴边裁剪不位移、整数像素、CSS 变量齐全 | `tests/observation-frame.test.ts`（7 条） |
+| **观察框不挡输入、不动画、窗口无脚本** | `evidence/p2-05/packaged-smoke.json`（3 条；把 `pointer-events` 改回 `auto` 即失败） |
 | **停靠滑动真的在动**（拖动到边缘后 dock，采样到 9 帧不同位置，从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 同上，`the dock gesture slides the window off the edge instead of snapping it` |
 | 缓动曲线、时长常量、矩形插值取整 | `tests/floating-dock-animation.test.ts`（4 条） |
 | 主进程几何 | `tests/floating-geometry.test.ts` |
