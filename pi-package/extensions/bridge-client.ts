@@ -58,7 +58,7 @@ export interface BridgeClientOptions {
 
 export type BridgeCallResult =
   | { readonly ok: true; readonly result: unknown }
-  | { readonly ok: false; readonly reason: BridgeRefusal | string; readonly message: string };
+  | { readonly ok: false; readonly reason: BridgeRefusal | string; readonly message: string; readonly result?: unknown };
 
 export class BridgeClient {
   readonly #options: BridgeClientOptions;
@@ -157,7 +157,7 @@ readToken(): BridgeTokenFile | null {
             const parsed = JSON.parse(line);
             if (parsed.type === "progress") { if (parsed.requestId === requestId) onProgress?.(parsed.step, parsed.total); continue; }
             if (parsed.ok) finish({ ok: true, result: parsed.result });
-            else finish({ ok: false, reason: parsed.reason, message: parsed.message });
+            else finish({ ok: false, reason: parsed.reason, message: parsed.message, ...(parsed.result ? { result: parsed.result } : {}) });
           } catch { finish({ ok: false, reason: "malformed", message: "Invalid bridge response." }); }
         }
       });
@@ -177,6 +177,7 @@ readToken(): BridgeTokenFile | null {
 
 /** Declared waits must outlive their work; batches budget each native action independently. */
 export function bridgeTimeoutMs(request: BridgeRequestBody): number {
+  if (request.type === "browser") return 95_000;
   if (request.type === "batch") {
     const count = (request.batch as { actions?: unknown[] } | null)?.actions?.length ?? 1;
     return 30_000 * Math.min(8, Math.max(1, count));

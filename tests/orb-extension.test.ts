@@ -6,6 +6,16 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 import orbExtension, { formatToolResult, renderResult } from "../pi-package/extensions/orb";
 
 describe("Orb extension result rendering", () => {
+  it("returns a refused single action's fresh screenshot and usable observation id", () => {
+    const result = formatToolResult({ ok: false, reason: "surface-changed", message: "No input sent.",
+      observation: { observationId: "changed-page", window: { id: "42", pid: 24, title: "Official account", appName: "chrome" },
+        coordinateSpace: { action: "screenshot-fraction", space: 1000 }, image: { data: "AQID", mimeType: "image/png" } } });
+    expect(result.details.ok).toBe(false);
+    expect(result.content[0]).toMatchObject({ text: expect.stringContaining("Refused (surface-changed)") });
+    expect(result.content[0]).toMatchObject({ text: expect.stringContaining("observation_id: changed-page") });
+    expect(result.content[1]).toMatchObject({ type: "image", data: "AQID" });
+    expect(result.details.orbImages).toEqual([{ observationId: "changed-page" }]);
+  });
   it("appends the latest pre-input surface after completed step images without duplicating pixels in details", () => {
     const observation = (id: string) => ({ observationId: id, window: { id: "42", pid: 24, title: "Target", appName: "test" },
       coordinateSpace: { action: "screenshot-fraction", space: 1000 }, image: { data: "AQID", mimeType: "image/png" } });
@@ -21,7 +31,8 @@ describe("Orb extension result rendering", () => {
     vi.stubEnv("PI_ORB_CONFIG", config);
     const handlers = new Map<string, (event: never, ctx: ExtensionContext) => unknown>();
     const tools: { name: string; executionMode: string }[] = [];
-    const api = { on: (name: string, callback: typeof handlers extends Map<string, infer F> ? F : never) => handlers.set(name, callback), registerTool: (tool: typeof tools[number]) => tools.push(tool), registerCommand: () => {} };
+    let activeTools = ["read", "advisor", "orb_observe"];
+    const api = { on: (name: string, callback: typeof handlers extends Map<string, infer F> ? F : never) => handlers.set(name, callback), registerTool: (tool: typeof tools[number]) => tools.push(tool), registerCommand: () => {}, getActiveTools: () => activeTools, setActiveTools: (names: string[]) => { activeTools = names; } };
     try {
       orbExtension(api as unknown as ExtensionAPI);
       const ordinary = { cwd: join(directory, "ordinary") } as ExtensionContext;
@@ -29,8 +40,15 @@ describe("Orb extension result rendering", () => {
       handlers.get("session_start")!({} as never, ordinary);
       expect(tools).toHaveLength(0);
       handlers.get("session_start")!({} as never, orb);
-      expect(tools).toHaveLength(12);
+      expect(tools).toHaveLength(13);
       expect(tools.every(t => t.executionMode === "sequential")).toBe(true);
+      const start = { systemPromptOptions: { sections: {}, promptGuidelines: [] } };
+      handlers.get("before_agent_start")!(start as never, ordinary);
+      expect(activeTools).toContain("advisor");
+      expect(start.systemPromptOptions.promptGuidelines).toEqual([]);
+      handlers.get("before_agent_start")!(start as never, orb);
+      expect(activeTools).toEqual(["read", "orb_observe"]);
+      expect(start.systemPromptOptions.promptGuidelines.join(" ")).toContain("requested destination");
       const messages = Array.from({ length: 5 }, (_, id) => ({ role: "toolResult", toolName: "orb_observe", content: [{ type: "image", data: String(id) }] }));
       const before = JSON.stringify(messages);
       expect(handlers.get("context")!({ messages } as never, ordinary)).toBeUndefined();

@@ -16,7 +16,7 @@ pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复�
 - **像素取点**：模型按 Pi 实际附加截图的像素坐标定位；观察绑定会话、代次和编号，过期观察与越界坐标会被拒绝。
 - **串行批量**：`orb_batch` 一次提交 2–8 个初始截图中已经可见、互相独立的动作。逐步执行、逐步观察，失败或取消时停止剩余动作。
 
-新 Orb 会话默认 **Full Access（完全访问）**，可以产生真实鼠标与键盘输入。请在开始任务前检查 Access；Stop、隐藏、断连、锁屏及会话/工作区切换会撤销旧授权。正常回复结束保留当前会话的授权；截图消息仍需另行预览确认。授权边界见 [SECURITY.md](./SECURITY.md)。
+新 Orb 会话及明确重新打开隐藏的 Orb 默认 **Full Access（完全访问）**，可以产生真实鼠标与键盘输入。请在开始任务前检查 Access；Stop、隐藏、断连、锁屏及会话/工作区切换会撤销旧授权。聚焦已经可见的 Orb 保留手动权限；正常回复结束保留当前会话的授权；截图消息仍需另行预览确认。授权边界见 [SECURITY.md](./SECURITY.md)。
 
 ## 快速开始
 
@@ -51,6 +51,8 @@ pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复�
 4. 从开始菜单打开 **pi-orb**，选择一个专用工作区，检查模型和 Access，再开始聊天或桌面任务。默认连接地址为 `http://127.0.0.1:30141`。
 
 未安装插件时，浮窗聊天仍可连接 pi-web，但模型不会获得 `orb_*` 工具。安装插件仅声明本地包，不复制目录，也不会自动授予其他工作区桌面能力。移除声明可运行 `pi remove "$PWD\pi-package"`（在仓库根目录中执行），然后重启 pi-web。
+
+浏览器任务使用 `orb_browser` 与 [Playwright Chrome 扩展](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm) 连接现有登录标签页。安装扩展后首次操作选择标签页即可，无需改 Pi 的全局 MCP 配置。当前 DOM 适配已通过真实 Chrome 测试，用户 Chrome 扩展连接与真实 B 站联合验收仍待完成；[安装步骤与证据边界](./doc/session-continuity.md)。
 
 ### 从源码运行
 

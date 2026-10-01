@@ -45,6 +45,7 @@ import { ScreenshotFlow } from "./screenshot-flow";
 import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-export";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
+import { BrowserBroker } from "./browser-broker";
 import { ReferenceWindowsDriver } from "./reference-windows-driver";
 import { applyFloatingOverlayGuard, resetFloatingOverlayGuard, OVERLAY_GUARD_INPUT_APPLY_MS } from "./floating-overlay-guard";
 import { delay } from "./reference-windows/wait";
@@ -135,8 +136,10 @@ let lastWorkspaceProblem: string | null = null;
 let lastShortcutProblem: string | null = null;
 let lastDesktopProblem: string | null = null;
 // The reference Orb ships with Full Access selected. Apply it once to each new Orb session;
-// Stop and hide still revoke it until the user selects Access again or starts a new session.
+// Stop and hide revoke it. An explicit reopen or new session selects Full Access again.
 let defaultAccessPending = true;
+let accessRevision = 0;
+const browserBroker = new BrowserBroker(() => desktopBroker?.status() ?? null);
 
 function grantDefaultAccess(sessionId: string, generation: number): void {
   if (!defaultAccessPending || !desktopBroker || generations.current !== generation || session.sessionId !== sessionId) return;
@@ -170,6 +173,7 @@ const client = new PiWebClient({
 });
 
 function emit(event: OrbSessionEvent): void {
+  if (event.type === "idle" || event.type === "error") hideObservationFrame(observationFrame ?? undefined);
   if (event.type === "idle") {
     // The full prompt queue has drained. A turn ending between queued prompts is not idle.
     // Release the prompt lock only; session-level desktop Access is intentionally preserved.
@@ -346,6 +350,7 @@ async function startDesktop(): Promise<void> {
       ops,
       backend: createWindowsDesktopBackend(ops),
       ownProcessId: process.pid,
+      onTargetChanged: () => showObservationFrameForTarget(),
       withGuiTurn: async <T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T> => {
         const current = window;
         if (!current || current.isDestroyed()) return run();
@@ -357,7 +362,6 @@ async function startDesktop(): Promise<void> {
           showObservationFrameForTarget();
           return await run();
         } finally {
-          hideObservationFrame(observationFrame ?? undefined);
           if (!current.isDestroyed()) {
             applyFloatingOverlayGuard(current, "input", "end");
             // The ribbon's `showInactive` can restack same-level panels, so the orb's higher level is
@@ -448,8 +452,9 @@ async function startBridge(): Promise<void> {
         return broker.act(action, sessionId, generation, signal);
       },
       batch: (value, sessionId, generation, signal, progress) => requireBroker().batch(value, sessionId, generation, signal, progress),
+      browser: (value, sessionId, generation, signal) => browserBroker.call(value, sessionId, generation, signal),
       status: () => desktopTaskStatus(),
-      revoke: () => desktopBroker?.revoke(),
+      revoke: () => revokeDesktopOperations("the bridge revoked Access"),
       /**
        * Admit only the live run's session and generation, and say which of the two failed.
        *
@@ -514,10 +519,10 @@ async function refreshPiWebState(): Promise<void> {
     markDisconnected();
     return;
   }
-  if (piWebState.reachable === false) {
+  if (piWebState.reachable === false && desktopBroker) {
     // A reconnect must not silently resume a desktop task that was granted for a session that died
     // while the connection was down.
-    desktopBroker?.revoke();
+    revokeDesktopOperations("the pi-web connection was re-established");
   }
   piWebState = { baseUrl: client.baseUrl, reachable: true, problem: null };
 }
@@ -599,7 +604,7 @@ function attachWakeController(win: BrowserWindow): void {
       isDestroyed: () => win.isDestroyed(),
     },
     {
-      revokeOrbAccess: () => desktopBroker?.revoke(),
+      revokeOrbAccess: () => revokeDesktopOperations("the orb was hidden"),
       discardPendingCapture: () => screenshotFlow?.discard(),
       // Collapse is the route users actually take, so the record must be dropped here too. The
       // revocation routine below documents this exact rule for a collapse, but only the tray, the
@@ -667,7 +672,9 @@ function attachKeyboardEdgeRecovery(): void {
  * session desktop Access and drops any unconfirmed screenshot, and it is idempotent.
  */
 function revokeDesktopOperations(reason: string): void {
+  accessRevision++;
   defaultAccessPending = false;
+  browserBroker.revoke();
   const hadAuthority = desktopBroker?.status().authorized === true;
   const hadCapture = screenshotFlow?.pending !== null && screenshotFlow?.pending !== undefined;
   desktopBroker?.revoke();
@@ -1204,7 +1211,10 @@ function registerIpc(): void {
       return desktopTaskStatus();
     }
     lastDesktopProblem = null;
+    const requestedRevision = accessRevision;
     return session.ensureSession(config.orbWorkspace).then((sessionId) => {
+      if (accessRevision !== requestedRevision || generations.current !== parsed.generation || session.sessionId !== sessionId || !window?.isVisible()) return desktopTaskStatus();
+      browserBroker.revoke();
       desktopBroker?.authorize({ sessionId, generation: parsed.generation, level: parsed.level });
       defaultAccessPending = false;
       return desktopTaskStatus();
@@ -1448,6 +1458,7 @@ async function showOrb(): Promise<void> {
  */
 async function presentOrb(win: BrowserWindow): Promise<void> {
   if (win.isDestroyed()) return;
+  const reopening = !win.isVisible();
   try {
     await clampFloatingWindow(win);
   } catch (error) {
@@ -1457,6 +1468,17 @@ async function presentOrb(win: BrowserWindow): Promise<void> {
   if (win.isMinimized()) win.restore();
   win.show();
   win.focus();
+  // Explicitly reopening the hidden Orb selects the user's requested default. Focusing an
+  // already visible Orb preserves a manually selected level and never undoes an emergency Stop.
+  if (reopening && config.orbWorkspace && desktopBroker && piWebState.reachable) {
+    defaultAccessPending = true;
+    const generation = generations.current;
+    try {
+      grantDefaultAccess(await session.ensureSession(config.orbWorkspace), generation);
+    } catch (error) {
+      lastDesktopProblem = describeError(error);
+    }
+  }
 }
 
 app.on("window-all-closed", () => {

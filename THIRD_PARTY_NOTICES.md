@@ -158,6 +158,13 @@ the source commit and the local adaptation boundary.
 
 ## 5. Trademarks
 
+Browser integration additionally distributes `@playwright/mcp` 0.0.83, Playwright / Playwright Core
+1.64.0-alpha-1790635538000 (Microsoft, Apache-2.0), and `@modelcontextprotocol/sdk` 1.31.0 (MIT).
+Their license texts remain in the packaged dependency directories. pi-orb uses their public
+`createConnection`, Client and InMemoryTransport APIs; it does not vendor the browser extension or
+implement its CDP protocol. The Chrome extension is installed separately from Microsoft's official
+Chrome Web Store listing. The Pi engine and credentials remain owned by Pi Web.
+
 pi-orb is an independent open-source project. It is not affiliated with, endorsed by, or an official
 product of the pi-web, Pi, Cua or DeepSeek projects. The MIT licenses of those projects do not grant
 trademark rights.

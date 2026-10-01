@@ -71,6 +71,7 @@ auth.json
 *.bmp
 
 # Electron/OS noise
+.playwright-mcp/
 Thumbs.db
 Desktop.ini
 .DS_Store

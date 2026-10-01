@@ -139,6 +139,7 @@ describe("orb_open_app: activation only", () => {
       },
       (target) => changed.push(target),
     );
+    changed.length = 0; // Initial observation also publishes the frame target.
 
     // First attempt: activation reports success but the foreground window is a different app, so
     // the driver must refuse rather than adopt whatever happens to be in front.
@@ -163,6 +164,7 @@ describe("orb_open_app: activation only", () => {
       },
       (target) => changed.push(target),
     );
+    changed.length = 0;
 
     const acted = await driver.act({ kind: "openApp", observationId: observation.observationId, name: "Notepad" }, observation);
     expect(acted.ok).toBe(true);
@@ -231,6 +233,7 @@ describe("orb_open_app: activation only", () => {
       { running: ["notepad.exe"] },
       (target) => changed.push(target),
     );
+    changed.length = 0;
 
     const acted = await driver.act({ kind: "openApp", observationId: observation.observationId, name: "calc" }, observation);
     expect(acted.ok).toBe(false);
@@ -257,6 +260,7 @@ describe("orb_open_app: activation only", () => {
       { running: ["notepad.exe"], activates: () => false },
       (target) => changed.push(target),
     );
+    changed.length = 0;
     const acted = await driver.act({ kind: "openApp", observationId: observation.observationId, name: "notepad" }, observation);
     expect(acted.ok).toBe(false);
     expect(acted.error).toMatch(/could not be brought to the foreground/u);

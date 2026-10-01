@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-01T02:45:56.903Z",
+  "capturedAt": "2026-10-01T05:58:39.616Z",
   "executable": "release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790822756903",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790834319616",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-40452",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/efe12881-3886-4c95-a8d2-5092539cc961"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-50808",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/789ec5e2-1bdc-4ce3-a44a-e4f409758417"
 }

@@ -33,7 +33,7 @@ export interface ReferenceWindowsDriverOptions {
   /** Hide or cloak the Orb while the target is captured or receives HID input. */
   readonly withGuiTurn?: <T>(run: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
   /**
-   * Called after `orb_open_app` moved the task to another application's window.
+   * Called whenever a fresh observation adopts a window, including after navigation.
    *
    * The driver reports the adopted application so the observation frame and shell diagnostics
    * follow the fresh observation returned to the model.
@@ -150,6 +150,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         this.#target = target;
         this.#screen = screen;
         this.#observation = observation;
+        this.#publishTarget(target);
         return observation;
       }, input.signal);
       input.signal?.throwIfAborted();
@@ -173,6 +174,13 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         await delay((action.kind === "wait" ? WAIT_SECONDS : action.waitSeconds) * 1000, abort);
       }
       const apps = action.kind === "listApps" ? [...await this.#options.backend.listApps(abort)] : undefined;
+      // Read-only refreshes never send input to the old surface. Navigation may legitimately
+      // change the title during a wait; observe the resulting page instead of refusing it.
+      if (action.kind === "wait" || action.kind === "longWait" || action.kind === "listApps") {
+        const fresh = await this.observe({ includeImage: true, signal });
+        if (!fresh.ok || !fresh.observation) throw new Error(fresh.error ?? "Observation unavailable.");
+        return { ok: true, refused: false, error: null, observation: fresh.observation, ...(apps ? { apps } : {}) };
+      }
       const observationAfterAction = await this.#withGuiTurn(async () => {
         if (!this.#isCurrentForeground(target)) {
           // No input has run. Return the new surface so a batch can stop with a current
@@ -210,7 +218,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
             scrollLevel: action.amount,
           }, signal));
         }
-        if (action.kind !== "wait" && action.kind !== "longWait" && action.kind !== "listApps") await timeToolPhase("post-action-wait", () => delay(this.#options.postActionWaitMs ?? POST_ACTION_WAIT_MS, abort));
+        await timeToolPhase("post-action-wait", () => delay(this.#options.postActionWaitMs ?? POST_ACTION_WAIT_MS, abort));
         const nextTarget = this.#findForegroundTarget();
         if (!nextTarget) throw new Error("No application window is available after the action.");
         const nextScreens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens(signal));
@@ -222,6 +230,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         this.#target = nextTarget;
         this.#screen = nextScreen;
         this.#observation = nextObservation;
+        this.#publishTarget(nextTarget);
         return nextObservation;
       }, signal);
       abort.throwIfAborted();
@@ -350,15 +359,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
         this.#target = foreground;
         this.#screen = screen;
         this.#observation = next;
-        this.#options.onTargetChanged?.({
-          windowId: foreground.windowId,
-          pid: foreground.pid,
-          appName: foreground.appName,
-          title: foreground.title,
-          bounds: foreground.bounds,
-          isOnScreen: true,
-          zIndex: BigInt(0),
-        });
+        this.#publishTarget(foreground);
         return next;
       }, signal);
       abort.throwIfAborted();
@@ -369,6 +370,10 @@ export class ReferenceWindowsDriver implements DesktopDriver {
   }
 
   /** Select the reference backend's frontmost operable window, excluding Orb chrome. */
+  #publishTarget(target: TargetWindow): void {
+    this.#options.onTargetChanged?.({ ...target, isOnScreen: true, zIndex: BigInt(0) });
+  }
+
   #findForegroundTarget(): TargetWindow | null {
     const snapshot = timeToolSync("window-enumeration", () => this.#options.ops.listWindows());
     const ownIds = snapshot.windows.filter((window) => window.pid === this.#options.ownProcessId).map((window) => window.hwnd);

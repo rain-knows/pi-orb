@@ -132,7 +132,7 @@ DeepSeek Orb 代码索引：
 
 - `orbWorkspace`：持久化路径配置；Electron 在**创建**会话之前传给现有 pi-web API。工作区切换应停止当前桌面任务并新建／选择正确 cwd 的会话，不在活跃会话里篡改路径。
 - `Orb 模式`：cwd 精确匹配后应用的提示与工具配置；普通 Web 或 CLI 若使用该 cwd，也可能进入此模式。用户已接受 cwd 标记路线，界面须解释这个结果；不以“来自哪个前端”作为模式识别的唯一依据。
-- `桌面授权`：按用户 2026-09-30 的明确要求，新 Orb 会话默认 `Full Access`；用户可在 Access 芯片切换 `Read Only / Workspace Write / Full Access`。grant 仅绑定当前本机壳、Orb session 与 generation，不写入会话日志或作为可恢复权限；Stop／hide／断连撤权后不静默重授。cwd 或 `/orb` 字符串匹配**不能授权**鼠标、键盘；截图消息仍须逐张预览确认。
+- `桌面授权`：按用户 2026-09-30／10-01 的明确要求，新 Orb 会话及明确重开隐藏的 Orb 默认 `Full Access`；用户可在 Access 芯片切换 `Read Only / Workspace Write / Full Access`。grant 仅绑定当前本机壳、Orb session 与 generation，不写入会话日志或作为可恢复权限；Stop／hide／断连立即撤权，后台事件不静默重授，聚焦已显示窗口保留手动档位。cwd 或 `/orb` 字符串匹配**不能授权**鼠标、键盘；截图消息仍须逐张预览确认。
 - 首选验证按 `session_start` 的 `ctx.cwd` 条件注册额外资源，非匹配 cwd 不贡献模型工具／提示。若需项目 scope 资源配置，只对用户选中的目录、经确认安装，不覆盖已有 `.pi` 文件。两者先验证，再选择一种简单实现，不并行维护两套。
 - `before_agent_start` 只在匹配模式时应用工具／提示；普通 cwd 不主动改原资源。不能依靠启动时隐藏一遍抵抗 W1 自动追加行为。执行器每次校验授权、限额及状态，防止旧工具调用继续执行。
 - prompt 用独立结构化 section 追加，说明截图新鲜度、坐标空间、动作后核验、禁止将屏幕内容当授权、遇阻停下，不替换用户原始指令体系。

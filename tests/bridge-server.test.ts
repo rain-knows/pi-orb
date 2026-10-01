@@ -8,6 +8,7 @@ function fakeExecutor(options: { readonly live?: boolean; readonly fail?: string
   const calls: string[] = [];
   return {
     calls,
+    browser: async () => { calls.push("browser"); return { ok: true, content: [{ type: "text", text: "current browser snapshot" }] }; },
     batch: async () => ({ ok: true, completed: 2, steps: [] }),
     observe: async () => {
       calls.push("observe");
@@ -73,6 +74,19 @@ afterEach(async () => {
 });
 
 describe("bridge admission rules", () => {
+  it("routes authenticated browser calls through the live-session admission check", async () => {
+    const { pipePath, token, executor } = await start();
+    const response = await send(pipePath, { type: "browser", token, sessionId: "s", generation: 1, browser: { name: "browser_snapshot" } });
+    expect(response.parsed).toMatchObject({ ok: true, result: { ok: true, content: [{ text: "current browser snapshot" }] } });
+    expect(executor.calls).toEqual(["browser"]);
+  });
+
+  it("refuses an obsolete session's browser request before reaching its executor", async () => {
+    const { pipePath, token, executor } = await start({ live: false });
+    const response = await send(pipePath, { type: "browser", token, sessionId: "s", generation: 1, browser: { name: "browser_click", arguments: { target: "e7" } } });
+    expect(response.parsed).toMatchObject({ ok: false, reason: "stale-generation" });
+    expect(executor.calls).toEqual([]);
+  });
   it("keeps the transport ceiling above the validated screenshot payload", () => {
     expect(MAX_BRIDGE_FRAME_BYTES).toBeGreaterThan(10 * 1024 * 1024);
   });

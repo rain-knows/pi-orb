@@ -669,6 +669,7 @@ export function createProductionWindowsOps(): WindowsDesktopOps {
    */
   function becomeForeground(target: unknown): boolean {
     if (api.IsIconic(target) !== 0) api.ShowWindow(target, SW_RESTORE)
+    else if (api.IsWindowVisible(target) === 0) api.ShowWindow(target, SW_SHOWNORMAL)
     postKey(api, VK_MENU, true, false)
     try {
       api.SetForegroundWindow(target)
@@ -795,10 +796,12 @@ try { [System.Windows.Forms.Clipboard]::SetImage($image) } finally { $image.Disp
     },
     listWindowApps() {
       const names = new Set<string>()
-      for (const hwnd of enumTopLevel(api)) {
-        if (api.IsWindowVisible(hwnd) === 0) continue
-        const name = processBaseName(api, pidOf(api, hwnd))
-        if (name !== undefined && name !== '') names.add(name)
+      for (const window of listWindows().windows) {
+        // Tray-resident applications still own a normal titled window. Helper and tool
+        // windows are excluded, but visibility is not evidence that an app has exited.
+        if (window.toolWindow || window.ownerHwnd !== 0 || window.cloaked || window.title.trim() === ''
+          || window.frame.width <= 0 || window.frame.height <= 0) continue
+        if (window.appName !== '') names.add(window.appName)
       }
       return [...names]
     },
@@ -806,16 +809,12 @@ try { [System.Windows.Forms.Clipboard]::SetImage($image) } finally { $image.Disp
       const wanted = name.trim().toLowerCase()
       if (wanted === '') return false
       return perMonitor(() => {
-        let target: unknown
-        for (const hwnd of enumTopLevel(api)) {
-          if (api.IsWindowVisible(hwnd) === 0) continue
-          const app = (processBaseName(api, pidOf(api, hwnd)) ?? '').toLowerCase()
-          const title = windowText(api, hwnd).toLowerCase()
-          if (app === wanted || title.includes(wanted)) {
-            target = hwnd
-            break
-          }
-        }
+        const candidates = listWindows().windows.filter(window =>
+          window.appName.toLowerCase().replace(/\.exe$/, '') === wanted.replace(/\.exe$/, '')
+          && !window.toolWindow && window.ownerHwnd === 0 && !window.cloaked
+          && window.title.trim() !== '' && window.frame.width > 0 && window.frame.height > 0)
+        const selected = candidates.find(window => window.visible) ?? candidates[0]
+        const target = selected ? windowPointer(selected.hwnd) : undefined
         if (target === undefined) return false
         if (!becomeForeground(target)) throw new Error(`computer-use: failed to activate ${name}`)
         return true

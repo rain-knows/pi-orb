@@ -15,7 +15,7 @@
 //
 // Run: node evidence/p1-07/run-lifecycle-regression.mjs
 
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { connect } from "node:net";
 import { createServer } from "node:http";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -35,7 +35,7 @@ const PI_WEB_PORT = 31422;
 const MODEL_PORT = 31423;
 const PI_WEB_PASSWORD = "p1-07-lifecycle-password";
 const piWebBaseUrl = `http://127.0.0.1:${PI_WEB_PORT}`;
-const piWebWorktree = join(tmpdir(), "pi-orb-p0-head-src");
+const piWebWorktree = process.env.PI_ORB_EVIDENCE_PI_WEB ?? resolve(repo, ".tmp/plugin-pointing/pi-web");
 const agentDir = join(runRoot, "agent");
 const sessionDir = join(agentDir, "sessions");
 const homeDir = join(runRoot, "home");
@@ -200,6 +200,7 @@ async function connectCdp(url) {
 }
 
 let shell = null;
+let target = null;
 let shellErr = "";
 
 try {
@@ -219,7 +220,7 @@ try {
 
   shell = spawn(
     electronBinary,
-    [".", `--user-data-dir=${shellDataDir}`, `--remote-debugging-port=${DEBUG_PORT}`],
+    [join(import.meta.dirname, "bootstrap.cjs"), `--user-data-dir=${shellDataDir}`, `--remote-debugging-port=${DEBUG_PORT}`],
     {
       cwd: repo,
       env: {
@@ -291,7 +292,7 @@ try {
    * This goes through the named pipe rather than the renderer on purpose: once the window is hidden
    * its renderer can be suspended, so a renderer-based read would never resolve after a collapse.
    */
-  async function bridgeStatus(session, generationForStatus) {
+  async function bridgeStatus(session, generationForStatus, type = "status") {
     const handshakeData = handshake();
     if (!session || !handshakeData) return null;
     return new Promise((done) => {
@@ -303,7 +304,7 @@ try {
       }, 5000);
       socket.on("connect", () =>
         socket.write(
-          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type: "status", token: handshakeData.token, sessionId: session, generation: generationForStatus })}\n`,
+          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type, token: handshakeData.token, sessionId: session, generation: generationForStatus })}\n`,
         ),
       );
       socket.on("data", (chunk) => (data += chunk.toString("utf8")));
@@ -364,6 +365,27 @@ try {
   const afterEnsure = await status();
   check("ensuring the stopped session does not silently restore Full Access", afterEnsure.desktopTask?.authorized === false, safe(afterEnsure.desktopTask));
 
+  // A real native observation finishes while the model is still thinking. The frame must outlive
+  // that tool, then disappear on idle. The target is disposable; no user app receives input.
+  await evaluate(`window.orb.setOrbAccess({ generation: ${generation}, level: 'full-access' })`);
+  const targetEnv = { ...process.env, PI_ORB_SPEED_ROOT: runRoot };
+  delete targetEnv.ELECTRON_RUN_AS_NODE;
+  target = spawn(electronBinary, [join(repo, "evidence/tool-speed/target-app")], { env: targetEnv, windowsHide: true, stdio: "ignore" });
+  for (let attempt = 0; attempt < 60 && !existsSync(join(runRoot, "geometry.json")); attempt++) await sleep(100);
+  const hwnd = Number(execFileSync("powershell.exe", ["-NoProfile", "-Command", `(Get-Process -Id ${target.pid}).MainWindowHandle.ToInt64()`], { encoding: "utf8", windowsHide: true }).trim());
+  modelResponseDelayMs = 6000;
+  await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: "observation frame lifetime" })`);
+  execFileSync("powershell.exe", ["-NoProfile", "-File", join(repo, "evidence/lib/activate-window.ps1"), "-Hwnd", String(hwnd), "-ForegroundOnly"], { windowsHide: true, stdio: "ignore" });
+  const observed = await bridgeStatus(sessionId, generation, "observe");
+  const frames = () => JSON.parse(readFileSync(join(shellDataDir, "probe-windows.json"), "utf8")).filter(w => w.url.endsWith("observation-frame.html"));
+  await sleep(2200);
+  const duringThinking = { busy: (await status()).busy, frames: frames() };
+  check("observation succeeds on a disposable native target", observed.ok === true && observed.result?.window?.pid === target.pid, safe(observed.result?.window));
+  check("frame persists after the native tool while the model is thinking", duringThinking.busy && duringThinking.frames.some(w => w.visible), safe(duringThinking));
+  for (let attempt = 0; attempt < 90 && (await status()).busy; attempt++) await sleep(100);
+  await sleep(150);
+  check("frame disappears when the Pi turn becomes idle", frames().length > 0 && frames().every(w => !w.visible), safe(frames()));
+
   // -------------------------------------------------------------------------
   // Collapse revokes. The collapse is triggered through the window's own control, which is the
   // same lifecycle routine the shortcut and the tray use — so this exercises the real route rather
@@ -397,6 +419,11 @@ try {
     report.collapse.bridgeAuthorizedBefore === true &&
     (report.collapse.bridgeAuthorizedAfter === false || collapseResult.authorized === false);
   check("collapsing the orb revokes session Access", revokedByCollapse, safe(report.collapse));
+  check("collapse clears the observation frame", frames().every(w => !w.visible), safe(frames()));
+  writeFileSync(join(shellDataDir, "probe-control.json"), JSON.stringify({ nonce: Date.now(), wake: true }));
+  await sleep(1500);
+  const afterReopen = await status();
+  check("explicitly reopening the hidden Orb selects Full Access on the same session", afterReopen.sessionId === sessionId && afterReopen.desktopTask?.authorized === true && afterReopen.desktopTask?.level === "full-access", safe(afterReopen.desktopTask));
 
   // A workspace switch replaces the old grant with the new session's default.
   const beforeWorkspaceSwitch = await status();
@@ -482,6 +509,7 @@ try {
   report.fatal = String(error?.stack ?? error).slice(0, 1000);
   report.stderrTail = shellErr.slice(-600);
 } finally {
+  if (target?.pid) try { execFileSync("taskkill.exe", ["/PID", String(target.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" }); } catch { /* Already exited. */ }
   try {
     shell?.kill();
     await sleep(1000);

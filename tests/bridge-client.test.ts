@@ -9,6 +9,22 @@ import { BRIDGE_PROTOCOL_VERSION } from "@shared/bridge-protocol";
 
 let dir = "";
 
+it("retains a pre-input surface change screenshot across the real named pipe", async () => {
+  const pipePath = `\\\\.\\pipe\\orb-surface-${process.pid}-${Date.now()}`;
+  const observation = { observationId: "new-page", image: { data: "AQID", mimeType: "image/png" } };
+  const server = new BridgeServer({ pipePath, token: "a".repeat(64), executor: {
+    accepts: () => true, status: () => ({}), revoke: () => {}, observe: async () => ({}), batch: async () => ({}),
+    act: async () => ({ ok: false, reason: "surface-changed", message: "No input sent.", observation }),
+  } });
+  await server.listen();
+  try {
+    const client = new BridgeClient({ pipePath, tokenFile: "unused" });
+    const result = await client.call({ type: "act", sessionId: "s", generation: 1, action: {} },
+      { version: 2, token: "a".repeat(64), pid: 1, workspace: "test", pipePath, generation: 1, createdAt: "now" });
+    expect(result).toMatchObject({ ok: false, reason: "surface-changed", result: { observation } });
+  } finally { await server.close(); }
+});
+
 it("budgets declared waits and batches", () => {
   expect(bridgeTimeoutMs({type:"act",sessionId:"s",generation:1,action:{kind:"longWait",waitSeconds:120}})).toBe(150_000);
   expect(bridgeTimeoutMs({type:"batch",sessionId:"s",generation:1,batch:{actions:[{}, {}, {}]}})).toBe(90_000);

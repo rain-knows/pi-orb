@@ -16,7 +16,7 @@ it("binds resized pixels to session, generation and observation; refuses before 
   const call=vi.spyOn(BridgeClient.prototype,"call").mockResolvedValue({ok:true,result:{ok:true}});
   const handlers = new Map<string,(event: never,ctx: ExtensionContext)=>unknown>();
   const tools=new Map<string,ToolDefinition>();
-  const api={on:(name:string,handler:typeof handlers extends Map<string,infer F>?F:never)=>handlers.set(name,handler),registerTool:(tool:ToolDefinition)=>tools.set(tool.name,tool),registerCommand:()=>{}};
+  const api={on:(name:string,handler:typeof handlers extends Map<string,infer F>?F:never)=>handlers.set(name,handler),registerTool:(tool:ToolDefinition)=>tools.set(tool.name,tool),registerCommand:()=>{},getActiveTools:()=>[...tools.keys()],setActiveTools:()=>{}};
   let sessionId="one";
   const ctx={cwd:directory,sessionManager:{getSessionId:()=>sessionId}} as ExtensionContext;
   const bytes=Buffer.alloc(24);bytes.set([137,80,78,71,13,10,26,10]);bytes.write("IHDR",12);bytes.writeUInt32BE(1600,16);bytes.writeUInt32BE(900,20);
