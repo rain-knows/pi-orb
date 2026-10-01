@@ -229,11 +229,13 @@ try {
         PI_ORB_CONFIG: configPath,
         PI_ORB_PI_WEB_URL: piWebBaseUrl,
         PI_ORB_PI_WEB_PASSWORD: PI_WEB_PASSWORD,
+        PI_ORB_EVIDENCE_DOM_FRAME: "1",
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
   shell.stderr.on("data", (chunk) => (shellErr += chunk.toString()));
+  shell.stdout.on("data", () => {});
 
   let pageTarget = null;
   for (let attempt = 0; attempt < 50; attempt += 1) {
@@ -292,7 +294,7 @@ try {
    * This goes through the named pipe rather than the renderer on purpose: once the window is hidden
    * its renderer can be suspended, so a renderer-based read would never resolve after a collapse.
    */
-  async function bridgeStatus(session, generationForStatus, type = "status") {
+  async function bridgeStatus(session, generationForStatus, type = "status", extra = {}) {
     const handshakeData = handshake();
     if (!session || !handshakeData) return null;
     return new Promise((done) => {
@@ -304,7 +306,7 @@ try {
       }, 5000);
       socket.on("connect", () =>
         socket.write(
-          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type, token: handshakeData.token, sessionId: session, generation: generationForStatus })}\n`,
+          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type, token: handshakeData.token, sessionId: session, generation: generationForStatus, ...extra })}\n`,
         ),
       );
       socket.on("data", (chunk) => (data += chunk.toString("utf8")));
@@ -385,6 +387,20 @@ try {
   for (let attempt = 0; attempt < 90 && (await status()).busy; attempt++) await sleep(100);
   await sleep(150);
   check("frame disappears when the Pi turn becomes idle", frames().length > 0 && frames().every(w => !w.visible), safe(frames()));
+
+  // Exercise the new DOM route through the same live bridge/main process with public MCP and a
+  // real, private Chrome fixture. User-profile extension connection is verified separately.
+  modelResponseDelayMs = 10_000;
+  await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: "DOM browser frame lifetime" })`);
+  const domObserved = await bridgeStatus(sessionId, generation, "browser", { browser: { name: "browser_snapshot" } });
+  check("DOM tools return a real Chrome snapshot through the production bridge", domObserved?.ok && domObserved.result?.ok
+    && domObserved.result.content.some(c => c.text?.includes("Page Title: Orb lifecycle browser fixture")), safe(domObserved).slice(0, 500));
+  await sleep(2200);
+  const duringDomThinking = { busy: (await status()).busy, frames: frames() };
+  check("browser ribbon persists after the DOM tool while the model is thinking", duringDomThinking.busy && duringDomThinking.frames.some(w => w.visible), safe(duringDomThinking));
+  for (let attempt = 0; attempt < 150 && (await status()).busy; attempt++) await sleep(100);
+  await sleep(150);
+  check("browser ribbon disappears when the Pi turn becomes idle", frames().every(w => !w.visible), safe(frames()));
 
   // -------------------------------------------------------------------------
   // Collapse revokes. The collapse is triggered through the window's own control, which is the
@@ -509,6 +525,8 @@ try {
   report.fatal = String(error?.stack ?? error).slice(0, 1000);
   report.stderrTail = shellErr.slice(-600);
 } finally {
+  writeFileSync(join(shellDataDir, "probe-control.json"), JSON.stringify({ nonce: Date.now(), closeBrowser: true }));
+  await sleep(300);
   if (target?.pid) try { execFileSync("taskkill.exe", ["/PID", String(target.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" }); } catch { /* Already exited. */ }
   try {
     shell?.kill();

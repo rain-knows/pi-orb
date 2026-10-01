@@ -22,6 +22,8 @@
 
 光效继续点击穿透及 capture 排除。普通 Pi Web cwd 不注册工具、不修改提示或 advisor。Stop、隐藏、断连、锁屏、换会话／工作区均通过统一撤权出口关闭浏览器连接和桌面权限；晚到的 Access 请求不越过撤权或换代。
 
+DOM 工具也复用同一个观察框。MCP 返回当前页面标题，适配层精确匹配唯一可见 Chrome 原生窗口；不把 DOM 页面冒充为桌面输入 observation。实际测得 DOM 标题比 Windows caption 早约 250ms 更新，因此仅在尚未匹配时，沿用参考 `POST_ACTION_WAIT_MS=600` 的就绪预算。取消、换 session/generation 或撤权后不显示晚到的光效；无法唯一匹配时不标记其他应用。来源仍是上表观察框及原生枚举，没有另写窗口／光效组件；页面与 HWND 匹配是公共 MCP 未提供原生窗口标识所需的最小适配。
+
 ## 浏览器实现
 
 当前运行的是原版 Pi 与 `agegr/pi-web`。用户提到的 OMP ZIP 配合 OMP CLI 内的 relay 服务工作，单装 ZIP 不会给当前 Pi 增加浏览器工具。[OMP v18.4.6 文档](https://github.com/can1357/oh-my-pi/blob/v18.4.6/packages/browser-relay/README.md)
@@ -34,12 +36,16 @@ MCP 0.0.83 默认把动作快照写成文件；Pi 在另一个进程不能直接
 
 ## 验证与边界
 
-- 47 个测试文件、471 项通过；lint、typecheck、build 通过。
-- `evidence/p1-07/session-access-regression.json`：18/18，真实 Electron、Pi Web、本地模型和一次性原生目标。工具返回后再等待 2.2 秒，模型仍 busy 且观察框可见；idle 后隐藏。Stop、隐藏、明确重开、换会话／工作区和断连通过。
+- 48 个测试文件、474 项通过；lint、typecheck、build 通过。
+- `evidence/p1-07/session-access-regression.json`：21/21，真实 Electron、Pi Web、本地模型、一次性原生目标及私有 Chrome 页面。原生和 DOM 工具返回后再等待 2.2 秒，模型仍 busy 且观察框可见；idle 后隐藏。Stop、隐藏、明确重开、换会话／工作区和断连通过。Chrome 页面通过公开 contextGetter 接入，仅证明新光效路径；用户扩展的独立实测见下一项。
 - `evidence/session-continuity/qq-native.json`：真实 QQ 被列出并前置，前台读回 PID 和窗口标题确为 QQ；随后恢复原前台。没有发送任何 QQ 消息。
 - `evidence/browser-connection/dom-probe.json`：真实 Chrome＋公共 MCP，5/5；同一已登录的测试标签完成搜索→指定官方帐号→第一个视频，保持测试 cookie，没有进入相似帐号，撤权中断未完成的等待。快照 48ms，三个操作分别约 628/598/593ms。该测试使用公共 contextGetter 注入一次性浏览器，不证明用户 Chrome 扩展已经连接，也不是真实 B 站或模型总耗时。
 - `evidence/p2-05/stage-result.json` 记录打包→内容审计→启动产物；审计 27/27、启动 22/22。
-- 用户已允许安装 Chrome 扩展，但 computer-use 无法可靠识别当前 Chrome URL，工具终止了本轮 UI 安装。现有用户配置已注册 `D:\workself\pi-orb\pi-package`；Playwright Chrome 扩展尚未安装，真实 B 站登录标签页联合验收仍待完成。
+- 最终切换到本轮构建的 `release/0.1.0-preview.1/win-unpacked/pi-orb.exe`；运行 PID 47432，protocol 2 握手与进程一致，新会话已授权完全访问。原有 Pi Web 启动器重启成功，主页返回 HTTP 200。
+- Chrome Profile 1 已安装微软 Playwright 扩展。当前源码 Orb 已实际启动：新会话默认完全访问，默认握手由退出进程遗留的 protocol 1 更新为当前 PID 的 protocol 2。第一次真实模型请求因 Pi Web 仍加载旧插件，未发现 `orb_browser`；重启原有 Pi Web 启动器并再次请求后，模型成功发现浏览器 schema，并调用 `browser_tabs` 打开客户端 `pi-orb` 的官方选页界面。
+- `evidence/browser-connection/live-extension-probe.json`：6/6。用户手动选页后，原版 Pi 的真实 `TZcode_gpt/gpt-6-sol` 模型通过生产桥接拿到原有 B 站搜索标签的 URL、标题与元素引用；4 次 DOM 调用进入帐号 `1265652806`，读取企业官方认证，打开“最新发布”首个视频 `BV1DEhH6tEBA`。没有 advisor 或原生坐标调用，模型正常结束；截图 `live-official-profile.png` 另证主页认证和列表顺序。新视频在工具返回的 tab 列表中确实出现，随后浏览器清单已无该视频；不声称它仍然打开。补充提示要求新开页必须 select 并核验该页，避免用旧标签快照替代目的页核验。
+- 首次选择由用户完成：Codex 浏览器 URL 策略拒绝 `chrome-extension://` 页面。并未绕过该拒绝，连接完成结论来自选择后的真实模型工具结果。
+- 浏览器桥接超时调整为 110 秒，覆盖 MCP 动作的 90 秒、随后的 inline snapshot 15 秒及 5 秒传输余量；旧 95 秒会提前断开尚在生成快照的请求。Stop／客户端断开仍立即取消，不等待超时。
 
 ## 安装与使用
 

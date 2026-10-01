@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-01T05:58:39.616Z",
+  "capturedAt": "2026-10-01T07:14:29.636Z",
   "executable": "release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790834319616",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790838869636",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -26,7 +26,7 @@
     {
       "name": "the packaged app answers IPC status",
       "ok": true,
-      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"b"
+      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application "
     },
     {
       "name": "the packaged app starts in the isolated unconfigured state",
@@ -86,7 +86,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-50808",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/789ec5e2-1bdc-4ce3-a44a-e4f409758417"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-25272",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/43052b0c-9cd0-4c1a-ba11-73e7039d86a2\n[pi-orb] wake shortcut not registered: Another application already owns this shortcut. Choose a different one."
 }

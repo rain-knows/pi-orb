@@ -177,7 +177,8 @@ readToken(): BridgeTokenFile | null {
 
 /** Declared waits must outlive their work; batches budget each native action independently. */
 export function bridgeTimeoutMs(request: BridgeRequestBody): number {
-  if (request.type === "browser") return 95_000;
+  // Browser actions allow 90s plus a 15s inline snapshot; leave 5s for transport.
+  if (request.type === "browser") return 110_000;
   if (request.type === "batch") {
     const count = (request.batch as { actions?: unknown[] } | null)?.actions?.length ?? 1;
     return 30_000 * Math.min(8, Math.max(1, count));

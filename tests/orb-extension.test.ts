@@ -49,6 +49,7 @@ describe("Orb extension result rendering", () => {
       handlers.get("before_agent_start")!(start as never, orb);
       expect(activeTools).toEqual(["read", "orb_observe"]);
       expect(start.systemPromptOptions.promptGuidelines.join(" ")).toContain("requested destination");
+      expect(start.systemPromptOptions.promptGuidelines.join(" ")).toContain("select that destination with browser_tabs");
       const messages = Array.from({ length: 5 }, (_, id) => ({ role: "toolResult", toolName: "orb_observe", content: [{ type: "image", data: String(id) }] }));
       const before = JSON.stringify(messages);
       expect(handlers.get("context")!({ messages } as never, ordinary)).toBeUndefined();

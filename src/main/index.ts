@@ -46,6 +46,7 @@ import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-e
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
 import { BrowserBroker } from "./browser-broker";
+import { waitForBrowserObservationWindow } from "./browser-observation-frame";
 import { ReferenceWindowsDriver } from "./reference-windows-driver";
 import { applyFloatingOverlayGuard, resetFloatingOverlayGuard, OVERLAY_GUARD_INPUT_APPLY_MS } from "./floating-overlay-guard";
 import { delay } from "./reference-windows/wait";
@@ -452,7 +453,23 @@ async function startBridge(): Promise<void> {
         return broker.act(action, sessionId, generation, signal);
       },
       batch: (value, sessionId, generation, signal, progress) => requireBroker().batch(value, sessionId, generation, signal, progress),
-      browser: (value, sessionId, generation, signal) => browserBroker.call(value, sessionId, generation, signal),
+      browser: async (value, sessionId, generation, signal) => {
+        const revision = accessRevision;
+        const result = await browserBroker.call(value, sessionId, generation, signal);
+        const stillLive = () => !signal?.aborted && generations.current === generation
+          && session.sessionId === sessionId && accessRevision === revision
+          && desktopBroker?.status().authorized && desktopBroker.status().level === "full-access";
+        try {
+          if (stillLive()) {
+            const target = await waitForBrowserObservationWindow(result, () => referenceDriver?.listWindows() ?? [], signal);
+            if (stillLive()) {
+              if (target) showObservationFrameForTarget(target.bounds);
+              else hideObservationFrame(observationFrame ?? undefined);
+            }
+          }
+        } catch (error) { console.warn(`[pi-orb] browser observation frame unavailable: ${describeError(error)}`); }
+        return result;
+      },
       status: () => desktopTaskStatus(),
       revoke: () => revokeDesktopOperations("the bridge revoked Access"),
       /**
@@ -696,8 +713,7 @@ function revokeDesktopOperations(reason: string): void {
  * annotating. It is skipped entirely when no target is recorded (nothing to mark) or when its bounds
  * are empty, because a zero-area ribbon would read as a grant over nothing.
  */
-function showObservationFrameForTarget(): void {
-  const bounds = referenceDriver?.targetBounds();
+function showObservationFrameForTarget(bounds = referenceDriver?.targetBounds()): void {
   if (!bounds || bounds.width < 2 || bounds.height < 2) return;
   try {
     observationFrame ??= createObservationFrameWindow();

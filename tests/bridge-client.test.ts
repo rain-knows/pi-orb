@@ -28,6 +28,7 @@ it("retains a pre-input surface change screenshot across the real named pipe", a
 it("budgets declared waits and batches", () => {
   expect(bridgeTimeoutMs({type:"act",sessionId:"s",generation:1,action:{kind:"longWait",waitSeconds:120}})).toBe(150_000);
   expect(bridgeTimeoutMs({type:"batch",sessionId:"s",generation:1,batch:{actions:[{}, {}, {}]}})).toBe(90_000);
+  expect(bridgeTimeoutMs({type:"browser",sessionId:"s",generation:1,browser:{name:"browser_click"}})).toBeGreaterThan(90_000 + 15_000);
 });
 
 it("streams correlated progress and cancels a disconnected execution", async () => {
