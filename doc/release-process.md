@@ -98,3 +98,24 @@ Pi 插件仍需要完整源码检出后通过 `pi install <repo>/pi-package` 单
 | 是否会产出可下载文件 | 否（只上传门禁记录） | 是 |
 
 发布 job 的 `contents: write` 只加在**该 job** 上，不放在 workflow 级别；CI 永远拿不到写权限。
+
+## 9. 本机作为发布机器
+
+GitHub runner 无法完成真实桌面验收时，可以在具有交互式桌面的 Windows 发布机器上执行同一组
+门禁，构建并发布该机器验证的产物。不得使用 runner 上失败的二进制，也不得删除、跳过或放宽失败断言。
+release notes 必须准确说明构建机器、runner 结果及本机验证结果。
+
+执行顺序：
+
+1. 确认待发布 tag 的源提交与本机源码一致，跑发布门禁和完整 `run-p2-05.mjs`。
+2. 执行 `npm run package:win` 构建安装器。
+3. 对安装器构建生成的解包目录再跑 `run-package-audit.mjs` 与 `run-packaged-smoke.mjs`。
+4. 断言本次 JSON 全部通过、版本一致；收集 §6 的产物，计算 SHA-256，并记录源提交、构建环境和签名状态。
+5. release notes 仍从本次提交的 support matrix §3 抽取完整未验证清单。先创建 draft，核对上传文件后再公开为 prerelease。
+
+首个 `v0.1.0-preview.1` 的源提交为 `921350965e0502ea7435ac67344dd8758cdb7cb2`。
+[首次 GitHub runner](https://github.com/rain-knows/pi-orb/actions/runs/36806936087) 通过发布门禁与包内容审计，
+但停靠动画断言只采到 2 个位置，要求至少 4 个，流程在发布前失败；原因尚未确认。
+本机完整 P2-05 通过；安装器构建后再审计 27/27、启动 22/22，停靠动画采到 9 个位置。
+发布附带 `github-runner-failure.log` 和 `release-provenance.json`，不宣称 Actions 通过。
+原生动作、人工安装和未验证项的边界保持不变。
