@@ -14,11 +14,12 @@
 
 | 位置 | 说明 |
 |---|---|
+| `D:\pi-orb-ref\dsh-orb-cordis` | 新插件参考，固定 `9cdc50302d202f4497569731be488a8afa500da7`；Computer Use 与非破坏式插件边界先看此检出，索引见手册 §1.2 |
 | `D:\pi-orb-ref\deepseek-harness-orb` | **本机优选检出**；注意它是 sparse checkout（只含 `apps/desktop/src` 与 `packages`），打包脚本／测试目录不在其中 |
 | `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb` | 完整工作树检出（同提交）；**需要 `apps/desktop/scripts`、`apps/desktop/tests` 时看这里** |
 | `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-research` | 只读研究检出，同提交 |
 
-三个检出都固定在源提交 `72f1d738458a223696685a909e806b683eff5885`，只用于核对和移植，
+旧单体仓库的三个检出都固定在源提交 `72f1d738458a223696685a909e806b683eff5885`，只用于核对和移植，
 不作为 pi-orb 的运行时依赖；源码复用仍须在本仓库保留来源提交、许可证和适配说明。
 开发前先核对 `git -C D:\pi-orb-ref\deepseek-harness-orb rev-parse HEAD` 与该提交一致；
 需要 sparse 检出里没有的目录时，用 `git sparse-checkout add <目录>` 或改看完整检出，

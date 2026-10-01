@@ -20,6 +20,7 @@
 | Pi SDK | `@earendil-works/pi-coding-agent@0.87.1` | P0-02 实测 | `evidence/p0-02/README.md` |
 | pi-web | `@agegr/pi-web@0.9.3`，HEAD `95a58744532c7fccaa933aa7757a1419ace67ed2` | P0-02/P0-03 实测 | `evidence/p0-02/README.md`、`evidence/p0-03/README.md` |
 | 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；桌面闭环和历史真实模型运行记录存在，但 2026-09-30 C7/D6/D8 复跑未完整通过，暂不宣称稳定支持 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
+| 新插件参考 | `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`（MIT） | 已检出/核对；取点适配待验证；不是运行时依赖 | `doc/reference-playbook.md` §1.2、`doc/plugin-reference-and-pointing.md` |
 | 快捷键边沿监听 | `uiohook-napi@1.5.5` | Windows Node 环境可加载并完成 `start/stop`；hook 不可用时快捷键失败而不静默降级；真实长按仍需 Electron 人工复测 | `src/main/shortcut-edge-guard.ts`、`tests/shortcut-edge-guard.test.ts` |
 | renderer 构建 | `vite@7.3.6` + `electron-vite@5.0.0`，原生 HTML/CSS/JS renderer | 构建通过；已删除 React 与 Vite React 插件 | 本仓库 `npm run build` |
 | TypeScript | `5.9.3`（`strict`） | 类型检查通过 | 本仓库 `npm run typecheck` |

@@ -48,6 +48,28 @@ git -C D:\pi-orb-ref\deepseek-harness-orb rev-parse HEAD
 git -C D:\pi-orb-ref\deepseek-harness-orb status --porcelain   # 期望：无输出
 ```
 
+### 1.2 新插件参考（2026-10-01）
+
+新增 [`rain-knows/dsh-orb-cordis`](https://github.com/rain-knows/dsh-orb-cordis)，只读检出
+`D:\pi-orb-ref\dsh-orb-cordis`，固定 `9cdc50302d202f4497569731be488a8afa500da7`（MIT，
+Copyright (c) 2026 mini-yifan；上游 DeepSeek 归属见该仓 `THIRD-PARTY-NOTICES.md`）。
+插件边界和 Computer Use 改动优先在这个检出定位；旧单体基线仍用于已移植的壳层和原生后端。
+不把 Cordis/dsh 注册、安装即授权、自动截图、凭据或其 helper 下载器搬进 Pi。
+
+| 工作 | 插件参考路径 | pi-orb 处理 |
+|---|---|---|
+| 非破坏式宿主/helper 边界 | `docs/02-architecture.md`、`packages/host/src/runtime.ts` | 研究边界，保留 Pi 插件 + 现有 Electron 壳；不运行参考插件 |
+| 小控件坐标 | `packages/computer-use/src/coordinates.ts`、`coordinate-mode.ts`、`observe.ts`、`policy.ts` | 复用 pixel → HID millifraction、实际 attachment 尺寸和明确坐标提示；不搬 dsh 事件迁移和双模式兼容层 |
+| 图片尺寸 | `packages/computer-use/src/raster.ts`、`tests/raster.spec.ts` | 直接移植 PNG/JPEG 头尺寸解析；Pi context 在 SDK 归一化后取得实际出站图片尺寸 |
+| Windows 抢焦点与光标 | `packages/host/src/windows-foreground.ts`、`packages/computer-use/src/windows-native.ts` | 对照当前窗口排除/焦点链；需要真实输入读回才能认定修复 |
+| 桌面工具与等待 | `packages/computer-use/src/plugin.ts`、`config.ts`、`policy.ts` | 保留 sequential、600ms 与动作后截图；批量只操作初始截图已有目标 |
+
+核对：`git -C D:\pi-orb-ref\dsh-orb-cordis rev-parse HEAD`；不得将此目录写成运行时依赖。
+旧单体仓库已 fetch：远端 HEAD `51f09764d7ff99947be08ebbb2ca2388faab3df4`，相对 `72f1d738`
+仅一次 Windows 安装身份更新（图标、安装提权/升级、相关测试与说明），Computer Use 没有差异。
+pi-orb 没有它的已发布系统级安装需要升级，本轮不搬这些打包改动，也不改变已验收的旧后端提交。
+实施与证据入口：[`plugin-reference-and-pointing.md`](./plugin-reference-and-pointing.md)。
+
 ## 2. 取材优先级
 
 参考项目内部本身有权威等级，**冲突时按下列顺序取值**，不要用 pi-orb 现有代码反过来“证明”参考项目的行为：

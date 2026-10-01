@@ -10,6 +10,11 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+### 插件参考更新
+
+- 本地检出并固定 `dsh-orb-cordis@9cdc503`，加入参考手册与阶段文档。旧单体远端
+  `51f0976` 仅 Windows 发布身份调整，Computer Use 无差异，生产原生后端保留现基线。
+
 ### 工具调用提速（四阶段）
 
 - 请求关联计时、串行批量工具、协议 v2、取消与按动作数/声明等待计算的超时。
