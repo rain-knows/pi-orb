@@ -276,14 +276,14 @@ D:\workself\pi-orb\
 | 参考文件 | 参考行数 | pi-orb 文件 | pi-orb 行数 | 判定 |
 |---|---|---|---|---|
 | `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 39 | 一致；`ReferenceWindowsDriver.#withGuiTurn` 写入本进程 HWND 排除列表，Windows backend 读取（见 §6.2） |
-| `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：只保留 `mapNormalizedToGlobal` 及其私有分数换算。参考的 11 个导出里 9 个在 pi-orb 无调用方（校验职责由 `src/shared/orb-tools.ts` 的 `validateAction` 唯一承担），按 N8 删除；需要 pixel 编码时按固定提交恢复 |
+| `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：原生边界只保留 `mapNormalizedToGlobal`。模型 pixel 校验/换算已按新插件固定提交移植到 `src/shared/pixel-coordinates.ts`，不恢复旧双模式接口 |
 | `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 38 | 逻辑一致（`delay` 供驱动使用，见 `windows.ts` 的指针/长按/双击/粘贴时序；`wait`/`long_wait` 工具未移植）。文件本身是 **adapted** 而非 unmodified：多出的 3 行是来源提交与许可证头，由 `evidence/p1-07/check-provenance.mjs` 逐行核对 |
 | `src/observation-limits.ts` | 13 | `src/main/reference-windows/observation-limits.ts` | 16 | 一致 |
 | `src/windows-foreground.ts` | 187 | `src/main/reference-windows/windows-foreground.ts` | 190 | 一致；参考自带的 10 条不变量已移植到 `tests/reference-windows-foreground.test.ts` |
 | `src/windows.ts` | 494 | `src/main/reference-windows/windows.ts` | 513 | **优于参考**：补了 `try/finally` 释放已按下的键与鼠标键（参考在 20ms 修饰键间隔或 80ms 长按期间被 abort 会留下卡键）。这是本项目刻意改进，不得“还原”成参考写法 |
-| `src/windows-native.ts` | 826 | `src/main/reference-windows/windows-native.ts` | 843 | **koffi 2.x 适配**：`INPUT.size` → `koffi.sizeof(INPUT)`（`:448`、`:466`、`:571`）、`EnumWindows` 句柄改用 `koffi.address()`（`:151-153`），并补 x64 `INPUT` 结构体大小校验（`:571-572`）。参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@^2.14.1`：**升级 koffi 时必须重看这几处** |
+| `src/windows-native.ts` | 826 | `src/main/reference-windows/windows-native.ts` | 843 | **koffi 2.x 适配**：`INPUT.size` → `koffi.sizeof(INPUT)`（`:448`、`:466`、`:571`）、`EnumWindows` 句柄改用 `koffi.address()`（`:151-153`），并补 x64 `INPUT` 结构体大小校验（`:571-572`）。参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@2.16.3`：已核对这些接口不变；**升级 koffi 时必须重看这几处** |
 | `src/backend.ts` | 277 | `src/main/reference-windows/backend.ts` | 100 | **裁剪**：删除 `createPlatformBackend` 平台工厂、macOS/unsupported 分支与 `ImageMediaType` 的 dsh 依赖；接口收窄为 Windows。`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句 |
-| `src/coordinate-mode.ts` | 346 | *（已删除）* | — | **删除**：只留两个类型且无调用方等于死文件；像素模式未实现，类型随死函数一并去掉 |
+| `src/coordinate-mode.ts` | 346 | *（已删除）* | — | **删除**旧双模式文件；新插件的 attachment 尺寸绑定语义适配到 `pi-package/extensions/orb-image-space.ts`，见 §1.2 |
 
 **参考测试的移植状态**：`windows-foreground.spec.ts` 的 10 条不变量与 `windows.spec.ts` 的 13 条
 （键映射、UIPI 拒绝、Explorer 文件夹、空标题省略、剪贴板顺序、滚轮档位、focus 恢复、取消与 PNG
@@ -303,7 +303,7 @@ D:\workself\pi-orb\
 
 | 缺口 | 事实 | 影响 | 建议动作 |
 |---|---|---|---|
-| `coordinate-mode.ts` 只剩类型 | **已处理**：文件删除，像素模式未实现这一事实现在写在 `coordinates.ts` 的文件头里 | 像素编码（pixel 模式）在 pi-orb 不可表达 | 需要 pixel 时按固定提交恢复该文件与 `modelPositionToHid` 调用方，不要重新推导 |
+| `coordinate-mode.ts` 只剩类型 | **已处理**：旧死文件删除；新插件的 pixel 公式直接移植到共享层 | 模型按实际附件像素输入，原生保持分数；没有双模式设置 | 通过 Pi context 绑定已归一化尺寸，禁止用 Win32 bounds 代替 attachment 尺寸 |
 | 后端声明与实际调用范围 | `inspectForeground`、`listApps` 已接入；`openApp` 保留在 backend 合同，但 Pi 的切换应用使用 `activateApp`；`openInBrowser/openInFinder/copyImageToClipboard/backend.withGuiTurn` 不在生产调用链 | 这些未开放方法不构成已支持的工具；主进程自身 `withGuiTurn` 配对参考 overlay guard | 新增能力前查参考方法与授权边界，不把声明当成已接入 |
 | 捕获排除列表恒为空 | **已修复**：`ReferenceWindowsDriver.#withGuiTurn` 写入 Orb HWND 排除列表，主进程直接复用 `floating-window.ts:848-868,906-961` 的计数式 `contentProtection`／点击穿透；删除整窗隐藏路径 | 工具调用期间保留面板，不进入截图、不截获原生输入 | `floating-overlay-guard.ts` 及参考 5 项测试；Orb 前台下仍能观察原生目标 |
 | 前台提示文案被截断 | **已修复**：`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句，并由 `tests/reference-windows-input.test.ts` 钉住字面量 | — | 保持；该测试就是防止再次被简写的绊线 |
@@ -315,17 +315,18 @@ D:\workself\pi-orb\
 
 ### 6.3 必须保持的坐标语义
 
-- 模型给出的位置是 **0–1000 的截图分数**，不是屏幕坐标（`<REF>/src/backend.ts:200` 注释、
-  `<REF>/src/plugin.ts:289`）。
-- 换算链：`0–1000 → 分数 → screen.bounds + 分数 × bounds 尺寸`（`<REF>/src/coordinates.ts:100-123`）。
-- 点击编码有两种：`millifraction`（0–1000，Windows 默认）与 `pixel`（附加截图栅格像素），
-  切换逻辑在 `coordinate-mode.ts`；pixel 模式会把工具描述改写成像素语义
-  （`toolsForCoordinateMode`，`<REF>/src/coordinate-mode.ts:246-304`）。
+- 当前模型位置是**最新附加截图的像素列/行**；`attached_size` 来自 Pi SDK 处理后的 PNG/JPEG。
+  来源为新插件 `9cdc503` 的 `coordinates.ts`、`raster.ts`、`coordinate-mode.ts`、`observe.ts`、`policy.ts`。
+- 换算链：`pixel / attached_size × 1000 → HID 分数 → screen.bounds + 分数 × bounds 尺寸`。
+  前一步直接复用新插件 `modelPositionToHid`，后一步保留旧原生 `mapNormalizedToGlobal`。
+- 旧参考支持 millifraction/pixel 两种模型编码；pi-orb 只保留 pixel 模型契约。
+  旧 `0–1000` 仅为内部原生单位；不可在同一个工具 schema/提示中混用两个单位。
 - pi-orb 现状：驱动把 `coordinateSpace.windowRect` 固定为 `{x:0, y:0, width, height}`
   （`src/main/reference-windows-driver.ts:221-225`），后端的 `mapNormalizedToGlobal` 再加回
   `screen.bounds` 原点，因此整链等价于“窗口相对分数”。**这个等价关系是当前实现的正确性依据，
   改动任一侧都会产生混合单位缺陷**（`doc/cua-driver-integration.md` 与 `evidence/p1-06/` 记录过同类缺陷）。
-- 因此：**不要**新增第三套坐标约定；需要 pixel 编码时，直接用 `coordinate-mode.ts` 的参考实现。
+- `attached_size` 缺失、session/generation 不符、旧 observation_id 或越界坐标须在扩展边界拒绝。
+  批次先完整换算后再转发，禁止部分输入；主进程继续执行自身的新鲜度/授权/区域变化检查。
 
 ## 7. C 面：工具契约与提示
 
@@ -452,8 +453,8 @@ D:\workself\pi-orb\
 
 | 参考规格测试 | 钉住的不变量 | pi-orb 对应测试 |
 |---|---|---|
-| `coordinates.spec.ts`（10） | 坐标校验、两种编码等价、禁用快捷键、点击修饰键别名与去重 | `tests/coordinate-mapping.test.ts`、`tests/orb-tools.test.ts`；**缺** pixel 模式与 `requireClickModifiers` 别名用例 |
-| `coordinate-mode.spec.ts`（9） | 两种编码切换、栅格缓存与日志重建、pixel 工具描述改写、投影折叠 | 无（像素模式未接入） |
+| `coordinates.spec.ts`（10） | 坐标校验、两种编码等价、禁用快捷键、点击修饰键别名与去重 | `coordinate-mapping.test.ts`、`orb-tools.test.ts`、`orb-image-space.test.ts`、`orb-pixel-extension.test.ts`；pixel 换算已覆盖；修饰键别名仍按现有收窄契约 |
+| `coordinate-mode.spec.ts`（9） | 两种编码切换、栅格缓存与日志重建、pixel 工具描述改写、投影折叠 | `orb-image-space.test.ts`、`orb-pixel-extension.test.ts` 覆盖 Pi 所需尺寸/会话绑定；不移植模式切换和 dsh 日志重建 |
 | `tools.spec.ts`（26） | 13 个工具的往返、`postActionWaitMs` 结算、GUI turn 包裹范围、截图落盘与剪贴板 | `tests/desktop-broker.test.ts`、`orb-tools.test.ts`、`reference-windows-driver.test.ts`、`screenshot-export.test.ts`、`reference-windows-open-app.test.ts`（open-app 的前置检查／激活／前台验证三步）；**缺** 结算时序、GUI turn 范围、Desktop 落盘/剪贴板 |
 | `observe.spec.ts`（9） | 观察信封与前台标签、`settleMs`、`persistCapture` 过滤、abort 重抛 | `tests/screenshot-flow.test.ts`；**缺** 信封/标签格式与 `requireScreen` 越界文案 |
 | `overlay-guard.spec.ts`（17） | 包裹范围、overlay id 传递、观察框显示/隐藏与 abort、turn 结束收起 | 无；`withGuiTurn` 的窗口隐藏也未测 |
@@ -486,7 +487,7 @@ D:\workself\pi-orb\
 - 来源记录现状：`src/main/reference-windows/*`、`floating-*.ts`、`src/renderer/index.html`、`floating.css`、`floating.js` 均有
   “仓库 + 提交 + 原路径 + MIT”来源头，并同时登记在 `THIRD_PARTY_NOTICES.md` §3.5。
   **新增移植文件时必须两处都补**，否则来源不可追溯。
-- 参考项目的依赖版本差异必须跟：参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@^2.14.1`；
+- 参考项目的依赖版本差异必须跟：参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@2.16.3`；
   移植时的 `koffi.sizeof`/`koffi.address` 适配就是为此。升级 koffi 时重看
   `windows-native.ts:148-156`、`:448`、`:466`、`:571-572`。
 - 参考项目“文档伴随代码改动”“当前状态陈述、一个事实只有一个归属”的写法
@@ -665,4 +666,4 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 
 ## 16. 工具调用提速适配
 
-参考没有 Pi observation_id 批量桥接和请求关联计时。实现差异、源码来源及阶段验收见 [`tool-speed-optimization.md`](./tool-speed-optimization.md)。桥接仅 v2，所有桌面工具 sequential；保留最近三张请求截图，历史不改；1500 次等待对照不满足缩短条件，生产保留 600ms。不复制 dsh 调度器或图片存储。
+参考没有 Pi observation_id 批量桥接和请求关联计时。此前阶段见 [`tool-speed-optimization.md`](./tool-speed-optimization.md)，当前像素契约和小控件实测见 [`plugin-reference-and-pointing.md`](./plugin-reference-and-pointing.md)。桥接仅 v2，所有桌面工具 sequential；保留最新一张请求截图，历史不改；1500 次等待对照不满足缩短条件，生产保留 600ms。不复制 dsh 调度器或图片存储。

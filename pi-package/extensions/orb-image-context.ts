@@ -6,7 +6,7 @@
 import { ORB_TOOLS } from "../../src/shared/orb-tools.js";
 
 const orbTools = new Set<string>(Object.values(ORB_TOOLS));
-export const RETAINED_ORB_IMAGES = 3;
+export const RETAINED_ORB_IMAGES = 1;
 
 /** Copy only changed tool messages; user attachments and other tool content pass through intact. */
 export function limitOrbImages<T>(messages: readonly T[]): T[] {
@@ -16,13 +16,20 @@ export function limitOrbImages<T>(messages: readonly T[]): T[] {
     const record = message as Record<string, unknown>;
     if (record.role !== "toolResult" || typeof record.toolName !== "string" || !orbTools.has(record.toolName) || !Array.isArray(record.content)) return message;
     let changed = false;
+    const details = record.details as { orbImages?: { observationId: string }[] } | undefined;
+    let imageIndex = details?.orbImages?.length ?? 0;
+    const retainedMetadata: { observationId: string }[] = [];
     const content = [...record.content].reverse().map(block => {
       if (!block || typeof block !== "object" || block.type !== "image") return block;
-      if (remaining-- > 0) return block;
+      const metadata = details?.orbImages?.[--imageIndex];
+      if (remaining-- > 0) {
+        if (metadata) retainedMetadata.push(metadata);
+        return block;
+      }
       changed = true;
       return { type: "text", text: "[较早的 Orb 工具截图已从本次模型请求省略；动作、观察编号和窗口信息保留，完整图片仍在聊天记录中。]" };
     }).reverse();
-    return changed ? { ...record, content } as T : message;
+    return changed ? { ...record, content, ...(details?.orbImages ? { details: { ...details, orbImages: retainedMetadata.reverse() } } : {}) } as T : message;
   }).reverse();
 }
 

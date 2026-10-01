@@ -62,7 +62,7 @@ P2 is being delivered as separately reviewable reference-reuse stages:
 | P2-02 — double-Alt screenshot gesture | **Implemented; real keyboard, AltGr and non-US layout acceptance remains unverified** |
 | P2-03 — pi-web history and selection context | **History and Windows UI Automation selection chip implemented; real UIA, multi-display/DPI and native selection toolbar remain unverified** |
 | P2-04 — reference desktop actions | **Hotkey, long press, same-window drag, authorized post-action image blocks and explicit screenshot export implemented; real desktop actions, target pixels and clipboard/save-dialog acceptance remain unverified** |
-| P2-05 — Windows distribution | **Unpacked app and per-user NSIS installer build; the packaged artifact's contents are audited (25/25) and the packaged app is started and driven (22/22, including the session Access preload contract). Clean-machine install, uninstall, upgrade and the unsigned-installer SmartScreen experience remain unverified** |
+| P2-05 — Windows distribution | **Unpacked app and per-user NSIS installer build; the packaged artifact's contents are audited (27/27) and the packaged app is started and driven (22/22, including the session Access preload contract). Clean-machine install, uninstall, upgrade and the unsigned-installer SmartScreen experience remain unverified** |
 
 So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
 must not be described as done. They are listed one by one in
@@ -217,7 +217,7 @@ prompts — it cannot promise the prompt content is byte-identical.
 
 ## 工具调用速度
 
-新增 `orb_batch`，一次提交 2–8 个初始截图中可见且互相独立的动作；宿主串行执行，返回各步截图。模型请求保留最近三张 Orb 工具图片，聊天历史不改。生产等待维持 600ms。真实模型对照及小控件定位限制见 [实施记录](./doc/tool-speed-optimization.md)。
+新增 `orb_batch`，一次提交 2–8 个初始截图中可见且互相独立的动作；宿主串行执行，返回各步截图。模型使用最新截图的像素坐标，尺寸从 Pi 已处理的实际图片读取；每次请求仅保留最新一张 Orb 工具图片，聊天历史不改。生产等待维持 600ms。新插件来源、小控件实测及限制见 [实施记录](./doc/plugin-reference-and-pointing.md)；此前四阶段证据见 [工具提速记录](./doc/tool-speed-optimization.md)。
 
 ## Licensing
 

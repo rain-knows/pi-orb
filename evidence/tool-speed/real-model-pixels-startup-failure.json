@@ -1,0 +1,15 @@
+{
+  "method": "real provider, Pi Web, product pipe/broker/native driver, disposable target readback",
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash",
+    "thinking": "off"
+  },
+  "rows": [],
+  "passed": false,
+  "coordinateEncoding": "pixels of SDK-normalized attached image",
+  "fixture": "compact independent controls",
+  "error": "Probe timed out",
+  "diagnostics": [],
+  "finishedAt": "2026-10-01T01:23:07.475Z"
+}

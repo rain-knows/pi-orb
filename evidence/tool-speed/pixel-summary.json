@@ -1,0 +1,342 @@
+{
+  "method": "real target A,B,C events or menu-item readback; no coordinates supplied by runner",
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash",
+    "thinking": "off"
+  },
+  "limitation": "Three samples per mode and fixture; p95 is the maximum. Historical fractions are not a paired performance baseline. Known callback defects addressed by Koffi 2.16.3; exact cause of prior intermittent exits remains unconfirmed.",
+  "fixtures": [
+    {
+      "file": "real-model-pixels.json",
+      "passed": true,
+      "nativeDependency": {
+        "name": "koffi",
+        "version": "2.14.1"
+      },
+      "modes": {
+        "single": {
+          "passed": 3,
+          "total": 3,
+          "durationMs": {
+            "n": 3,
+            "p50": 18423.033200000005,
+            "p95": 20008.341
+          },
+          "modelResponses": [
+            5,
+            5,
+            5
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            4,
+            4,
+            4
+          ],
+          "cumulativeImageBytes": [
+            98205,
+            94135,
+            92982
+          ],
+          "historyResultImages": [
+            4,
+            4,
+            4
+          ]
+        },
+        "batch": {
+          "passed": 3,
+          "total": 3,
+          "durationMs": {
+            "n": 3,
+            "p50": 12383.402799999996,
+            "p95": 13061.5674
+          },
+          "modelResponses": [
+            3,
+            3,
+            3
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            2,
+            2,
+            2
+          ],
+          "cumulativeImageBytes": [
+            46162,
+            46710,
+            47083
+          ],
+          "historyResultImages": [
+            4,
+            4,
+            4
+          ]
+        },
+        "menu": {
+          "passed": 1,
+          "total": 1,
+          "durationMs": {
+            "n": 1,
+            "p50": 15435.427800000005,
+            "p95": 15435.427800000005
+          },
+          "modelResponses": [
+            4
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            3
+          ],
+          "cumulativeImageBytes": [
+            76558
+          ],
+          "historyResultImages": [
+            3
+          ]
+        }
+      }
+    },
+    {
+      "file": "real-model-pixels-tiny.json",
+      "passed": true,
+      "nativeDependency": {
+        "name": "koffi",
+        "version": "2.14.1"
+      },
+      "modes": {
+        "single": {
+          "passed": 3,
+          "total": 3,
+          "durationMs": {
+            "n": 3,
+            "p50": 18413.690699999992,
+            "p95": 20516.536
+          },
+          "modelResponses": [
+            5,
+            5,
+            5
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            4,
+            4,
+            4
+          ],
+          "cumulativeImageBytes": [
+            88309,
+            84909,
+            84672
+          ],
+          "historyResultImages": [
+            4,
+            4,
+            4
+          ]
+        },
+        "batch": {
+          "passed": 3,
+          "total": 3,
+          "durationMs": {
+            "n": 3,
+            "p50": 11678.578300000008,
+            "p95": 12900.6564
+          },
+          "modelResponses": [
+            3,
+            3,
+            3
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            2,
+            2,
+            2
+          ],
+          "cumulativeImageBytes": [
+            42297,
+            42357,
+            42496
+          ],
+          "historyResultImages": [
+            4,
+            4,
+            4
+          ]
+        },
+        "menu": {
+          "passed": 1,
+          "total": 1,
+          "durationMs": {
+            "n": 1,
+            "p50": 14913.302199999991,
+            "p95": 14913.302199999991
+          },
+          "modelResponses": [
+            4
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            3
+          ],
+          "cumulativeImageBytes": [
+            69583
+          ],
+          "historyResultImages": [
+            3
+          ]
+        }
+      }
+    },
+    {
+      "file": "real-model-pixels-koffi-fixed.json",
+      "passed": true,
+      "nativeDependency": {
+        "name": "koffi",
+        "version": "2.16.3",
+        "recordedFrom": "installed package before launch and native-callback-stress.json"
+      },
+      "modes": {
+        "single": {
+          "passed": 3,
+          "total": 3,
+          "durationMs": {
+            "n": 3,
+            "p50": 18991.3933,
+            "p95": 20794.583799999993
+          },
+          "modelResponses": [
+            5,
+            5,
+            5
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            4,
+            4,
+            4
+          ],
+          "cumulativeImageBytes": [
+            84580,
+            84883,
+            84648
+          ],
+          "historyResultImages": [
+            4,
+            4,
+            4
+          ]
+        },
+        "batch": {
+          "passed": 3,
+          "total": 3,
+          "durationMs": {
+            "n": 3,
+            "p50": 11029.476800000004,
+            "p95": 12139.459099999993
+          },
+          "modelResponses": [
+            3,
+            3,
+            3
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            2,
+            2,
+            2
+          ],
+          "cumulativeImageBytes": [
+            42284,
+            42345,
+            42484
+          ],
+          "historyResultImages": [
+            4,
+            4,
+            4
+          ]
+        },
+        "menu": {
+          "passed": 1,
+          "total": 1,
+          "durationMs": {
+            "n": 1,
+            "p50": 16625.865200000015,
+            "p95": 16625.865200000015
+          },
+          "modelResponses": [
+            4
+          ],
+          "maxOutboundImages": 1,
+          "cumulativeOutboundImages": [
+            3
+          ],
+          "cumulativeImageBytes": [
+            69564
+          ],
+          "historyResultImages": [
+            3
+          ]
+        }
+      }
+    }
+  ],
+  "nativePhasesCurrentMs": {
+    "native-input": {
+      "n": 20,
+      "p50": 152.3914999999979,
+      "p95": 161.68410000001313
+    },
+    "post-action-wait": {
+      "n": 20,
+      "p50": 606.3902000000089,
+      "p95": 612.3851999999897
+    },
+    "capture-and-png": {
+      "n": 27,
+      "p50": 39.99620000000141,
+      "p95": 47.86099999999715
+    },
+    "window-enumeration": {
+      "n": 74,
+      "p50": 14.591300000000047,
+      "p95": 22.497400000007474
+    }
+  },
+  "interruptedProbes": [
+    {
+      "file": "real-model-pixels-shell-exit.json",
+      "shellExit": {
+        "code": 2147483651,
+        "signal": null
+      },
+      "completedTrials": 5,
+      "successfulTrials": 4,
+      "error": "CDP command timed out"
+    },
+    {
+      "file": "real-model-fraction-recheck.json",
+      "shellExit": {
+        "code": 2147483651,
+        "signal": null
+      },
+      "completedTrials": 2,
+      "successfulTrials": 1,
+      "error": "CDP command timed out"
+    },
+    {
+      "file": "real-model-fraction-recheck-logged.json",
+      "shellExit": {
+        "code": 2147483651,
+        "signal": null
+      },
+      "completedTrials": 1,
+      "successfulTrials": 0,
+      "error": "CDP command timed out"
+    }
+  ]
+}

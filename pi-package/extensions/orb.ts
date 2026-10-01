@@ -38,6 +38,7 @@ import {
   type DesktopObservation,
 } from "../../src/shared/orb-tools.js";
 import { limitOrbImages, orbImageBudget } from "./orb-image-context.js";
+import { projectOrbImageSpace, pixelActionToHid, type AttachedFrame } from "./orb-image-space.js";
 import { BridgeClient } from "./bridge-client.js";
 
 export { ORB_MODE_SECTION };
@@ -47,23 +48,19 @@ const OBSERVE_PARAMS = Type.Object({}, { additionalProperties: false });
 /**
  * Position parameters, shared by click and scroll.
  *
- * A position is a fraction of the screenshot the model is looking at: `[0,0]` is the screenshot's
- * top-left and `[1000,1000]` its bottom-right. It is deliberately NOT a screen coordinate — the
- * model cannot know where a window sits on the desktop, and asking it for one produced the
- * documented wrong-place failure. The shell converts the fraction onto the window's own rect.
+ * Model positions are pixels of the SDK-normalized attachment. The extension converts them to
+ * the reference HID millifraction at the bridge boundary using the actual outbound raster.
  */
 const POSITION_PARAMS = {
   x: Type.Number({
       minimum: 0,
-      maximum: 1000,
       description:
-        "Horizontal fraction of the screenshot being viewed, 0 (left edge) to 1000 (right edge). Not a screen coordinate.",
+        "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate.",
     }),
   y: Type.Number({
       minimum: 0,
-      maximum: 1000,
       description:
-        "Vertical fraction of the screenshot being viewed, 0 (top edge) to 1000 (bottom edge). Not a screen coordinate.",
+        "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate.",
     }),
 };
 
@@ -125,8 +122,7 @@ const HOTKEY_PARAMS = Type.Object(
 const LONG_PRESS_PARAMS = Type.Object(
   {
     observation_id: Type.String({ description: "The observation_id this press was decided from." }),
-    x: Type.Number({ minimum: 0, maximum: 1000, description: "Horizontal screenshot fraction (0-1000)." }),
-    y: Type.Number({ minimum: 0, maximum: 1000, description: "Vertical screenshot fraction (0-1000)." }),
+    ...POSITION_PARAMS,
     duration_seconds: Type.Number({
       minimum: ORB_LIMITS.minLongPressSeconds,
       maximum: ORB_LIMITS.maxLongPressSeconds,
@@ -139,10 +135,10 @@ const LONG_PRESS_PARAMS = Type.Object(
 const DRAG_PARAMS = Type.Object(
   {
     observation_id: Type.String({ description: "The observation_id this drag was decided from." }),
-    start_x: Type.Number({ minimum: 0, maximum: 1000, description: "Start horizontal screenshot fraction." }),
-    start_y: Type.Number({ minimum: 0, maximum: 1000, description: "Start vertical screenshot fraction." }),
-    end_x: Type.Number({ minimum: 0, maximum: 1000, description: "End horizontal screenshot fraction." }),
-    end_y: Type.Number({ minimum: 0, maximum: 1000, description: "End vertical screenshot fraction." }),
+    start_x: Type.Number({ minimum: 0, description: "Start pixel column in the attached screenshot." }),
+    start_y: Type.Number({ minimum: 0, description: "Start pixel row in the attached screenshot." }),
+    end_x: Type.Number({ minimum: 0, description: "End pixel column in the attached screenshot." }),
+    end_y: Type.Number({ minimum: 0, description: "End pixel row in the attached screenshot." }),
   },
   { additionalProperties: false },
 );
@@ -222,6 +218,7 @@ function createBridge(): BridgeClient | null {
 
 export default function orbExtension(pi: ExtensionAPI): void {
   const sessionState = { generation: 0 };
+  let attachedFrame: (AttachedFrame & { sessionId: string; generation: number }) | null = null;
 
   // A run generation is needed so a request from a previous run cannot act on the current
   // one. The extension learns it from the push-based status; the shell refuses anything that
@@ -230,6 +227,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     const config = readOrbConfig(resolveOrbConfigPath());
     if (!config || !isOrbWorkspace(ctx.cwd, config.orbWorkspace)) return;
     sessionState.generation = 0;
+    attachedFrame = null;
 
     pi.registerTool({
       executionMode: "sequential",
@@ -255,10 +253,10 @@ export default function orbExtension(pi: ExtensionAPI): void {
       name: ORB_TOOLS.click,
       label: "Orb: click",
       description:
-        "Click at a 0-1000 position in the observed screenshot. Supports right button, double-click and modifiers. Returns a fresh screenshot.",
+        "Click at a pixel position in the attached screenshot. Supports right button, double-click and modifiers. Returns a fresh screenshot.",
       promptSnippet: "Click in the observed window",
       promptGuidelines: [
-        "x and y are fractions of the screenshot you can see (0-1000), not screen coordinates. Read them off the image.",
+        "x and y are pixel columns and rows of the latest attached screenshot. Read attached_size and click the control's center; never send 0-1000 fractions.",
         "Do not click twice from the same observation. After an action, use its returned fresh observation and screenshot.",
       ],
       parameters: CLICK_PARAMS,
@@ -280,7 +278,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
       name: ORB_TOOLS.type,
       label: "Orb: type text",
       description:
-        "Click the specified 0-1000 position, type text, optionally replace field contents and press Enter. Returns a fresh screenshot.",
+        "Click the specified screenshot pixel position, type text, optionally replace field contents and press Enter. Returns a fresh screenshot.",
       promptSnippet: "Type text into the observed window",
       promptGuidelines: ["Ask the user for confirmation before typing into a field that may hold sensitive data."],
       parameters: TYPE_PARAMS,
@@ -304,7 +302,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
       description: "Scroll inside the observed window. Requires an authorized desktop task.",
       promptSnippet: "Scroll inside the observed window",
       promptGuidelines: [
-        "If you give x/y, they are fractions of the screenshot you can see (0-1000), not screen coordinates.",
+        "x/y are pixel columns and rows of the attached screenshot, not 0-1000 fractions or desktop coordinates.",
       ],
       parameters: SCROLL_PARAMS,
       async execute(_toolCallId, params, _signal, _onUpdate, toolCtx: ExtensionContext) {
@@ -501,8 +499,10 @@ export default function orbExtension(pi: ExtensionAPI): void {
   pi.on("context", (event, ctx) => {
     const config = readOrbConfig(resolveOrbConfigPath());
     if (!config || !isOrbWorkspace(ctx.cwd, config.orbWorkspace)) return;
-    const messages = limitOrbImages(event.messages);
-    console.log(`[pi-orb] image-budget ${JSON.stringify(orbImageBudget(messages))}`);
+    const projected = projectOrbImageSpace(limitOrbImages(event.messages));
+    attachedFrame = projected.frame ? { ...projected.frame, sessionId: ctx.sessionManager.getSessionId(), generation: sessionState.generation } : null;
+    const messages = projected.messages;
+    console.log(`[pi-orb] image-budget ${JSON.stringify({ ...orbImageBudget(messages), frame: projected.frame })}`);
     return { messages };
   });
 
@@ -556,6 +556,23 @@ export default function orbExtension(pi: ExtensionAPI): void {
     // workspace change cannot leave this session using an old generation.
     sessionState.generation = token.generation;
     payload.generation = token.generation;
+
+    // Pixel input is meaningful only for the exact image sent on the calling session's request.
+    // The shell independently checks grant, generation, freshness and the native window region.
+    const batch = payload.batch as { observationId: string; actions: Omit<DesktopAction, "observationId">[] } | undefined;
+    const coordinateActions = type === "batch" ? batch?.actions : payload.action ? [payload.action] : [];
+    if (coordinateActions?.some(action => "position" in action || "startPosition" in action)) {
+      const observationId = batch?.observationId ?? payload.action?.observationId;
+      if (!attachedFrame || attachedFrame.sessionId !== payload.sessionId || attachedFrame.generation !== token.generation || attachedFrame.observationId !== observationId) {
+        return textResult("The pixel target does not match the latest attached screenshot for this session. Observe again before acting.", { ok: false, reason: "stale-image" });
+      }
+      try {
+        if (batch) payload.batch = { ...batch, actions: batch.actions.map(action => pixelActionToHid(action, attachedFrame!)) };
+        else if (payload.action) payload.action = pixelActionToHid(payload.action, attachedFrame);
+      } catch (error) {
+        return textResult(error instanceof Error ? error.message : String(error), { ok: false, reason: "invalid-pixel-position" });
+      }
+    }
 
     const request =
       type === "observe"
@@ -653,10 +670,8 @@ function renderObservation(observation: DesktopObservation): string {
   const lines = [
     `observation_id: ${observation.observationId}`,
     `window: "${observation.window.title}" (${observation.window.appName}, pid ${observation.window.pid}, window id ${observation.window.id})`,
-    `coordinate space for actions: x and y are fractions of the screenshot you can see, 0-${observation.coordinateSpace.space} on each axis ([0,0] top-left, [${observation.coordinateSpace.space},${observation.coordinateSpace.space}] bottom-right)`,
-    rect
-      ? `the screenshot covers this window (${Math.round(rect.width)}x${Math.round(rect.height)} px); a position is mapped onto it`
-      : "warning: this window's rect could not be determined; observe again before acting",
+    "coordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates",
+    ...(rect ? [] : ["warning: this window's rect could not be determined; observe again before acting"]),
     observation.foreground ? `foreground: ${observation.foreground.appName}${observation.foreground.windowTitle ? ` — ${observation.foreground.windowTitle}` : ""}${observation.foreground.focusNote ? ` (${observation.foreground.focusNote})` : ""}` : "foreground: unavailable",
   ];
   if (observation.degraded) lines.push("note: the driver reported a degraded observation; treat it with caution.");
@@ -676,10 +691,12 @@ export function formatToolResult(result: unknown) {
       content.push({ type: "text", text: `Surface changed before input:\n${renderObservation(finalObservation)}` });
       if (finalObservation.image) content.push({ type: "image", data: finalObservation.image.data, mimeType: finalObservation.image.mimeType });
     }
-    return { content, details: { ok: record.ok === true, result: removeImageData(result) } };
+    const observations = record.steps.map(findObservation);
+    if (finalObservation && finalObservation.observationId !== lastCompleted?.observationId) observations.push(finalObservation);
+    return { content, details: { ok: record.ok === true, result: removeImageData(result), orbImages: observations.filter(observation => observation?.image).map(observation => ({ observationId: observation!.observationId })) } };
   }
   const observation = findObservation(result);
-  return textResult(renderResult(result), { ok: record?.ok !== false, result: removeImageData(result) }, observation?.image);
+  return textResult(renderResult(result), { ok: record?.ok !== false, result: removeImageData(result), orbImages: observation?.image ? [{ observationId: observation.observationId }] : [] }, observation?.image);
 }
 
 export { createBridge };

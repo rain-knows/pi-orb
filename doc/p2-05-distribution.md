@@ -92,8 +92,9 @@ koffi import library 的做法同类，只是范围更大。审计从 129 个解
 [`../evidence/p2-05/README.md`](../evidence/p2-05/README.md)）：
 
 1. **构建**：`npm run build` + electron-builder 出解包目录；
-2. **内容审计**（25 项）：产品文件在 asar 内的运行时路径上、许可证随包、仓库源码／测试／证据／
-   凭据／密钥／其它平台二进制／构建残留一律不在包内、原生模块确实在 `app.asar.unpacked`；
+2. **内容审计**（27 项）：产品文件在 asar 内的运行时路径上、许可证随包、仓库源码／测试／证据／
+   凭据／密钥／其它平台二进制／构建残留一律不在包内、原生模块确实在 `app.asar.unpacked`，
+   Koffi 版本与原生二进制匹配已验证的安装环境；
 3. **打包产物启动探测**（22 项）：真实启动 `release/.../pi-orb.exe`，证明 preload 桥可用、
    renderer 无 Node 权限、构建后的 renderer 与其素材确实从 asar 里加载出来、参考壳层与
    session Access 合同已生效。桌面 native action 的真实闭环另由

@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-09-30T10:11:42.056Z",
+  "capturedAt": "2026-10-01T02:21:13.337Z",
   "projectVersion": "0.1.0",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "10004 ms"
+      "detail": "10526 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "6974 ms"
+      "detail": "7061 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "12377 ms"
+      "detail": "12993 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4021 ms"
+      "detail": "3966 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -55,7 +55,7 @@
     {
       "name": "the license inventory records every installed production dependency",
       "ok": true,
-      "detail": "6 installed components"
+      "detail": "3 installed components"
     },
     {
       "name": "no AGPL, GPL-3 or SSPL component is present",
@@ -175,7 +175,7 @@
     {
       "name": "every ported file records its reference commit and licence",
       "ok": true,
-      "detail": "adapted=11 unmodified=0 withoutHeader=0"
+      "detail": "adapted=12 unmodified=0 withoutHeader=0"
     },
     {
       "name": "the agent instructions record the local reference checkout and the playbook entry point",
@@ -290,7 +290,7 @@
     {
       "name": "the recorded packaged-artifact audit passed and carries its native-binary checks",
       "ok": true,
-      "detail": "{\"passed\":true,\"checks\":25}"
+      "detail": "{\"passed\":true,\"checks\":27}"
     },
     {
       "name": "the recorded packaged-application probe passed and verifies the session Access preload contract",

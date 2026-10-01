@@ -16,6 +16,7 @@
 // Run: node evidence/p2-05/run-package-audit.mjs
 
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join, relative, resolve } from "node:path";
 import { extractFile, listPackage } from "@electron/asar";
 
@@ -145,7 +146,7 @@ check(
 );
 
 const toolchainLeftovers = unpackedFiles.filter(
-  (entry) => /(koffi\.(lib|exp)|\/src\/|\/vendor\/|\/doc\/|\/libuiohook\/|\/doc\/)/u.test(entry),
+  (entry) => /(koffi\.(lib|exp)|\/src\/|\/vendor\/|\/doc\/|\/libuiohook\/|koffi\/lib\/)/u.test(entry),
 );
 check(
   "no build toolchain, vendored sources or package documentation ship",
@@ -163,6 +164,15 @@ for (const notice of ["LICENSE", "THIRD_PARTY_NOTICES.md", "CHANGELOG.md"]) {
 }
 
 const shippedManifest = JSON.parse(extractFile(asarPath, "package.json").toString("utf8"));
+const shippedKoffi = JSON.parse(extractFile(asarPath, join("node_modules","koffi","package.json")).toString("utf8"));
+const installedKoffi = JSON.parse(readFileSync(join(repo,"node_modules/koffi/package.json"),"utf8"));
+check("the packaged Koffi version matches the pinned production dependency",
+  shippedKoffi.version===installedKoffi.version && packageJson.dependencies.koffi===shippedKoffi.version,
+  `${shippedKoffi.version} vs installed ${installedKoffi.version} vs pinned ${packageJson.dependencies.koffi}`);
+const nativePath="node_modules/koffi/build/koffi/win32_x64/koffi.node";
+const digest=path=>createHash("sha256").update(readFileSync(path)).digest("hex");
+check("the packaged Koffi binary matches the validated installed binary",
+  existsSync(join(unpackedRoot,nativePath)) && digest(join(unpackedRoot,nativePath))===digest(join(repo,nativePath)),nativePath);
 check(
   "the shipped manifest carries the project version",
   shippedManifest.version === packageJson.version,

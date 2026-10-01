@@ -66,7 +66,7 @@ pi-orb 的复用默认值应是“先复用参考项目已经跑通的软件实�
 自动证据当前为：Vitest 426/426、P1-03 OS 探针通过、P1-06 当前参考
 backend 产品侧闭环通过、P1-07 release gate 66/66、当前 session Access 生命周期回归 12/12（旧
 per-task 历史记录仍为 10/10）、P2-05 产物内容审计
-25/25 与打包产物启动探测 22/22、TypeScript/ESLint/build 通过。真实模型 C7/D6/D8 最新复跑未完整通过；A4/A5 仍需人工真实键盘/托盘复测；
+27/27 与打包产物启动探测 22/22、TypeScript/ESLint/build 通过。真实模型 C7/D6/D8 最新复跑未完整通过；A4/A5 仍需人工真实键盘/托盘复测；
 P2-05 的干净机安装／卸载／升级与 SmartScreen、以及 `orb_open_app` 的真机效果属人工项。
 
 P1-05/C6 审计发现 broker 原先没有把撤权传播给正在执行的 native action，因此只验证 backend 的

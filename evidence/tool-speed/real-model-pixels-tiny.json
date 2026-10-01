@@ -1,0 +1,3236 @@
+{
+  "method": "real provider, Pi Web, product pipe/broker/native driver, disposable target readback",
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash",
+    "thinking": "off"
+  },
+  "rows": [
+    {
+      "mode": "single",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 20516.536,
+      "modelResponses": 5,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovck5s-1",
+            "x": 84,
+            "y": 120
+          }
+        },
+        {
+          "response": 2,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovcnm7-2",
+            "x": 84,
+            "y": 169
+          }
+        },
+        {
+          "response": 3,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovcr32-3",
+            "x": 84,
+            "y": 220
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "click",
+          "id": "a"
+        },
+        {
+          "kind": "click",
+          "id": "b"
+        },
+        {
+          "kind": "click",
+          "id": "c"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 24972,
+          "base64Bytes": 33296,
+          "frame": {
+            "observationId": "obs-muovck5s-1",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21182,
+          "base64Bytes": 28244,
+          "frame": {
+            "observationId": "obs-muovcnm7-2",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21112,
+          "base64Bytes": 28152,
+          "frame": {
+            "observationId": "obs-muovcr32-3",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21043,
+          "base64Bytes": 28060,
+          "frame": {
+            "observationId": "obs-muovcu76-4",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "bridge-roundtrip",
+          "durationMs": 204.47580000000016
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "result-format",
+          "durationMs": 0.4105999999992491
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "bridge-roundtrip",
+          "durationMs": 1001.5896999999968
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "result-format",
+          "durationMs": 0.056599999999889405
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "bridge-roundtrip",
+          "durationMs": 959.9788999999982
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "result-format",
+          "durationMs": 0.09800000000177533
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "bridge-roundtrip",
+          "durationMs": 990.4051
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "result-format",
+          "durationMs": 0.09039999999731663
+        },
+        {
+          "at": "2026-10-01T01:42:02.421Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "window-enumeration",
+          "durationMs": 21.2520999999997
+        },
+        {
+          "at": "2026-10-01T01:42:02.437Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "window-enumeration",
+          "durationMs": 14.656499999999141
+        },
+        {
+          "at": "2026-10-01T01:42:02.454Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "listScreens",
+          "durationMs": 16.10059999999976
+        },
+        {
+          "at": "2026-10-01T01:42:02.497Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "capture-and-png",
+          "durationMs": 42.487199999999575
+        },
+        {
+          "at": "2026-10-01T01:42:02.497Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "capture",
+          "durationMs": 42.745600000000195
+        },
+        {
+          "at": "2026-10-01T01:42:02.510Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "inspectForeground",
+          "durationMs": 13.627599999999802
+        },
+        {
+          "at": "2026-10-01T01:42:02.511Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "base64",
+          "durationMs": 0.09950000000026193
+        },
+        {
+          "at": "2026-10-01T01:42:02.511Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "image",
+          "bytes": 24972,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:02.514Z",
+          "event": "tool-timing",
+          "requestId": "87744e9b-7e56-439c-a29b-d8781625391b",
+          "phase": "executor-total",
+          "durationMs": 200.51889999999912
+        },
+        {
+          "at": "2026-10-01T01:42:06.119Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "window-enumeration",
+          "durationMs": 16.692900000001828
+        },
+        {
+          "at": "2026-10-01T01:42:06.133Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "window-enumeration",
+          "durationMs": 14.156699999999546
+        },
+        {
+          "at": "2026-10-01T01:42:06.283Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "native-input",
+          "durationMs": 149.3738000000012
+        },
+        {
+          "at": "2026-10-01T01:42:06.897Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "post-action-wait",
+          "durationMs": 614.0289999999986
+        },
+        {
+          "at": "2026-10-01T01:42:06.912Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "window-enumeration",
+          "durationMs": 14.752799999998388
+        },
+        {
+          "at": "2026-10-01T01:42:06.925Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "listScreens",
+          "durationMs": 12.685499999999593
+        },
+        {
+          "at": "2026-10-01T01:42:06.974Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "capture-and-png",
+          "durationMs": 48.72220000000016
+        },
+        {
+          "at": "2026-10-01T01:42:06.974Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "capture",
+          "durationMs": 48.95890000000145
+        },
+        {
+          "at": "2026-10-01T01:42:06.990Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "inspectForeground",
+          "durationMs": 16.29500000000189
+        },
+        {
+          "at": "2026-10-01T01:42:06.991Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "base64",
+          "durationMs": 0.11449999999967986
+        },
+        {
+          "at": "2026-10-01T01:42:06.991Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "image",
+          "bytes": 21182,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:06.997Z",
+          "event": "tool-timing",
+          "requestId": "9cc875cd-521f-4b0a-997b-376af5475ebe",
+          "phase": "executor-total",
+          "durationMs": 999.9354999999996
+        },
+        {
+          "at": "2026-10-01T01:42:10.637Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "window-enumeration",
+          "durationMs": 18.33390000000145
+        },
+        {
+          "at": "2026-10-01T01:42:10.651Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "window-enumeration",
+          "durationMs": 13.533699999999953
+        },
+        {
+          "at": "2026-10-01T01:42:10.802Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "native-input",
+          "durationMs": 151.03719999999885
+        },
+        {
+          "at": "2026-10-01T01:42:11.407Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "post-action-wait",
+          "durationMs": 604.2559000000001
+        },
+        {
+          "at": "2026-10-01T01:42:11.420Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "window-enumeration",
+          "durationMs": 13.295200000000477
+        },
+        {
+          "at": "2026-10-01T01:42:11.433Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "listScreens",
+          "durationMs": 12.862900000000081
+        },
+        {
+          "at": "2026-10-01T01:42:11.471Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "capture-and-png",
+          "durationMs": 38.131499999999505
+        },
+        {
+          "at": "2026-10-01T01:42:11.472Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "capture",
+          "durationMs": 38.29069999999774
+        },
+        {
+          "at": "2026-10-01T01:42:11.486Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "inspectForeground",
+          "durationMs": 14.228300000002491
+        },
+        {
+          "at": "2026-10-01T01:42:11.486Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "base64",
+          "durationMs": 0.08870000000024447
+        },
+        {
+          "at": "2026-10-01T01:42:11.486Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "image",
+          "bytes": 21112,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:11.490Z",
+          "event": "tool-timing",
+          "requestId": "93d2eec7-2738-4ad0-be9f-a2c5d2c0bd9a",
+          "phase": "executor-total",
+          "durationMs": 957.5921999999991
+        },
+        {
+          "at": "2026-10-01T01:42:14.649Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "window-enumeration",
+          "durationMs": 18.667900000000373
+        },
+        {
+          "at": "2026-10-01T01:42:14.664Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "window-enumeration",
+          "durationMs": 14.92989999999918
+        },
+        {
+          "at": "2026-10-01T01:42:14.818Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "native-input",
+          "durationMs": 152.92519999999786
+        },
+        {
+          "at": "2026-10-01T01:42:15.425Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "post-action-wait",
+          "durationMs": 607.2059000000008
+        },
+        {
+          "at": "2026-10-01T01:42:15.442Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "window-enumeration",
+          "durationMs": 16.92989999999918
+        },
+        {
+          "at": "2026-10-01T01:42:15.450Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "listScreens",
+          "durationMs": 8.258300000001327
+        },
+        {
+          "at": "2026-10-01T01:42:15.502Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "capture-and-png",
+          "durationMs": 51.556799999998475
+        },
+        {
+          "at": "2026-10-01T01:42:15.502Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "capture",
+          "durationMs": 51.66100000000006
+        },
+        {
+          "at": "2026-10-01T01:42:15.522Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "inspectForeground",
+          "durationMs": 19.905699999999342
+        },
+        {
+          "at": "2026-10-01T01:42:15.522Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "base64",
+          "durationMs": 0.09510000000227592
+        },
+        {
+          "at": "2026-10-01T01:42:15.522Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "image",
+          "bytes": 21043,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:15.528Z",
+          "event": "tool-timing",
+          "requestId": "4335365f-2404-425b-9f35-5f71fbdb613d",
+          "phase": "executor-total",
+          "durationMs": 988.5611000000026
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muovck5s-1\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target (Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.)",
+          "count": 1,
+          "encodedBytes": 24972
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovcnm7-2\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21182
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovcr32-3\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21112
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovcu76-4\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21043
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "batch",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 12900.6564,
+      "modelResponses": 3,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_batch",
+          "arguments": {
+            "observation_id": "obs-muovd08a-5",
+            "actions": [
+              {
+                "kind": "click",
+                "x": 84,
+                "y": 124
+              },
+              {
+                "kind": "click",
+                "x": 84,
+                "y": 172
+              },
+              {
+                "kind": "click",
+                "x": 84,
+                "y": 220
+              }
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "click",
+          "id": "a"
+        },
+        {
+          "kind": "click",
+          "id": "b"
+        },
+        {
+          "kind": "click",
+          "id": "c"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 21043,
+          "base64Bytes": 28060,
+          "frame": {
+            "observationId": "obs-muovd08a-5",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21254,
+          "base64Bytes": 28340,
+          "frame": {
+            "observationId": "obs-muovd536-8",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "bridge-roundtrip",
+          "durationMs": 192.08259999999427
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "result-format",
+          "durationMs": 0.05620000000635628
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "bridge-roundtrip",
+          "durationMs": 2927.771099999998
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "result-format",
+          "durationMs": 0.4260999999969499
+        },
+        {
+          "at": "2026-10-01T01:42:23.254Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "window-enumeration",
+          "durationMs": 15.679000000003725
+        },
+        {
+          "at": "2026-10-01T01:42:23.264Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "window-enumeration",
+          "durationMs": 9.159700000003795
+        },
+        {
+          "at": "2026-10-01T01:42:23.284Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "listScreens",
+          "durationMs": 20.21480000000156
+        },
+        {
+          "at": "2026-10-01T01:42:23.323Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "capture-and-png",
+          "durationMs": 39.137000000002445
+        },
+        {
+          "at": "2026-10-01T01:42:23.323Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "capture",
+          "durationMs": 39.245899999994435
+        },
+        {
+          "at": "2026-10-01T01:42:23.338Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "inspectForeground",
+          "durationMs": 14.337200000001758
+        },
+        {
+          "at": "2026-10-01T01:42:23.338Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "base64",
+          "durationMs": 0.06319999999686843
+        },
+        {
+          "at": "2026-10-01T01:42:23.338Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "image",
+          "bytes": 21043,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:23.339Z",
+          "event": "tool-timing",
+          "requestId": "22396afb-3ed8-4141-9690-41d20b335ae8",
+          "phase": "executor-total",
+          "durationMs": 190.77180000000226
+        },
+        {
+          "at": "2026-10-01T01:42:26.823Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 19.26430000000255
+        },
+        {
+          "at": "2026-10-01T01:42:26.836Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 12.723099999995611
+        },
+        {
+          "at": "2026-10-01T01:42:26.992Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "native-input",
+          "durationMs": 155.44290000000183
+        },
+        {
+          "at": "2026-10-01T01:42:27.597Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "post-action-wait",
+          "durationMs": 604.5906000000032
+        },
+        {
+          "at": "2026-10-01T01:42:27.610Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 13.504699999997683
+        },
+        {
+          "at": "2026-10-01T01:42:27.626Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "listScreens",
+          "durationMs": 15.720799999995506
+        },
+        {
+          "at": "2026-10-01T01:42:27.663Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "capture-and-png",
+          "durationMs": 36.5911000000051
+        },
+        {
+          "at": "2026-10-01T01:42:27.663Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "capture",
+          "durationMs": 36.98070000000007
+        },
+        {
+          "at": "2026-10-01T01:42:27.679Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "inspectForeground",
+          "durationMs": 15.310499999999593
+        },
+        {
+          "at": "2026-10-01T01:42:27.679Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "base64",
+          "durationMs": 0.051200000001699664
+        },
+        {
+          "at": "2026-10-01T01:42:27.679Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "image",
+          "bytes": 21103,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:27.791Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 15.152499999996508
+        },
+        {
+          "at": "2026-10-01T01:42:27.806Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 14.263400000003458
+        },
+        {
+          "at": "2026-10-01T01:42:27.959Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "native-input",
+          "durationMs": 152.96779999999853
+        },
+        {
+          "at": "2026-10-01T01:42:28.565Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "post-action-wait",
+          "durationMs": 605.5903000000035
+        },
+        {
+          "at": "2026-10-01T01:42:28.580Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 15.693599999998696
+        },
+        {
+          "at": "2026-10-01T01:42:28.599Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "listScreens",
+          "durationMs": 18.771600000000035
+        },
+        {
+          "at": "2026-10-01T01:42:28.638Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "capture-and-png",
+          "durationMs": 37.9745999999941
+        },
+        {
+          "at": "2026-10-01T01:42:28.638Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "capture",
+          "durationMs": 38.069900000002235
+        },
+        {
+          "at": "2026-10-01T01:42:28.651Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "inspectForeground",
+          "durationMs": 13.503300000003946
+        },
+        {
+          "at": "2026-10-01T01:42:28.651Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "base64",
+          "durationMs": 0.042099999998754356
+        },
+        {
+          "at": "2026-10-01T01:42:28.651Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "image",
+          "bytes": 21183,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:28.771Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 19.28200000000652
+        },
+        {
+          "at": "2026-10-01T01:42:28.782Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 11.34599999999773
+        },
+        {
+          "at": "2026-10-01T01:42:28.942Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "native-input",
+          "durationMs": 159.26140000000305
+        },
+        {
+          "at": "2026-10-01T01:42:29.550Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "post-action-wait",
+          "durationMs": 608.4362999999939
+        },
+        {
+          "at": "2026-10-01T01:42:29.564Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "window-enumeration",
+          "durationMs": 13.673999999999069
+        },
+        {
+          "at": "2026-10-01T01:42:29.586Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "listScreens",
+          "durationMs": 21.259299999997893
+        },
+        {
+          "at": "2026-10-01T01:42:29.624Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "capture-and-png",
+          "durationMs": 37.77520000000368
+        },
+        {
+          "at": "2026-10-01T01:42:29.624Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "capture",
+          "durationMs": 37.86219999999594
+        },
+        {
+          "at": "2026-10-01T01:42:29.634Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "inspectForeground",
+          "durationMs": 10.482600000003004
+        },
+        {
+          "at": "2026-10-01T01:42:29.634Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "base64",
+          "durationMs": 0.03179999999701977
+        },
+        {
+          "at": "2026-10-01T01:42:29.634Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "image",
+          "bytes": 21254,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:29.638Z",
+          "event": "tool-timing",
+          "requestId": "e216b4cf-5790-407c-8763-24a9e8200d8d",
+          "phase": "executor-total",
+          "durationMs": 2925.390800000001
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muovd08a-5\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21043
+        },
+        {
+          "tool": "orb_batch",
+          "text": "Batch completed: 3 actions. \naction: click completed\nobservation_id: obs-muovd3kv-6\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target\naction: click completed\nobservation_id: obs-muovd4bv-7\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target\naction: click completed\nobservation_id: obs-muovd536-8\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 3,
+          "encodedBytes": 63540
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "single",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 17693.692700000007,
+      "modelResponses": 5,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovdc2p-9",
+            "x": 80,
+            "y": 121
+          }
+        },
+        {
+          "response": 2,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovdeyy-10",
+            "x": 80,
+            "y": 171
+          }
+        },
+        {
+          "response": 3,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovdi7v-11",
+            "x": 80,
+            "y": 221
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "click",
+          "id": "a"
+        },
+        {
+          "kind": "click",
+          "id": "b"
+        },
+        {
+          "kind": "click",
+          "id": "c"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 21254,
+          "base64Bytes": 28340,
+          "frame": {
+            "observationId": "obs-muovdc2p-9",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21242,
+          "base64Bytes": 28324,
+          "frame": {
+            "observationId": "obs-muovdeyy-10",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21211,
+          "base64Bytes": 28284,
+          "frame": {
+            "observationId": "obs-muovdi7v-11",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21202,
+          "base64Bytes": 28272,
+          "frame": {
+            "observationId": "obs-muovdle3-12",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "bridge-roundtrip",
+          "durationMs": 185.54679999999644
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "result-format",
+          "durationMs": 0.0878999999986263
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "bridge-roundtrip",
+          "durationMs": 956.6061999999947
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "result-format",
+          "durationMs": 0.0970999999990454
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "bridge-roundtrip",
+          "durationMs": 959.1278999999995
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "result-format",
+          "durationMs": 0.06769999999960419
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "bridge-roundtrip",
+          "durationMs": 977.3828999999969
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "result-format",
+          "durationMs": 0.0544000000008964
+        },
+        {
+          "at": "2026-10-01T01:42:38.603Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "window-enumeration",
+          "durationMs": 15.691599999998289
+        },
+        {
+          "at": "2026-10-01T01:42:38.622Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "window-enumeration",
+          "durationMs": 18.78940000000148
+        },
+        {
+          "at": "2026-10-01T01:42:38.637Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "listScreens",
+          "durationMs": 14.364000000001397
+        },
+        {
+          "at": "2026-10-01T01:42:38.672Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "capture-and-png",
+          "durationMs": 35.269200000002456
+        },
+        {
+          "at": "2026-10-01T01:42:38.672Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "capture",
+          "durationMs": 35.409200000001874
+        },
+        {
+          "at": "2026-10-01T01:42:38.688Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "inspectForeground",
+          "durationMs": 15.470399999998335
+        },
+        {
+          "at": "2026-10-01T01:42:38.688Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "base64",
+          "durationMs": 0.10010000000329455
+        },
+        {
+          "at": "2026-10-01T01:42:38.688Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "image",
+          "bytes": 21254,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:38.689Z",
+          "event": "tool-timing",
+          "requestId": "d1bd2e9d-5a29-4102-bb67-9f47661cd80d",
+          "phase": "executor-total",
+          "durationMs": 184.0054999999993
+        },
+        {
+          "at": "2026-10-01T01:42:41.603Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "window-enumeration",
+          "durationMs": 15.61540000000241
+        },
+        {
+          "at": "2026-10-01T01:42:41.617Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "window-enumeration",
+          "durationMs": 14.195800000001327
+        },
+        {
+          "at": "2026-10-01T01:42:41.765Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "native-input",
+          "durationMs": 147.59130000000005
+        },
+        {
+          "at": "2026-10-01T01:42:42.373Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "post-action-wait",
+          "durationMs": 607.4478000000017
+        },
+        {
+          "at": "2026-10-01T01:42:42.385Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "window-enumeration",
+          "durationMs": 12.263299999998708
+        },
+        {
+          "at": "2026-10-01T01:42:42.395Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "listScreens",
+          "durationMs": 9.859799999998359
+        },
+        {
+          "at": "2026-10-01T01:42:42.430Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "capture-and-png",
+          "durationMs": 34.54930000000604
+        },
+        {
+          "at": "2026-10-01T01:42:42.430Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "capture",
+          "durationMs": 34.63690000000497
+        },
+        {
+          "at": "2026-10-01T01:42:42.442Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "inspectForeground",
+          "durationMs": 11.542999999997846
+        },
+        {
+          "at": "2026-10-01T01:42:42.442Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "base64",
+          "durationMs": 0.03619999999500578
+        },
+        {
+          "at": "2026-10-01T01:42:42.442Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "image",
+          "bytes": 21242,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:42.445Z",
+          "event": "tool-timing",
+          "requestId": "7104e460-9288-4a47-b2db-b3ef41a6e747",
+          "phase": "executor-total",
+          "durationMs": 955.0994999999966
+        },
+        {
+          "at": "2026-10-01T01:42:45.800Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "window-enumeration",
+          "durationMs": 15.344899999996414
+        },
+        {
+          "at": "2026-10-01T01:42:45.812Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "window-enumeration",
+          "durationMs": 11.363799999999173
+        },
+        {
+          "at": "2026-10-01T01:42:45.972Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "native-input",
+          "durationMs": 159.6756000000023
+        },
+        {
+          "at": "2026-10-01T01:42:46.579Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "post-action-wait",
+          "durationMs": 606.9136999999973
+        },
+        {
+          "at": "2026-10-01T01:42:46.591Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "window-enumeration",
+          "durationMs": 11.777900000000955
+        },
+        {
+          "at": "2026-10-01T01:42:46.603Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "listScreens",
+          "durationMs": 12.186499999996158
+        },
+        {
+          "at": "2026-10-01T01:42:46.639Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "capture-and-png",
+          "durationMs": 35.159700000003795
+        },
+        {
+          "at": "2026-10-01T01:42:46.639Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "capture",
+          "durationMs": 35.33099999999831
+        },
+        {
+          "at": "2026-10-01T01:42:46.651Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "inspectForeground",
+          "durationMs": 11.830699999998615
+        },
+        {
+          "at": "2026-10-01T01:42:46.651Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "base64",
+          "durationMs": 0.060599999997066334
+        },
+        {
+          "at": "2026-10-01T01:42:46.651Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "image",
+          "bytes": 21211,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:46.654Z",
+          "event": "tool-timing",
+          "requestId": "1e98880a-e0fc-43b2-90d3-4a59e2512bf9",
+          "phase": "executor-total",
+          "durationMs": 958.0138000000006
+        },
+        {
+          "at": "2026-10-01T01:42:49.903Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "window-enumeration",
+          "durationMs": 12.257600000004459
+        },
+        {
+          "at": "2026-10-01T01:42:49.918Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "window-enumeration",
+          "durationMs": 15.138999999995576
+        },
+        {
+          "at": "2026-10-01T01:42:50.074Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "native-input",
+          "durationMs": 155.53949999999895
+        },
+        {
+          "at": "2026-10-01T01:42:50.680Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "post-action-wait",
+          "durationMs": 605.4835999999996
+        },
+        {
+          "at": "2026-10-01T01:42:50.696Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "window-enumeration",
+          "durationMs": 15.89890000000014
+        },
+        {
+          "at": "2026-10-01T01:42:50.712Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "listScreens",
+          "durationMs": 15.692699999999604
+        },
+        {
+          "at": "2026-10-01T01:42:50.746Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "capture-and-png",
+          "durationMs": 33.65080000000307
+        },
+        {
+          "at": "2026-10-01T01:42:50.746Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "capture",
+          "durationMs": 33.72830000000249
+        },
+        {
+          "at": "2026-10-01T01:42:50.763Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "inspectForeground",
+          "durationMs": 17.147899999996298
+        },
+        {
+          "at": "2026-10-01T01:42:50.763Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "base64",
+          "durationMs": 0.05580000000190921
+        },
+        {
+          "at": "2026-10-01T01:42:50.763Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "image",
+          "bytes": 21202,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:50.766Z",
+          "event": "tool-timing",
+          "requestId": "66072ba7-bb6a-4244-a1f2-97be6a5f930b",
+          "phase": "executor-total",
+          "durationMs": 975.9806000000026
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muovdc2p-9\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21254
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovdeyy-10\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21242
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovdi7v-11\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21211
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovdle3-12\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21202
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "batch",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 11516.861300000004,
+      "modelResponses": 3,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_batch",
+          "arguments": {
+            "observation_id": "obs-muovdro5-13",
+            "actions": [
+              {
+                "kind": "click",
+                "x": 85,
+                "y": 120
+              },
+              {
+                "kind": "click",
+                "x": 85,
+                "y": 170
+              },
+              {
+                "kind": "click",
+                "x": 85,
+                "y": 220
+              }
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "click",
+          "id": "a"
+        },
+        {
+          "kind": "click",
+          "id": "b"
+        },
+        {
+          "kind": "click",
+          "id": "c"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 21202,
+          "base64Bytes": 28272,
+          "frame": {
+            "observationId": "obs-muovdro5-13",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21155,
+          "base64Bytes": 28208,
+          "frame": {
+            "observationId": "obs-muovdwbv-16",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "bridge-roundtrip",
+          "durationMs": 201.44170000001031
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "result-format",
+          "durationMs": 0.03209999999671709
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "bridge-roundtrip",
+          "durationMs": 2927.3606
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "result-format",
+          "durationMs": 0.15970000000379514
+        },
+        {
+          "at": "2026-10-01T01:42:58.804Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "window-enumeration",
+          "durationMs": 13.909899999998743
+        },
+        {
+          "at": "2026-10-01T01:42:58.823Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "window-enumeration",
+          "durationMs": 18.500299999999697
+        },
+        {
+          "at": "2026-10-01T01:42:58.840Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "listScreens",
+          "durationMs": 17.07970000000205
+        },
+        {
+          "at": "2026-10-01T01:42:58.884Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "capture-and-png",
+          "durationMs": 43.17179999999644
+        },
+        {
+          "at": "2026-10-01T01:42:58.884Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "capture",
+          "durationMs": 43.326700000005076
+        },
+        {
+          "at": "2026-10-01T01:42:58.901Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "inspectForeground",
+          "durationMs": 17.167199999996228
+        },
+        {
+          "at": "2026-10-01T01:42:58.901Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "base64",
+          "durationMs": 0.046900000001187436
+        },
+        {
+          "at": "2026-10-01T01:42:58.901Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "image",
+          "bytes": 21202,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:42:58.902Z",
+          "event": "tool-timing",
+          "requestId": "427d1bab-04f8-4c6e-8ff4-583cf4bea6a8",
+          "phase": "executor-total",
+          "durationMs": 200.2146999999968
+        },
+        {
+          "at": "2026-10-01T01:43:02.134Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 14.27379999999539
+        },
+        {
+          "at": "2026-10-01T01:43:02.145Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 11.005900000003749
+        },
+        {
+          "at": "2026-10-01T01:43:02.299Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "native-input",
+          "durationMs": 154.22449999999662
+        },
+        {
+          "at": "2026-10-01T01:43:02.906Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "post-action-wait",
+          "durationMs": 606.4502999999968
+        },
+        {
+          "at": "2026-10-01T01:43:02.919Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 13.187400000009802
+        },
+        {
+          "at": "2026-10-01T01:43:02.929Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "listScreens",
+          "durationMs": 9.298800000004121
+        },
+        {
+          "at": "2026-10-01T01:43:02.962Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "capture-and-png",
+          "durationMs": 33.67229999999108
+        },
+        {
+          "at": "2026-10-01T01:43:02.962Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "capture",
+          "durationMs": 33.82809999999881
+        },
+        {
+          "at": "2026-10-01T01:43:02.979Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "inspectForeground",
+          "durationMs": 16.331700000009732
+        },
+        {
+          "at": "2026-10-01T01:43:02.979Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "base64",
+          "durationMs": 0.06730000000970904
+        },
+        {
+          "at": "2026-10-01T01:43:02.979Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "image",
+          "bytes": 21188,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:03.100Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 15.414300000004005
+        },
+        {
+          "at": "2026-10-01T01:43:03.112Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 11.894899999999325
+        },
+        {
+          "at": "2026-10-01T01:43:03.274Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "native-input",
+          "durationMs": 161.68510000000242
+        },
+        {
+          "at": "2026-10-01T01:43:03.881Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "post-action-wait",
+          "durationMs": 607.2201000000059
+        },
+        {
+          "at": "2026-10-01T01:43:03.897Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 15.131000000008498
+        },
+        {
+          "at": "2026-10-01T01:43:03.908Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "listScreens",
+          "durationMs": 10.752099999997881
+        },
+        {
+          "at": "2026-10-01T01:43:03.943Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "capture-and-png",
+          "durationMs": 35.80689999999595
+        },
+        {
+          "at": "2026-10-01T01:43:03.944Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "capture",
+          "durationMs": 35.90869999999995
+        },
+        {
+          "at": "2026-10-01T01:43:03.955Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "inspectForeground",
+          "durationMs": 11.552100000000792
+        },
+        {
+          "at": "2026-10-01T01:43:03.955Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "base64",
+          "durationMs": 0.03269999999611173
+        },
+        {
+          "at": "2026-10-01T01:43:03.955Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "image",
+          "bytes": 21179,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:04.068Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 17.649099999995087
+        },
+        {
+          "at": "2026-10-01T01:43:04.083Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 14.906100000007427
+        },
+        {
+          "at": "2026-10-01T01:43:04.237Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "native-input",
+          "durationMs": 153.63399999999092
+        },
+        {
+          "at": "2026-10-01T01:43:04.843Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "post-action-wait",
+          "durationMs": 606.0270000000019
+        },
+        {
+          "at": "2026-10-01T01:43:04.860Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "window-enumeration",
+          "durationMs": 16.386599999997998
+        },
+        {
+          "at": "2026-10-01T01:43:04.880Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "listScreens",
+          "durationMs": 19.360799999994924
+        },
+        {
+          "at": "2026-10-01T01:43:04.922Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "capture-and-png",
+          "durationMs": 41.43110000000161
+        },
+        {
+          "at": "2026-10-01T01:43:04.922Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "capture",
+          "durationMs": 41.52530000000843
+        },
+        {
+          "at": "2026-10-01T01:43:04.939Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "inspectForeground",
+          "durationMs": 17.541499999992084
+        },
+        {
+          "at": "2026-10-01T01:43:04.939Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "base64",
+          "durationMs": 0.0595000000030268
+        },
+        {
+          "at": "2026-10-01T01:43:04.939Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "image",
+          "bytes": 21155,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:04.944Z",
+          "event": "tool-timing",
+          "requestId": "2c598a8a-80be-4f2f-9d50-0c654d80e3bd",
+          "phase": "executor-total",
+          "durationMs": 2925.0589000000036
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muovdro5-13\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21202
+        },
+        {
+          "tool": "orb_batch",
+          "text": "Batch completed: 3 actions. \naction: click completed\nobservation_id: obs-muovdutf-14\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target\naction: click completed\nobservation_id: obs-muovdvkj-15\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target\naction: click completed\nobservation_id: obs-muovdwbv-16\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 3,
+          "encodedBytes": 63522
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "single",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 18413.690699999992,
+      "modelResponses": 5,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muove2go-17",
+            "x": 82,
+            "y": 120
+          }
+        },
+        {
+          "response": 2,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muove5d0-18",
+            "x": 82,
+            "y": 169
+          }
+        },
+        {
+          "response": 3,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muove8k7-19",
+            "x": 82,
+            "y": 221
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "click",
+          "id": "a"
+        },
+        {
+          "kind": "click",
+          "id": "b"
+        },
+        {
+          "kind": "click",
+          "id": "c"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 21155,
+          "base64Bytes": 28208,
+          "frame": {
+            "observationId": "obs-muove2go-17",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21165,
+          "base64Bytes": 28220,
+          "frame": {
+            "observationId": "obs-muove5d0-18",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21166,
+          "base64Bytes": 28224,
+          "frame": {
+            "observationId": "obs-muove8k7-19",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21186,
+          "base64Bytes": 28248,
+          "frame": {
+            "observationId": "obs-muovebuw-20",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "bridge-roundtrip",
+          "durationMs": 213.3222999999998
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "result-format",
+          "durationMs": 0.0507999999972526
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "bridge-roundtrip",
+          "durationMs": 972.4401999999973
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "result-format",
+          "durationMs": 0.07599999998637941
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "bridge-roundtrip",
+          "durationMs": 976.4383999999991
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "result-format",
+          "durationMs": 0.04409999999916181
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "bridge-roundtrip",
+          "durationMs": 982.4992999999959
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "result-format",
+          "durationMs": 0.02569999999832362
+        },
+        {
+          "at": "2026-10-01T01:43:12.787Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "window-enumeration",
+          "durationMs": 21.676899999991292
+        },
+        {
+          "at": "2026-10-01T01:43:12.808Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "window-enumeration",
+          "durationMs": 20.69289999999455
+        },
+        {
+          "at": "2026-10-01T01:43:12.826Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "listScreens",
+          "durationMs": 18.111999999993714
+        },
+        {
+          "at": "2026-10-01T01:43:12.860Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "capture-and-png",
+          "durationMs": 33.74009999999544
+        },
+        {
+          "at": "2026-10-01T01:43:12.860Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "capture",
+          "durationMs": 33.93510000000242
+        },
+        {
+          "at": "2026-10-01T01:43:12.887Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "inspectForeground",
+          "durationMs": 26.95130000000063
+        },
+        {
+          "at": "2026-10-01T01:43:12.888Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "base64",
+          "durationMs": 0.07550000000628643
+        },
+        {
+          "at": "2026-10-01T01:43:12.888Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "image",
+          "bytes": 21155,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:12.889Z",
+          "event": "tool-timing",
+          "requestId": "14743878-96d3-4e46-b501-f1ba02d76c33",
+          "phase": "executor-total",
+          "durationMs": 212.1012000000046
+        },
+        {
+          "at": "2026-10-01T01:43:15.792Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "window-enumeration",
+          "durationMs": 15.793299999990268
+        },
+        {
+          "at": "2026-10-01T01:43:15.804Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "window-enumeration",
+          "durationMs": 11.593399999997928
+        },
+        {
+          "at": "2026-10-01T01:43:15.957Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "native-input",
+          "durationMs": 153.35559999999532
+        },
+        {
+          "at": "2026-10-01T01:43:16.564Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "post-action-wait",
+          "durationMs": 606.4787000000069
+        },
+        {
+          "at": "2026-10-01T01:43:16.578Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "window-enumeration",
+          "durationMs": 13.600299999990966
+        },
+        {
+          "at": "2026-10-01T01:43:16.588Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "listScreens",
+          "durationMs": 10.039000000004307
+        },
+        {
+          "at": "2026-10-01T01:43:16.630Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "capture-and-png",
+          "durationMs": 41.720200000010664
+        },
+        {
+          "at": "2026-10-01T01:43:16.630Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "capture",
+          "durationMs": 41.83030000000144
+        },
+        {
+          "at": "2026-10-01T01:43:16.644Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "inspectForeground",
+          "durationMs": 13.756199999988894
+        },
+        {
+          "at": "2026-10-01T01:43:16.644Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "base64",
+          "durationMs": 0.0400999999983469
+        },
+        {
+          "at": "2026-10-01T01:43:16.644Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "image",
+          "bytes": 21165,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:16.648Z",
+          "event": "tool-timing",
+          "requestId": "5dff7514-2572-40f6-a75c-2e11039c919b",
+          "phase": "executor-total",
+          "durationMs": 970.8545000000013
+        },
+        {
+          "at": "2026-10-01T01:43:19.925Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "window-enumeration",
+          "durationMs": 15.430200000002515
+        },
+        {
+          "at": "2026-10-01T01:43:19.940Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "window-enumeration",
+          "durationMs": 14.205300000001444
+        },
+        {
+          "at": "2026-10-01T01:43:20.107Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "native-input",
+          "durationMs": 166.9539999999979
+        },
+        {
+          "at": "2026-10-01T01:43:20.720Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "post-action-wait",
+          "durationMs": 613.0642999999982
+        },
+        {
+          "at": "2026-10-01T01:43:20.732Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "window-enumeration",
+          "durationMs": 11.751900000002934
+        },
+        {
+          "at": "2026-10-01T01:43:20.743Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "listScreens",
+          "durationMs": 10.775199999989127
+        },
+        {
+          "at": "2026-10-01T01:43:20.778Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "capture-and-png",
+          "durationMs": 34.51580000000831
+        },
+        {
+          "at": "2026-10-01T01:43:20.778Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "capture",
+          "durationMs": 34.662000000011176
+        },
+        {
+          "at": "2026-10-01T01:43:20.791Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "inspectForeground",
+          "durationMs": 12.851800000004005
+        },
+        {
+          "at": "2026-10-01T01:43:20.791Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "base64",
+          "durationMs": 0.07259999999951106
+        },
+        {
+          "at": "2026-10-01T01:43:20.791Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "image",
+          "bytes": 21166,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:20.796Z",
+          "event": "tool-timing",
+          "requestId": "a38a13aa-58aa-412a-a2d7-1c8ac458e0ea",
+          "phase": "executor-total",
+          "durationMs": 975.1173999999883
+        },
+        {
+          "at": "2026-10-01T01:43:24.203Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "window-enumeration",
+          "durationMs": 19.600399999995716
+        },
+        {
+          "at": "2026-10-01T01:43:24.218Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "window-enumeration",
+          "durationMs": 15.01249999999709
+        },
+        {
+          "at": "2026-10-01T01:43:24.380Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "native-input",
+          "durationMs": 161.6649000000034
+        },
+        {
+          "at": "2026-10-01T01:43:24.983Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "post-action-wait",
+          "durationMs": 603.2781000000105
+        },
+        {
+          "at": "2026-10-01T01:43:24.994Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "window-enumeration",
+          "durationMs": 10.846799999999348
+        },
+        {
+          "at": "2026-10-01T01:43:25.012Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "listScreens",
+          "durationMs": 17.01799999999639
+        },
+        {
+          "at": "2026-10-01T01:43:25.049Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "capture-and-png",
+          "durationMs": 36.92290000000503
+        },
+        {
+          "at": "2026-10-01T01:43:25.049Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "capture",
+          "durationMs": 37.000499999994645
+        },
+        {
+          "at": "2026-10-01T01:43:25.064Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "inspectForeground",
+          "durationMs": 14.974300000001676
+        },
+        {
+          "at": "2026-10-01T01:43:25.064Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "base64",
+          "durationMs": 0.06479999999282882
+        },
+        {
+          "at": "2026-10-01T01:43:25.064Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "image",
+          "bytes": 21186,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:25.067Z",
+          "event": "tool-timing",
+          "requestId": "7607c215-1fc1-449c-bb0c-55471f55994a",
+          "phase": "executor-total",
+          "durationMs": 981.5913
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muove2go-17\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21155
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muove5d0-18\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21165
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muove8k7-19\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21166
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovebuw-20\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21186
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "batch",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 11678.578300000008,
+      "modelResponses": 3,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_batch",
+          "arguments": {
+            "observation_id": "obs-muoveih2-21",
+            "actions": [
+              {
+                "kind": "click",
+                "x": 78,
+                "y": 119
+              },
+              {
+                "kind": "click",
+                "x": 78,
+                "y": 171
+              },
+              {
+                "kind": "click",
+                "x": 78,
+                "y": 223
+              }
+            ]
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "click",
+          "id": "a"
+        },
+        {
+          "kind": "click",
+          "id": "b"
+        },
+        {
+          "kind": "click",
+          "id": "c"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 21186,
+          "base64Bytes": 28248,
+          "frame": {
+            "observationId": "obs-muoveih2-21",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 21310,
+          "base64Bytes": 28416,
+          "frame": {
+            "observationId": "obs-muovemy1-24",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "bridge-roundtrip",
+          "durationMs": 194.90520000000834
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "result-format",
+          "durationMs": 0.055399999997462146
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "bridge-roundtrip",
+          "durationMs": 2916.529800000004
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "result-format",
+          "durationMs": 0.11289999999280553
+        },
+        {
+          "at": "2026-10-01T01:43:33.544Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "window-enumeration",
+          "durationMs": 14.392200000002049
+        },
+        {
+          "at": "2026-10-01T01:43:33.565Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "window-enumeration",
+          "durationMs": 20.630199999999604
+        },
+        {
+          "at": "2026-10-01T01:43:33.581Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "listScreens",
+          "durationMs": 15.88279999999213
+        },
+        {
+          "at": "2026-10-01T01:43:33.623Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "capture-and-png",
+          "durationMs": 42.43730000000505
+        },
+        {
+          "at": "2026-10-01T01:43:33.623Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "capture",
+          "durationMs": 42.55900000000838
+        },
+        {
+          "at": "2026-10-01T01:43:33.637Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "inspectForeground",
+          "durationMs": 13.693899999998393
+        },
+        {
+          "at": "2026-10-01T01:43:33.637Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "base64",
+          "durationMs": 0.0913999999902444
+        },
+        {
+          "at": "2026-10-01T01:43:33.637Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "image",
+          "bytes": 21186,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:33.639Z",
+          "event": "tool-timing",
+          "requestId": "68c9289a-b6bf-49ab-bc4f-97df81367d4e",
+          "phase": "executor-total",
+          "durationMs": 193.38709999999264
+        },
+        {
+          "at": "2026-10-01T01:43:36.625Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 16.13949999999022
+        },
+        {
+          "at": "2026-10-01T01:43:36.637Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 11.551199999987148
+        },
+        {
+          "at": "2026-10-01T01:43:36.782Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "native-input",
+          "durationMs": 144.85060000000522
+        },
+        {
+          "at": "2026-10-01T01:43:37.395Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "post-action-wait",
+          "durationMs": 612.8361999999906
+        },
+        {
+          "at": "2026-10-01T01:43:37.407Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 12.001399999993737
+        },
+        {
+          "at": "2026-10-01T01:43:37.422Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "listScreens",
+          "durationMs": 13.087099999989732
+        },
+        {
+          "at": "2026-10-01T01:43:37.456Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "capture-and-png",
+          "durationMs": 33.81610000001092
+        },
+        {
+          "at": "2026-10-01T01:43:37.456Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "capture",
+          "durationMs": 33.99900000001071
+        },
+        {
+          "at": "2026-10-01T01:43:37.471Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "inspectForeground",
+          "durationMs": 15.093800000002375
+        },
+        {
+          "at": "2026-10-01T01:43:37.471Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "base64",
+          "durationMs": 0.09980000001087319
+        },
+        {
+          "at": "2026-10-01T01:43:37.471Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "image",
+          "bytes": 21224,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:37.593Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 17.223599999997532
+        },
+        {
+          "at": "2026-10-01T01:43:37.604Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 11.24309999999241
+        },
+        {
+          "at": "2026-10-01T01:43:37.758Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "native-input",
+          "durationMs": 154.16389999999956
+        },
+        {
+          "at": "2026-10-01T01:43:38.371Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "post-action-wait",
+          "durationMs": 612.9407999999967
+        },
+        {
+          "at": "2026-10-01T01:43:38.381Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 9.234800000005635
+        },
+        {
+          "at": "2026-10-01T01:43:38.391Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "listScreens",
+          "durationMs": 9.887300000002142
+        },
+        {
+          "at": "2026-10-01T01:43:38.425Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "capture-and-png",
+          "durationMs": 33.83939999999711
+        },
+        {
+          "at": "2026-10-01T01:43:38.425Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "capture",
+          "durationMs": 33.98040000000037
+        },
+        {
+          "at": "2026-10-01T01:43:38.444Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "inspectForeground",
+          "durationMs": 19.199099999997998
+        },
+        {
+          "at": "2026-10-01T01:43:38.444Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "base64",
+          "durationMs": 0.06799999999930151
+        },
+        {
+          "at": "2026-10-01T01:43:38.444Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "image",
+          "bytes": 21279,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:38.555Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 13.591500000009546
+        },
+        {
+          "at": "2026-10-01T01:43:38.572Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 17.34320000000298
+        },
+        {
+          "at": "2026-10-01T01:43:38.738Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "native-input",
+          "durationMs": 165.30510000001232
+        },
+        {
+          "at": "2026-10-01T01:43:39.339Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "post-action-wait",
+          "durationMs": 601.1587
+        },
+        {
+          "at": "2026-10-01T01:43:39.353Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "window-enumeration",
+          "durationMs": 13.791299999997136
+        },
+        {
+          "at": "2026-10-01T01:43:39.371Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "listScreens",
+          "durationMs": 17.039499999998952
+        },
+        {
+          "at": "2026-10-01T01:43:39.412Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "capture-and-png",
+          "durationMs": 41.195999999996275
+        },
+        {
+          "at": "2026-10-01T01:43:39.412Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "capture",
+          "durationMs": 41.349300000001676
+        },
+        {
+          "at": "2026-10-01T01:43:39.433Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "inspectForeground",
+          "durationMs": 20.444900000002235
+        },
+        {
+          "at": "2026-10-01T01:43:39.433Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "base64",
+          "durationMs": 0.05899999999382999
+        },
+        {
+          "at": "2026-10-01T01:43:39.433Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "image",
+          "bytes": 21310,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:39.436Z",
+          "event": "tool-timing",
+          "requestId": "d25a4f83-f667-4206-8e5b-fdd795e9504b",
+          "phase": "executor-total",
+          "durationMs": 2914.8956999999937
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muoveih2-21\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21186
+        },
+        {
+          "tool": "orb_batch",
+          "text": "Batch completed: 3 actions. \naction: click completed\nobservation_id: obs-muovelfk-22\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target\naction: click completed\nobservation_id: obs-muovem6l-23\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target\naction: click completed\nobservation_id: obs-muovemy1-24\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 3,
+          "encodedBytes": 63813
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "menu",
+      "succeeded": true,
+      "finished": true,
+      "totalMs": 14913.302199999991,
+      "modelResponses": 4,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        },
+        {
+          "response": 1,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muoveto4-25",
+            "x": 133,
+            "y": 379
+          }
+        },
+        {
+          "response": 2,
+          "name": "orb_click",
+          "arguments": {
+            "observation_id": "obs-muovewr0-26",
+            "x": 133,
+            "y": 508
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "menu-click"
+        },
+        {
+          "kind": "menu-ready"
+        },
+        {
+          "kind": "menu-item"
+        }
+      ],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0,
+          "frame": null
+        },
+        {
+          "images": 1,
+          "bytes": 21310,
+          "base64Bytes": 28416,
+          "frame": {
+            "observationId": "obs-muoveto4-25",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 24121,
+          "base64Bytes": 32164,
+          "frame": {
+            "observationId": "obs-muovewr0-26",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        },
+        {
+          "images": 1,
+          "bytes": 24152,
+          "base64Bytes": 32204,
+          "frame": {
+            "observationId": "obs-muovf04k-27",
+            "raster": {
+              "width": 957,
+              "height": 1266
+            }
+          }
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "bridge-roundtrip",
+          "durationMs": 193.4789000000019
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "result-format",
+          "durationMs": 0.0326000000059139
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "bridge-roundtrip",
+          "durationMs": 969.5501000000077
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "result-format",
+          "durationMs": 0.07739999999466818
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "bridge-roundtrip",
+          "durationMs": 961.5899999999965
+        },
+        {
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "result-format",
+          "durationMs": 0.03230000000621658
+        },
+        {
+          "at": "2026-10-01T01:43:48.061Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "window-enumeration",
+          "durationMs": 16.710399999996298
+        },
+        {
+          "at": "2026-10-01T01:43:48.074Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "window-enumeration",
+          "durationMs": 13.273399999990943
+        },
+        {
+          "at": "2026-10-01T01:43:48.089Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "listScreens",
+          "durationMs": 14.36699999999837
+        },
+        {
+          "at": "2026-10-01T01:43:48.130Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "capture-and-png",
+          "durationMs": 40.83879999999772
+        },
+        {
+          "at": "2026-10-01T01:43:48.130Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "capture",
+          "durationMs": 41.0109999999986
+        },
+        {
+          "at": "2026-10-01T01:43:48.147Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "inspectForeground",
+          "durationMs": 17.422000000005937
+        },
+        {
+          "at": "2026-10-01T01:43:48.148Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "base64",
+          "durationMs": 0.05550000000221189
+        },
+        {
+          "at": "2026-10-01T01:43:48.148Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "image",
+          "bytes": 21310,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:48.148Z",
+          "event": "tool-timing",
+          "requestId": "fb1180b9-d0a0-4ddc-ac98-afba5d063217",
+          "phase": "executor-total",
+          "durationMs": 192.23859999999695
+        },
+        {
+          "at": "2026-10-01T01:43:51.283Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "window-enumeration",
+          "durationMs": 15.82839999999851
+        },
+        {
+          "at": "2026-10-01T01:43:51.293Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "window-enumeration",
+          "durationMs": 10.049599999998463
+        },
+        {
+          "at": "2026-10-01T01:43:51.454Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "native-input",
+          "durationMs": 161.39400000000023
+        },
+        {
+          "at": "2026-10-01T01:43:52.068Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "post-action-wait",
+          "durationMs": 613.8986999999906
+        },
+        {
+          "at": "2026-10-01T01:43:52.078Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "window-enumeration",
+          "durationMs": 9.522499999991851
+        },
+        {
+          "at": "2026-10-01T01:43:52.087Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "listScreens",
+          "durationMs": 8.82290000001376
+        },
+        {
+          "at": "2026-10-01T01:43:52.127Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "capture-and-png",
+          "durationMs": 39.49880000000121
+        },
+        {
+          "at": "2026-10-01T01:43:52.127Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "capture",
+          "durationMs": 39.61930000000575
+        },
+        {
+          "at": "2026-10-01T01:43:52.139Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "inspectForeground",
+          "durationMs": 12.523199999995995
+        },
+        {
+          "at": "2026-10-01T01:43:52.139Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "base64",
+          "durationMs": 0.09370000001217704
+        },
+        {
+          "at": "2026-10-01T01:43:52.139Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "image",
+          "bytes": 24121,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:52.144Z",
+          "event": "tool-timing",
+          "requestId": "8a0d80b5-7b9d-4761-90e5-1df46f75d89c",
+          "phase": "executor-total",
+          "durationMs": 967.7485999999917
+        },
+        {
+          "at": "2026-10-01T01:43:55.665Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "window-enumeration",
+          "durationMs": 16.76280000001134
+        },
+        {
+          "at": "2026-10-01T01:43:55.676Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "window-enumeration",
+          "durationMs": 10.239300000001094
+        },
+        {
+          "at": "2026-10-01T01:43:55.837Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "native-input",
+          "durationMs": 160.96890000000712
+        },
+        {
+          "at": "2026-10-01T01:43:56.443Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "post-action-wait",
+          "durationMs": 606.2416999999987
+        },
+        {
+          "at": "2026-10-01T01:43:56.455Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "window-enumeration",
+          "durationMs": 11.153999999994994
+        },
+        {
+          "at": "2026-10-01T01:43:56.464Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "listScreens",
+          "durationMs": 9.36030000000028
+        },
+        {
+          "at": "2026-10-01T01:43:56.503Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "capture-and-png",
+          "durationMs": 39.176699999996345
+        },
+        {
+          "at": "2026-10-01T01:43:56.503Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "capture",
+          "durationMs": 39.264199999990524
+        },
+        {
+          "at": "2026-10-01T01:43:56.515Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "inspectForeground",
+          "durationMs": 11.810299999997369
+        },
+        {
+          "at": "2026-10-01T01:43:56.515Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "base64",
+          "durationMs": 0.03830000000016298
+        },
+        {
+          "at": "2026-10-01T01:43:56.515Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "image",
+          "bytes": 24152,
+          "width": 957,
+          "height": 1266
+        },
+        {
+          "at": "2026-10-01T01:43:56.519Z",
+          "event": "tool-timing",
+          "requestId": "0abeb4fd-f8c4-4a24-9702-c0f9c0203b96",
+          "phase": "executor-total",
+          "durationMs": 960.363599999997
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "observation_id: obs-muoveto4-25\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 21310
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovewr0-26\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 24121
+        },
+        {
+          "tool": "orb_click",
+          "text": "action: click completed\nobservation_id: obs-muovf04k-27\nwindow: \"Orb speed target\" (electron, pid 44484, window id 5835174)\ncoordinate space for actions: pixel columns and rows of the attached screenshot; use attached_size in its orb_image envelope, not 0-1000 fractions or desktop coordinates\nforeground: electron — Orb speed target",
+          "count": 1,
+          "encodedBytes": 24152
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "passed": true,
+  "coordinateEncoding": "pixels of SDK-normalized attached image",
+  "fixture": "28x24 DIP independent controls",
+  "piWebSource": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+  "runDirectory": "D:\\workself\\pi-orb\\.tmp\\tool-speed\\model-1790818906159",
+  "diagnostics": [],
+  "nativeDiagnostics": [],
+  "finishedAt": "2026-10-01T01:44:00.292Z"
+}

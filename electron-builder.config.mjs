@@ -27,7 +27,7 @@ export default {
     output: "release/${version}",
   },
   // Ship the built main/preload/renderer trees plus the manifest; electron-builder adds the
-  // production dependency graph (koffi, uiohook-napi, react) on its own.
+  // production dependency graph (koffi, uiohook-napi) on its own.
   //
   // The exclusions below keep a Windows x64 release to what actually runs. electron-builder's
   // "smart unpack" moves a whole package directory out of the archive as soon as one file in it
@@ -43,6 +43,7 @@ export default {
     "!node_modules/koffi/doc/**",
     "!node_modules/koffi/src/**",
     "!node_modules/koffi/vendor/**",
+    "!node_modules/koffi/lib/**",
     "!node_modules/koffi/build/koffi/*/**",
     "node_modules/koffi/build/koffi/win32_x64/**",
     // The koffi import library and export file are link-time artifacts; the reference deletes the

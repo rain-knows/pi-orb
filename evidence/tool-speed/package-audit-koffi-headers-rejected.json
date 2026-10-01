@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-01T02:17:03.313Z",
+  "capturedAt": "2026-10-01T02:16:38.311Z",
   "version": "0.1.0",
   "appRoot": "release/0.1.0/win-unpacked",
   "entries": {
@@ -31,6 +31,7 @@
     "node_modules/koffi/build/koffi/win32_x64/koffi.node",
     "node_modules/koffi/index.js",
     "node_modules/koffi/indirect.js",
+    "node_modules/koffi/lib/native/base/base.hh",
     "node_modules/koffi/LICENSE.txt",
     "node_modules/koffi/package.json",
     "node_modules/uiohook-napi/dist/index.js",
@@ -42,7 +43,7 @@
   "sizes": {
     "executableBytes": 246090752,
     "asarBytes": 8085800,
-    "unpackedNativeBytes": 1834010,
+    "unpackedNativeBytes": 2009626,
     "archiveEntryCount": 49
   },
   "checks": [
@@ -138,8 +139,8 @@
     },
     {
       "name": "no build toolchain, vendored sources or package documentation ship",
-      "ok": true,
-      "detail": "none"
+      "ok": false,
+      "detail": "node_modules/koffi/lib/native/base/base.hh"
     },
     {
       "name": "the packaged resources carry LICENSE",
@@ -182,5 +183,5 @@
       "detail": "scanned 13 files"
     }
   ],
-  "passed": true
+  "passed": false
 }

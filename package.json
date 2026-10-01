@@ -28,7 +28,7 @@
     "verify:p0-baseline": "node evidence/p0-01/verify-baseline.mjs"
   },
   "dependencies": {
-    "koffi": "^2.14.1",
+    "koffi": "2.16.3",
     "uiohook-napi": "1.5.5"
   },
   "devDependencies": {
@@ -51,6 +51,6 @@
     "esbuild@0.28.2": true,
     "esbuild@0.25.12": true,
     "uiohook-napi@1.5.5": true,
-    "koffi": "true"
+    "koffi@2.16.3": true
   }
 }

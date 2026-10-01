@@ -20,7 +20,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 
 `run-p2-05.mjs` 写 `stage-result.json`（三步的合并结论），两个探针各自写自己的 JSON。
 
-## 1. 内容审计：`package-audit.json`（25/25 通过）
+## 1. 内容审计：`package-audit.json`（27/27 通过）
 
 审计读取 `release/<version>/win-unpacked`，不重新构建。
 
@@ -31,12 +31,16 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | 不该在包内 | `src/`、`tests/`、`evidence/`、`doc/`、`pi-package/`、`release/`、`.tmp/` 全部为 0 命中；无 `auth.json`／`.env`／私钥／`.pem`／`.pfx` | 通过 |
 | 原生模块 | `koffi/build/koffi/win32_x64/koffi.node` 与 `uiohook-napi/prebuilds/win32-x64/uiohook-napi.node` 已解包；**无其它平台**的 `.node`；无 C++ 源码、vendored 头文件、包文档、import library | 通过 |
 | 随包许可 | `resources/LICENSE`、`resources/THIRD_PARTY_NOTICES.md`、`resources/CHANGELOG.md` | 通过 |
-| 清单一致 | 包内 `package.json` 版本 = 仓库版本；`main` 指向构建入口 | 通过 |
+| 清单一致 | 包内 `package.json` 版本 = 仓库版本；`main` 指向构建入口；Koffi 2.16.3 与精确锁定一致，.node SHA-256 与验证环境一致 | 通过 |
 | 内容泄漏 | 对 asar 内 11 个自建文本文件扫描本机用户路径、`PI_ORB_PI_WEB_PASSWORD`、`sk-` 形态密钥：0 命中 | 通过 |
 
 体积记录（不是判据，是复核「某个包不再被裁剪」的事实）：`pi-orb.exe` 246 090 752 B、
-`app.asar` 9 291 054 B、解包原生二进制合计 2 658 109 B、asar 条目 135。
+`app.asar` 8 085 800 B、解包原生二进制合计 1 834 010 B、asar 条目 49。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
+
+2026-10-01 更新 Koffi 后发现新增 `lib/native` 头文件目录，按参考的最小运行文件策略排除；
+新审计对放回 `base.hh` 的产物确实失败。依赖来源、反证和完整重建记录见
+[`plugin-reference-and-pointing.md`](../../doc/plugin-reference-and-pointing.md)。
 
 ## 2. 启动探测：`packaged-smoke.json`（22/22 通过）
 

@@ -9,7 +9,7 @@ let dialogs=[];
 let dialogTimer;
 ipcMain.on("speed-event", (_event, value) => appendFileSync(join(root, "events.jsonl"), `${JSON.stringify({ at: Date.now(), ...value })}\n`));
 const html = `<!doctype html><meta charset="utf-8"><title>Orb speed target</title>
-<style>body{font:18px system-ui;padding:20px;background:#fff}button,input{display:block;margin:12px;padding:10px;font:inherit}#popup{display:none;padding:15px;background:#eee}#popup.open{display:block}${process.env.PI_ORB_SPEED_LARGE_CONTROLS==='1'?'#a,#b,#c{display:inline-block;width:150px;height:150px;font-size:36px;margin:8px}#menu,#item{min-width:240px;min-height:90px;font-size:28px}':''}</style>
+<style>body{font:18px system-ui;padding:20px;background:#fff}button,input{display:block;margin:12px;padding:10px;font:inherit}#popup{display:none;padding:15px;background:#eee}#popup.open{display:block}${process.env.PI_ORB_SPEED_LARGE_CONTROLS==='1'?'#a,#b,#c{display:inline-block;width:150px;height:150px;font-size:36px;margin:8px}#menu,#item{min-width:240px;min-height:90px;font-size:28px}':''}${process.env.PI_ORB_SPEED_TINY_CONTROLS==='1'?'#a,#b,#c{box-sizing:border-box;width:28px;height:24px;font:12px system-ui;padding:0;margin:10px}':''}</style>
 <button id="a">A: 0</button><button id="b">B: 0</button><button id="c">C: 0</button>
 <input id="text" placeholder="测试输入"><button id="menu">打开菜单</button><div id="popup"><button id="item">菜单项</button></div><button id="dialog">打开弹窗</button><button id="close">关闭菜单</button>
 <script>

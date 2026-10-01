@@ -7,7 +7,7 @@ reproducible with `node evidence/p1-07/collect-licenses.mjs`.
 
 - Inventory captured for: pi-orb `0.1.0` (unreleased), Windows x64
 - Desktop backend: Windows source imported from `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885` (MIT)
-- Windows native FFI: `koffi@2.14.1` (MIT)
+- Windows native FFI: `koffi@2.16.3` (MIT)
 - Keyboard edge detection: `uiohook-napi@1.5.5` (MIT)
 
 ## 1. pi-orb itself
@@ -21,7 +21,7 @@ a release.
 |---|---|---|---|---|
 | `scheduler` | 0.28.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `uiohook-napi` | 1.5.5 | MIT | yes (`LICENSE`) | include copyright and permission notice |
-| `koffi` | 2.14.1 | MIT | yes (`LICENSE`) | include copyright and permission notice |
+| `koffi` | 2.16.3 | MIT | yes (`LICENSE.txt`) | include copyright and permission notice |
 | `node-gyp-build` | 4.8.4 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 
 No AGPL, GPL-3 or SSPL component is present in the production graph; the inventory fails the release
@@ -173,3 +173,46 @@ trademark rights.
 工具提速的批量提示与动作后截图语义参考并适配自 `packages/experimental/tool-computer-use/src/policy.ts:20-30` 与 `plugin.ts:330-360`，固定提交 `72f1d738458a223696685a909e806b683eff5885`，Copyright (c) 2026 DeepSeek，MIT。Pi 批量桥接为运行时边界适配，不搬 dsh 调度器。
 
 `orb-image-context.ts` 的请求图片预算模式参考 `packages/attachment/attachment-local/src/request-image.ts`（同固定提交、MIT）；使用 Pi 公开钩子适配，未复制 dsh 附件实现。
+
+## 7. dsh-orb-cordis pixel observation adaptation
+
+Source: [rain-knows/dsh-orb-cordis](https://github.com/rain-knows/dsh-orb-cordis), pinned commit
+`9cdc50302d202f4497569731be488a8afa500da7`. The plugin is MIT licensed by mini-yifan;
+its Computer Use sources derive from DeepSeek Harness under the upstream MIT notice.
+
+- `src/shared/observation-raster.ts` ← `packages/computer-use/src/raster.ts` (PNG/JPEG header parser;
+  unused screenshot-export policy removed).
+- `src/shared/pixel-coordinates.ts` ← `packages/computer-use/src/coordinates.ts:166-215` (pixel
+  validator and pixel branch of `modelPositionToHid`; Cordis imports and dual-mode switch removed).
+- `pi-package/extensions/orb-image-space.ts` and `orb.ts` adapt `coordinate-mode.ts`, `observe.ts`
+  and `policy.ts`'s actual attachment-size binding and pixel copy to Pi's public context hook;
+  Pi session/generation/observation checks are local runtime integration.
+- `tests/orb-image-space.test.ts` adapts `packages/computer-use/tests/raster.spec.ts`'s header cases.
+
+No Cordis runtime, dsh session engine, credentials, installer-consent policy, automatic screenshot
+pipeline or helper download mechanism is imported.
+
+```text
+MIT License
+
+Copyright (c) 2026 mini-yifan
+Copyright (c) 2026 DeepSeek
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

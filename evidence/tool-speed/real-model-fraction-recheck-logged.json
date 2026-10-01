@@ -1,0 +1,79 @@
+{
+  "method": "real provider, Pi Web, product pipe/broker/native driver, disposable target readback",
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash",
+    "thinking": "off"
+  },
+  "rows": [
+    {
+      "mode": "single",
+      "succeeded": false,
+      "finished": true,
+      "totalMs": 13357.605700000002,
+      "modelResponses": 2,
+      "toolCalls": [
+        {
+          "response": 0,
+          "name": "orb_observe",
+          "arguments": {}
+        }
+      ],
+      "events": [],
+      "imageBudgets": [
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0
+        },
+        {
+          "images": 0,
+          "bytes": 0,
+          "base64Bytes": 0
+        }
+      ],
+      "phaseTimings": [
+        {
+          "event": "tool-timing",
+          "requestId": "a50d72ed-c3c8-4eb9-bdbb-9150a6a3b603",
+          "phase": "bridge-roundtrip",
+          "durationMs": 4764.931500000002
+        },
+        {
+          "at": "2026-10-01T01:49:39.208Z",
+          "event": "tool-timing",
+          "requestId": "a50d72ed-c3c8-4eb9-bdbb-9150a6a3b603",
+          "phase": "window-enumeration",
+          "durationMs": 15.350900000001275
+        }
+      ],
+      "toolResultImages": [
+        {
+          "tool": "orb_observe",
+          "text": "Refused (malformed): Bridge closed without a result.",
+          "count": 0,
+          "encodedBytes": 0
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "passed": false,
+  "coordinateEncoding": "baseline millifraction",
+  "fixture": "compact independent controls",
+  "piWebSource": "C:\\Users\\JUSTLIKEZYP\\OneDrive\\文档\\daily\\pi-web",
+  "runDirectory": "D:\\workself\\pi-orb\\.tmp\\tool-speed\\model-1790819361911",
+  "shellExit": {
+    "code": 2147483651,
+    "signal": null
+  },
+  "error": "CDP command timed out",
+  "stage": "trial 1 batch",
+  "startupDiagnostics": [
+    "- Local:         http://127.0.0.1:41072",
+    "✓ Ready in 305ms"
+  ],
+  "diagnostics": [],
+  "nativeDiagnostics": [],
+  "finishedAt": "2026-10-01T01:50:47.427Z"
+}

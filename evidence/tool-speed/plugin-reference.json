@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-01T02:28:40.867Z",
+  "repository": "https://github.com/rain-knows/dsh-orb-cordis",
+  "checkout": "D:\\pi-orb-ref\\dsh-orb-cordis",
+  "commit": "9cdc50302d202f4497569731be488a8afa500da7",
+  "clean": true,
+  "license": "MIT; mini-yifan, derived Computer Use DeepSeek",
+  "ports": [
+    {
+      "source": "packages/computer-use/src/raster.ts",
+      "target": "src/shared/observation-raster.ts",
+      "adaptation": "Header parser copied; unused export policy helpers removed",
+      "sourceSha256": "3f16b5d99cf0558c3d569c2cd83bbea33ed3423c4d9e5051717627c3126f144a",
+      "targetSha256": "2946d0d39492d8386cb91e3e9027d265f7ab292032c8bef504a1e318f88d4a9a",
+      "provenanceHeader": true
+    },
+    {
+      "source": "packages/computer-use/src/coordinates.ts",
+      "target": "src/shared/pixel-coordinates.ts",
+      "adaptation": "Pixel validator and HID formula copied; Cordis imports and dual-mode branch removed",
+      "sourceSha256": "c1db0403e00c4ae84568fabf1f83f3880375adc15440fefc24637b9d6c99586a",
+      "targetSha256": "17f0858ea82e5b9a2845f09eb4999654849f17ff7f3189ee6e970874535c10f9",
+      "provenanceHeader": true
+    }
+  ],
+  "sources": [
+    {
+      "path": "LICENSE",
+      "sha256": "b682b3bf1c81f45ba902e61ee89460c1700d99c03d41c626cc5200069f65074c"
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "sha256": "957f779a9d10e102c6cbc9651c1ac09d4a501033777c38b021367ca41a9a3334"
+    },
+    {
+      "path": "docs/02-architecture.md",
+      "sha256": "fbdfc8d5f50cf0c7697b775fa3d5dba94f8cb2d7a8c60e83af33c4e3066009b3"
+    },
+    {
+      "path": "packages/computer-use/src/coordinate-mode.ts",
+      "sha256": "cc618bbae6554f7e000cefba8702786a547578419e9250ebbc6e71b7618f9c97"
+    },
+    {
+      "path": "packages/computer-use/src/observe.ts",
+      "sha256": "a925a049b1fd235c7a1214c1f99187d469c6b2842c728830aa9fa289ec90a842"
+    },
+    {
+      "path": "packages/computer-use/src/policy.ts",
+      "sha256": "0896eae0c61056aa7154efce7be6e26ae45a05b889c05060bcefa75c87df5f5e"
+    },
+    {
+      "path": "packages/computer-use/src/config.ts",
+      "sha256": "b5d80c6555ae5a68a9a17c7a7b3b33d82f1ceaca95a1bf5621b1ef8b05dda221"
+    }
+  ],
+  "passed": true
+}

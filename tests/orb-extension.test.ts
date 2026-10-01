@@ -25,7 +25,7 @@ describe("Orb extension result rendering", () => {
     try {
       orbExtension(api as unknown as ExtensionAPI);
       const ordinary = { cwd: join(directory, "ordinary") } as ExtensionContext;
-      const orb = { cwd: directory } as ExtensionContext;
+      const orb = { cwd: directory, sessionManager: { getSessionId: () => "test" } } as ExtensionContext;
       handlers.get("session_start")!({} as never, ordinary);
       expect(tools).toHaveLength(0);
       handlers.get("session_start")!({} as never, orb);
@@ -78,7 +78,9 @@ describe("Orb extension result rendering", () => {
     };
 
     expect(renderResult(result)).toContain("observation_id: obs-1");
-    expect(renderResult(result)).toContain("800x600 px");
+    expect(renderResult(result)).toContain("pixel columns and rows");
+    expect(renderResult(result)).toContain("attached_size");
+    expect(renderResult(result)).not.toContain("800x600");
   });
 
   it("returns a fresh action observation as a Pi image block without duplicating base64 in details", () => {

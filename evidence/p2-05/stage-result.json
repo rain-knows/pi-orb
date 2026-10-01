@@ -1,28 +1,28 @@
 {
-  "capturedAt": "2026-09-30T15:30:54.570Z",
+  "capturedAt": "2026-10-01T02:16:39.311Z",
   "steps": [
     {
       "name": "build and package the unpacked Windows app",
       "ok": true,
-      "ms": 24103,
+      "ms": 23828,
       "output": "  • downloaded electron zip extracted successfully  output=D:\\workself\\pi-orb\\release\\0.1.0\\win-unpacked |   • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • updating asar integrity executable resource  executablePath=release\\0.1.0\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0\\win-unpacked\\pi-orb.exe"
     },
     {
       "name": "audit the packaged artifact",
       "ok": true,
-      "ms": 233,
-      "output": "  }, |   \"failed\": [], |   \"passedCount\": 25 | }"
+      "ms": 227,
+      "output": "  }, |   \"failed\": [], |   \"passedCount\": 27 | }"
     },
     {
       "name": "start the packaged application and drive its renderer",
       "ok": true,
-      "ms": 7733,
+      "ms": 7616,
       "output": "      \"detail\": \"none\" |     } |   ] | }"
     }
   ],
   "passed": true,
   "artifactAudit": {
-    "capturedAt": "2026-09-30T15:31:18.861Z",
+    "capturedAt": "2026-10-01T02:17:03.313Z",
     "version": "0.1.0",
     "appRoot": "release/0.1.0/win-unpacked",
     "entries": {
@@ -64,8 +64,8 @@
     ],
     "sizes": {
       "executableBytes": 246090752,
-      "asarBytes": 8085796,
-      "unpackedNativeBytes": 2658109,
+      "asarBytes": 8085800,
+      "unpackedNativeBytes": 1834010,
       "archiveEntryCount": 49
     },
     "checks": [
@@ -172,12 +172,22 @@
       {
         "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
         "ok": true,
-        "detail": "10964 bytes"
+        "detail": "13261 bytes"
       },
       {
         "name": "the packaged resources carry CHANGELOG.md",
         "ok": true,
-        "detail": "57374 bytes"
+        "detail": "58931 bytes"
+      },
+      {
+        "name": "the packaged Koffi version matches the pinned production dependency",
+        "ok": true,
+        "detail": "2.16.3 vs installed 2.16.3 vs pinned 2.16.3"
+      },
+      {
+        "name": "the packaged Koffi binary matches the validated installed binary",
+        "ok": true,
+        "detail": "node_modules/koffi/build/koffi/win32_x64/koffi.node"
       },
       {
         "name": "the shipped manifest carries the project version",
@@ -198,9 +208,9 @@
     "passed": true
   },
   "packagedSmoke": {
-    "capturedAt": "2026-09-30T15:31:19.042Z",
+    "capturedAt": "2026-10-01T02:17:03.508Z",
     "executable": "release\\0.1.0\\win-unpacked\\pi-orb.exe",
-    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790782279042",
+    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790821023508",
     "checks": [
       {
         "name": "the packaged application stays alive",
@@ -285,7 +295,7 @@
       {
         "name": "the dock gesture slides the window off the edge instead of snapping it",
         "ok": true,
-        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
+        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
       },
       {
         "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -314,8 +324,8 @@
       }
     ],
     "passed": true,
-    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-43992",
-    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/6ba5a45f-b7c3-4fca-9e40-754bdc13b76e"
+    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-41224",
+    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/78c31db1-346a-41c1-b4d5-44d6d7bb8727"
   },
   "installer": "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
 }
