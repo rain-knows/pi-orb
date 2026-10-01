@@ -38,7 +38,7 @@ describe("Orb extension result rendering", () => {
       const ordinary = { cwd: join(directory, "ordinary") } as ExtensionContext;
       const orb = { cwd: directory, sessionManager: { getSessionId: () => "test" } } as ExtensionContext;
       handlers.get("session_start")!({} as never, ordinary);
-      expect(tools).toHaveLength(0);
+      expect(tools.map(tool => tool.name)).toEqual(["orb_browser"]);
       handlers.get("session_start")!({} as never, orb);
       expect(tools).toHaveLength(13);
       expect(tools.every(t => t.executionMode === "sequential")).toBe(true);

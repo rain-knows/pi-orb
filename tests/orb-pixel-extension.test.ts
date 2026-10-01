@@ -12,7 +12,7 @@ it("binds resized pixels to session, generation and observation; refuses before 
   writeFileSync(config,JSON.stringify({version:1,orbWorkspace:directory,shortcut:"Control+Alt+F11",window:{alwaysOnTop:true,width:445,height:632}}));
   vi.stubEnv("PI_ORB_CONFIG",config);
   let generation=7;
-  const token=vi.spyOn(BridgeClient.prototype,"readToken").mockImplementation(()=>({version:2,token:"test",pid:1,workspace:directory,pipePath:"unused",generation,createdAt:"now"}));
+  const token=vi.spyOn(BridgeClient.prototype,"readToken").mockImplementation(()=>({version:2,token:"test",pid:1,workspace:directory,orbSessionId:"test",pipePath:"unused",generation,createdAt:"now"}));
   const call=vi.spyOn(BridgeClient.prototype,"call").mockResolvedValue({ok:true,result:{ok:true}});
   const handlers = new Map<string,(event: never,ctx: ExtensionContext)=>unknown>();
   const tools=new Map<string,ToolDefinition>();

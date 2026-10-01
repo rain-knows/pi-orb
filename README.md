@@ -2,7 +2,7 @@
 
 基于 [pi-web](https://github.com/agegr/pi-web) 的开源 Electron 桌面悬浮助手。在浮球中聊天、查看历史、分享截图，并让支持图像与工具调用的模型操作桌面。
 
-pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复用它的会话引擎、模型配置、凭据和插件加载机制。普通 pi-web 会话保持原有行为；Orb 工具只在选定的专用工作区中注册。
+pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复用它的会话引擎、模型配置、凭据和插件加载机制。原生桌面工具只在选定的 Orb 工作区注册；Playwright 浏览器工具按用户要求开放给普通 Pi/Pi Web 会话。
 
 **当前版本：`0.1.0-preview.1`，Windows x64 未签名预览版。** P1/P2 已有实现和分阶段证据，但尚未完成完整 v0.1 的人工验收。未验证（unverified）项见[支持矩阵](./doc/support-matrix.md)。
 
@@ -52,7 +52,7 @@ pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复�
 
 未安装插件时，浮窗聊天仍可连接 pi-web，但模型不会获得 `orb_*` 工具。安装插件仅声明本地包，不复制目录，也不会自动授予其他工作区桌面能力。移除声明可运行 `pi remove "$PWD\pi-package"`（在仓库根目录中执行），然后重启 pi-web。
 
-浏览器任务使用 `orb_browser` 与 [Playwright Chrome 扩展](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm) 连接现有登录标签页。安装扩展后首次操作选择标签页即可，无需改 Pi 的全局 MCP 配置。现有用户 Chrome＋真实 Pi 模型已通过 B 站官方帐号与首个视频实测；DOM 与桌面光效均保持到整轮结束。[安装步骤与证据边界](./doc/session-continuity.md)。
+浏览器任务使用公用 `orb_browser`（Playwright 浏览器）与 [Playwright Chrome 扩展](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm) 连接现有登录标签页。普通 Pi/Pi Web 无需启动 Orb；Orb 会话保留完全访问、Stop 撤权与光效。用户目录中配置扩展 token 后自动认证，无需改全局 MCP 配置或另装 CLI。[公用工具与认证配置](./doc/public-playwright.md)，[B 站验证记录](./doc/session-continuity.md)。
 
 ### 从源码运行
 

@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-01T07:14:29.636Z",
+  "capturedAt": "2026-10-01T10:40:11.920Z",
   "executable": "release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790838869636",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790851211920",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": "pi-orb"
+      "detail": ""
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -26,7 +26,7 @@
     {
       "name": "the packaged app answers IPC status",
       "ok": true,
-      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application "
+      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"b"
     },
     {
       "name": "the packaged app starts in the isolated unconfigured state",
@@ -86,7 +86,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-25272",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/43052b0c-9cd0-4c1a-ba11-73e7039d86a2\n[pi-orb] wake shortcut not registered: Another application already owns this shortcut. Choose a different one."
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-36424",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/47c53805-915f-4d0b-a032-ff099f8047a5"
 }

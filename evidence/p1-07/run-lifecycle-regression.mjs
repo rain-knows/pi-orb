@@ -377,7 +377,7 @@ try {
   const hwnd = Number(execFileSync("powershell.exe", ["-NoProfile", "-Command", `(Get-Process -Id ${target.pid}).MainWindowHandle.ToInt64()`], { encoding: "utf8", windowsHide: true }).trim());
   modelResponseDelayMs = 6000;
   await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: "observation frame lifetime" })`);
-  execFileSync("powershell.exe", ["-NoProfile", "-File", join(repo, "evidence/lib/activate-window.ps1"), "-Hwnd", String(hwnd), "-ForegroundOnly"], { windowsHide: true, stdio: "ignore" });
+  execFileSync("powershell.exe", ["-NoProfile", "-File", join(repo, "evidence/lib/activate-window.ps1"), "-Hwnd", String(hwnd), "-ForegroundOnly"], { windowsHide: true, encoding: "utf8" });
   const observed = await bridgeStatus(sessionId, generation, "observe");
   const frames = () => JSON.parse(readFileSync(join(shellDataDir, "probe-windows.json"), "utf8")).filter(w => w.url.endsWith("observation-frame.html"));
   await sleep(2200);
@@ -521,6 +521,7 @@ try {
 
   cdp.close();
 } catch (error) {
+  if (error?.stdout) report.nativeForegroundFailure = String(error.stdout).trim().slice(0, 600);
   check("the lifecycle regression completed without error", false, error?.message ?? String(error));
   report.fatal = String(error?.stack ?? error).slice(0, 1000);
   report.stderrTail = shellErr.slice(-600);

@@ -21,6 +21,13 @@ function fixture() {
 }
 
 describe("Browser connection session boundary", () => {
+  it("redacts authentication tokens from failed connection results", async () => {
+    vi.stubEnv("PLAYWRIGHT_MCP_EXTENSION_TOKEN", "fixture-secret");
+    try {
+      const broker = new BrowserBroker(() => ({ authorized: true, level: "full-access", sessionId: "orb", generation: 4, stopped: false, stoppedReason: null, lastObservationId: null }), async () => { throw new Error("Rejected fixture-secret"); });
+      expect(await broker.call({ name: "tools" }, "orb", 4)).toMatchObject({ ok: false, message: "Rejected [redacted]" });
+    } finally { vi.unstubAllEnvs(); }
+  });
   it("refuses an absent grant, weaker level, other session and stale generation before opening MCP", async () => {
     const f = fixture();
     expect(await f.broker.call({ name: "browser_snapshot" }, "other", 4)).toMatchObject({ ok: false, reason: "no-task-authorization" });

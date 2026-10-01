@@ -91,6 +91,7 @@ readToken(): BridgeTokenFile | null {
     if (parsed.version !== BRIDGE_PROTOCOL_VERSION) return null;
     if (typeof parsed.token !== "string" || parsed.token.length === 0) return null;
     if (typeof parsed.workspace !== "string") return null;
+    if (parsed.orbSessionId !== null && typeof parsed.orbSessionId !== "string") return null;
     if (typeof parsed.pipePath !== "string" || parsed.pipePath.length === 0) return null;
     // The generation is required, not defaulted. Defaulting it (to 0, say) would produce a request the
     // shell refuses as stale, which looks like a policy decision rather than a missing handshake.
@@ -100,6 +101,7 @@ readToken(): BridgeTokenFile | null {
       token: parsed.token,
       pid: typeof parsed.pid === "number" ? parsed.pid : -1,
       workspace: parsed.workspace,
+      orbSessionId: parsed.orbSessionId,
       pipePath: parsed.pipePath,
       generation: parsed.generation,
       createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : "",

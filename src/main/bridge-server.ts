@@ -294,6 +294,7 @@ export function writeHandshake(
   workspace: string,
   processId: number,
   generation: number,
+  orbSessionId: string | null,
 ): BridgeHandshakeFiles {
   mkdirSync(dataDir, { recursive: true });
   const pipePath = createPipePath(processId);
@@ -306,6 +307,7 @@ export function writeHandshake(
         token,
         pid: processId,
         workspace,
+        orbSessionId,
         pipePath,
         generation,
         createdAt: new Date().toISOString(),

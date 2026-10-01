@@ -145,6 +145,7 @@ const browserBroker = new BrowserBroker(() => desktopBroker?.status() ?? null);
 function grantDefaultAccess(sessionId: string, generation: number): void {
   if (!defaultAccessPending || !desktopBroker || generations.current !== generation || session.sessionId !== sessionId) return;
   desktopBroker.authorize({ sessionId, generation, level: "full-access" });
+  publishHandshake();
   defaultAccessPending = false;
   lastDesktopProblem = null;
 }
@@ -415,6 +416,7 @@ function publishHandshake(): void {
       config.orbWorkspace ?? "",
       process.pid,
       generations.current,
+      session?.sessionId ?? null,
     );
   } catch (error) {
     console.warn(`[pi-orb] could not publish the bridge handshake: ${describeError(error)}`);
@@ -439,6 +441,7 @@ async function startBridge(): Promise<void> {
     config.orbWorkspace ?? "",
     process.pid,
     generations.current,
+    session?.sessionId ?? null,
   );
   bridge = new BridgeServer({
     pipePath: handshake.pipePath,

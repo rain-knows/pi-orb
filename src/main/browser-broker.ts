@@ -8,6 +8,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types.js";
 import type { BrokerStatus } from "./desktop-broker";
+import { configureBrowserExtensionEnvironment } from "../shared/browser-extension-env";
 
 const allowedTools = new Set([
   "browser_snapshot", "browser_navigate", "browser_navigate_back", "browser_click", "browser_type",
@@ -22,10 +23,15 @@ export class BrowserBroker {
   #opening: Promise<Client> | null = null;
   #epoch = 0;
   #executing = false;
+  readonly #clientName: string;
 
-  constructor(access: () => BrokerStatus | null, createServer = () => createConnection({ extension: true, webmcp: false, snapshot: { mode: "none" }, codegen: "none" })) {
+  constructor(access: () => BrokerStatus | null, createServer = () => {
+    configureBrowserExtensionEnvironment();
+    return createConnection({ extension: true, webmcp: false, snapshot: { mode: "none" }, codegen: "none" });
+  }, clientName = "pi-orb") {
     this.#access = access;
     this.#createServer = createServer;
+    this.#clientName = clientName;
   }
 
   revoke(): void {
@@ -48,7 +54,7 @@ export class BrowserBroker {
     const epoch = this.#epoch;
     const opening = (async () => {
       const server = await this.#createServer();
-      const client = new Client({ name: "pi-orb", version: "0.1.0" });
+      const client = new Client({ name: this.#clientName, version: "0.1.0" });
       const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
       try {
         await server.connect(serverTransport);
@@ -84,7 +90,7 @@ export class BrowserBroker {
       if (signal?.aborted || this.#epoch !== epoch || !this.#authorized(sessionId, generation)) throw new Error("Browser Access was revoked.");
       if (request.name === "tools") {
         const { tools } = await client.listTools();
-        return { ok: true, tools: tools.filter(t => allowedTools.has(t.name)), connection: "Playwright extension in existing Chrome; first action opens its tab selection page." };
+        return { ok: true, tools: tools.filter(t => allowedTools.has(t.name)), connection: "Playwright extension in existing Chrome; configured token authenticates automatically, otherwise approve the connection in Chrome." };
       }
       const result = CallToolResultSchema.parse(await client.callTool({ name: request.name, arguments: request.arguments as Record<string, unknown> | undefined }, undefined, { signal, timeout: 90_000 }));
       // MCP 0.0.83 puts automatic snapshots in local files. Pi runs in another process: return
@@ -98,7 +104,9 @@ export class BrowserBroker {
     } catch (error) {
       const cancelled = signal?.aborted || this.#epoch !== epoch;
       this.revoke();
-      return { ok: false, reason: cancelled ? "cancelled" : "browser-error", message: error instanceof Error ? error.message : String(error) };
+      const message = error instanceof Error ? error.message : String(error);
+      const token = process.env.PLAYWRIGHT_MCP_EXTENSION_TOKEN;
+      return { ok: false, reason: cancelled ? "cancelled" : "browser-error", message: token ? message.replaceAll(token, "[redacted]") : message };
     } finally {
       signal?.removeEventListener("abort", cancel);
       this.#executing = false;

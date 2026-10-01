@@ -80,7 +80,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **历史 Cua 拒绝结果解析**：驱动拒绝不能被适配器误报为成功 | 历史探针已验证；当前 broker/参考 backend 有独立拒绝合同 | `tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts` |
 | **按键/鼠标无残留** | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
 | **C6：真实 native 按下中途取消释放** | 已验证；disposable target 自身日志收到 `mouse-down=1`、匹配 `mouse-up=1`，取消错误也正确上报 | `evidence/p1-05/reference-cancel.json`（5/5） |
-| **Orb 工具仅限 Orb 模式**：普通会话无 Orb 工具、Orb 会话获得当前 13 个工具（含 `orb_browser`、`orb_batch`、`orb_open_app`、等待和应用列表） | 条件注册和 sequential 声明已验证；真实模型浏览器调用见 `evidence/browser-connection/live-extension-probe.json`，批量与单步见 `evidence/tool-speed/` | `pi-package/extensions/orb.ts`、`tests/orb-tools.test.ts` |
+| **原生桌面工具仅限 Orb 模式**：Orb 工作区当前 13 个工具；按用户要求，`orb_browser` 也开放给普通 Pi/Pi Web | 顺序工具及会话路由见 `tests/public-browser-extension.test.ts`；认证与普通 Pi Web 实测见 `doc/public-playwright.md`，桌面证据见 `evidence/tool-speed/` | `pi-package/extensions/orb.ts`、`pi-package/extensions/browser.ts`、`tests/orb-tools.test.ts` |
 | **桌面工具闭环**：session Access、新鲜度、拒绝零副作用、真实点击落点为目标格心 | **已验证（当前 session Access backend）**；自动前台观察、Read Only/Workspace Write、点击、滚动、撤权均由 disposable 目标与壳日志证明 | `evidence/p1-06/loop-verification-session-access.json` |
 | 桥准入：无会话/错误令牌/浏览器来源/旧代次均被拒 | 已验证 | `evidence/p1-06/` + `tests/bridge-server.test.ts` |
 | Orb 扩展仅凭握手文件连接壳的命名管道：无需额外设置 `PI_ORB_BRIDGE_PIPE` | 已验证（隔离管道测试 + 当前壳只读探针） | `tests/bridge-client.test.ts`；2026-09-28 `hello.ok=true`，无效会话返回 `unknown-session` |
