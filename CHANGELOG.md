@@ -10,6 +10,12 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+## [0.1.0-preview.1] - 2026-10-01
+
+首个 Windows x64 未签名预览版，标为 GitHub prerelease；未验证项与完整 v0.1 门槛仍以
+[`doc/support-matrix.md`](./doc/support-matrix.md) 为准。README 更新为中文使用入口，补充
+安装器与独立 Pi 插件的安装、启动、Access 默认值、最新像素取点结果及验证边界。
+
 ### 插件参考更新
 
 - 本地检出并固定 `dsh-orb-cordis@9cdc503`，加入参考手册与阶段文档。旧单体远端

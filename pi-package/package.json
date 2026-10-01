@@ -1,6 +1,6 @@
 {
   "name": "pi-orb-pi-package",
-  "version": "0.1.0",
+  "version": "0.1.0-preview.1",
   "private": true,
   "description": "Pi resources shipped with pi-orb: the Orb mode extension.",
   "keywords": ["pi-package"],

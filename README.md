@@ -1,229 +1,136 @@
 # pi-orb
 
-An open-source Electron desktop companion for [pi-web](https://github.com/agegr/pi-web).
-pi-orb adds a floating orb window with a dedicated working directory and an explicit,
-user-authorized desktop mode. It is **not** another agent harness: it reuses the
-existing pi-web / Pi session engine, model configuration and credentials.
+基于 [pi-web](https://github.com/agegr/pi-web) 的开源 Electron 桌面悬浮助手。在浮球中聊天、查看历史、分享截图，并让支持图像与工具调用的模型操作桌面。
 
-## Product direction
+pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复用它的会话引擎、模型配置、凭据和插件加载机制。普通 pi-web 会话保持原有行为；Orb 工具只在选定的专用工作区中注册。
 
-pi-orb is a **non-destructive extension of pi-web**, built on Pi's supported plugin
-system and small Electron adapters. Its product shape, floating-window behavior,
-interaction language and desktop workflow are implemented by directly reusing the
-reference project [deepseek-harness-orb](https://github.com/rain-knows/deepseek-harness-orb)
-wherever possible. pi-web remains the owner of sessions, model loops, credentials and
-plugin loading; Orb-specific tools and prompts are scoped to the configured Orb workspace
-and explicit user authorization.
+**当前版本：`0.1.0-preview.1`，Windows x64 未签名预览版。** P1/P2 已有实现和分阶段证据，但尚未完成完整 v0.1 的人工验收。未验证（unverified）项见[支持矩阵](./doc/support-matrix.md)。
 
-The primary local read-only reference checkout is
-`D:\pi-orb-ref\deepseek-harness-orb`, pinned to
-`72f1d738458a223696685a909e806b683eff5885` (two further checkouts of the same commit are
-recorded in [`AGENTS.md`](./AGENTS.md)). They are research and source-audit checkouts, not runtime
-dependencies.
+[下载预览版](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) · [更新记录](./CHANGELOG.md) · [验证证据](./evidence/README.md) · [文档目录](./doc/README.md)
 
-Before changing anything that touches the floating shell, the desktop backend, the tool contract or
-the authorization path, start from
-[`doc/reference-playbook.md`](./doc/reference-playbook.md): it indexes the reference files, pins the
-constants and interaction specs that must match, lists what is reusable, adaptable or off limits, and
-gives the per-task procedure plus the upstream-sync steps. The reuse-first rules themselves are in
-[`AGENTS.md`](./AGENTS.md).
+## 能做什么
 
-- Development goals, non-destructive contract and acceptance matrix: [`doc/pi-orb-development-goals.md`](./doc/pi-orb-development-goals.md)
-- Technology choices and version boundaries: [`doc/tech-stack.md`](./doc/tech-stack.md)
-- Supported and unverified version combinations: [`doc/support-matrix.md`](./doc/support-matrix.md)
-- Document index: [`doc/README.md`](./doc/README.md)
-- Verification evidence: [`evidence/README.md`](./evidence/README.md)
-- Version history: [`CHANGELOG.md`](./CHANGELOG.md)
+- **悬浮聊天**：参考 Orb 的展开、收起、拖动、停靠动画、固定面板和系统主题；支持流式回复、连续提问、模型选择、历史会话和问题卡片。
+- **截图上下文**：选择当前非 Orb 窗口，预览并确认后发送给模型；双 Alt 截图手势与 Windows 选中文字 chip 已接入，真实键盘和 UI Automation 体验仍待人工验收。
+- **桌面工具**：观察、点击、输入、滚动、热键、长按、同窗口拖拽、等待、查询应用和激活已运行应用；动作后返回新观察。文件操作与后台任务使用 Pi 原有工具。
+- **像素取点**：模型按 Pi 实际附加截图的像素坐标定位；观察绑定会话、代次和编号，过期观察与越界坐标会被拒绝。
+- **串行批量**：`orb_batch` 一次提交 2–8 个初始截图中已经可见、互相独立的动作。逐步执行、逐步观察，失败或取消时停止剩余动作。
 
-## Status
+新 Orb 会话默认 **Full Access（完全访问）**，可以产生真实鼠标与键盘输入。请在开始任务前检查 Access；Stop、隐藏、断连、锁屏及会话/工作区切换会撤销旧授权。正常回复结束保留当前会话的授权；截图消息仍需另行预览确认。授权边界见 [SECURITY.md](./SECURITY.md)。
 
-**P1 feature-complete; not a complete v0.1 release.** All seven P1 tasks (`P1-01` … `P1-07`) are
-implemented and each has a reproducible record under [`evidence/`](./evidence/README.md).
+## 快速开始
 
-P2 work is now being delivered in small reference-reuse stages. P2-01's renderer shape and
-Electron floating-window geometry follow the pinned DeepSeek Orb shell source and are recorded in
-[`doc/p2-01-reference-reuse.md`](./doc/p2-01-reference-reuse.md); real multi-display, DPI and
-manual drag acceptance remains explicitly unverified.
+### 前置条件
 
-v0.1 is defined as M1 + M2 + M3 + P1-07:
+- Windows x64；当前验证环境为 Windows 11，其他平台未验证。
+- 已安装 Pi CLI，且 pi-web 可运行。实测组合为 `@earendil-works/pi-coding-agent@0.87.1` + `@agegr/pi-web@0.9.3`，其他版本组合未验证。
+- 桌面任务需要支持图像与工具调用的模型，模型与凭据在 pi-web 中配置。
+- 从源码运行需要 Node.js `>=24.19.0`、npm 和 Git。
 
-| Milestone | State |
-|---|---|
-| M1 — floating window, dedicated workspace, chat | **Complete** (P1-01, P1-02, P1-03) |
-| M2 — explicitly authorized screenshot context | **Complete** (P1-04, 41/41): the positive path — record the user's target, capture by handle, preview, confirm, and the model receiving those exact bytes — is verified on this machine |
-| M3 — one-action-one-observation computer use | **Core loop complete** (P1-05, P1-06): background and **foreground** clicks land on the aimed target, a foreground scroll both reaches and moves the intended element, and a point picked off a screenshot lands on that same point in the target within one run — all judged from the target's own event log. The model addresses a position as a fraction of the screenshot it can see, not as a screen coordinate. Typing into Chromium content, elevated windows, multi-monitor, and a **real** model choosing to call the tools remain unverified |
-| P1-07 — safety, regression and release gate | **Complete** |
+### 安装与启动
 
-P2 is being delivered as separately reviewable reference-reuse stages:
+1. 从 [Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) 下载 `pi-orb-0.1.0-preview.1-win-x64.exe` 并安装。安装器按用户安装，不请求提权，也不包含 pi-web。它未签名，Windows 可能提示未知发布者；SmartScreen 的实际体验仍待验收。
+2. 取得同版本源码并安装 Pi 插件。**安装器不包含 Pi 插件**；插件会引用仓库中的 `src/shared/`，请保留完整检出目录。
 
-| Stage | State |
-|---|---|
-| P2-01 — reference floating shell, geometry and interactions | **Implemented; real multi-display, DPI and manual drag acceptance remains unverified** |
-| P2-02 — double-Alt screenshot gesture | **Implemented; real keyboard, AltGr and non-US layout acceptance remains unverified** |
-| P2-03 — pi-web history and selection context | **History and Windows UI Automation selection chip implemented; real UIA, multi-display/DPI and native selection toolbar remain unverified** |
-| P2-04 — reference desktop actions | **Hotkey, long press, same-window drag, authorized post-action image blocks and explicit screenshot export implemented; real desktop actions, target pixels and clipboard/save-dialog acceptance remain unverified** |
-| P2-05 — Windows distribution | **Unpacked app and per-user NSIS installer build; the packaged artifact's contents are audited (27/27) and the packaged app is started and driven (22/22, including the session Access preload contract). Clean-machine install, uninstall, upgrade and the unsigned-installer SmartScreen experience remain unverified** |
+   ```powershell
+   git clone --branch v0.1.0-preview.1 https://github.com/rain-knows/pi-orb.git
+   cd pi-orb
+   npm ci
+   pi install "$PWD\pi-package"
+   pi list
+   ```
 
-So the current build is **not** a complete v0.1: the unverified items above are narrow but real, and M3
-must not be described as done. They are listed one by one in
-[`doc/support-matrix.md`](./doc/support-matrix.md) with manual verification steps; the release gate
-checks that those unverified records still exist, so a release cannot turn green by deleting them.
+3. 启动现有 pi-web：
 
-Unverified means disabled or reported as unavailable, never silently faked. No mock stands in for a
-native input, cancellation or key-release check.
+   ```powershell
+   piweb
+   ```
 
-## Repository layout
+   如果安装插件时 pi-web 已经运行，请通过你原有的启动方式重启它，让 Pi 重新加载插件声明。
 
-| Path | Contents |
-|---|---|
-| `src/main/` | Electron main process: window, tray, shortcut, Orb configuration, pi-web client, session controller |
-| `src/preload/` | Sandboxed `contextBridge` bridge; the only channel between renderer and main |
-| `src/renderer/` | Reference floating HTML/CSS/JS shell plus Pi-specific surface modules |
-| `src/shared/` | Code shared by main, preload, renderer and the Pi extension (configuration schema and matching rules, IPC contract) |
-| `pi-package/` | Pi resources shipped with pi-orb; `extensions/orb.ts` is the Orb mode entry point |
-| `tests/` | Unit tests for pure logic and the workspace rules |
-| `evidence/` | Reproducible verification records, per P0/P1/P2 stage |
-| `resources/` | Packaging assets (the application icon, derived from the approved product avatar) |
-| `doc/` | Goals, technology choices, support matrix and supporting research |
+4. 从开始菜单打开 **pi-orb**，选择一个专用工作区，检查模型和 Access，再开始聊天或桌面任务。默认连接地址为 `http://127.0.0.1:30141`。
 
-## Verification
+未安装插件时，浮窗聊天仍可连接 pi-web，但模型不会获得 `orb_*` 工具。安装插件仅声明本地包，不复制目录，也不会自动授予其他工作区桌面能力。移除声明可运行 `pi remove "$PWD\pi-package"`（在仓库根目录中执行），然后重启 pi-web。
 
-Every claim in this repository is backed by a script that can be re-run. Start with
-the release gate, which runs the project's quality gates and checks the release
-hygiene, the license inventory and the evidence records:
+### 从源码运行
+
+完成上面的插件安装并启动 pi-web 后，在仓库根目录运行：
 
 ```powershell
-node evidence/p1-07/run-release-gate.mjs
+npm run dev
 ```
 
-The per-stage commands, including the native acceptance runs, are listed in
-[`evidence/README.md`](./evidence/README.md).
+`npm run dev` 启动 Electron 与 renderer 热更新。pi-orb 不会替你启动、重启或关闭现有 pi-web。
 
-The same gates run on every pull request in
-[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) (Windows runner, read-only token). Two
-checks need a machine this project cannot assume:
+### 连接配置
 
-- the **pi-web baseline comparison** needs a developer-local pi-web checkout. Where there is none,
-  the gate reports it as *skipped with a reason* — counted separately in the summary, never as
-  passed. Point `PI_ORB_P0_PI_WEB` at a checkout at the recorded commit to run it for real.
-- the **packaged-application probe** starts a real Electron window and enumerates real desktop
-  windows, so it belongs to the release machine rather than to every pull request.
+| 环境变量 | 用途 |
+|---|---|
+| `PI_ORB_PI_WEB_URL` | pi-web 地址，默认 `http://127.0.0.1:30141` |
+| `PI_ORB_PI_WEB_PASSWORD` | pi-web 密码，仅由 Electron 主进程使用 |
+| `PI_ORB_CONFIG` | 覆盖 Orb 配置路径；Electron 与 Pi 插件读取同一变量 |
 
-## Contributing
+凭据留在主进程，renderer 经沙箱 preload 桥访问功能。插件安装和首次工作区配置的细节见[人工验收说明](./doc/manual-acceptance.md) §1.1。
 
-[`CONTRIBUTING.md`](./CONTRIBUTING.md) (also [中文](./CONTRIBUTING.zh.md)) describes the reuse-first
-rule, the non-destructive contract, and the evidence a change is expected to carry in the same
-commit. Security and safety reports — including "an action landed on the wrong window" and "a key
-was left held" — are handled under [`SECURITY.md`](./SECURITY.md), which also states plainly what
-this product does **not** protect against: the Orb workspace is not a filesystem sandbox, and screen
-content is untrusted input.
+## 本版改进与验证边界
 
-## Development
+本版收敛了浮窗交互：输入草稿、焦点和问题卡片阻止自动收起；工具执行期间保留面板，临时使用截图排除与点击穿透；产品控件尽量中文化，工具进度采用紧凑状态行，并修正停止按钮与输入光标重叠。
+
+桌面取点采用新插件参考的图片尺寸解析与 pixel → HID 换算。模型请求只保留最新一张 Orb 工具截图，完整持久历史不变；生产动作后等待仍为 600ms。Koffi 精确锁定 `2.16.3`，包内只保留 Windows x64 运行时所需文件。
+
+| 验证 | 已记录结果 | 边界 |
+|---|---|---|
+| 质量与发布门禁 | 461 个单元测试，门禁 66/66 | 类型、lint、构建、许可、版本、证据及非破坏性检查 |
+| 真实模型像素取点 | 紧凑及 28×24 DIP 控件，三个完整轮次共 21/21 任务 | 专用夹具与单一模型；不能外推到任意应用 |
+| 工具往返 | 最新小控件轮次：三动作批量中位 11.03s，单步中位 18.99s | 每模式仅三个样本，不承诺普遍提速 |
+| 原生依赖 | 实际 Electron 中 1000 次枚举 + 50 次截图通过 | 有限压力样本，未确认历史间歇退出的精确根因 |
+| Windows 打包 | 包内容审计 27/27，实际打包产物启动 22/22 | 不等同于干净机器安装、卸载或升级验收 |
+
+完整来源与原始记录见[像素取点实施记录](./doc/plugin-reference-and-pointing.md)、[浮窗体验记录](./doc/orb-experience-improvements.md)和[支持矩阵](./doc/support-matrix.md)。
+
+以下仍未验证：多显示器与 DPI 变化、高权限窗口、Chromium/Electron 内容输入、跨应用真实模型流程、真实键盘/锁屏/休眠恢复，以及干净机器安装、卸载、升级和 SmartScreen 体验。历史失败和原生退出记录原样保留。本版按 GitHub **prerelease** 发布，不宣称完整 v0.1 已完成。
+
+## 开发与构建
 
 ```powershell
-npm install
+npm ci
 npm run typecheck
-npm test
 npm run lint
+npm test
 npm run build
+
+# 发布门禁
+node evidence/p1-07/run-release-gate.mjs
+
+# Windows x64：构建、审计内容、启动实际打包产物
+node evidence/p2-05/run-p2-05.mjs
+
+# 构建每用户 NSIS 安装器
+npm run package:win
 ```
 
-`npm run dev` starts the Electron shell with a hot-reloading renderer.
+产物位于 `release/<version>/`。安装器未签名，无自动更新源；Pi 插件仍按上面的独立步骤安装。发布流程见 [`doc/release-process.md`](./doc/release-process.md)，自动流程见 [`release-preview.yml`](./.github/workflows/release-preview.yml)。
 
-### Building a Windows distribution
+## 项目边界与参考来源
 
-```powershell
-npm run package:win:dir   # release/<version>/win-unpacked, no NSIS download needed
-npm run package:win       # release/<version>/pi-orb-<version>-win-x64.exe (per-user NSIS, unsigned)
-node evidence/p2-05/run-p2-05.mjs   # build + audit the contents + start the packaged app
-```
+产品形态、窗口结构、交互和 Windows 后端优先直接复用 [deepseek-harness-orb](https://github.com/rain-knows/deepseek-harness-orb)，旧单体基线固定于 `72f1d738458a223696685a909e806b683eff5885`。像素取点与图片尺寸语义参考 `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`。这些是源码研究/移植基线，不是运行时依赖。
 
-Prebuilt installers are published as **unsigned preview releases** (never as a complete v0.1, and
-every one is a GitHub *prerelease* whose notes list what is still unverified). They are built by
-[`.github/workflows/release-preview.yml`](./.github/workflows/release-preview.yml), which is
-triggered by hand or by a `v*` tag, re-verifies the artifact on the release runner rather than
-trusting the records committed here, and refuses to publish if the support matrix stops declaring its
-unverified items. The process and its reasoning are in
-[`doc/release-process.md`](./doc/release-process.md).
+开发从[参考手册](./doc/reference-playbook.md)定位原实现，遵循 [AGENTS.md](./AGENTS.md) 的复用约束，保留来源、许可证和适配说明。pi-orb 不复制 pi-web 的模型循环、凭据管理或插件加载机制。
 
-The packaging posture — electron-builder, per-user NSIS with elevation disabled, `asarUnpack` for
-native modules, no update feed — follows the reference project's
-[`apps/desktop/scripts/electron-builder-config.mjs`](https://github.com/rain-knows/deepseek-harness-orb)
-at the pinned commit; what is not copied is its dsh-monorepo release pipeline. Three deliberate
-deviations from electron-builder's defaults are documented in
-[`doc/p2-05-distribution.md`](./doc/p2-05-distribution.md) §4 (no native rebuild, third-party build
-residue trimmed, icon derived from the approved avatar asset).
+- 非 Orb 工作区不新增工具、命令或 Orb prompt section。
+- Stop、隐藏、断连、切换及退出撤权，释放正在进行的输入操作。
+- 关闭/卸载 Orb 不应删除工作区文件或 pi-web 历史；完整卸载流程仍待人工验收。
+- Orb 工作区不是文件系统沙箱；屏幕内容属于不可信输入。
+- Pi 会无条件加载用户级 `~/.agents/skills`，因此普通会话也可能包含这些既有 skills；pi-orb 只承诺不主动改动它们。
 
-The installer is **unsigned**, so Windows SmartScreen will warn about an unknown publisher. Clean
-install, uninstall, upgrade and SmartScreen acceptance are manual steps, not automated ones: see
-[`doc/manual-acceptance.md`](./doc/manual-acceptance.md) §9.
-
-### Environment
-
-| Variable | Meaning |
+| 目录 | 职责 |
 |---|---|
-| `PI_ORB_PI_WEB_URL` | pi-web base URL. Default `http://127.0.0.1:30141`. |
-| `PI_ORB_PI_WEB_PASSWORD` | pi-web password used by the main process. |
-| `PI_ORB_CONFIG` | Overrides the Orb configuration path. The Pi extension reads the same variable. |
+| `src/main/` | Electron 窗口、pi-web 客户端、会话与原生桌面适配 |
+| `src/preload/` | 沙箱 `contextBridge` 桥 |
+| `src/renderer/` | 参考浮球 HTML/CSS/JS 与 Pi 界面模块 |
+| `src/shared/` | 配置、协议、工具与坐标契约 |
+| `pi-package/` | Pi Orb 插件 |
+| `tests/`、`evidence/` | 单元测试与分阶段可复跑证据 |
+| `doc/`、`resources/` | 阶段文档、图标与打包资源 |
 
-Credentials stay in the Electron main process. pi-orb never starts, restarts or stops
-a pi-web service it did not start itself.
-
-### Installing the Pi extension
-
-The Orb tools exist only in a session whose Pi configuration declares this repository's package.
-pi-orb does **not** register it for you — writing into your Pi settings would modify your environment
-unasked — so it is one explicit step, using the official CLI:
-
-```powershell
-pi install D:\workself\pi-orb\pi-package   # declare the local package
-pi list                                     # confirm; the CLI writes a `packages` array entry
-```
-
-Then restart pi-web: Pi reads the declaration at process start. To undo it, one command removes the
-declaration again (it copies no files, so nothing else is left behind):
-
-```powershell
-pi remove D:\workself\pi-orb\pi-package
-```
-
-The full walkthrough, including why a session without this step has no `orb_*` tool, is in
-[`doc/manual-acceptance.md`](./doc/manual-acceptance.md) §1.1.
-
-## Non-destructive guarantees
-
-The following are contract requirements, not aspirations
-(see [`doc/pi-orb-development-goals.md`](./doc/pi-orb-development-goals.md) §2):
-
-- **N1–N3** A session whose working directory is not the configured Orb workspace
-  gains no tool, no command and no prompt section.
-- **N4** pi-orb only connects to an existing pi-web. It never takes ownership of a
-  service it did not start.
-- **N5** Two clients may browse the same session; only one entry point holds control
-  of a task.
-- **N6** Installing, closing or removing pi-orb deletes no user workspace file and no
-  history.
-- **N7** Disconnect, reload, session change, lock and exit revoke desktop authority
-  and release keys, mouse, locks and listeners.
-- **N8** Explicit versions, small adaptation modules, no silent API fallbacks and no
-  compatibility layers for abandoned paths.
-
-**One unavoidable exception, stated explicitly:** Pi loads the *user-level*
-`~/.agents/skills` unconditionally, resolved from `HOME` at runtime and independent
-of both `cwd` and `agentDir` (see [`evidence/p0-01/README.md`](./evidence/p0-01/README.md)).
-When that directory exists it reaches the prompt of **every** session, including
-normal non-Orb ones. pi-orb therefore promises that it does not actively change those
-prompts — it cannot promise the prompt content is byte-identical.
-
-## 工具调用速度
-
-新增 `orb_batch`，一次提交 2–8 个初始截图中可见且互相独立的动作；宿主串行执行，返回各步截图。模型使用最新截图的像素坐标，尺寸从 Pi 已处理的实际图片读取；每次请求仅保留最新一张 Orb 工具图片，聊天历史不改。生产等待维持 600ms。新插件来源、小控件实测及限制见 [实施记录](./doc/plugin-reference-and-pointing.md)；此前四阶段证据见 [工具提速记录](./doc/tool-speed-optimization.md)。
-
-## Licensing
-
-pi-orb is MIT licensed (see [`LICENSE`](./LICENSE)).
-
-Third-party obligations are recorded in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
-The bundled desktop backend is the MIT licensed Windows implementation imported from
-`deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`; historical Cua probe
-records remain under `evidence/` but are not production dependencies.
+贡献指南：[中文](./CONTRIBUTING.zh.md) / [English](./CONTRIBUTING.md)。项目采用 [MIT](./LICENSE) 许可证，复用源码与随包依赖的义务见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。

@@ -8,7 +8,7 @@
 
 | 事实 | 后果 |
 |---|---|
-| 安装包**未签名** | 首次运行必然出现「未知发布者」SmartScreen 提示；这是 `manual-acceptance.md` §9（E9）记录的状态，不是缺陷 |
+| 安装包**未签名** | Windows 可能提示「未知发布者」；实际 SmartScreen 体验仍按 `manual-acceptance.md` §9（E9）标为未验证 |
 | 发布门槛**未满足** | 多显示器、高权限窗口、Chromium 内容输入、干净机安装／卸载／升级仍未验证（`support-matrix.md` §3） |
 | 因此每个 release 都标为 **prerelease** | 不得被当作完整 v0.1；release notes 必须带上未验证清单 |
 
@@ -64,6 +64,10 @@ notes 由 `doc/support-matrix.md` 与 `doc/manual-acceptance.md` 现场生成，
 也就是说，把未验证清单删掉之后，发布流程会失败而不是发一个看起来没问题的包。
 notes 里同时保留：未签名提示与「不要为此关闭安全设置」、未验证项清单、以及指向 `SECURITY.md`
 的授权说明（工作区不是沙箱、截图内容是未受信输入）。
+
+未验证清单直接抽取本次提交的 support matrix §3，不再维护手写子集；另附本版改进、
+同版本插件安装入口和新会话默认 Full Access 的说明。安装器只分发 Electron 桌面壳，
+Pi 插件仍需要完整源码检出后通过 `pi install <repo>/pi-package` 单独注册。
 
 ## 6. 一次发布留下的东西
 

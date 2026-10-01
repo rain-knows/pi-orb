@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-01T02:17:03.313Z",
-  "version": "0.1.0",
-  "appRoot": "release/0.1.0/win-unpacked",
+  "capturedAt": "2026-10-01T02:39:20.915Z",
+  "version": "0.1.0-preview.1",
+  "appRoot": "release/0.1.0-preview.1/win-unpacked",
   "entries": {
     "count": 49,
     "sample": [
@@ -41,7 +41,7 @@
   ],
   "sizes": {
     "executableBytes": 246090752,
-    "asarBytes": 8085800,
+    "asarBytes": 8085810,
     "unpackedNativeBytes": 1834010,
     "archiveEntryCount": 49
   },
@@ -49,7 +49,7 @@
     {
       "name": "the unpacked Windows build exists",
       "ok": true,
-      "detail": "release/0.1.0/win-unpacked/pi-orb.exe"
+      "detail": "release/0.1.0-preview.1/win-unpacked/pi-orb.exe"
     },
     {
       "name": "the archive contains package.json",
@@ -154,7 +154,7 @@
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "58931 bytes"
+      "detail": "59640 bytes"
     },
     {
       "name": "the packaged Koffi version matches the pinned production dependency",
@@ -169,7 +169,7 @@
     {
       "name": "the shipped manifest carries the project version",
       "ok": true,
-      "detail": "0.1.0 vs 0.1.0"
+      "detail": "0.1.0-preview.1 vs 0.1.0-preview.1"
     },
     {
       "name": "the shipped manifest names no repository-only entry point",
