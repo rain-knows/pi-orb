@@ -1,0 +1,39 @@
+{
+  "method": "UTF-8 bytes / 4 estimate; additive policies only, no native prompt duplication",
+  "activeTools": [
+    "read",
+    "powershell",
+    "edit",
+    "write",
+    "subagents_enable",
+    "ask_user_question",
+    "advisor",
+    "web_enable",
+    "codemode",
+    "tool_search"
+  ],
+  "blocks": [
+    {
+      "name": "engineering",
+      "bytes": 540,
+      "estimatedTokens": 135
+    },
+    {
+      "name": "tool_policy",
+      "bytes": 2802,
+      "estimatedTokens": 701
+    },
+    {
+      "name": "workflow",
+      "bytes": 1693,
+      "estimatedTokens": 424
+    },
+    {
+      "name": "delivery_contract",
+      "bytes": 594,
+      "estimatedTokens": 149
+    }
+  ],
+  "estimatedTokens": 1409,
+  "selftest": "21 assertions passed"
+}

@@ -34,12 +34,17 @@ export function systemMessageEnd(): unknown {
   return { type: "message_end", message: { role: "system", content: "prompt" } };
 }
 
-export function assistantMessageEnd(content: unknown = []): unknown {
-  return { type: "message_end", message: { role: "assistant", content } };
+export function assistantMessageEnd(content: unknown = [], stopReason = "stop"): unknown {
+  return { type: "message_end", message: { role: "assistant", content, stopReason } };
 }
 
-export function agentEnd(stopReason = "stop"): unknown {
-  return { type: "agent_end", stopReason };
+export function agentEnd(): unknown {
+  return { type: "agent_end" };
+}
+
+/** pi-web v0.10 logical prompt completion (after retries and follow-ups). */
+export function promptDone(): unknown {
+  return { type: "prompt_done" };
 }
 
 export function streamError(message: string): unknown {

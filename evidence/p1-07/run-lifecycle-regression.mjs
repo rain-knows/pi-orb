@@ -551,7 +551,8 @@ try {
 
   report.passed = report.checks.length > 0 && report.checks.every((entry) => entry.ok);
   mkdirSync(import.meta.dirname, { recursive: true });
-  writeFileSync(join(import.meta.dirname, "session-access-regression.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  const output = process.argv.find(argument => argument.startsWith("--output="))?.slice(9) ?? join(import.meta.dirname, "session-access-regression.json");
+  writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ passed: report.passed, checks: report.checks }, null, 2));
 }
 

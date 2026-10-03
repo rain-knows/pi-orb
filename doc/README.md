@@ -6,6 +6,7 @@
 
 | 文档 | 用途 | 状态 |
 |---|---|---|
+| [`pi-web-0.10-compatibility.md`](./pi-web-0.10-compatibility.md) | Pi 1.0 提示词段责任、全局插件/MCP 组织、Orb 完成事件适配和验证限制 | 2026-10-03 本机/源码升级记录 |
 | [`reference-playbook.md`](./reference-playbook.md) | **开发取材入口**：参考项目本地检出、取材优先级、可复用／不可复用清单、必须一致的常量与交互规格、各任务作业流程、上游同步与提交前检查 | 随参考提交和实现变化维护 |
 | [`pi-orb-development-goals.md`](./pi-orb-development-goals.md) | 产品目标、非破坏性合同、目标架构、P0/P1/P2 优先级、验收矩阵和阻塞规则 | 开发目标与验收基线 |
 | [`tech-stack.md`](./tech-stack.md) | 技术栈建议、选型依据、版本边界、P0 验证门槛和明确非目标 | 技术选型建议，待验证 |

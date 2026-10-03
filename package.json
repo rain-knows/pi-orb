@@ -34,7 +34,7 @@
     "uiohook-napi": "1.5.5"
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "0.87.1",
+    "@earendil-works/pi-coding-agent": "1.0.0",
     "@types/jsdom": "28.0.3",
     "@types/node": "24.19.0",
     "electron": "44.4.5",

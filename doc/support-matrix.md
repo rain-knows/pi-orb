@@ -18,8 +18,9 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | Node.js | `24.19.0` | 开发基线 | `evidence/p0-01/environment-baseline.json` |
 | npm | `11.17.0` | 开发基线 | 同上 |
 | Electron | `44.4.5` | 首个实测点 | `evidence/p0-03/README.md`（真实 Electron 腿 16/16） |
-| Pi SDK | `@earendil-works/pi-coding-agent@0.87.1` | P0-02 实测 | `evidence/p0-02/README.md` |
-| pi-web | `@agegr/pi-web@0.9.3`，HEAD `95a58744532c7fccaa933aa7757a1419ace67ed2` | P0-02/P0-03 实测 | `evidence/p0-02/README.md`、`evidence/p0-03/README.md` |
+| Pi SDK | `@earendil-works/pi-coding-agent@1.0.0` | 当前源码与 Pi Web 宿主一致；提示词/插件/模型闭环已验证 | `evidence/upgrade-0.10/`；旧 P0 为历史记录 |
+| Pi CLI | `@earendil-works/pi-coding-agent@1.0.1` | 本机全局命令与扩展更新完成；Orb 会话由 Pi Web 的 SDK 驱动 | `evidence/upgrade-0.10/environment.json` |
+| pi-web | `@agegr/pi-web@0.10.0`，上游 `6fcd7d44981ab51a21d6cd6eb06d361d0e3d3068` | 本机源码保留 Endfield 与 Windows 保存修复；生产构建、原生 MCP、提示词和 Orb 闭环通过；全量测试限制见升级记录 | `doc/pi-web-0.10-compatibility.md`、`evidence/upgrade-0.10/` |
 | 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；桌面闭环和历史真实模型运行记录存在，但 2026-09-30 C7/D6/D8 复跑未完整通过，暂不宣称稳定支持 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
 | 新插件参考 | `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`（MIT） | 已检出/核对；pixel 适配两种夹具及依赖更新复跑共 21/21 任务通过；不是运行时依赖 | `doc/reference-playbook.md` §1.2、`doc/plugin-reference-and-pointing.md` |
 | Windows FFI | `koffi@2.16.3`（MIT，精确锁定） | 替换 2.14.1；原生回调/截图压力探针 1000 枚举 + 50 捕获通过；并非对间歇退出根因的证明 | `evidence/tool-speed/native-callback-stress.json`；`doc/plugin-reference-and-pointing.md` |
@@ -42,7 +43,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 |---|---|---|
 | `electron` | **精确** `44.4.5` | 窗口、沙箱与跨 origin 行为必须锁定版本实测；P0-03 的第一个实测点就是该版本 |
 | `deepseek-harness-orb` Windows backend | **精确** `72f1d738458a223696685a909e806b683eff5885` | 直接导入并保留 MIT 通知；只在 pi-orb 的 Pi/授权/bridge 边界做薄适配 |
-| `@earendil-works/pi-coding-agent` | **精确** `0.87.1` | 与 pi-web `0.9.3` 的依赖对齐；扩展 API 以该版本的类型声明为准 |
+| `@earendil-works/pi-coding-agent` | **精确** `1.0.0` | 与 pi-web `0.10.0` 的宿主依赖对齐；扩展 API 以该版本的类型声明为准 |
 | `vite` | `7.3.6` | `electron-vite@5` 的 peer 范围是 `^5 \|\| ^6 \|\| ^7`，不含 `8` |
 | `typescript` | `5.9.3` | `typescript-eslint@8` 的 peer 上限为 `<6.1.0`，且不使用 TS 7 预览版 |
 | `eslint` | `9.39.5` | 使用 `typescript-eslint@8` 支持的稳定主版本 |

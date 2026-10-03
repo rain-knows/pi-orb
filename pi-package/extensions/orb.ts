@@ -213,8 +213,13 @@ export default function orbExtension(pi: ExtensionAPI): void {
     if (!config || !isOrbWorkspace(ctx.cwd, config.orbWorkspace)) return;
     sessionState.generation = 0;
     attachedFrame = null;
+    // Remove the reviewer before prompt policies inspect this session's loadout.
+    // Native Pi prompt rules are refreshed after handlers; custom policy sections
+    // are assembled at before_agent_start and must see the correct tools then.
+    pi.setActiveTools(pi.getActiveTools().filter(name => name !== "advisor"));
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.observe,
       label: "Orb: observe a window",
@@ -234,6 +239,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.click,
       label: "Orb: click",
@@ -259,6 +265,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.type,
       label: "Orb: type text",
@@ -281,6 +288,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.scroll,
       label: "Orb: scroll",
@@ -303,6 +311,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.hotkey,
       label: "Orb: press hotkey",
@@ -321,6 +330,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.longPress,
       label: "Orb: long press",
@@ -340,6 +350,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.openApp,
       label: "Orb: switch app",
@@ -366,6 +377,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.drag,
       label: "Orb: drag",
@@ -385,6 +397,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.wait,
       label: "Orb: wait",
@@ -397,6 +410,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.longWait,
       label: "Orb: long wait",
@@ -409,6 +423,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     });
 
     pi.registerTool({
+      exposure: "model-only",
       executionMode: "sequential",
       name: ORB_TOOLS.listApps,
       label: "Orb: list running apps",
@@ -423,6 +438,7 @@ export default function orbExtension(pi: ExtensionAPI): void {
     pi.registerTool({
       name: ORB_TOOLS.batch,
       label: "Orb: 批量操作",
+      exposure: "model-only",
       executionMode: "sequential",
       description: "Execute 2–8 GUI actions in order, using targets already visible in the initial screenshot. Later targets must not depend on UI created by earlier actions. Never batch opening a menu with choosing its new item, or navigation with input on the new page. Returns each completed step's screenshot and the final observation. Failure or surface change stops remaining actions.",
       parameters: BATCH_PARAMS,

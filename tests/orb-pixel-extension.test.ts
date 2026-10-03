@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, it, vi } from "vitest";
-import type { ExtensionAPI, ExtensionContext, ToolDefinition } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, ExtensionToolContext, ToolDefinition } from "@earendil-works/pi-coding-agent";
 import orbExtension from "../pi-package/extensions/orb";
 import { BridgeClient } from "../pi-package/extensions/bridge-client";
 
@@ -18,7 +18,7 @@ it("binds resized pixels to session, generation and observation; refuses before 
   const tools=new Map<string,ToolDefinition>();
   const api={on:(name:string,handler:typeof handlers extends Map<string,infer F>?F:never)=>handlers.set(name,handler),registerTool:(tool:ToolDefinition)=>tools.set(tool.name,tool),registerCommand:()=>{},getActiveTools:()=>[...tools.keys()],setActiveTools:()=>{}};
   let sessionId="one";
-  const ctx={cwd:directory,sessionManager:{getSessionId:()=>sessionId}} as ExtensionContext;
+  const ctx={cwd:directory,sessionManager:{getSessionId:()=>sessionId},tools:[],executeTool:vi.fn()} as unknown as ExtensionToolContext;
   const bytes=Buffer.alloc(24);bytes.set([137,80,78,71,13,10,26,10]);bytes.write("IHDR",12);bytes.writeUInt32BE(1600,16);bytes.writeUInt32BE(900,20);
   const context={messages:[{role:"toolResult",toolName:"orb_observe",details:{orbImages:[{observationId:"observed"}],result:{image:{width:3200,height:1800}}},content:[{type:"image",data:bytes.toString("base64"),mimeType:"image/png"}]}]};
   const start=()=>handlers.get("before_agent_start")!({systemPromptOptions:{sections:{},promptGuidelines:[]}} as never,ctx);

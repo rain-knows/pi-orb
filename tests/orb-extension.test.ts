@@ -30,7 +30,7 @@ describe("Orb extension result rendering", () => {
     writeFileSync(config, JSON.stringify({ version: 1, orbWorkspace: directory, shortcut: "Control+Alt+F11", window: { alwaysOnTop: true, width: 445, height: 632 } }));
     vi.stubEnv("PI_ORB_CONFIG", config);
     const handlers = new Map<string, (event: never, ctx: ExtensionContext) => unknown>();
-    const tools: { name: string; executionMode: string }[] = [];
+    const tools: { name: string; executionMode: string; exposure?: string }[] = [];
     let activeTools = ["read", "advisor", "orb_observe"];
     const api = { on: (name: string, callback: typeof handlers extends Map<string, infer F> ? F : never) => handlers.set(name, callback), registerTool: (tool: typeof tools[number]) => tools.push(tool), registerCommand: () => {}, getActiveTools: () => activeTools, setActiveTools: (names: string[]) => { activeTools = names; } };
     try {
@@ -42,6 +42,10 @@ describe("Orb extension result rendering", () => {
       handlers.get("session_start")!({} as never, orb);
       expect(tools).toHaveLength(13);
       expect(tools.every(t => t.executionMode === "sequential")).toBe(true);
+      expect(tools.filter(t => t.name !== "orb_browser").every(t => t.exposure === "model-only")).toBe(true);
+      expect(activeTools).not.toContain("advisor");
+      // Each real Pi session has its own extension instance and loadout.
+      activeTools = ["read", "advisor", "orb_observe"];
       const start = { systemPromptOptions: { sections: {}, promptGuidelines: [] } };
       handlers.get("before_agent_start")!(start as never, ordinary);
       expect(activeTools).toContain("advisor");

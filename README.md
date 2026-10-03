@@ -23,7 +23,7 @@ pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复�
 ### 前置条件
 
 - Windows x64；当前验证环境为 Windows 11，其他平台未验证。
-- 已安装 Pi CLI，且 pi-web 可运行。实测组合为 `@earendil-works/pi-coding-agent@0.87.1` + `@agegr/pi-web@0.9.3`，其他版本组合未验证。
+- 已安装 Pi CLI，且 pi-web 可运行。当前源码基线为 Pi Web 0.10 / Pi SDK 1.0；具体版本与验证范围见[支持矩阵](./doc/support-matrix.md)和[升级记录](./doc/pi-web-0.10-compatibility.md)。已发布预览安装器仍是原发布产物。
 - 桌面任务需要支持图像与工具调用的模型，模型与凭据在 pi-web 中配置。
 - 从源码运行需要 Node.js `>=24.19.0`、npm 和 Git。
 
