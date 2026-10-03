@@ -13,6 +13,11 @@ dist/
 build/
 coverage/
 *.tsbuildinfo
+.cache/
+.vite/
+.eslintcache
+playwright-report/
+test-results/
 
 # electron-builder output (installers, unpacked app, blockmaps). The packaging
 # configuration that produces it is versioned; the binaries are not.
@@ -49,6 +54,8 @@ auth.json
 **/auth.json
 *.pem
 *.key
+*.pfx
+*.p12
 .env
 .env.*
 !.env.example
@@ -70,7 +77,17 @@ auth.json
 *.webp
 *.bmp
 
+# Product artwork required by the renderer is source, not a captured screenshot.
+!/src/renderer/orb-avatar.png
+
+# Local recordings and Electron crash dumps.
+/evidence/**/*.gif
+/evidence/**/*.mp4
+/evidence/**/*.webm
+*.dmp
+
 # Electron/OS noise
+.playwright-mcp/
 Thumbs.db
 Desktop.ini
 .DS_Store

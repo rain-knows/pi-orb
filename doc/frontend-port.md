@@ -8,7 +8,8 @@ The complete checkout supplies `apps/desktop/renderer/floating.{html,css,js}` an
 
 ## Stage 1: baseline and boundaries
 
-The 344 × 444 pixel comparison is in `evidence/frontend-port/`:
+The 344 × 444 pixel comparison is generated locally in `evidence/frontend-port/`.
+Screenshots are ignored by Git; the capture scripts and text review remain versioned.
 
 | Image | What it captures |
 |---|---|
