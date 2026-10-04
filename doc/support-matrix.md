@@ -13,7 +13,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 
 | 组件 | 版本 | 状态 | 依据 |
 |---|---|---|---|
-| pi-orb | `0.1.0-preview.2` | 本地 Windows x64 未签名构建，尚未发布；旧发布版为 preview.1 | 本仓库 `package.json`、`CHANGELOG.md` |
+| pi-orb | `0.1.0-preview.3` | 本地 Windows x64 未签名构建，尚未发布；旧发布版为 preview.1 | 本仓库 `package.json`、`CHANGELOG.md` |
 | OS | Windows 11 x64（Build 26200） | 首发目标平台 | `evidence/p0-01/environment-baseline.json` |
 | Node.js | `24.19.0` | 开发基线 | `evidence/p0-01/environment-baseline.json` |
 | npm | `11.17.0` | 开发基线 | 同上 |
@@ -95,13 +95,15 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览、锁屏／休眠后清除遗失的按键状态 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘及真实锁屏／休眠体验未验证）。参考项目固定提交 `72f1d738458a223696685a909e806b683eff5885` 无对应全局手势；本项是 Pi 接入所需的独立能力 | `tests/double-alt.test.ts`、`tests/double-alt-recovery.test.ts`、`tests/shortcut-edge-guard.test.ts`、`src/main/double-alt.ts`、`src/main/shortcut-edge-guard.ts`、`src/main/index.ts` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/floating.js`、`evidence/p2-03/README.md` |
 | **P2-04/P2-06 桌面操作扩展**：参考按钮/次数/修饰键、replace/submit、纵向滚动、等待、应用列表、前台信息、热键、长按、同窗口拖拽、动作后回图与显式截图导出 | 已接入自动化；真实桌面动作、目标像素、保存对话框、剪贴板和真实模型仍需人工验收 | `doc/desktop-tools-port.md`、`tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows-input.test.ts` |
-| **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 当前 preview.2 本机构建，内容审计 30/30、实际启动 22/22；旧 preview.1 发布与 GitHub runner 动画失败披露保留在发布记录 | `electron-builder.config.mjs`、`evidence/p2-05/`、`doc/release-process.md` §9 |
+| **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 当前 preview.3 本机构建，内容审计 30/30、实际启动 22/22；旧 preview.1 发布与 GitHub runner 动画失败披露保留在发布记录 | `electron-builder.config.mjs`、`evidence/p2-05/`、`doc/release-process.md` §9 |
 | **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留，Koffi 版本和二进制匹配验证环境 | 已验证（30/30，新增头文件残留反证） | `evidence/p2-05/package-audit.json`、`evidence/tool-speed/package-audit-koffi-headers-rejected.json` |
 | **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、session Access bridge 存在且旧选窗 API 不存在 | 已验证（22/22；桌面 native action 闭环另由 session Access 探针证明） | `evidence/p2-05/packaged-smoke.json` |
 | **参考项目 Windows 后端自带的规格测试已移植**：窗口选择 10 条不变量 + 输入 13 条（键映射、UIPI 拒绝、剪贴板顺序、滚轮档位、PNG 头等） | 已验证（23/23，逐条对应参考 spec） | `tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts` |
 | **独立随包 Pi 插件**：无源码目录时加载，完整工具清单保持工作区边界 | 真实 Pi 1.0 加载 4/4；普通会话仅公用浏览器工具，Orb 会话完整工具集合 | `evidence/personal-startup/plugin-load.json` |
-| **个人启动与后端复用**：官方 CLI 注册/移除，隐藏 Pi Web 启动、同 PID 复用、真实 API 会话与模型偏好保留 | 隔离用户设置/随机端口 6/6；不等同于新用户环境安装 | `evidence/personal-startup/backend-startup.json` |
-| **个人安装与短命令**：NSIS 安装至中文/空格目录、App Paths/ShellExecute、单实例保留草稿、卸载清理与应用配置保留 | 当前开发机 8/8；完整干净用户环境、升级、向导与 SmartScreen 仍未验证 | `evidence/personal-startup/installer-smoke.json` |
+| **个人启动与后端复用**：官方 CLI 注册/移除，隐藏 Pi Web 启动、同 PID 复用、真实 API 会话与模型偏好保留 | 隔离用户设置/随机端口 7/7；preview.3 新增 Win32 无控制台探针；不等同于新用户环境安装 | `evidence/personal-startup/backend-startup.json` |
+| **个人安装与短命令**：NSIS 安装至中文/空格目录、App Paths/ShellExecute、单实例保留草稿、卸载清理与应用配置保留 | 当前开发机 8/8；完整干净用户环境、交互安装/升级向导与 SmartScreen 仍未验证 | `evidence/personal-startup/installer-smoke.json` |
+| **当前账户 preview.2 → preview.3 升级**：静默升级、真实短命令启动、无控制台、同实例唤回、图标与数据保留 | 本机 11/11；模型/凭据字节不变、工作区和快捷键保留；完整干净用户与交互向导仍未验证 | `evidence/windows-startup-and-workspaces/current-user-upgrade.json` |
+| **工作区入口与默认完全访问界面**：原生菜单入口、同目录无操作、切换前停止旧任务、实际授权/撤权标签同步 | 单测及实际 Electron/Pi Web UI 生命周期 25/25；参考底板图标用于安装器/快捷方式/托盘 | `evidence/windows-startup-and-workspaces/ui-lifecycle.json`、`doc/windows-startup-and-workspaces.md` |
 | **`orb_open_app` 的收窄语义**：只激活已在运行的应用、不启动进程；`name` 拒绝路径／参数片段／shell 元字符；激活后必须验证前台窗口确属该应用才重绑定 | 已验证（自动化：前置检查失败、前台不匹配、`launch` 不可达三条失败路径均有断言） | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`evidence/p1-06/tool-exposure.json` |
 
 ## 3. 未验证（不得宣称支持）

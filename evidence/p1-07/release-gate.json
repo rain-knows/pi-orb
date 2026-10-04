@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-10-04T13:11:58.353Z",
-  "projectVersion": "0.1.0-preview.2",
+  "capturedAt": "2026-10-04T14:41:27.590Z",
+  "projectVersion": "0.1.0-preview.3",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "12065 ms"
+      "detail": "14539 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "8299 ms"
+      "detail": "8720 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "14469 ms"
+      "detail": "14492 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4478 ms"
+      "detail": "4825 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -80,12 +80,12 @@
     {
       "name": "the changelog records the current version as unreleased or released",
       "ok": true,
-      "detail": "version 0.1.0-preview.2"
+      "detail": "version 0.1.0-preview.3"
     },
     {
       "name": "the support matrix records the project version",
       "ok": true,
-      "detail": "looked for 0.1.0-preview.2"
+      "detail": "looked for 0.1.0-preview.3"
     },
     {
       "name": "the support matrix records the reference desktop backend commit",
@@ -349,7 +349,7 @@
     "passed": 66,
     "skipped": 0,
     "failed": 0,
-    "version": "0.1.0-preview.2",
+    "version": "0.1.0-preview.3",
     "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files. `skipped` counts checks that could not run in this environment and are explicitly NOT counted as passed"
   }
 }

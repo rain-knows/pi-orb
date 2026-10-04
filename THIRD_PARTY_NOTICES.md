@@ -1,5 +1,12 @@
 # pi-orb third-party notices
 
+Windows icon plate: `resources/icon.svg` adapts
+`rain-knows/deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885`,
+`apps/desktop/resources/icon-windows.svg` (MIT, Copyright (c) 2026 DeepSeek).
+The rounded plate, gradients and shadow filters are reused; the whale mark is replaced by a Pi
+symbol. `resources/icon.png` and `resources/icon.ico` are raster/Windows derivatives of that SVG.
+The upstream MIT license text is retained below. These assets do not represent DeepSeek endorsement.
+
 This file records the third-party components redistributed with a pi-orb Windows x64 release, and
 the license obligations that follow. It is generated and checked against
 [`evidence/p1-07/license-inventory.json`](./evidence/p1-07/license-inventory.json), which is

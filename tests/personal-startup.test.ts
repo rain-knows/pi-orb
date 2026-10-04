@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname, basename } from "node:path";
 import { createServer } from "node:http";
-import { assertPortAvailable, localOrbPackages, packageCli, probePersonalPiWeb } from "../src/main/personal-startup";
+import { assertPortAvailable, localOrbPackages, packageCli, probePersonalPiWeb, piWebServerLaunch } from "../src/main/personal-startup";
 
 const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
@@ -17,6 +17,17 @@ function fixture(name = "@agegr/pi-web", bin = "bin/pi-web.js") {
 }
 
 describe("personal installation boundaries", () => {
+  it("resolves the production server directly within Pi Web and rejects an unbuilt installation", () => {
+    const root = fixture();
+    expect(() => piWebServerLaunch(join(root, "bin/pi-web.js"), new URL("http://localhost:30141"))).toThrow("生产构建");
+    mkdirSync(join(root, ".next"));
+    writeFileSync(join(root, ".next/BUILD_ID"), "fixture");
+    const nextRoot = join(root, "node_modules/next");
+    mkdirSync(join(nextRoot, "dist/bin"), { recursive: true });
+    writeFileSync(join(nextRoot, "package.json"), JSON.stringify({ name: "next" }));
+    writeFileSync(join(nextRoot, "dist/bin/next"), "");
+    expect(piWebServerLaunch(join(root, "bin/pi-web.js"), new URL("http://localhost:30141"))).toEqual({ cwd: root, args: [join(nextRoot, "dist/bin/next"), "start", "-p", "30141", "-H", "localhost"] });
+  });
   it("accepts the manifest's official entry with Chinese and space paths", () => {
     const root = fixture();
     expect(packageCli(root, "@agegr/pi-web", "pi-web")).toBe(join(root, "bin/pi-web.js"));

@@ -1,6 +1,6 @@
 {
   "name": "pi-orb",
-  "version": "0.1.0-preview.2",
+  "version": "0.1.0-preview.3",
   "private": true,
   "type": "module",
   "description": "Electron desktop companion for pi-web: a floating orb window with an explicit, user-authorized desktop mode.",

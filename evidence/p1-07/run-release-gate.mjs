@@ -152,7 +152,7 @@ const binaryExtensions = [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".dll", ".no
 // Product UI assets are allowed only by exact path. The frontend-port PNGs are deterministic,
 // synthetic visual-review fixtures required by the reference-port stage; personal screenshots and
 // native binaries remain rejected.
-const approvedProductAssets = new Set(["src/renderer/orb-avatar.png"]);
+const approvedProductAssets = new Set(["src/renderer/orb-avatar.png", "resources/icon.png"]);
 // Audit files eligible for source distribution; ignored local captures are not committed assets.
 const sourceCandidates = new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: repo, encoding: "utf8" }).split("\0"));
 for (const file of shipFiles) {

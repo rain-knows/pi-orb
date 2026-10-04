@@ -526,7 +526,8 @@ D:\workself\pi-orb\
 **改动打包配置前必须先看的三个非默认决定**（理由写在 `electron-builder.config.mjs` 与
 `doc/p2-05-distribution.md` §4）：`npmRebuild: false`（发出去的必须是证据测过的预编译二进制）、
 `files` 排除段（否则 smart unpack 会把 C++ 源码与其它平台二进制打进包）、
-图标由已批准的 `orb-avatar.png` 派生（不新增品牌素材）。
+图标初版由已批准的 `orb-avatar.png` 派生；preview.3 按用户要求复用参考 SVG 的底板与阴影，
+替换为 π 主体，SVG/PNG/ICO 同源。许可已核对，见 §18 和 `THIRD_PARTY_NOTICES.md`。
 
 验证一律走 `node evidence/p2-05/run-p2-05.mjs`（构建 → 内容审计 → 启动打包产物），
 不要用“安装包构建成功”代替内容与运行证据。
@@ -676,3 +677,14 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 或字符串替换模板。用现有 Vite 构建独立插件，宿主 SDK 保持 peer，经官方 Pi CLI 注册。
 主进程单实例锁与既有唤醒出口结合；已有后端优先、未运行才隐藏启动官方入口，不重启共享服务。
 来源仍为固定旧提交的 desktop main/welcome/config，差异理由及真机证据见该阶段文档。
+
+## 18. Windows 启动、图标与工作区入口修正
+
+本轮先核对固定旧提交的 resources/icon-windows.svg、src/floating-window.ts:55-129、
+src/orb-permission.ts 与 src/project-manager.ts。复用图标底板/阴影及原生上下文菜单；
+图标主体替换为 Pi 的数学符号，不沿用 DeepSeek 品牌标志。参考的 project-manager 管理固定
+运行时目录，没有用户文件夹切换器；Pi 侧通过已有文件选择、generation/session 切换做最小适配。
+Full Access 保持参考默认值，授权变更实时送到 renderer，撤权规则保留。
+Pi Web CLI 的二次 spawn 没有 windowsHide；Orb 从已验证 Pi Web 包解析其 Next.js 正式
+生产入口直接隐藏启动，保留 cwd、hostname、日志与共享服务复用，不改上游或 monkey patch。
+实施和证据见 `windows-startup-and-workspaces.md`。

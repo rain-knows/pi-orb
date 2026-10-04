@@ -126,6 +126,7 @@ describe("ported shell context menu", () => {
       { isEditable: false, canCut: false, canCopy: false, canPaste: false, canSelectAll: false, hasSelectionContext: true },
       {
         onModel: () => calls.push("model"),
+        onWorkspace: () => calls.push("workspace"),
         onScreenshot: () => calls.push("screenshot"),
         onShortcut: () => calls.push("shortcut"),
         onCollapse: () => calls.push("collapse"),
@@ -134,7 +135,7 @@ describe("ported shell context menu", () => {
       },
     );
     for (const item of items) item.click?.({} as never, undefined, {} as never);
-    expect(calls).toEqual(["model", "screenshot", "shortcut", "collapse", "clear", "quit"]);
+    expect(calls).toEqual(["workspace", "model", "screenshot", "shortcut", "collapse", "clear", "quit"]);
 
     const text = items.map((item) => item.label ?? "").join(" ");
     for (const absent of ["Settings", "Toolbar", "Millifraction"]) {

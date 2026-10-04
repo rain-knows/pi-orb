@@ -1,5 +1,8 @@
 # Windows 个人用户安装与启动
 
+本页保留 preview.2 的阶段记录；preview.3 的无控制台入口、图标和工作区修正见
+[`windows-startup-and-workspaces.md`](./windows-startup-and-workspaces.md)。当前运行与分发流程以 README 为准。
+
 2026-10-04，`0.1.0-preview.2` 本地构建，尚未发布。目标是让已有 Pi/Pi Web 的用户无需
 本项目源码即可安装，通过 Win+R 启动助手。支持范围仍以 `support-matrix.md` 为准。
 
@@ -54,7 +57,8 @@ MCP/Playwright 有独立 node_modules 并保留许可；electron-builder 过滤�
 - 隔离用户设置/工作区/随机端口，官方 CLI 注册、官方 Pi Web 隐藏启动、重复调用复用 PID、真实 API 创建 Orb 会话；测试模型不请求供应商。
 - 实际 NSIS 安装、ShellExecute 短命令、再次唤回与卸载清理。开发机结果不外推到干净机器、人工 Win+R 或 SmartScreen。
 
-最终记录为插件 4/4、后端 6/6、实际安装/卸载 8/8、包内容 30/30、打包启动 22/22。
+preview.2 的最终记录为插件 4/4、后端 6/6、实际安装/卸载 8/8、包内容 30/30、打包启动 22/22。
+最新 backend-startup.json 在 preview.3 重跑为 7/7，新增 Win32 无控制台检查。
 当前账户另已完成默认用户目录安装，短命令、实际进程与后端、随包插件、工作区保留和模型/凭据
 字节一致性共 7/7；见 `current-user-installation.json`。本机既有 Pi Web 入口已写入本机 runtime 配置，
 个人路径不进入产品运行时默认值。

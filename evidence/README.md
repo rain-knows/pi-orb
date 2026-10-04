@@ -6,6 +6,7 @@
 
 | 路径 | 内容 | 状态 |
 |---|---|---|
+| `windows-startup-and-workspaces/` | preview.3 实际 UI、工作区与权限、当前账户升级验证 | 见该目录结果；干净环境范围不外推 |
 | `personal-startup/` | 随包独立 Pi 插件、官方 CLI/后端隐藏启动、NSIS/ShellExecute 单实例与卸载、升级后的 Pi Web 源码保护基线 | 结果见该目录；干净机与 SmartScreen 仍未验证 |
 | `upgrade-0.10/` | Pi Web 0.10 / Pi 1.0：实际 provider 提示词审计与旧版本反证、插件/MCP、真实模型与桌面、生命周期及本地产物 | 聚焦与生产验证通过；上游 Windows 全量测试限制保留 |
 | `tool-speed/` | 四阶段工具速度优化：计时、原生批量/Stop、1500 次等待实验、真实模型对照和图片预算 | 见阶段记录；大控件通过，小控件定位失败保留，生产等待 600ms |

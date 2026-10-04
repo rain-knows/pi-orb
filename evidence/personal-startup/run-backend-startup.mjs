@@ -6,6 +6,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createServer } from "node:net";
 import { execFileSync } from "node:child_process";
+import koffi from "koffi";
 
 const repo = resolve(import.meta.dirname, "../..");
 const piWebCli = process.argv[2];
@@ -50,9 +51,17 @@ try {
   await preparePersonalStartup(options);
   const settings = JSON.parse(readFileSync(join(agentDir, "settings.json"), "utf8"));
   checks.push({ name: "official Pi CLI registers the bundled plugin in isolated agent settings", ok: settings.packages.some(source => resolve(agentDir, source) === resolve(pluginSource)), detail: settings.packages });
-  checks.push({ name: "official Pi Web becomes ready without browser launch", ok: await probePersonalPiWeb(baseUrl), detail: "--no-open; startup log in isolated userData" });
+  checks.push({ name: "official Pi Web becomes ready without browser launch", ok: await probePersonalPiWeb(baseUrl), detail: "Next production CLI; startup log in isolated userData" });
   // Only the listener on this fresh test port belongs to this test. The existing 30141 service is untouched.
   backendPid = Number(execFileSync("powershell.exe", ["-NoProfile", "-Command", `(Get-NetTCPConnection -LocalPort ${port} -State Listen).OwningProcess`], { encoding: "utf8", windowsHide: true }).trim());
+  // Read-only Win32 probe: the test detaches only its own console, never another app's window.
+  const kernel = koffi.load("kernel32.dll");
+  const freeConsole = kernel.func("bool __stdcall FreeConsole()");
+  const attachConsole = kernel.func("bool __stdcall AttachConsole(uint32_t processId)");
+  freeConsole();
+  const attached = attachConsole(backendPid);
+  if (attached) freeConsole();
+  checks.push({ name: "running Pi Web production server owns no Windows console", ok: !attached, detail: { backendPid, attachedConsole: attached } });
   const before = JSON.stringify(JSON.parse(readFileSync(join(userData, "startup-runtime.json"), "utf8")));
   await preparePersonalStartup(options);
   const reusedPid = Number(execFileSync("powershell.exe", ["-NoProfile", "-Command", `(Get-NetTCPConnection -LocalPort ${port} -State Listen).OwningProcess`], { encoding: "utf8", windowsHide: true }).trim());
@@ -68,8 +77,7 @@ try {
 } catch (error) { checks.push({ name: "backend integration", ok: false, detail: error.message }); }
 finally {
   if (backendPid) {
-    const parentPid = Number(execFileSync("powershell.exe", ["-NoProfile", "-Command", `(Get-CimInstance Win32_Process -Filter 'ProcessId=${backendPid}').ParentProcessId`], { encoding: "utf8", windowsHide: true }).trim());
-    if (parentPid > 0) execFileSync("taskkill.exe", ["/PID", String(parentPid), "/T", "/F"], { windowsHide: true });
+    execFileSync("taskkill.exe", ["/PID", String(backendPid), "/T", "/F"], { windowsHide: true });
   }
 }
 result.passed = checks.every(check => check.ok);

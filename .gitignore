@@ -79,6 +79,7 @@ auth.json
 
 # Product artwork required by the renderer is source, not a captured screenshot.
 !/src/renderer/orb-avatar.png
+!/resources/icon.png
 
 # Local recordings and Electron crash dumps.
 /evidence/**/*.gif

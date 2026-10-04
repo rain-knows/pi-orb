@@ -88,7 +88,7 @@ import {
 } from "./floating-window-controller";
 import { startSelectionMonitor, type SelectionMonitor } from "./selection-monitor";
 import { preparePersonalStartup, probePersonalPiWeb, removeBundledPlugin } from "./personal-startup";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 
 // Electron's Chromium switch does not by itself relocate main-process configuration/handshake.
 // Make an explicit profile override consistent before the lock or installer cleanup uses it.
@@ -229,6 +229,7 @@ function createWindow(): BrowserWindow {
     hasShadow: false,
     alwaysOnTop: config.window.alwaysOnTop,
     skipTaskbar: true,
+    icon: createTrayIcon(),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
@@ -412,6 +413,7 @@ async function startDesktop(): Promise<void> {
     log: (entry) => {
       // Structured, desensitized: action kind and reason only, never typed text or pixels.
       console.log(`[pi-orb] desktop ${JSON.stringify(entry)}`);
+      if (entry.event === "authorize" || entry.event === "revoke") emit({ type: "access", status: desktopTaskStatus() });
     },
   });
 }
@@ -765,6 +767,7 @@ function createTray(): void {
       // "Show" is an explicit wake, not a toggle: a menu item labelled Show must never hide a focused
       // orb.
       { label: "显示悬浮球", click: () => void showOrb() },
+      { label: "切换工作区…", click: () => { void showOrb().then(() => window?.webContents.send(IPC.shellMenuAction, "workspace")); } },
       // Goes through the same collapse routine as the shortcut and the window button, so the tray
       // cannot hide the orb while leaving desktop authority alive.
       { label: "隐藏悬浮球", click: () => lifecycle?.collapse() },
@@ -775,17 +778,9 @@ function createTray(): void {
   tray.on("click", () => toggleWindow("tray"));
 }
 
-/** A 16x16 solid icon, drawn in code so no binary asset is committed. */
+/** The same reference-derived Pi icon used by the installer and Windows shortcuts. */
 function createTrayIcon(): NativeImage {
-  const size = 16;
-  const buffer = Buffer.alloc(size * size * 4);
-  for (let i = 0; i < size * size; i += 1) {
-    buffer[i * 4 + 0] = 0x4c;
-    buffer[i * 4 + 1] = 0x8b;
-    buffer[i * 4 + 2] = 0xf5;
-    buffer[i * 4 + 3] = 0xff;
-  }
-  return nativeImage.createFromBuffer(buffer, { width: size, height: size });
+  return nativeImage.createFromBuffer(readFileSync(join(__dirname, "icon.png"))).resize({ width: 32, height: 32 });
 }
 
 function registerIpc(): void {
@@ -839,6 +834,7 @@ function registerIpc(): void {
         onModel: () => current.webContents.send(IPC.shellMenuAction, "model"),
         onScreenshot: () => current.webContents.send(IPC.shellMenuAction, "screenshot"),
         onShortcut: () => current.webContents.send(IPC.shellMenuAction, "shortcut"),
+        onWorkspace: () => current.webContents.send(IPC.shellMenuAction, "workspace"),
         onCollapse: () => lifecycle?.collapse(),
         onQuit: () => quit(),
         onClearSelectionContext: () => {
@@ -962,13 +958,18 @@ function registerIpc(): void {
       }
 
       lastWorkspaceProblem = null;
-      config = { ...config, orbWorkspace: validation.resolved };
-      saveOrbConfig(configPath, config);
+      if (isOrbWorkspace(validation.resolved, config.orbWorkspace)) return currentStatus();
       // A workspace change binds a fresh run: any in-flight work from the
       // previous workspace must not continue under the new one. An unconfirmed
       // screenshot and any desktop authorization belong to the previous run and must not
       // survive it either.
       revokeDesktopOperations("the workspace changed");
+      // Abort the old provider/queue before dropping its stream; changing cwd cannot orphan a turn.
+      try { if (session.running || session.pendingQuestionId) await session.abort(); }
+      catch (error) { lastWorkspaceProblem = `旧会话未能停止：${describeError(error)}`; return currentStatus(); }
+      const nextConfig = { ...config, orbWorkspace: validation.resolved };
+      saveOrbConfig(configPath, nextConfig);
+      config = nextConfig;
       defaultAccessPending = true;
       clearSelectionContext();
       if (!selectionMonitor) await startNativeSelectionMonitor();

@@ -1,0 +1,51 @@
+{
+  "capturedAt": "2026-10-04T14:40:36.527Z",
+  "version": "0.1.0-preview.3",
+  "checks": [
+    {
+      "name": "App Paths points to the installed executable",
+      "ok": true
+    },
+    {
+      "name": "installed archive is preview.3",
+      "ok": true
+    },
+    {
+      "name": "installed executable equals final audited build",
+      "ok": true
+    },
+    {
+      "name": "installed application icon equals reference-adapted product asset",
+      "ok": true
+    },
+    {
+      "name": "installed short-name startup brings up real Pi Web",
+      "ok": true
+    },
+    {
+      "name": "active bridge belongs to registered installed executable",
+      "ok": true
+    },
+    {
+      "name": "current user production backend owns no Windows console",
+      "ok": true
+    },
+    {
+      "name": "repeated ShellExecute retains bridge process and identity",
+      "ok": true
+    },
+    {
+      "name": "models and credentials are byte-identical",
+      "ok": true
+    },
+    {
+      "name": "existing chosen workspace and shortcut retained",
+      "ok": true
+    },
+    {
+      "name": "bundled plugin remains registered by official Pi CLI",
+      "ok": true
+    }
+  ],
+  "passed": true
+}

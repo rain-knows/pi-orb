@@ -9,6 +9,7 @@ import { dirname, join, resolve } from "node:path";
 import { homedir } from "node:os";
 import { promisify } from "node:util";
 import { createServer } from "node:net";
+import { createRequire } from "node:module";
 
 const execute = promisify(execFile);
 interface StartupRuntime {
@@ -59,6 +60,17 @@ function globalCli(shim: string, packageName: string, bin: string): string | und
     if (entry) return entry;
   }
   return undefined;
+}
+
+/** Start Pi Web's production build with Next's documented CLI, without an intermediate spawner.
+ * Pi Web 0.10 bin/pi-web.js uses this same package cwd and PI_WEB_HOSTNAME. No source edits/hooks.
+ */
+export function piWebServerLaunch(piWebCli: string, url: URL): { args: string[]; cwd: string } {
+  const root = resolve(dirname(piWebCli), "..");
+  if (packageCli(root, "@agegr/pi-web", "pi-web") !== resolve(piWebCli)) throw new Error("Pi Web 入口与官方包不匹配。");
+  if (!existsSync(join(root, ".next", "BUILD_ID"))) throw new Error("Pi Web 尚未完成生产构建；请先构建 Pi Web。");
+  const require = createRequire(piWebCli);
+  return { cwd: root, args: [require.resolve("next/dist/bin/next"), "start", "-p", url.port || "80", "-H", url.hostname] };
 }
 
 /** Refuse an occupied port even when the listener is not Pi Web. */
@@ -139,10 +151,11 @@ export async function preparePersonalStartup(options: PersonalStartupOptions): P
     runtime.piWebCli = selected;
     save();
   }
+  const launch = piWebServerLaunch(runtime.piWebCli, url);
   const log = openSync(join(options.userData, "pi-web-startup.log"), "a");
-  const child = spawn(runtime.node, [runtime.piWebCli, "--port", url.port || "80", "--hostname", url.hostname, "--no-open"], {
-    cwd: homedir(), windowsHide: true, detached: true, stdio: ["ignore", log, log],
-    env: { ...process.env, ...(options.password ? { PI_WEB_PASSWORD: options.password } : {}) },
+  const child = spawn(runtime.node, launch.args, {
+    cwd: launch.cwd, windowsHide: true, detached: true, stdio: ["ignore", log, log],
+    env: { ...process.env, PI_WEB_HOSTNAME: url.hostname, ...(options.password ? { PI_WEB_PASSWORD: options.password } : {}) },
   });
   closeSync(log);
   let failure: Error | undefined;

@@ -10,6 +10,13 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+### Windows 启动与工作区（preview.3，本地构建）
+
+- 直接隐藏运行 Pi Web 包的 Next.js 正式生产入口，消除启动器二次 spawn 的黑窗口；保留日志与后端复用。
+- 安装器、快捷方式、窗口与托盘统一使用参考图标底板加 Pi 标识，移除蓝色方块托盘。
+- 悬浮球右键和托盘增加工作区切换；取消/选择当前目录不改变会话，切换前停止旧任务并清理旧上下文。
+- Full Access 默认授权变更实时同步到界面，Stop、隐藏、断连等撤权仍有效。
+
 ### Windows 个人安装与启动（preview.2，本地构建）
 
 - 每用户安装后支持 Win+R `pi-orb`；第二实例唤回已有浮窗，不覆盖握手与快捷键。

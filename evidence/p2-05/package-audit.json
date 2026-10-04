@@ -1,9 +1,9 @@
 {
-  "capturedAt": "2026-10-04T12:51:48.094Z",
-  "version": "0.1.0-preview.2",
-  "appRoot": "release/0.1.0-preview.2/win-unpacked",
+  "capturedAt": "2026-10-04T14:39:24.416Z",
+  "version": "0.1.0-preview.3",
+  "appRoot": "release/0.1.0-preview.3/win-unpacked",
   "entries": {
-    "count": 2842,
+    "count": 2843,
     "sample": [
       "node_modules",
       "node_modules/@hono",
@@ -40,16 +40,16 @@
     "node_modules/uiohook-napi/prebuilds/win32-x64/uiohook-napi.node"
   ],
   "sizes": {
-    "executableBytes": 246090752,
-    "asarBytes": 36116559,
+    "executableBytes": 246038528,
+    "asarBytes": 36214662,
     "unpackedNativeBytes": 1834010,
-    "archiveEntryCount": 2842
+    "archiveEntryCount": 2843
   },
   "checks": [
     {
       "name": "the unpacked Windows build exists",
       "ok": true,
-      "detail": "release/0.1.0-preview.2/win-unpacked/pi-orb.exe"
+      "detail": "release/0.1.0-preview.3/win-unpacked/pi-orb.exe"
     },
     {
       "name": "the archive contains package.json",
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-B6NcydUX.css, out/renderer/assets/index-DL1-v5Ir.js, out/renderer/assets/observation-frame-CWh_eSAv.css"
+      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-B6NcydUX.css, out/renderer/assets/index-Beju4B_b.js, out/renderer/assets/observation-frame-CWh_eSAv.css"
     },
     {
       "name": "the archive ships no src/ files",
@@ -149,12 +149,12 @@
     {
       "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
       "ok": true,
-      "detail": "13829 bytes"
+      "detail": "14325 bytes"
     },
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "60606 bytes"
+      "detail": "61167 bytes"
     },
     {
       "name": "the independent plugin ships outside ASAR at the app version",
@@ -184,7 +184,7 @@
     {
       "name": "the shipped manifest carries the project version",
       "ok": true,
-      "detail": "0.1.0-preview.2 vs 0.1.0-preview.2"
+      "detail": "0.1.0-preview.3 vs 0.1.0-preview.3"
     },
     {
       "name": "the shipped manifest names no repository-only entry point",

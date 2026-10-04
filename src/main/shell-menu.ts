@@ -46,6 +46,7 @@ export interface ShellMenuActions {
   readonly onModel?: () => void;
   readonly onScreenshot?: () => void;
   readonly onShortcut?: () => void;
+  readonly onWorkspace?: () => void;
 }
 
 /**
@@ -59,6 +60,7 @@ export function shellMenuTemplate(
   actions: ShellMenuActions,
 ): MenuItemConstructorOptions[] {
   const utilities: MenuItemConstructorOptions[] = [];
+  if (actions.onWorkspace) utilities.push({ label: "切换工作区…", click: actions.onWorkspace });
   if (actions.onModel) utilities.push({ label: "选择模型", click: actions.onModel });
   if (actions.onScreenshot) utilities.push({ label: "截取屏幕", click: actions.onScreenshot });
   if (actions.onShortcut) utilities.push({ label: "修改唤醒快捷键…", click: actions.onShortcut });

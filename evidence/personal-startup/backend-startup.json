@@ -1,26 +1,34 @@
 {
-  "capturedAt": "2026-10-04T12:49:29.310Z",
-  "root": "D:\\pi-orb-personal-runs\\backend 中文 1791118169119",
-  "baseUrl": "http://127.0.0.1:61363",
+  "capturedAt": "2026-10-04T14:13:26.533Z",
+  "root": "D:\\pi-orb-personal-runs\\backend 中文 1791123206237",
+  "baseUrl": "http://127.0.0.1:49678",
   "checks": [
     {
       "name": "official Pi CLI registers the bundled plugin in isolated agent settings",
       "ok": true,
       "detail": [
-        "..\\..\\..\\workself\\pi-orb\\release\\0.1.0-preview.2\\win-unpacked\\resources\\pi-plugin"
+        "..\\..\\..\\workself\\pi-orb\\release\\0.1.0-preview.3\\win-unpacked\\resources\\pi-plugin"
       ]
     },
     {
       "name": "official Pi Web becomes ready without browser launch",
       "ok": true,
-      "detail": "--no-open; startup log in isolated userData"
+      "detail": "Next production CLI; startup log in isolated userData"
+    },
+    {
+      "name": "running Pi Web production server owns no Windows console",
+      "ok": true,
+      "detail": {
+        "backendPid": 92460,
+        "attachedConsole": false
+      }
     },
     {
       "name": "second startup reuses the same backend and registration",
       "ok": true,
       "detail": {
-        "backendPid": 50512,
-        "reusedPid": 50512
+        "backendPid": 92460,
+        "reusedPid": 92460
       }
     },
     {

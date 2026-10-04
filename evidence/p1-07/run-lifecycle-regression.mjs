@@ -23,6 +23,7 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const repo = resolve(import.meta.dirname, "..", "..");
+const checkWorkspaceUi = process.argv.includes("--workspace-ui");
 const runRoot = join("D:\\pi-orb-p1-runs", `p1-07-lifecycle-${Date.now()}`);
 const shellDataDir = join(runRoot, "shell-data");
 const configPath = join(runRoot, "orb-config.json");
@@ -280,6 +281,12 @@ try {
   // The session id the bridge is addressed with.
   const sessionId = typeof ensured === "string" && !ensured.startsWith("ERR:") ? ensured : null;
   const defaultStatus = await status();
+  if (checkWorkspaceUi) {
+    const fullSelected = await evaluate("document.getElementById('permission-label').textContent === '完全访问' && document.getElementById('access-full').getAttribute('aria-selected') === 'true'");
+    check("real renderer displays Full Access selected at startup", fullSelected === true, "actual main grant and actual renderer");
+    const noChange = JSON.parse(await evaluate(`window.orb.setWorkspace(${JSON.stringify(workspace)}, false).then(s => JSON.stringify(s))`));
+    check("selecting the current workspace preserves session and generation", noChange.sessionId === defaultStatus.sessionId && noChange.generation === defaultStatus.generation, "no new session");
+  }
   check("new Orb session defaults to Full Access bound to its session and generation", defaultStatus.desktopTask?.authorized === true && defaultStatus.desktopTask?.level === "full-access" && defaultStatus.desktopTask?.sessionId === sessionId && defaultStatus.desktopTask?.generation === generation, safe(defaultStatus.desktopTask));
 
   /** The bridge handshake written by the shell, used to read state from the main process. */
@@ -444,8 +451,23 @@ try {
   // A workspace switch replaces the old grant with the new session's default.
   const beforeWorkspaceSwitch = await status();
   await setAccess(beforeWorkspaceSwitch.generation);
+  let switchingActiveTurn = false;
+  if (checkWorkspaceUi) {
+    modelResponseDelayMs = 10000;
+    await evaluate(`window.orb.sendPrompt({ generation: ${beforeWorkspaceSwitch.generation}, text: 'cancel this turn when switching workspace' })`);
+    for (let attempt = 0; attempt < 40; attempt++) {
+      switchingActiveTurn = (await status()).busy === true;
+      if (switchingActiveTurn) break;
+      await sleep(50);
+    }
+  }
   await evaluate(`window.orb.setWorkspace(${JSON.stringify(nextWorkspace)}, true)`);
   const afterWorkspaceSwitch = await status();
+  if (checkWorkspaceUi) {
+    check("workspace switching stops a real active local-provider turn", switchingActiveTurn && !afterWorkspaceSwitch.busy && afterWorkspaceSwitch.sessionId !== beforeWorkspaceSwitch.sessionId, "active before switch, idle new session after switch");
+    const fullSelected = await evaluate("document.getElementById('permission-label').textContent === '完全访问' && document.getElementById('access-full').getAttribute('aria-selected') === 'true'");
+    check("real renderer selects the new workspace's Full Access grant", fullSelected === true, "actual access update event");
+  }
   report.workspaceSwitch = { before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch };
   check("workspace switch replaces the old grant with Full Access for the new session generation", afterWorkspaceSwitch.desktopTask?.authorized === true && afterWorkspaceSwitch.desktopTask?.level === "full-access" && afterWorkspaceSwitch.desktopTask?.sessionId === afterWorkspaceSwitch.sessionId && afterWorkspaceSwitch.desktopTask?.generation === afterWorkspaceSwitch.generation && afterWorkspaceSwitch.workspace === nextWorkspace && afterWorkspaceSwitch.sessionId !== sessionId && afterWorkspaceSwitch.generation !== generation, safe({ before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch }).slice(0, 500));
 

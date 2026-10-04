@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-04T12:43:45.138Z",
-  "root": "D:\\pi-orb-personal-runs\\plugin 中文 1791117802543",
-  "version": "0.1.0-preview.2",
+  "capturedAt": "2026-10-04T14:11:56.379Z",
+  "root": "D:\\pi-orb-personal-runs\\plugin 中文 1791123087512",
+  "version": "0.1.0-preview.3",
   "checks": [
     {
       "name": "ordinary: real Pi loader accepts packaged independent extension",

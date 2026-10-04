@@ -18,6 +18,7 @@ function copyNativeScripts(): Plugin {
     name: "pi-orb:copy-native-scripts",
     apply: "build",
     generateBundle() {
+      this.emitFile({ type: "asset", fileName: "icon.png", source: readFileSync(resolve(__dirname, "resources/icon.png")) });
       for (const name of ["foreground-window.ps1"]) {
         this.emitFile({
           type: "asset",
