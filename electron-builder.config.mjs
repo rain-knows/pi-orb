@@ -38,6 +38,7 @@ export default {
   // (`apps/desktop/scripts/runtime-file-policy.ts:42`); these patterns are the pi-orb form of it.
   files: [
     "out/**/*",
+    "!out/pi-plugin/**",
     "package.json",
     "!**/*.map",
     "!node_modules/koffi/doc/**",
@@ -67,6 +68,10 @@ export default {
   asarUnpack: ["**/*.{node,dll,exe}"],
   // The packaged app carries its own license obligations with it, not only in the repository.
   extraResources: [
+    { from: "out/pi-plugin", to: "pi-plugin" },
+    // electron-builder deliberately filters a mapping's root node_modules directory.
+    // A separate mapping retains the plugin's independent runtime dependency graph.
+    { from: "out/pi-plugin/node_modules", to: "pi-plugin/node_modules" },
     { from: "LICENSE", to: "LICENSE" },
     { from: "THIRD_PARTY_NOTICES.md", to: "THIRD_PARTY_NOTICES.md" },
     { from: "CHANGELOG.md", to: "CHANGELOG.md" },
@@ -76,6 +81,7 @@ export default {
     target: ["nsis"],
   },
   nsis: {
+    include: "resources/installer.nsh",
     oneClick: false,
     perMachine: false,
     allowElevation: false,

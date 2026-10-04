@@ -50,7 +50,7 @@ describe("Orb tool naming", () => {
 
   it("exposes reference actions supported by the Windows backend", () => {
     expect(Object.values(ORB_TOOLS)).toEqual([
-      "orb_observe", "orb_batch", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app", "orb_wait", "orb_long_wait", "orb_list_apps",
+      "orb_observe", "orb_batch", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app", "orb_wait", "orb_long_wait", "orb_list_apps", "orb_browser",
     ]);
   });
 });
@@ -295,7 +295,7 @@ describe("describeOrbModeSection", () => {
   it("states that access is session-level and a matching directory is not authorization", () => {
     expect(section).toMatch(/never grants it/i);
     expect(section).toMatch(/Read Only.*Workspace Write.*Full Access/s);
-    expect(section).toContain("New Orb sessions default to Full Access");
+    expect(section).toContain("New Orb sessions and explicitly reopening a hidden Orb default to Full Access");
     expect(section).toMatch(/current foreground application/i);
     expect(section).toMatch(/review and confirm/i);
   });

@@ -55,6 +55,23 @@ function backendFake(calls: unknown[]) {
 }
 
 describe("ReferenceWindowsDriver", () => {
+  it("waits across a navigation title change and publishes the resulting observation without input", async () => {
+    const { ops } = opsFake();
+    const original = ops.listWindows;
+    let loaded = false;
+    ops.listWindows = () => ({ ...original(), windows: original().windows.map(window =>
+      window.hwnd === 42 && loaded ? { ...window, title: "Official account - Browser" } : window) });
+    const calls: unknown[] = [];
+    const targets: string[] = [];
+    const driver = new ReferenceWindowsDriver({ ops, backend: backendFake(calls), ownProcessId: 1,
+      onTargetChanged: window => targets.push(window.title) });
+    const initial = (await driver.observe({ includeImage: true })).observation!;
+    loaded = true;
+    const result = await driver.act({ kind: "wait", observationId: initial.observationId }, initial);
+    expect(result).toMatchObject({ ok: true, observation: { window: { title: "Official account - Browser" } } });
+    expect(calls).toEqual([]);
+    expect(targets).toEqual(["Disposable target", "Official account - Browser"]);
+  });
   it("refuses input if the observed window moves or resizes before execution", async () => {
     for (const field of ["x", "y", "width", "height"] as const) {
       const { ops } = opsFake();

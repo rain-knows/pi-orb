@@ -1,0 +1,44 @@
+{
+  "capturedAt": "2026-10-04T12:01:28.434Z",
+  "root": "D:\\pi-orb-personal-runs\\plugin 中文 1791115270892",
+  "version": "0.1.0-preview.1",
+  "checks": [
+    {
+      "name": "ordinary: real Pi loader accepts packaged independent extension",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "ordinary: native tools follow workspace boundary",
+      "ok": true,
+      "detail": [
+        "orb_browser"
+      ]
+    },
+    {
+      "name": "orb: real Pi loader accepts packaged independent extension",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "orb: native tools follow workspace boundary",
+      "ok": false,
+      "detail": [
+        "orb_browser",
+        "orb_observe",
+        "orb_click",
+        "orb_type",
+        "orb_scroll",
+        "orb_hotkey",
+        "orb_long_press",
+        "orb_open_app",
+        "orb_drag",
+        "orb_wait",
+        "orb_long_wait",
+        "orb_list_apps",
+        "orb_batch"
+      ]
+    }
+  ],
+  "passed": false
+}

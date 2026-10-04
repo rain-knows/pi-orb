@@ -3,6 +3,10 @@
 本文件记录 P2-05 的阶段决策、参考项目来源与验收边界。结论的唯一来源仍是
 [`support-matrix.md`](./support-matrix.md)；可复现证据在 [`../evidence/p2-05/`](../evidence/p2-05/README.md)。
 
+2026-10-04 preview.2 追加独立 Pi 插件、Win+R App Paths 与个人启动准备，见
+[`personal-user-installation.md`](./personal-user-installation.md)。本仓库 installer.nsh 仅使用
+公开 NSIS hooks，仍不搬参考替换模板的管道。下文保留原 P2-05 形态决策。
+
 ## 1. 本阶段要解决的问题
 
 在这个阶段之前，pi-orb 只有「源码 + `npm run dev`」这一种存在形式：没有任何可分发产物，

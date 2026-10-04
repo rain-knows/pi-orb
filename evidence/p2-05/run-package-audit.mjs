@@ -164,6 +164,15 @@ for (const notice of ["LICENSE", "THIRD_PARTY_NOTICES.md", "CHANGELOG.md"]) {
 }
 
 const shippedManifest = JSON.parse(extractFile(asarPath, "package.json").toString("utf8"));
+const pluginRoot = join(resources, "pi-plugin");
+const pluginManifest = existsSync(join(pluginRoot, "package.json"))
+  ? JSON.parse(readFileSync(join(pluginRoot, "package.json"), "utf8")) : null;
+check("the independent plugin ships outside ASAR at the app version",
+  pluginManifest?.version === packageJson.version && existsSync(join(pluginRoot, "orb.cjs")), "resources/pi-plugin");
+check("the independent plugin carries browser runtime dependencies",
+  ["@playwright/mcp", "@modelcontextprotocol/sdk"].every(name => existsSync(join(pluginRoot, "node_modules", name, "package.json"))), "MCP and Playwright are real files");
+check("the independent plugin does not carry a second Pi SDK",
+  !existsSync(join(pluginRoot, "node_modules/@earendil-works/pi-coding-agent")), "Pi and typebox remain host-provided peers");
 const shippedKoffi = JSON.parse(extractFile(asarPath, join("node_modules","koffi","package.json")).toString("utf8"));
 const installedKoffi = JSON.parse(readFileSync(join(repo,"node_modules/koffi/package.json"),"utf8"));
 check("the packaged Koffi version matches the pinned production dependency",

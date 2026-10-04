@@ -10,7 +10,7 @@
 ## 复现
 
 ```powershell
-# 三步一起跑：构建解包产物 → 内容审计 → 启动打包后的产物并驱动其 renderer
+# 四步一起跑：构建 → 内容审计 → 真实 Pi 加载插件 → 启动并驱动 renderer
 node evidence/p2-05/run-p2-05.mjs
 
 # 也可以分开跑（需要先有 release/<version>/win-unpacked）
@@ -18,9 +18,9 @@ node evidence/p2-05/run-package-audit.mjs
 node evidence/p2-05/run-packaged-smoke.mjs
 ```
 
-`run-p2-05.mjs` 写 `stage-result.json`（三步的合并结论），两个探针各自写自己的 JSON。
+`run-p2-05.mjs` 写 `stage-result.json`（四步合并结论），插件加载记录在 `../personal-startup/plugin-load.json`。
 
-## 1. 内容审计：`package-audit.json`（27/27 通过）
+## 1. 内容审计：`package-audit.json`（30/30 通过）
 
 审计读取 `release/<version>/win-unpacked`，不重新构建。
 

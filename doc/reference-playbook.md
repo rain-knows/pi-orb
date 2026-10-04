@@ -177,7 +177,7 @@ D:\workself\pi-orb\
 | `apps/desktop/renderer/floating.css` | 面板、圆角、停靠 tab、暗色主题 | `src/renderer/floating.css` | **直接移植**布局、设计令牌、交互状态、暗色及动效；删除 DSH iframe/TCC 专用选择器；Pi 表面补丁在 `orb-surface.css` |
 | `apps/desktop/renderer/floating.js` | hover 展开、pin、历史/权限浮层、键盘焦点 | `src/renderer/floating.js` | **移植状态机**及输入行为；`window.dshDesktop`、RPC、NDJSON 和 iframe 转为现有 `window.orb` 及 Pi Web 会话事件，无 dsh 兼容层 |
 | `apps/desktop/src/floating-agent-menu.ts` | 右键菜单模型（主窗、设置、轨道模型、退出） | `src/main/shell-menu.ts` | **部分移植**：结构取自参考的 `floatingContextMenuTemplate`（`floating-window.ts:55-129`）——可编辑时置顶 `cut/copy/paste/selectAll` 角色块（由焦点字段的 `editFlags` 逐项 `enabled`），其下是壳层动作。参考的「打开主窗口」换成「隐藏浮球」（pi-orb 无自有主窗，pi-web 才是会话 UI），Quit 保留。**不移植**：Agent 模型设置（pi-orb 不另立模型配置）、选区工具栏开关与毫坐标开关（无对应物） |
-| `apps/desktop/src/orb-permission.ts` | 浮球权限模型与 `read-only` / `workspace-write` / `danger-full-access` presets | `src/main/index.ts`、`desktop-task.ts`、`src/shared/ipc.ts` | **复用能力等级语义和默认值，适配授权主体**：新 Orb session 默认 `Full Access`，绑定 session/generation；Stop/hide 撤权后须在 Access 芯片重新选择。不持久化参考项目的 profile preset；`Full Access` 对应参考 `danger-full-access` |
+| `apps/desktop/src/orb-permission.ts` | 浮球权限模型与 `read-only` / `workspace-write` / `danger-full-access` presets | `src/main/index.ts`、`desktop-task.ts`、`src/shared/ipc.ts` | **复用能力等级语义和默认值，适配授权主体**：新 Orb session 默认 `Full Access`，绑定 session/generation；Stop 后须重新选择 Access；按 2026-10-01 用户要求，明确重开隐藏的 Orb 也选完全访问，聚焦已显示窗口不改权限。不持久化参考项目的 profile preset |
 | `apps/desktop/src/orb-agent-models.ts` | 浮球轨道模型选择与思考档 | 未移植 | 不适用：pi-orb 不另立模型配置 |
 | `apps/desktop/renderer/deepseek-avatar-square.gif` | 浮球 GIF 动效资源 | `src/renderer/deepseek-avatar-square.gif` | **直接复用**固定提交的 MIT 素材；pi-orb 按浮球状态播放/冻结，不移植 `orb-avatar.ts` 的用户自定义头像存储 |
 | `apps/desktop/src/observation-frame-window.ts` | 观察框原生 overlay（点透、不进截图） | `src/main/observation-frame.ts`、`src/renderer/observation-frame.{html,css}` | **已移植**：几何（stroke 8 / glow 28 / outset 36、work-area 裁剪不位移、DIP 换算）、窗口构造（`setIgnoreMouseEvents(true,{forward:true})` 点透、`contentProtection` 不进截图、`showInactive` 不抢焦点、`roundedCorners:false`）、renderer 渐变遮罩挖空。宿主调用面不同：pi-orb 在 `withGuiTurn` 里画、在统一撤权出口隐藏，参考由 dsh 的 observation lifecycle 驱动 |
@@ -442,7 +442,7 @@ D:\workself\pi-orb\
 **不可让步的三条**（pi-orb 的宿主授权边界）：
 
 1. 每次 observe 按参考规则选择前台或最上层合格原生应用并排除 Orb；单步 action 只能使用最新 observation；orb_batch 整批绑定初始观察、仅包含初始可见且独立的目标，由宿主逐步采用新的观察；动作前目标身份变化时必须重新观察，批次内观察区域或身份变化时停止后续动作。
-2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话默认完全访问，Stop／hide／断连后不静默重授。截图消息必须另经用户预览确认。唤醒、cwd 匹配、`/orb` 字符串都不构成授权。
+2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话及明确重开隐藏的 Orb 默认完全访问，Stop／hide／断连立即撤权，不由后台事件静默重授。截图消息必须另经用户预览确认。cwd 匹配、`/orb` 字符串都不构成授权；2026-10-01 的重开默认值是用户明确要求的 shell 授权行为，详见 `doc/session-continuity.md`。
 3. 断连、换 workspace/session、收起、Stop、退出都必须撤权并释放按键／鼠标／监听器；turn idle 与普通回复完成不撤权。
 
 ## 9. E/F 面：工程、验证与文档约定
@@ -526,7 +526,8 @@ D:\workself\pi-orb\
 **改动打包配置前必须先看的三个非默认决定**（理由写在 `electron-builder.config.mjs` 与
 `doc/p2-05-distribution.md` §4）：`npmRebuild: false`（发出去的必须是证据测过的预编译二进制）、
 `files` 排除段（否则 smart unpack 会把 C++ 源码与其它平台二进制打进包）、
-图标由已批准的 `orb-avatar.png` 派生（不新增品牌素材）。
+图标初版由已批准的 `orb-avatar.png` 派生；preview.3 按用户要求复用参考 SVG 的底板与阴影，
+替换为 π 主体，SVG/PNG/ICO 同源。许可已核对，见 §18 和 `THIRD_PARTY_NOTICES.md`。
 
 验证一律走 `node evidence/p2-05/run-p2-05.mjs`（构建 → 内容审计 → 启动打包产物），
 不要用“安装包构建成功”代替内容与运行证据。
@@ -667,3 +668,23 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 ## 16. 工具调用提速适配
 
 参考没有 Pi observation_id 批量桥接和请求关联计时。此前阶段见 [`tool-speed-optimization.md`](./tool-speed-optimization.md)，当前像素契约和小控件实测见 [`plugin-reference-and-pointing.md`](./plugin-reference-and-pointing.md)。桥接仅 v2，所有桌面工具 sequential；保留最新一张请求截图，历史不改；1500 次等待对照不满足缩短条件，生产保留 600ms。不复制 dsh 调度器或图片存储。
+
+## 17. 个人用户安装与启动适配
+
+参考没有 Pi 包登记、独立 Pi 插件分发和本机现有 Pi Web 的启动入口。实现见
+[`personal-user-installation.md`](./personal-user-installation.md)：沿用 §9.4 的每用户 NSIS，
+仅用 electron-builder 公开 include/hooks 登记 App Paths 与卸载清理，不复制上游自定义页面
+或字符串替换模板。用现有 Vite 构建独立插件，宿主 SDK 保持 peer，经官方 Pi CLI 注册。
+主进程单实例锁与既有唤醒出口结合；已有后端优先、未运行才隐藏启动官方入口，不重启共享服务。
+来源仍为固定旧提交的 desktop main/welcome/config，差异理由及真机证据见该阶段文档。
+
+## 18. Windows 启动、图标与工作区入口修正
+
+本轮先核对固定旧提交的 resources/icon-windows.svg、src/floating-window.ts:55-129、
+src/orb-permission.ts 与 src/project-manager.ts。复用图标底板/阴影及原生上下文菜单；
+图标主体替换为 Pi 的数学符号，不沿用 DeepSeek 品牌标志。参考的 project-manager 管理固定
+运行时目录，没有用户文件夹切换器；Pi 侧通过已有文件选择、generation/session 切换做最小适配。
+Full Access 保持参考默认值，授权变更实时送到 renderer，撤权规则保留。
+Pi Web CLI 的二次 spawn 没有 windowsHide；Orb 从已验证 Pi Web 包解析其 Next.js 正式
+生产入口直接隐藏启动，保留 cwd、hostname、日志与共享服务复用，不改上游或 monkey patch。
+实施和证据见 `windows-startup-and-workspaces.md`。

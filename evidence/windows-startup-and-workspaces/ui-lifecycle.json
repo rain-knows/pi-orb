@@ -1,0 +1,302 @@
+{
+  "capturedAt": "2026-10-04T14:22:46.558Z",
+  "checks": [
+    {
+      "name": "real renderer displays Full Access selected at startup",
+      "ok": true,
+      "detail": "actual main grant and actual renderer"
+    },
+    {
+      "name": "selecting the current workspace preserves session and generation",
+      "ok": true,
+      "detail": "no new session"
+    },
+    {
+      "name": "new Orb session defaults to Full Access bound to its session and generation",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"full-access\",\"sessionId\":\"01a1074b-e7cb-75b2-9887-a9d31d58d707\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "a session exists before Access is granted",
+      "ok": true,
+      "detail": "01a1074b-e7cb-75b2-9887-a9d31d58d707"
+    },
+    {
+      "name": "Workspace Write binds to the current session and generation",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a1074b-e7cb-75b2-9887-a9d31d58d707\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "three queued prompts used the local Pi model",
+      "ok": true,
+      "detail": "requests=3"
+    },
+    {
+      "name": "the same session and Workspace Write grant survive queued turns and idle",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1791123766553\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application already owns this shortcut. Choose a different one.\",\"generation\":1,\"busy\":fals…"
+    },
+    {
+      "name": "Stop was exercised while a prompt was running",
+      "ok": true,
+      "detail": "{\"runningBeforeStop\":true,\"stopped\":true,\"status\":{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1791123766553\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application already owns this shortcut. C…"
+    },
+    {
+      "name": "Stop revokes Access but preserves the Pi session and generation",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1791123766553\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application already owns this shortcut. Choose a different one.\",\"generation\":1,\"busy\":fals…"
+    },
+    {
+      "name": "ensuring the stopped session does not silently restore Full Access",
+      "ok": true,
+      "detail": "{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "observation succeeds on a disposable native target",
+      "ok": true,
+      "detail": "{\"id\":\"460244\",\"pid\":89072,\"title\":\"Orb speed target\",\"appName\":\"electron\",\"bounds\":{\"x\":279,\"y\":105,\"width\":957,\"height\":1266}}"
+    },
+    {
+      "name": "frame persists after the native tool while the model is thinking",
+      "ok": true,
+      "detail": "{\"busy\":true,\"frames\":[{\"id\":2,\"visible\":true,\"bounds\":{\"x\":150,\"y\":34,\"width\":710,\"height\":916},\"url\":\"file:///D:/workself/pi-orb/out/renderer/observation-frame.html\"}]}"
+    },
+    {
+      "name": "frame disappears when the Pi turn becomes idle",
+      "ok": true,
+      "detail": "[{\"id\":2,\"visible\":false,\"bounds\":{\"x\":150,\"y\":34,\"width\":710,\"height\":916},\"url\":\"file:///D:/workself/pi-orb/out/renderer/observation-frame.html\"}]"
+    },
+    {
+      "name": "DOM tools return a real Chrome snapshot through the production bridge",
+      "ok": true,
+      "detail": "{\"ok\":true,\"result\":{\"ok\":true,\"content\":[{\"type\":\"text\",\"text\":\"### Page\\n- Page URL: about:blank\\n- Page Title: Orb lifecycle browser fixture\\n### Snapshot\\n```yaml\\n- heading \\\"Disposable browser target\\\" [level=1] [ref=e2]\\n```\"}]}}"
+    },
+    {
+      "name": "browser ribbon persists after the DOM tool while the model is thinking",
+      "ok": true,
+      "detail": "{\"busy\":true,\"frames\":[{\"id\":2,\"visible\":true,\"bounds\":{\"x\":0,\"y\":0,\"width\":1336,\"height\":848},\"url\":\"file:///D:/workself/pi-orb/out/renderer/observation-frame.html\"}]}"
+    },
+    {
+      "name": "browser ribbon disappears when the Pi turn becomes idle",
+      "ok": true,
+      "detail": "[{\"id\":2,\"visible\":false,\"bounds\":{\"x\":0,\"y\":0,\"width\":1336,\"height\":848},\"url\":\"file:///D:/workself/pi-orb/out/renderer/observation-frame.html\"}]"
+    },
+    {
+      "name": "collapsing the orb revokes session Access",
+      "ok": true,
+      "detail": "{\"beforeAuthorized\":true,\"bridgeAuthorizedBefore\":true,\"collapseResponse\":\"{\\\"authorized\\\":false,\\\"level\\\":null,\\\"sessionId\\\":null,\\\"generation\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridgeReady\\\":true}\",\"bridgeAuthorizedAfter\":false,\"bridgeStatusAfter\":\"{\\\"ok\\\"…"
+    },
+    {
+      "name": "collapse clears the observation frame",
+      "ok": true,
+      "detail": "[{\"id\":2,\"visible\":false,\"bounds\":{\"x\":0,\"y\":0,\"width\":1336,\"height\":848},\"url\":\"file:///D:/workself/pi-orb/out/renderer/observation-frame.html\"}]"
+    },
+    {
+      "name": "explicitly reopening the hidden Orb selects Full Access on the same session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"full-access\",\"sessionId\":\"01a1074b-e7cb-75b2-9887-a9d31d58d707\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "workspace switching stops a real active local-provider turn",
+      "ok": true,
+      "detail": "active before switch, idle new session after switch"
+    },
+    {
+      "name": "real renderer selects the new workspace's Full Access grant",
+      "ok": true,
+      "detail": "actual access update event"
+    },
+    {
+      "name": "workspace switch replaces the old grant with Full Access for the new session generation",
+      "ok": true,
+      "detail": "{\"before\":{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1791123766553\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application already owns this shortcut. Choose a different one.\",\"generation\":1,\"…"
+    },
+    {
+      "name": "new conversation replaces the old grant with its own Full Access default",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-07-lifecycle-1791123766553\\\\orb-workspace-next\",\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application already owns this shortcut. Choose a different one.\",\"generation\":2,\"busy\"…"
+    },
+    {
+      "name": "the shell survived the lifecycle sequence",
+      "ok": true,
+      "detail": "exitCode=null"
+    },
+    {
+      "name": "losing the pi-web connection revokes desktop authority",
+      "ok": true,
+      "detail": "{\"regranted\":\"\\\"{\\\\\\\"authorized\\\\\\\":true,\\\\\\\"level\\\\\\\":\\\\\\\"workspace-write\\\\\\\",\\\\\\\"sessionId\\\\\\\":\\\\\\\"01a1074c-4694-75b2-9887-a9d789800149\\\\\\\",\\\\\\\"generation\\\\\\\":2,\\\\\\\"stopped\\\\\\\":false,\\\\\\\"stoppedReason\\\\\\\":null,\\\\\\\"lastObservationId\\\\\\\":null,\\\\\\\"bridge\",\"bridgeAuthorizedBefore\":true,\"piWebPid\":9288…"
+    }
+  ],
+  "passed": true,
+  "environment": {
+    "generation": 1,
+    "ensureResult": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+    "piWebReachable": true
+  },
+  "access": {
+    "authorized": true,
+    "level": "workspace-write",
+    "sessionId": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+    "generation": 1,
+    "stopped": false,
+    "stoppedReason": null,
+    "lastObservationId": null,
+    "bridgeReady": true
+  },
+  "queuedTurns": {
+    "modelRequestCount": 3,
+    "status": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1791123766553\\orb-workspace",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": false,
+      "shortcutProblem": "Another application already owns this shortcut. Choose a different one.",
+      "generation": 1,
+      "busy": false,
+      "sessionId": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": true,
+        "level": "workspace-write",
+        "sessionId": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+        "generation": 1,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    }
+  },
+  "stop": {
+    "runningBeforeStop": true,
+    "stopped": true,
+    "status": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1791123766553\\orb-workspace",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": false,
+      "shortcutProblem": "Another application already owns this shortcut. Choose a different one.",
+      "generation": 1,
+      "busy": false,
+      "sessionId": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    }
+  },
+  "collapse": {
+    "beforeAuthorized": true,
+    "bridgeAuthorizedBefore": true,
+    "collapseResponse": "{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}",
+    "bridgeAuthorizedAfter": false,
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+  },
+  "workspaceSwitch": {
+    "before": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1791123766553\\orb-workspace",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": false,
+      "shortcutProblem": "Another application already owns this shortcut. Choose a different one.",
+      "generation": 1,
+      "busy": false,
+      "sessionId": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": true,
+        "level": "full-access",
+        "sessionId": "01a1074b-e7cb-75b2-9887-a9d31d58d707",
+        "generation": 1,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "after": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1791123766553\\orb-workspace-next",
+      "problem": null,
+      "shortcut": "CommandOrControl+Shift+Space",
+      "shortcutRegistered": false,
+      "shortcutProblem": "Another application already owns this shortcut. Choose a different one.",
+      "generation": 2,
+      "busy": false,
+      "sessionId": "01a1074c-45a0-75b2-9887-a9d4f3400b40",
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:31422",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": true,
+        "level": "full-access",
+        "sessionId": "01a1074c-45a0-75b2-9887-a9d4f3400b40",
+        "generation": 2,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    }
+  },
+  "newSession": {
+    "configured": true,
+    "workspace": "D:\\pi-orb-p1-runs\\p1-07-lifecycle-1791123766553\\orb-workspace-next",
+    "problem": null,
+    "shortcut": "CommandOrControl+Shift+Space",
+    "shortcutRegistered": false,
+    "shortcutProblem": "Another application already owns this shortcut. Choose a different one.",
+    "generation": 2,
+    "busy": false,
+    "sessionId": "01a1074c-4694-75b2-9887-a9d789800149",
+    "piWeb": {
+      "baseUrl": "http://127.0.0.1:31422",
+      "reachable": true,
+      "problem": null
+    },
+    "desktopTask": {
+      "authorized": true,
+      "level": "full-access",
+      "sessionId": "01a1074c-4694-75b2-9887-a9d789800149",
+      "generation": 2,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    }
+  },
+  "disconnect": {
+    "regranted": "\"{\\\"authorized\\\":true,\\\"level\\\":\\\"workspace-write\\\",\\\"sessionId\\\":\\\"01a1074c-4694-75b2-9887-a9d789800149\\\",\\\"generation\\\":2,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridge",
+    "bridgeAuthorizedBefore": true,
+    "piWebPid": 92880,
+    "sessionId": "01a1074c-4694-75b2-9887-a9d789800149",
+    "generation": 2,
+    "refreshResult": "\"{\\\"authorized\\\":false,\\\"level\\\":null,\\\"sessionId\\\":null,\\\"generation\\\":null,\\\"stopped\\\":false,\\\"stoppedReason\\\":null,\\\"lastObservationId\\\":null,\\\"bridgeReady\\\":true}\"",
+    "bridgeAuthorizedAfter": false,
+    "bridgeStatusAfter": "{\"ok\":true,\"result\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+  }
+}

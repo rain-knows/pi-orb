@@ -4,6 +4,7 @@ import type { PiWebClient } from "../src/main/pi-web-client";
 import type { OrbSessionEvent } from "@shared/ipc";
 import {
   agentEnd,
+  promptDone,
   assistantError,
   assistantMessageEnd,
   assistantMessageStart,
@@ -60,6 +61,82 @@ function setup() {
 }
 
 describe("OrbSessionController", () => {
+  it("rejects old stream events immediately when workspace or history session changes", async () => {
+    const { controller, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("first");
+    const first = client.delivered[0]!;
+    first(promptDone());
+    await controller.ensureSession("C:\\work\\other");
+    first({ type: "agent_start" });
+    expect(controller.running).toBe(false);
+    await controller.prompt("second");
+    const second = client.delivered[1]!;
+    second(promptDone());
+    await controller.openExistingSession("C:\\work\\other", "history-session");
+    second({ type: "agent_start" });
+    expect(controller.running).toBe(false);
+  });
+
+  it("keeps retries, compaction and extension follow-ups in one prompt until prompt_done", async () => {
+    const { controller, client, events } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("first");
+    await controller.prompt("queued");
+    const deliver = client.delivered[0]!;
+    deliver(assistantMessageEnd([{ type: "text", text: "first response" }]));
+    deliver(agentEnd());
+    deliver({ type: "auto_compaction_start" });
+    deliver({ type: "agent_start" });
+    deliver(assistantMessageEnd([{ type: "text", text: "follow-up response" }]));
+    deliver(agentEnd());
+    deliver({ type: "agent_settled" });
+    expect(controller.running).toBe(true);
+    expect(client.prompt).toHaveBeenCalledTimes(1);
+    expect(events.filter(event => event.type === "idle")).toHaveLength(0);
+    deliver(promptDone());
+    await expect.poll(() => client.prompt.mock.calls.length).toBe(2);
+    // An event buffered on the previous stream cannot complete the queued prompt.
+    deliver(promptDone());
+    expect(controller.running).toBe(true);
+    client.delivered[1]!(promptDone());
+    expect(controller.running).toBe(false);
+  });
+
+  it("completes extension-only runs on agent_settled and reports asynchronous prompt errors", async () => {
+    const { controller, client, events } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("start");
+    const deliver = client.delivered[0]!;
+    deliver({ type: "prompt_error", errorMessage: "provider unavailable" });
+    expect(events).toContainEqual({ type: "error", message: "provider unavailable" });
+    expect(controller.running).toBe(true);
+    deliver(promptDone());
+    deliver({ type: "agent_start" });
+    expect(controller.running).toBe(true);
+    deliver(textDelta("extension reply"));
+    deliver(agentEnd());
+    expect(controller.running).toBe(true);
+    deliver({ type: "agent_settled" });
+    expect(controller.running).toBe(false);
+    expect(events).toContainEqual({ type: "assistant-message", text: "extension reply" });
+  });
+
+  it("ignores buffered completion and agent starts after Stop", async () => {
+    const { controller, client } = setup();
+    await controller.ensureSession("C:\\work\\orb");
+    await controller.prompt("old");
+    const old = client.delivered[0]!;
+    await controller.abort();
+    old({ type: "agent_start" });
+    expect(controller.running).toBe(false);
+    await controller.prompt("new");
+    old(promptDone());
+    expect(controller.running).toBe(true);
+    client.delivered[1]!(promptDone());
+    expect(controller.running).toBe(false);
+  });
+
   it("projects batch progress and measures new responses without counting same-response tool gaps", async () => {
     const { controller, client, events, logs } = setup();
     await controller.ensureSession("C:\\orb");
@@ -129,7 +206,7 @@ describe("OrbSessionController", () => {
     const { client, controller } = setup();
     const first = await controller.ensureSession("C:\\work\\orb");
     await controller.prompt("hello");
-    client.delivered[0]!(agentEnd());
+    client.delivered[0]!(promptDone());
     const second = await controller.newConversation("C:\\work\\orb");
     expect(second).not.toBe(first);
     expect(client.createSession).toHaveBeenCalledTimes(2);
@@ -193,15 +270,15 @@ describe("OrbSessionController", () => {
     expect(events).toContainEqual({ type: "queued", count: 1 });
     expect(events).toContainEqual({ type: "queued", count: 2 });
 
-    client.delivered[0]!(agentEnd());
+    client.delivered[0]!(promptDone());
     await expect.poll(() => client.prompt.mock.calls.length).toBe(2);
     expect(client.prompt.mock.calls[1]).toEqual(["session-1", "second", undefined, "C:\\work\\orb"]);
-    client.delivered[1]!(agentEnd());
+    client.delivered[1]!(promptDone());
     await expect.poll(() => client.prompt.mock.calls.length).toBe(3);
     expect(client.prompt.mock.calls[2]).toEqual(["session-1", "third", undefined, "C:\\work\\orb"]);
     expect(events.filter((event) => event.type === "idle")).toHaveLength(0);
 
-    client.delivered[2]!(agentEnd());
+    client.delivered[2]!(promptDone());
     expect(controller.running).toBe(false);
     expect(events.filter((event) => event.type === "idle")).toHaveLength(1);
   });
@@ -218,6 +295,7 @@ describe("OrbSessionController", () => {
     deliver(textDelta("tial"));
     deliver(assistantMessageEnd());
     deliver(agentEnd());
+    deliver(promptDone());
 
     const deltas = events.filter((event) => event.type === "assistant-delta");
     expect(deltas.map((event) => (event as { text: string }).text)).toEqual(["par", "tial"]);

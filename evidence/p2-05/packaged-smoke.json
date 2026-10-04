@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-01T02:45:56.903Z",
-  "executable": "release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790822756903",
+  "capturedAt": "2026-10-04T14:39:37.804Z",
+  "executable": "release\\0.1.0-preview.3\\win-unpacked\\pi-orb.exe",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1791124777803",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": "pi-orb"
+      "detail": ""
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -26,7 +26,7 @@
     {
       "name": "the packaged app answers IPC status",
       "ok": true,
-      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"b"
+      "detail": "{\"configured\":false,\"workspace\":null,\"problem\":null,\"shortcut\":\"CommandOrControl+Shift+Space\",\"shortcutRegistered\":false,\"shortcutProblem\":\"Another application "
     },
     {
       "name": "the packaged app starts in the isolated unconfigured state",
@@ -86,7 +86,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-40452",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/efe12881-3886-4c95-a8d2-5092539cc961"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-86092",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/4fc0bf69-7523-407a-9586-fe87cd35041b\n[pi-orb] wake shortcut not registered: Another application already owns this shortcut. Choose a different one."
 }

@@ -2,9 +2,11 @@
 
 基于 [pi-web](https://github.com/agegr/pi-web) 的开源 Electron 桌面悬浮助手。在浮球中聊天、查看历史、分享截图，并让支持图像与工具调用的模型操作桌面。
 
-pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复用它的会话引擎、模型配置、凭据和插件加载机制。普通 pi-web 会话保持原有行为；Orb 工具只在选定的专用工作区中注册。
+pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复用它的会话引擎、模型配置、凭据和插件加载机制。原生桌面工具只在选定的 Orb 工作区注册；Playwright 浏览器工具按用户要求开放给普通 Pi/Pi Web 会话。
 
-**当前版本：`0.1.0-preview.1`，Windows x64 未签名预览版。** P1/P2 已有实现和分阶段证据，但尚未完成完整 v0.1 的人工验收。未验证（unverified）项见[支持矩阵](./doc/support-matrix.md)。
+**当前源码：`0.1.0-preview.3`，Windows x64 未签名预览版，尚未发布。** 已发布的 `preview.1` 使用旧安装流程；下面的个人用户流程适用于本地构建的 `preview.3`。完整 v0.1 的人工验收仍未完成，未验证（unverified）项见[支持矩阵](./doc/support-matrix.md)。
+
+P1/P2 的实现与分阶段证据保留；个人用户安装与启动改进见下方流程。
 
 [下载预览版](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) · [更新记录](./CHANGELOG.md) · [验证证据](./evidence/README.md) · [文档目录](./doc/README.md)
 
@@ -16,51 +18,45 @@ pi-orb 通过 Pi 插件和小型 Electron 适配模块扩展现有 pi-web，复�
 - **像素取点**：模型按 Pi 实际附加截图的像素坐标定位；观察绑定会话、代次和编号，过期观察与越界坐标会被拒绝。
 - **串行批量**：`orb_batch` 一次提交 2–8 个初始截图中已经可见、互相独立的动作。逐步执行、逐步观察，失败或取消时停止剩余动作。
 
-新 Orb 会话默认 **Full Access（完全访问）**，可以产生真实鼠标与键盘输入。请在开始任务前检查 Access；Stop、隐藏、断连、锁屏及会话/工作区切换会撤销旧授权。正常回复结束保留当前会话的授权；截图消息仍需另行预览确认。授权边界见 [SECURITY.md](./SECURITY.md)。
+新 Orb 会话及明确重新打开隐藏的 Orb 默认 **Full Access（完全访问）**，可以产生真实鼠标与键盘输入。请在开始任务前检查 Access；Stop、隐藏、断连、锁屏及会话/工作区切换会撤销旧授权。聚焦已经可见的 Orb 保留手动权限；正常回复结束保留当前会话的授权；截图消息仍需另行预览确认。授权边界见 [SECURITY.md](./SECURITY.md)。
 
 ## 快速开始
 
 ### 前置条件
 
 - Windows x64；当前验证环境为 Windows 11，其他平台未验证。
-- 已安装 Pi CLI，且 pi-web 可运行。实测组合为 `@earendil-works/pi-coding-agent@0.87.1` + `@agegr/pi-web@0.9.3`，其他版本组合未验证。
+- 已安装 Pi CLI，且 pi-web 可运行。当前源码基线为 Pi Web 0.10 / Pi SDK 1.0；具体版本与验证范围见[支持矩阵](./doc/support-matrix.md)和[升级记录](./doc/pi-web-0.10-compatibility.md)。已发布预览安装器仍是原发布产物。
 - 桌面任务需要支持图像与工具调用的模型，模型与凭据在 pi-web 中配置。
-- 从源码运行需要 Node.js `>=24.19.0`、npm 和 Git。
+- 自动启动 Pi Web 需要 Node.js `>=24.19.0`；从源码开发另需 npm 和 Git。使用安装包无需克隆本项目。
 
 ### 安装与启动
 
-1. 从 [Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) 下载 `pi-orb-0.1.0-preview.1-win-x64.exe` 并安装。安装器按用户安装，不请求提权，也不包含 pi-web。它未签名，Windows 可能提示未知发布者；SmartScreen 的实际体验仍待验收。
-2. 取得同版本源码并安装 Pi 插件。**安装器不包含 Pi 插件**；插件会引用仓库中的 `src/shared/`，请保留完整检出目录。
+1. 安装本地构建的 `pi-orb-0.1.0-preview.3-win-x64.exe`。按用户安装，不请求提权；包含独立 Pi 插件及浏览器依赖，不包含 Pi Web/Node。它未签名，SmartScreen 的实际体验仍待验收。
+2. 从开始菜单打开 **pi-orb**，或按 **Win+R** 输入 **`pi-orb`**。首次启动通过已安装 Pi CLI 自动注册随包插件，并备份 Pi 的用户设置；旧的同名本地 Orb 插件登记由官方 CLI 移除，不修改模型、凭据与其他插件。
+3. 已有 Pi Web 服务会直接复用。尚未运行时，从全局安装或首次选定的 `bin/pi-web.js` 定位 Pi Web 包，直接隐藏启动其 Next.js 正式生产入口，等待就绪，不打开浏览器或终端。源码版 Pi Web 需先完成生产构建。默认地址为 `http://127.0.0.1:30141`。
+4. 选择专用工作区，检查模型和 Access，再开始聊天。新会话默认完全访问；右键悬浮球或托盘选择「切换工作区…」可更换文件夹。切换先停止旧任务并清理旧上下文，历史仍可在原目录查看。重复运行 `pi-orb` 会唤回已有窗口；退出 Orb 保留共享 Pi Web 服务。
 
-   ```powershell
-   git clone --branch v0.1.0-preview.1 https://github.com/rain-knows/pi-orb.git
-   cd pi-orb
-   npm ci
-   pi install "$PWD\pi-package"
-   pi list
-   ```
+首次插件安装/更新后，正在运行的 Pi Web 可能尚未加载它；请等网页任务结束后，通过原有方式重启 Pi Web。Orb 不会重启已有服务或终止占用端口的进程。
 
-3. 启动现有 pi-web：
+安装器会在卸载前调用 Pi CLI 移除随包插件声明，并清理 Win+R 登记；保留模型、凭据、历史和工作区。若 Node/Pi CLI 已被移除导致插件清理失败，会提示手动执行 `pi remove "<安装目录>\resources\pi-plugin"`。
+App Paths 支持 Win+R/ShellExecute；PowerShell 直接输入 `pi-orb` 不属于这个入口。
 
-   ```powershell
-   piweb
-   ```
+完整实现与验证见[个人用户安装与启动](./doc/personal-user-installation.md)。现有 [preview.1 Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) 不包含以上改进。
 
-   如果安装插件时 pi-web 已经运行，请通过你原有的启动方式重启它，让 Pi 重新加载插件声明。
-
-4. 从开始菜单打开 **pi-orb**，选择一个专用工作区，检查模型和 Access，再开始聊天或桌面任务。默认连接地址为 `http://127.0.0.1:30141`。
-
-未安装插件时，浮窗聊天仍可连接 pi-web，但模型不会获得 `orb_*` 工具。安装插件仅声明本地包，不复制目录，也不会自动授予其他工作区桌面能力。移除声明可运行 `pi remove "$PWD\pi-package"`（在仓库根目录中执行），然后重启 pi-web。
+浏览器任务使用公用 `orb_browser`（Playwright 浏览器）与 [Playwright Chrome 扩展](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm) 连接现有登录标签页。普通 Pi/Pi Web 无需启动 Orb；Orb 会话保留完全访问、Stop 撤权与光效。用户目录中配置扩展 token 后自动认证，无需改全局 MCP 配置或另装 CLI。[公用工具与认证配置](./doc/public-playwright.md)，[B 站验证记录](./doc/session-continuity.md)。
 
 ### 从源码运行
 
-完成上面的插件安装并启动 pi-web 后，在仓库根目录运行：
+开发模式不会自动安装插件或启动 Pi Web。在仓库根目录执行：
 
 ```powershell
+npm ci
+pi install "$PWD\pi-package"
+# 通过你原有的 piweb 入口启动/重启 Pi Web
 npm run dev
 ```
 
-`npm run dev` 启动 Electron 与 renderer 热更新。pi-orb 不会替你启动、重启或关闭现有 pi-web。
+`npm run dev` 启动 Electron 与 renderer 热更新。开发源码插件仍引用本仓库；个人用户安装包携带独立构建。
 
 ### 连接配置
 
@@ -80,15 +76,15 @@ npm run dev
 
 | 验证 | 已记录结果 | 边界 |
 |---|---|---|
-| 质量与发布门禁 | 461 个单元测试，门禁 66/66 | 类型、lint、构建、许可、版本、证据及非破坏性检查 |
+| 质量与发布门禁 | 491 个单元测试，门禁 66/66 | 类型、lint、构建、许可、版本、证据及非破坏性检查 |
 | 真实模型像素取点 | 紧凑及 28×24 DIP 控件，三个完整轮次共 21/21 任务 | 专用夹具与单一模型；不能外推到任意应用 |
 | 工具往返 | 最新小控件轮次：三动作批量中位 11.03s，单步中位 18.99s | 每模式仅三个样本，不承诺普遍提速 |
 | 原生依赖 | 实际 Electron 中 1000 次枚举 + 50 次截图通过 | 有限压力样本，未确认历史间歇退出的精确根因 |
-| Windows 打包 | 包内容审计 27/27，实际打包产物启动 22/22 | 不等同于干净机器安装、卸载或升级验收 |
+| Windows 打包 | 包内容审计 30/30，实际打包产物启动 22/22 | 不等同于干净机器安装、卸载或升级验收 |
 
 完整来源与原始记录见[像素取点实施记录](./doc/plugin-reference-and-pointing.md)、[浮窗体验记录](./doc/orb-experience-improvements.md)和[支持矩阵](./doc/support-matrix.md)。
 
-以下仍未验证：多显示器与 DPI 变化、高权限窗口、Chromium/Electron 内容输入、跨应用真实模型流程、真实键盘/锁屏/休眠恢复，以及干净机器安装、卸载、升级和 SmartScreen 体验。历史失败和原生退出记录原样保留。本版按 GitHub **prerelease** 发布，不宣称完整 v0.1 已完成。
+以下仍未验证：多显示器与 DPI 变化、高权限窗口、Chromium/Electron 内容输入、跨应用真实模型流程、真实键盘/锁屏/休眠恢复，以及干净机器安装、卸载、升级和 SmartScreen 体验。历史失败和原生退出记录原样保留。后续发布仍采用 GitHub **prerelease**；当前 preview.3 仅本地构建，不宣称完整 v0.1 已完成。
 
 ## 开发与构建
 
@@ -109,7 +105,7 @@ node evidence/p2-05/run-p2-05.mjs
 npm run package:win
 ```
 
-产物位于 `release/<version>/`。安装器未签名，无自动更新源；Pi 插件仍按上面的独立步骤安装。发布流程见 [`doc/release-process.md`](./doc/release-process.md)，自动流程见 [`release-preview.yml`](./.github/workflows/release-preview.yml)。
+产物位于 `release/<version>/`。安装器未签名，无自动更新源；Pi 插件随包并在首次启动时通过官方 CLI 注册。发布流程见 [`doc/release-process.md`](./doc/release-process.md)，自动流程见 [`release-preview.yml`](./.github/workflows/release-preview.yml)。
 
 ## 项目边界与参考来源
 

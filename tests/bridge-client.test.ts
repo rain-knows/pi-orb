@@ -9,9 +9,26 @@ import { BRIDGE_PROTOCOL_VERSION } from "@shared/bridge-protocol";
 
 let dir = "";
 
+it("retains a pre-input surface change screenshot across the real named pipe", async () => {
+  const pipePath = `\\\\.\\pipe\\orb-surface-${process.pid}-${Date.now()}`;
+  const observation = { observationId: "new-page", image: { data: "AQID", mimeType: "image/png" } };
+  const server = new BridgeServer({ pipePath, token: "a".repeat(64), executor: {
+    accepts: () => true, status: () => ({}), revoke: () => {}, observe: async () => ({}), batch: async () => ({}),
+    act: async () => ({ ok: false, reason: "surface-changed", message: "No input sent.", observation }),
+  } });
+  await server.listen();
+  try {
+    const client = new BridgeClient({ pipePath, tokenFile: "unused" });
+    const result = await client.call({ type: "act", sessionId: "s", generation: 1, action: {} },
+      { version: 2, token: "a".repeat(64), pid: 1, workspace: "test", orbSessionId: "s", pipePath, generation: 1, createdAt: "now" });
+    expect(result).toMatchObject({ ok: false, reason: "surface-changed", result: { observation } });
+  } finally { await server.close(); }
+});
+
 it("budgets declared waits and batches", () => {
   expect(bridgeTimeoutMs({type:"act",sessionId:"s",generation:1,action:{kind:"longWait",waitSeconds:120}})).toBe(150_000);
   expect(bridgeTimeoutMs({type:"batch",sessionId:"s",generation:1,batch:{actions:[{}, {}, {}]}})).toBe(90_000);
+  expect(bridgeTimeoutMs({type:"browser",sessionId:"s",generation:1,browser:{name:"browser_click"}})).toBeGreaterThan(90_000 + 15_000);
 });
 
 it("streams correlated progress and cancels a disconnected execution", async () => {
@@ -19,7 +36,7 @@ it("streams correlated progress and cancels a disconnected execution", async () 
   let cancelled=false;let entered!:()=>void;const started=new Promise<void>(r=>entered=r);
   const server=new BridgeServer({pipePath,token:"a".repeat(64),executor:{accepts:()=>true,status:()=>({}),revoke:()=>{},observe:async()=>({}),act:async()=>({}),batch:async(_batch,_id,_generation,signal,progress)=>{progress?.(1,2);entered();await new Promise<void>(r=>signal?.addEventListener("abort",()=>{cancelled=true;r();},{once:true}));return {ok:false,completed:0};}}});
   await server.listen();
-  const handshake={version:2,token:"a".repeat(64),pid:1,workspace:dir,pipePath,generation:1,createdAt:"now"};
+  const handshake={version:2,token:"a".repeat(64),pid:1,workspace:dir,orbSessionId:"s",pipePath,generation:1,createdAt:"now"};
   const controller=new AbortController();const updates:number[]=[];
   try {
     const client=new BridgeClient({pipePath,tokenFile:"unused"});
@@ -47,6 +64,7 @@ function writeHandshakeFile(overrides: Record<string, unknown> = {}): string {
       token: "a".repeat(64),
       pid: 1234,
       workspace: "C:\\work\\orb",
+      orbSessionId: "orb-session",
       pipePath: "\\\\.\\pipe\\pi-orb-1234",
       generation: 7,
       createdAt: new Date().toISOString(),

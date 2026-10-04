@@ -15,7 +15,7 @@
 //
 // Run: node evidence/p1-07/run-lifecycle-regression.mjs
 
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { connect } from "node:net";
 import { createServer } from "node:http";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -23,6 +23,7 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const repo = resolve(import.meta.dirname, "..", "..");
+const checkWorkspaceUi = process.argv.includes("--workspace-ui");
 const runRoot = join("D:\\pi-orb-p1-runs", `p1-07-lifecycle-${Date.now()}`);
 const shellDataDir = join(runRoot, "shell-data");
 const configPath = join(runRoot, "orb-config.json");
@@ -35,7 +36,7 @@ const PI_WEB_PORT = 31422;
 const MODEL_PORT = 31423;
 const PI_WEB_PASSWORD = "p1-07-lifecycle-password";
 const piWebBaseUrl = `http://127.0.0.1:${PI_WEB_PORT}`;
-const piWebWorktree = join(tmpdir(), "pi-orb-p0-head-src");
+const piWebWorktree = process.env.PI_ORB_EVIDENCE_PI_WEB ?? resolve(repo, ".tmp/plugin-pointing/pi-web");
 const agentDir = join(runRoot, "agent");
 const sessionDir = join(agentDir, "sessions");
 const homeDir = join(runRoot, "home");
@@ -200,6 +201,7 @@ async function connectCdp(url) {
 }
 
 let shell = null;
+let target = null;
 let shellErr = "";
 
 try {
@@ -219,7 +221,7 @@ try {
 
   shell = spawn(
     electronBinary,
-    [".", `--user-data-dir=${shellDataDir}`, `--remote-debugging-port=${DEBUG_PORT}`],
+    [join(import.meta.dirname, "bootstrap.cjs"), `--user-data-dir=${shellDataDir}`, `--remote-debugging-port=${DEBUG_PORT}`],
     {
       cwd: repo,
       env: {
@@ -228,11 +230,13 @@ try {
         PI_ORB_CONFIG: configPath,
         PI_ORB_PI_WEB_URL: piWebBaseUrl,
         PI_ORB_PI_WEB_PASSWORD: PI_WEB_PASSWORD,
+        PI_ORB_EVIDENCE_DOM_FRAME: "1",
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
   shell.stderr.on("data", (chunk) => (shellErr += chunk.toString()));
+  shell.stdout.on("data", () => {});
 
   let pageTarget = null;
   for (let attempt = 0; attempt < 50; attempt += 1) {
@@ -277,6 +281,12 @@ try {
   // The session id the bridge is addressed with.
   const sessionId = typeof ensured === "string" && !ensured.startsWith("ERR:") ? ensured : null;
   const defaultStatus = await status();
+  if (checkWorkspaceUi) {
+    const fullSelected = await evaluate("document.getElementById('permission-label').textContent === '完全访问' && document.getElementById('access-full').getAttribute('aria-selected') === 'true'");
+    check("real renderer displays Full Access selected at startup", fullSelected === true, "actual main grant and actual renderer");
+    const noChange = JSON.parse(await evaluate(`window.orb.setWorkspace(${JSON.stringify(workspace)}, false).then(s => JSON.stringify(s))`));
+    check("selecting the current workspace preserves session and generation", noChange.sessionId === defaultStatus.sessionId && noChange.generation === defaultStatus.generation, "no new session");
+  }
   check("new Orb session defaults to Full Access bound to its session and generation", defaultStatus.desktopTask?.authorized === true && defaultStatus.desktopTask?.level === "full-access" && defaultStatus.desktopTask?.sessionId === sessionId && defaultStatus.desktopTask?.generation === generation, safe(defaultStatus.desktopTask));
 
   /** The bridge handshake written by the shell, used to read state from the main process. */
@@ -291,7 +301,7 @@ try {
    * This goes through the named pipe rather than the renderer on purpose: once the window is hidden
    * its renderer can be suspended, so a renderer-based read would never resolve after a collapse.
    */
-  async function bridgeStatus(session, generationForStatus) {
+  async function bridgeStatus(session, generationForStatus, type = "status", extra = {}) {
     const handshakeData = handshake();
     if (!session || !handshakeData) return null;
     return new Promise((done) => {
@@ -303,7 +313,7 @@ try {
       }, 5000);
       socket.on("connect", () =>
         socket.write(
-          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type: "status", token: handshakeData.token, sessionId: session, generation: generationForStatus })}\n`,
+          `${JSON.stringify({ version: 2, requestId: `status-${Date.now()}`, type, token: handshakeData.token, sessionId: session, generation: generationForStatus, ...extra })}\n`,
         ),
       );
       socket.on("data", (chunk) => (data += chunk.toString("utf8")));
@@ -364,6 +374,41 @@ try {
   const afterEnsure = await status();
   check("ensuring the stopped session does not silently restore Full Access", afterEnsure.desktopTask?.authorized === false, safe(afterEnsure.desktopTask));
 
+  // A real native observation finishes while the model is still thinking. The frame must outlive
+  // that tool, then disappear on idle. The target is disposable; no user app receives input.
+  await evaluate(`window.orb.setOrbAccess({ generation: ${generation}, level: 'full-access' })`);
+  const targetEnv = { ...process.env, PI_ORB_SPEED_ROOT: runRoot };
+  delete targetEnv.ELECTRON_RUN_AS_NODE;
+  target = spawn(electronBinary, [join(repo, "evidence/tool-speed/target-app")], { env: targetEnv, windowsHide: true, stdio: "ignore" });
+  for (let attempt = 0; attempt < 60 && !existsSync(join(runRoot, "geometry.json")); attempt++) await sleep(100);
+  const hwnd = Number(execFileSync("powershell.exe", ["-NoProfile", "-Command", `(Get-Process -Id ${target.pid}).MainWindowHandle.ToInt64()`], { encoding: "utf8", windowsHide: true }).trim());
+  modelResponseDelayMs = 6000;
+  await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: "observation frame lifetime" })`);
+  execFileSync("powershell.exe", ["-NoProfile", "-File", join(repo, "evidence/lib/activate-window.ps1"), "-Hwnd", String(hwnd), "-ForegroundOnly"], { windowsHide: true, encoding: "utf8" });
+  const observed = await bridgeStatus(sessionId, generation, "observe");
+  const frames = () => JSON.parse(readFileSync(join(shellDataDir, "probe-windows.json"), "utf8")).filter(w => w.url.endsWith("observation-frame.html"));
+  await sleep(2200);
+  const duringThinking = { busy: (await status()).busy, frames: frames() };
+  check("observation succeeds on a disposable native target", observed.ok === true && observed.result?.window?.pid === target.pid, safe(observed.result?.window));
+  check("frame persists after the native tool while the model is thinking", duringThinking.busy && duringThinking.frames.some(w => w.visible), safe(duringThinking));
+  for (let attempt = 0; attempt < 90 && (await status()).busy; attempt++) await sleep(100);
+  await sleep(150);
+  check("frame disappears when the Pi turn becomes idle", frames().length > 0 && frames().every(w => !w.visible), safe(frames()));
+
+  // Exercise the new DOM route through the same live bridge/main process with public MCP and a
+  // real, private Chrome fixture. User-profile extension connection is verified separately.
+  modelResponseDelayMs = 10_000;
+  await evaluate(`window.orb.sendPrompt({ generation: ${generation}, text: "DOM browser frame lifetime" })`);
+  const domObserved = await bridgeStatus(sessionId, generation, "browser", { browser: { name: "browser_snapshot" } });
+  check("DOM tools return a real Chrome snapshot through the production bridge", domObserved?.ok && domObserved.result?.ok
+    && domObserved.result.content.some(c => c.text?.includes("Page Title: Orb lifecycle browser fixture")), safe(domObserved).slice(0, 500));
+  await sleep(2200);
+  const duringDomThinking = { busy: (await status()).busy, frames: frames() };
+  check("browser ribbon persists after the DOM tool while the model is thinking", duringDomThinking.busy && duringDomThinking.frames.some(w => w.visible), safe(duringDomThinking));
+  for (let attempt = 0; attempt < 150 && (await status()).busy; attempt++) await sleep(100);
+  await sleep(150);
+  check("browser ribbon disappears when the Pi turn becomes idle", frames().every(w => !w.visible), safe(frames()));
+
   // -------------------------------------------------------------------------
   // Collapse revokes. The collapse is triggered through the window's own control, which is the
   // same lifecycle routine the shortcut and the tray use — so this exercises the real route rather
@@ -397,12 +442,32 @@ try {
     report.collapse.bridgeAuthorizedBefore === true &&
     (report.collapse.bridgeAuthorizedAfter === false || collapseResult.authorized === false);
   check("collapsing the orb revokes session Access", revokedByCollapse, safe(report.collapse));
+  check("collapse clears the observation frame", frames().every(w => !w.visible), safe(frames()));
+  writeFileSync(join(shellDataDir, "probe-control.json"), JSON.stringify({ nonce: Date.now(), wake: true }));
+  await sleep(1500);
+  const afterReopen = await status();
+  check("explicitly reopening the hidden Orb selects Full Access on the same session", afterReopen.sessionId === sessionId && afterReopen.desktopTask?.authorized === true && afterReopen.desktopTask?.level === "full-access", safe(afterReopen.desktopTask));
 
   // A workspace switch replaces the old grant with the new session's default.
   const beforeWorkspaceSwitch = await status();
   await setAccess(beforeWorkspaceSwitch.generation);
+  let switchingActiveTurn = false;
+  if (checkWorkspaceUi) {
+    modelResponseDelayMs = 10000;
+    await evaluate(`window.orb.sendPrompt({ generation: ${beforeWorkspaceSwitch.generation}, text: 'cancel this turn when switching workspace' })`);
+    for (let attempt = 0; attempt < 40; attempt++) {
+      switchingActiveTurn = (await status()).busy === true;
+      if (switchingActiveTurn) break;
+      await sleep(50);
+    }
+  }
   await evaluate(`window.orb.setWorkspace(${JSON.stringify(nextWorkspace)}, true)`);
   const afterWorkspaceSwitch = await status();
+  if (checkWorkspaceUi) {
+    check("workspace switching stops a real active local-provider turn", switchingActiveTurn && !afterWorkspaceSwitch.busy && afterWorkspaceSwitch.sessionId !== beforeWorkspaceSwitch.sessionId, "active before switch, idle new session after switch");
+    const fullSelected = await evaluate("document.getElementById('permission-label').textContent === '完全访问' && document.getElementById('access-full').getAttribute('aria-selected') === 'true'");
+    check("real renderer selects the new workspace's Full Access grant", fullSelected === true, "actual access update event");
+  }
   report.workspaceSwitch = { before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch };
   check("workspace switch replaces the old grant with Full Access for the new session generation", afterWorkspaceSwitch.desktopTask?.authorized === true && afterWorkspaceSwitch.desktopTask?.level === "full-access" && afterWorkspaceSwitch.desktopTask?.sessionId === afterWorkspaceSwitch.sessionId && afterWorkspaceSwitch.desktopTask?.generation === afterWorkspaceSwitch.generation && afterWorkspaceSwitch.workspace === nextWorkspace && afterWorkspaceSwitch.sessionId !== sessionId && afterWorkspaceSwitch.generation !== generation, safe({ before: beforeWorkspaceSwitch, after: afterWorkspaceSwitch }).slice(0, 500));
 
@@ -478,10 +543,14 @@ try {
 
   cdp.close();
 } catch (error) {
+  if (error?.stdout) report.nativeForegroundFailure = String(error.stdout).trim().slice(0, 600);
   check("the lifecycle regression completed without error", false, error?.message ?? String(error));
   report.fatal = String(error?.stack ?? error).slice(0, 1000);
   report.stderrTail = shellErr.slice(-600);
 } finally {
+  writeFileSync(join(shellDataDir, "probe-control.json"), JSON.stringify({ nonce: Date.now(), closeBrowser: true }));
+  await sleep(300);
+  if (target?.pid) try { execFileSync("taskkill.exe", ["/PID", String(target.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" }); } catch { /* Already exited. */ }
   try {
     shell?.kill();
     await sleep(1000);
@@ -504,7 +573,8 @@ try {
 
   report.passed = report.checks.length > 0 && report.checks.every((entry) => entry.ok);
   mkdirSync(import.meta.dirname, { recursive: true });
-  writeFileSync(join(import.meta.dirname, "session-access-regression.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  const output = process.argv.find(argument => argument.startsWith("--output="))?.slice(9) ?? join(import.meta.dirname, "session-access-regression.json");
+  writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ passed: report.passed, checks: report.checks }, null, 2));
 }
 

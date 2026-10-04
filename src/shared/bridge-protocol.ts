@@ -42,6 +42,9 @@ export interface BridgeTokenFile {
   readonly token: string;
   readonly pid: number;
   readonly workspace: string;
+  /** Identifies the shell's session even while Access is revoked. Browser routing uses
+   * this identity, never cwd, so ordinary Pi Web sessions can share the same directory. */
+  readonly orbSessionId: string | null;
   /**
    * The pipe this run listens on.
    *
@@ -78,6 +81,7 @@ export type BridgeRequest = ({ readonly version?: number; readonly requestId?: s
       readonly action: unknown;
     }
   | { readonly type: "batch"; readonly token: string; readonly sessionId: string; readonly generation: number; readonly batch: unknown }
+  | { readonly type: "browser"; readonly token: string; readonly sessionId: string; readonly generation: number; readonly browser: unknown }
   | { readonly type: "status"; readonly token: string; readonly sessionId: string; readonly generation: number }
   | { readonly type: "revoke"; readonly token: string; readonly sessionId: string; readonly generation: number });
 
@@ -103,7 +107,7 @@ export type BridgeRefusal =
 
 export type BridgeResponse =
   | { readonly ok: true; readonly result: unknown }
-  | { readonly ok: false; readonly reason: BridgeRefusal | string; readonly message: string };
+  | { readonly ok: false; readonly reason: BridgeRefusal | string; readonly message: string; readonly result?: unknown };
 
 /**
  * Detect a request that came from a browser context rather than from the extension.

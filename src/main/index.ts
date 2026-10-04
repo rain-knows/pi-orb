@@ -45,6 +45,8 @@ import { ScreenshotFlow } from "./screenshot-flow";
 import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-export";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
+import { BrowserBroker } from "./browser-broker";
+import { waitForBrowserObservationWindow } from "./browser-observation-frame";
 import { ReferenceWindowsDriver } from "./reference-windows-driver";
 import { applyFloatingOverlayGuard, resetFloatingOverlayGuard, OVERLAY_GUARD_INPUT_APPLY_MS } from "./floating-overlay-guard";
 import { delay } from "./reference-windows/wait";
@@ -85,6 +87,31 @@ import {
   unsnapDockedBall,
 } from "./floating-window-controller";
 import { startSelectionMonitor, type SelectionMonitor } from "./selection-monitor";
+import { preparePersonalStartup, probePersonalPiWeb, removeBundledPlugin } from "./personal-startup";
+import { mkdirSync, readFileSync } from "node:fs";
+
+// Electron's Chromium switch does not by itself relocate main-process configuration/handshake.
+// Make an explicit profile override consistent before the lock or installer cleanup uses it.
+const profileDirectory = app.commandLine.getSwitchValue("user-data-dir");
+if (profileDirectory) {
+  mkdirSync(profileDirectory, { recursive: true });
+  app.setPath("userData", profileDirectory);
+}
+
+// Installer cleanup never owns a window or bridge.
+if (process.argv.includes("--remove-bundled-plugin")) {
+  try {
+    removeBundledPlugin(app.getPath("userData"), join(process.resourcesPath, "pi-plugin"));
+    app.exit(0);
+  } catch { app.exit(1); }
+}
+// A secondary instance must exit before hooks or handshake ownership, including quit cleanup.
+if (!app.requestSingleInstanceLock()) app.exit(0);
+let wakeAfterStartup = false;
+app.on("second-instance", () => {
+  if (!window || window.isDestroyed()) wakeAfterStartup = true;
+  else void showOrb();
+});
 
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
@@ -135,12 +162,15 @@ let lastWorkspaceProblem: string | null = null;
 let lastShortcutProblem: string | null = null;
 let lastDesktopProblem: string | null = null;
 // The reference Orb ships with Full Access selected. Apply it once to each new Orb session;
-// Stop and hide still revoke it until the user selects Access again or starts a new session.
+// Stop and hide revoke it. An explicit reopen or new session selects Full Access again.
 let defaultAccessPending = true;
+let accessRevision = 0;
+const browserBroker = new BrowserBroker(() => desktopBroker?.status() ?? null);
 
 function grantDefaultAccess(sessionId: string, generation: number): void {
   if (!defaultAccessPending || !desktopBroker || generations.current !== generation || session.sessionId !== sessionId) return;
   desktopBroker.authorize({ sessionId, generation, level: "full-access" });
+  publishHandshake();
   defaultAccessPending = false;
   lastDesktopProblem = null;
 }
@@ -170,6 +200,7 @@ const client = new PiWebClient({
 });
 
 function emit(event: OrbSessionEvent): void {
+  if (event.type === "idle" || event.type === "error") hideObservationFrame(observationFrame ?? undefined);
   if (event.type === "idle") {
     // The full prompt queue has drained. A turn ending between queued prompts is not idle.
     // Release the prompt lock only; session-level desktop Access is intentionally preserved.
@@ -198,6 +229,7 @@ function createWindow(): BrowserWindow {
     hasShadow: false,
     alwaysOnTop: config.window.alwaysOnTop,
     skipTaskbar: true,
+    icon: createTrayIcon(),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
@@ -346,6 +378,7 @@ async function startDesktop(): Promise<void> {
       ops,
       backend: createWindowsDesktopBackend(ops),
       ownProcessId: process.pid,
+      onTargetChanged: () => showObservationFrameForTarget(),
       withGuiTurn: async <T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T> => {
         const current = window;
         if (!current || current.isDestroyed()) return run();
@@ -357,7 +390,6 @@ async function startDesktop(): Promise<void> {
           showObservationFrameForTarget();
           return await run();
         } finally {
-          hideObservationFrame(observationFrame ?? undefined);
           if (!current.isDestroyed()) {
             applyFloatingOverlayGuard(current, "input", "end");
             // The ribbon's `showInactive` can restack same-level panels, so the orb's higher level is
@@ -381,6 +413,7 @@ async function startDesktop(): Promise<void> {
     log: (entry) => {
       // Structured, desensitized: action kind and reason only, never typed text or pixels.
       console.log(`[pi-orb] desktop ${JSON.stringify(entry)}`);
+      if (entry.event === "authorize" || entry.event === "revoke") emit({ type: "access", status: desktopTaskStatus() });
     },
   });
 }
@@ -410,6 +443,7 @@ function publishHandshake(): void {
       config.orbWorkspace ?? "",
       process.pid,
       generations.current,
+      session?.sessionId ?? null,
     );
   } catch (error) {
     console.warn(`[pi-orb] could not publish the bridge handshake: ${describeError(error)}`);
@@ -434,6 +468,7 @@ async function startBridge(): Promise<void> {
     config.orbWorkspace ?? "",
     process.pid,
     generations.current,
+    session?.sessionId ?? null,
   );
   bridge = new BridgeServer({
     pipePath: handshake.pipePath,
@@ -448,8 +483,25 @@ async function startBridge(): Promise<void> {
         return broker.act(action, sessionId, generation, signal);
       },
       batch: (value, sessionId, generation, signal, progress) => requireBroker().batch(value, sessionId, generation, signal, progress),
+      browser: async (value, sessionId, generation, signal) => {
+        const revision = accessRevision;
+        const result = await browserBroker.call(value, sessionId, generation, signal);
+        const stillLive = () => !signal?.aborted && generations.current === generation
+          && session.sessionId === sessionId && accessRevision === revision
+          && desktopBroker?.status().authorized && desktopBroker.status().level === "full-access";
+        try {
+          if (stillLive()) {
+            const target = await waitForBrowserObservationWindow(result, () => referenceDriver?.listWindows() ?? [], signal);
+            if (stillLive()) {
+              if (target) showObservationFrameForTarget(target.bounds);
+              else hideObservationFrame(observationFrame ?? undefined);
+            }
+          }
+        } catch (error) { console.warn(`[pi-orb] browser observation frame unavailable: ${describeError(error)}`); }
+        return result;
+      },
       status: () => desktopTaskStatus(),
-      revoke: () => desktopBroker?.revoke(),
+      revoke: () => revokeDesktopOperations("the bridge revoked Access"),
       /**
        * Admit only the live run's session and generation, and say which of the two failed.
        *
@@ -498,7 +550,7 @@ async function refreshPiWebState(): Promise<void> {
     piWebState = {
       baseUrl: client.baseUrl,
       reachable: false,
-      problem: `No pi-web service answered at ${client.baseUrl}. Start it yourself; Orb will not start, restart or stop it.`,
+      problem: `未连接到 ${client.baseUrl}。请检查 Pi Web 服务或重新打开 Orb；启动日志位于 Orb 用户数据目录。`,
     };
     markDisconnected();
     return;
@@ -514,10 +566,10 @@ async function refreshPiWebState(): Promise<void> {
     markDisconnected();
     return;
   }
-  if (piWebState.reachable === false) {
+  if (piWebState.reachable === false && desktopBroker) {
     // A reconnect must not silently resume a desktop task that was granted for a session that died
     // while the connection was down.
-    desktopBroker?.revoke();
+    revokeDesktopOperations("the pi-web connection was re-established");
   }
   piWebState = { baseUrl: client.baseUrl, reachable: true, problem: null };
 }
@@ -599,7 +651,7 @@ function attachWakeController(win: BrowserWindow): void {
       isDestroyed: () => win.isDestroyed(),
     },
     {
-      revokeOrbAccess: () => desktopBroker?.revoke(),
+      revokeOrbAccess: () => revokeDesktopOperations("the orb was hidden"),
       discardPendingCapture: () => screenshotFlow?.discard(),
       // Collapse is the route users actually take, so the record must be dropped here too. The
       // revocation routine below documents this exact rule for a collapse, but only the tray, the
@@ -667,7 +719,9 @@ function attachKeyboardEdgeRecovery(): void {
  * session desktop Access and drops any unconfirmed screenshot, and it is idempotent.
  */
 function revokeDesktopOperations(reason: string): void {
+  accessRevision++;
   defaultAccessPending = false;
+  browserBroker.revoke();
   const hadAuthority = desktopBroker?.status().authorized === true;
   const hadCapture = screenshotFlow?.pending !== null && screenshotFlow?.pending !== undefined;
   desktopBroker?.revoke();
@@ -689,8 +743,7 @@ function revokeDesktopOperations(reason: string): void {
  * annotating. It is skipped entirely when no target is recorded (nothing to mark) or when its bounds
  * are empty, because a zero-area ribbon would read as a grant over nothing.
  */
-function showObservationFrameForTarget(): void {
-  const bounds = referenceDriver?.targetBounds();
+function showObservationFrameForTarget(bounds = referenceDriver?.targetBounds()): void {
   if (!bounds || bounds.width < 2 || bounds.height < 2) return;
   try {
     observationFrame ??= createObservationFrameWindow();
@@ -714,6 +767,7 @@ function createTray(): void {
       // "Show" is an explicit wake, not a toggle: a menu item labelled Show must never hide a focused
       // orb.
       { label: "显示悬浮球", click: () => void showOrb() },
+      { label: "切换工作区…", click: () => { void showOrb().then(() => window?.webContents.send(IPC.shellMenuAction, "workspace")); } },
       // Goes through the same collapse routine as the shortcut and the window button, so the tray
       // cannot hide the orb while leaving desktop authority alive.
       { label: "隐藏悬浮球", click: () => lifecycle?.collapse() },
@@ -724,17 +778,9 @@ function createTray(): void {
   tray.on("click", () => toggleWindow("tray"));
 }
 
-/** A 16x16 solid icon, drawn in code so no binary asset is committed. */
+/** The same reference-derived Pi icon used by the installer and Windows shortcuts. */
 function createTrayIcon(): NativeImage {
-  const size = 16;
-  const buffer = Buffer.alloc(size * size * 4);
-  for (let i = 0; i < size * size; i += 1) {
-    buffer[i * 4 + 0] = 0x4c;
-    buffer[i * 4 + 1] = 0x8b;
-    buffer[i * 4 + 2] = 0xf5;
-    buffer[i * 4 + 3] = 0xff;
-  }
-  return nativeImage.createFromBuffer(buffer, { width: size, height: size });
+  return nativeImage.createFromBuffer(readFileSync(join(__dirname, "icon.png"))).resize({ width: 32, height: 32 });
 }
 
 function registerIpc(): void {
@@ -788,6 +834,7 @@ function registerIpc(): void {
         onModel: () => current.webContents.send(IPC.shellMenuAction, "model"),
         onScreenshot: () => current.webContents.send(IPC.shellMenuAction, "screenshot"),
         onShortcut: () => current.webContents.send(IPC.shellMenuAction, "shortcut"),
+        onWorkspace: () => current.webContents.send(IPC.shellMenuAction, "workspace"),
         onCollapse: () => lifecycle?.collapse(),
         onQuit: () => quit(),
         onClearSelectionContext: () => {
@@ -911,13 +958,18 @@ function registerIpc(): void {
       }
 
       lastWorkspaceProblem = null;
-      config = { ...config, orbWorkspace: validation.resolved };
-      saveOrbConfig(configPath, config);
+      if (isOrbWorkspace(validation.resolved, config.orbWorkspace)) return currentStatus();
       // A workspace change binds a fresh run: any in-flight work from the
       // previous workspace must not continue under the new one. An unconfirmed
       // screenshot and any desktop authorization belong to the previous run and must not
       // survive it either.
       revokeDesktopOperations("the workspace changed");
+      // Abort the old provider/queue before dropping its stream; changing cwd cannot orphan a turn.
+      try { if (session.running || session.pendingQuestionId) await session.abort(); }
+      catch (error) { lastWorkspaceProblem = `旧会话未能停止：${describeError(error)}`; return currentStatus(); }
+      const nextConfig = { ...config, orbWorkspace: validation.resolved };
+      saveOrbConfig(configPath, nextConfig);
+      config = nextConfig;
       defaultAccessPending = true;
       clearSelectionContext();
       if (!selectionMonitor) await startNativeSelectionMonitor();
@@ -1204,7 +1256,10 @@ function registerIpc(): void {
       return desktopTaskStatus();
     }
     lastDesktopProblem = null;
+    const requestedRevision = accessRevision;
     return session.ensureSession(config.orbWorkspace).then((sessionId) => {
+      if (accessRevision !== requestedRevision || generations.current !== parsed.generation || session.sessionId !== sessionId || !window?.isVisible()) return desktopTaskStatus();
+      browserBroker.revoke();
       desktopBroker?.authorize({ sessionId, generation: parsed.generation, level: parsed.level });
       defaultAccessPending = false;
       return desktopTaskStatus();
@@ -1375,6 +1430,21 @@ void app.whenReady().then(async () => {
     console.warn(`[pi-orb] ${loaded.error}`);
   }
 
+  // Explicit-config dev/evidence sessions remain isolated from personal installation.
+  if (app.isPackaged && !process.env.PI_ORB_CONFIG) {
+    try {
+      await preparePersonalStartup({
+        userData: app.getPath("userData"), pluginSource: join(process.resourcesPath, "pi-plugin"),
+        baseUrl: piWebBaseUrl, password: piWebPassword, probe: () => probePersonalPiWeb(piWebBaseUrl),
+        pickFile: async (title, extension) => {
+          const result = await dialog.showOpenDialog({ title, properties: ["openFile"], filters: [{ name: extension, extensions: [extension] }] });
+          return result.canceled ? undefined : result.filePaths[0];
+        },
+        notify: message => { void dialog.showMessageBox({ type: "info", title: "pi-orb 安装提示", message }); },
+      });
+    } catch (error) { dialog.showErrorBox("pi-orb 启动准备未完成", describeError(error)); }
+  }
+
   session = new OrbSessionController({
     log: entry => console.log(`[pi-orb] session timing ${JSON.stringify(entry)}`),
     client,
@@ -1392,6 +1462,7 @@ void app.whenReady().then(async () => {
   registerIpc();
   createTray();
   window = createWindow();
+  if (wakeAfterStartup) { wakeAfterStartup = false; void showOrb(); }
   await startNativeSelectionMonitor();
   attachWakeController(window);
   if (!shortcutEdgeGuard.start()) {
@@ -1448,6 +1519,7 @@ async function showOrb(): Promise<void> {
  */
 async function presentOrb(win: BrowserWindow): Promise<void> {
   if (win.isDestroyed()) return;
+  const reopening = !win.isVisible();
   try {
     await clampFloatingWindow(win);
   } catch (error) {
@@ -1457,6 +1529,17 @@ async function presentOrb(win: BrowserWindow): Promise<void> {
   if (win.isMinimized()) win.restore();
   win.show();
   win.focus();
+  // Explicitly reopening the hidden Orb selects the user's requested default. Focusing an
+  // already visible Orb preserves a manually selected level and never undoes an emergency Stop.
+  if (reopening && config.orbWorkspace && desktopBroker && piWebState.reachable) {
+    defaultAccessPending = true;
+    const generation = generations.current;
+    try {
+      grantDefaultAccess(await session.ensureSession(config.orbWorkspace), generation);
+    } catch (error) {
+      lastDesktopProblem = describeError(error);
+    }
+  }
 }
 
 app.on("window-all-closed", () => {

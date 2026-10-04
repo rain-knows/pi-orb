@@ -533,7 +533,18 @@ async function main() {
   async function chooseWorkspace() {
     const picked = await api.chooseWorkspace()
     if (!picked.ok) { if (picked.message) showNotice(picked.message); return }
+    const previousGeneration = snapshot.generation
     snapshot = await api.setWorkspace(picked.resolved ?? '', false)
+    if (snapshot.generation !== previousGeneration) {
+      closeSheet()
+      preview = undefined
+      setHistoryOpen(false)
+      historyList.replaceChildren()
+      clearMessages()
+      clearPrompt()
+      setSelectionContext(null)
+      setRunning(false)
+    }
     desktopTask = snapshot.desktopTask
     renderPermission()
     syncEmpty()
@@ -655,7 +666,10 @@ async function main() {
   }
 
   api.onSessionEvent((event) => {
-    if (event.type === 'assistant-delta') {
+    if (event.type === 'access') {
+      desktopTask = event.status
+      renderPermission()
+    } else if (event.type === 'assistant-delta') {
       streaming += event.text
       appendAssistant(streaming)
     } else if (event.type === 'assistant-message') {
@@ -944,6 +958,7 @@ async function main() {
     if (action === 'model') void openModelChooser().catch(report)
     else if (action === 'screenshot') void captureScreenshot().catch(report)
     else if (action === 'shortcut') openShortcutEditor()
+    else if (action === 'workspace') void chooseWorkspace().catch(report)
   })
   el('question-cancel').addEventListener('click', () => { void answerQuestion(true).catch(report) })
   questionContinue.addEventListener('click', () => { void answerQuestion().catch(report) })

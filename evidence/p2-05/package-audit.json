@@ -1,30 +1,30 @@
 {
-  "capturedAt": "2026-10-01T02:45:55.582Z",
-  "version": "0.1.0-preview.1",
-  "appRoot": "release/0.1.0-preview.1/win-unpacked",
+  "capturedAt": "2026-10-04T14:39:24.416Z",
+  "version": "0.1.0-preview.3",
+  "appRoot": "release/0.1.0-preview.3/win-unpacked",
   "entries": {
-    "count": 49,
+    "count": 2843,
     "sample": [
       "node_modules",
-      "node_modules/koffi",
-      "node_modules/koffi/LICENSE.txt",
-      "node_modules/koffi/index.js",
-      "node_modules/koffi/indirect.js",
-      "node_modules/koffi/package.json",
-      "node_modules/koffi/build",
-      "node_modules/koffi/build/koffi",
-      "node_modules/koffi/build/koffi/win32_x64",
-      "node_modules/koffi/build/koffi/win32_x64/koffi.node",
-      "node_modules/node-gyp-build",
-      "node_modules/node-gyp-build/LICENSE",
-      "node_modules/node-gyp-build/SECURITY.md",
-      "node_modules/node-gyp-build/bin.js",
-      "node_modules/node-gyp-build/build-test.js",
-      "node_modules/node-gyp-build/index.js",
-      "node_modules/node-gyp-build/node-gyp-build.js",
-      "node_modules/node-gyp-build/optional.js",
-      "node_modules/node-gyp-build/package.json",
-      "node_modules/uiohook-napi"
+      "node_modules/@hono",
+      "node_modules/@hono/node-server",
+      "node_modules/@hono/node-server/LICENSE",
+      "node_modules/@hono/node-server/dist",
+      "node_modules/@hono/node-server/dist/conninfo.cjs",
+      "node_modules/@hono/node-server/dist/conninfo.d.cts",
+      "node_modules/@hono/node-server/dist/conninfo.d.mts",
+      "node_modules/@hono/node-server/dist/conninfo.mjs",
+      "node_modules/@hono/node-server/dist/constants-BLSFu_RU.mjs",
+      "node_modules/@hono/node-server/dist/constants-BXAKTxRC.cjs",
+      "node_modules/@hono/node-server/dist/early-hints.cjs",
+      "node_modules/@hono/node-server/dist/early-hints.d.cts",
+      "node_modules/@hono/node-server/dist/early-hints.d.mts",
+      "node_modules/@hono/node-server/dist/early-hints.mjs",
+      "node_modules/@hono/node-server/dist/index.cjs",
+      "node_modules/@hono/node-server/dist/index.d.cts",
+      "node_modules/@hono/node-server/dist/index.d.mts",
+      "node_modules/@hono/node-server/dist/index.mjs",
+      "node_modules/@hono/node-server/dist/serve-static.cjs"
     ]
   },
   "unpacked": [
@@ -40,16 +40,16 @@
     "node_modules/uiohook-napi/prebuilds/win32-x64/uiohook-napi.node"
   ],
   "sizes": {
-    "executableBytes": 246090752,
-    "asarBytes": 8085810,
+    "executableBytes": 246038528,
+    "asarBytes": 36214662,
     "unpackedNativeBytes": 1834010,
-    "archiveEntryCount": 49
+    "archiveEntryCount": 2843
   },
   "checks": [
     {
       "name": "the unpacked Windows build exists",
       "ok": true,
-      "detail": "release/0.1.0-preview.1/win-unpacked/pi-orb.exe"
+      "detail": "release/0.1.0-preview.3/win-unpacked/pi-orb.exe"
     },
     {
       "name": "the archive contains package.json",
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-B6NcydUX.css, out/renderer/assets/index-DL1-v5Ir.js, out/renderer/assets/observation-frame-CWh_eSAv.css"
+      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-B6NcydUX.css, out/renderer/assets/index-Beju4B_b.js, out/renderer/assets/observation-frame-CWh_eSAv.css"
     },
     {
       "name": "the archive ships no src/ files",
@@ -149,12 +149,27 @@
     {
       "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
       "ok": true,
-      "detail": "13261 bytes"
+      "detail": "14325 bytes"
     },
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "59640 bytes"
+      "detail": "61167 bytes"
+    },
+    {
+      "name": "the independent plugin ships outside ASAR at the app version",
+      "ok": true,
+      "detail": "resources/pi-plugin"
+    },
+    {
+      "name": "the independent plugin carries browser runtime dependencies",
+      "ok": true,
+      "detail": "MCP and Playwright are real files"
+    },
+    {
+      "name": "the independent plugin does not carry a second Pi SDK",
+      "ok": true,
+      "detail": "Pi and typebox remain host-provided peers"
     },
     {
       "name": "the packaged Koffi version matches the pinned production dependency",
@@ -169,7 +184,7 @@
     {
       "name": "the shipped manifest carries the project version",
       "ok": true,
-      "detail": "0.1.0-preview.1 vs 0.1.0-preview.1"
+      "detail": "0.1.0-preview.3 vs 0.1.0-preview.3"
     },
     {
       "name": "the shipped manifest names no repository-only entry point",

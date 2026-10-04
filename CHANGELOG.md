@@ -10,6 +10,33 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+### Windows 启动与工作区（preview.3，本地构建）
+
+- 直接隐藏运行 Pi Web 包的 Next.js 正式生产入口，消除启动器二次 spawn 的黑窗口；保留日志与后端复用。
+- 安装器、快捷方式、窗口与托盘统一使用参考图标底板加 Pi 标识，移除蓝色方块托盘。
+- 悬浮球右键和托盘增加工作区切换；取消/选择当前目录不改变会话，切换前停止旧任务并清理旧上下文。
+- Full Access 默认授权变更实时同步到界面，Stop、隐藏、断连等撤权仍有效。
+
+### Windows 个人安装与启动（preview.2，本地构建）
+
+- 每用户安装后支持 Win+R `pi-orb`；第二实例唤回已有浮窗，不覆盖握手与快捷键。
+- 独立 Pi 插件与浏览器依赖随包；首次备份设置后通过官方 CLI 注册，移除旧同名本地包。无需克隆 Orb 源码。
+- 已有 Pi Web 直接复用，未运行从确认的官方入口隐藏启动；不打开浏览器、不重启已有服务，退出 Orb 保留共享后端。
+- 卸载经 Pi CLI 移除随包登记，清理本安装 Win+R 登记，保留用户数据。
+- 打包门禁加入真实 Pi 独立插件加载；干净机器安装/升级与 SmartScreen 仍未验证。
+
+### Pi Web 0.10 / Pi 1.0
+
+- 开发 SDK 锁定 1.0.0，与 Pi Web 0.10 宿主一致。Orb 以 `prompt_done` / `agent_settled`
+  识别逻辑完成，避免重试、压缩或 follow-up 的中间 `agent_end` 提前推进队列；停止后拒绝旧流事件。
+- 桌面观察/输入工具声明 model-only，Code mode only 下保留直接模型声明与图片上下文。
+  Orb 专用工作区在 session_start 关闭 advisor，普通会话保持原有插件行为。
+- 本机全局 Prompt Architect 改为命名策略段追加，删除复制 Pi 主提示词和旧 MCP gateway 路由；
+  本机迁入原生 MCP 并移除旧 adapter。全局配置改动为本机升级，不作为 Orb 通用策略依赖。
+- 482 单测、29 项 provider 提示词审计、5 个原生 MCP 连接、真实模型搜索、21 项生命周期、
+  7 个真实桌面任务、打包审计 27/27 与启动 22/22 通过；Pi Web 全量测试限制及详细来源见
+  [升级记录](./doc/pi-web-0.10-compatibility.md)。未发布新安装器。
+
 ## [0.1.0-preview.1] - 2026-10-01
 
 首个 Windows x64 未签名预览版，标为 GitHub prerelease；未验证项与完整 v0.1 门槛仍以

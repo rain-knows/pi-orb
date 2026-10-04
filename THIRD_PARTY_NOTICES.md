@@ -1,5 +1,12 @@
 # pi-orb third-party notices
 
+Windows icon plate: `resources/icon.svg` adapts
+`rain-knows/deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885`,
+`apps/desktop/resources/icon-windows.svg` (MIT, Copyright (c) 2026 DeepSeek).
+The rounded plate, gradients and shadow filters are reused; the whale mark is replaced by a Pi
+symbol. `resources/icon.png` and `resources/icon.ico` are raster/Windows derivatives of that SVG.
+The upstream MIT license text is retained below. These assets do not represent DeepSeek endorsement.
+
 This file records the third-party components redistributed with a pi-orb Windows x64 release, and
 the license obligations that follow. It is generated and checked against
 [`evidence/p1-07/license-inventory.json`](./evidence/p1-07/license-inventory.json), which is
@@ -157,6 +164,13 @@ the source commit and the local adaptation boundary.
 | Any `darwin-*` / `linux-*` / `win32-arm64` platform package | not installed on Windows x64, so not shipped |
 
 ## 5. Trademarks
+
+Browser integration additionally distributes `@playwright/mcp` 0.0.83, Playwright / Playwright Core
+1.64.0-alpha-1790635538000 (Microsoft, Apache-2.0), and `@modelcontextprotocol/sdk` 1.31.0 (MIT).
+Their license texts remain in the packaged dependency directories. pi-orb uses their public
+`createConnection`, Client and InMemoryTransport APIs; it does not vendor the browser extension or
+implement its CDP protocol. The Chrome extension is installed separately from Microsoft's official
+Chrome Web Store listing. The Pi engine and credentials remain owned by Pi Web.
 
 pi-orb is an independent open-source project. It is not affiliated with, endorsed by, or an official
 product of the pi-web, Pi, Cua or DeepSeek projects. The MIT licenses of those projects do not grant

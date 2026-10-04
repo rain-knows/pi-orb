@@ -40,7 +40,7 @@ function harness(configured = true) {
   let onEvent: (event: Record<string, unknown>) => void = () => {};
   let onSelection: (value: unknown) => void = () => {};
   let onDoubleAlt: () => void = () => {};
-  let onShellMenuAction: (action: "model" | "screenshot" | "shortcut") => void = () => {};
+  let onShellMenuAction: (action: "model" | "screenshot" | "shortcut" | "workspace") => void = () => {};
   const api = {
     getStatus: vi.fn(async () => status),
     getSelectionContext: vi.fn(async () => null),
@@ -52,7 +52,7 @@ function harness(configured = true) {
     clampFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined as "left" | "right" | undefined })),
     unsnapFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined })),
     chooseWorkspace: vi.fn(async () => ({ ok: true, resolved: "C:\\orb" })),
-    setWorkspace: vi.fn(async () => { status = { ...status, configured: true }; return status; }),
+    setWorkspace: vi.fn(async () => { status = { ...status, configured: true, generation: status.generation + 1 }; return status; }),
     ensureSession: vi.fn(async () => "session-1"),
     sendPrompt: vi.fn(async () => {}),
     clearSelectionContext: vi.fn(async () => true),
@@ -78,10 +78,49 @@ function harness(configured = true) {
   runInContext(script, dom.getInternalVMContext());
   const document = win.document;
   const byId = (id: string) => document.getElementById(id)!;
-  return { dom, win, document, byId, api, emit: (event: Record<string, unknown>) => onEvent(event), select: (value: unknown) => onSelection(value), doubleAlt: () => onDoubleAlt(), shellAction: (action: "model" | "screenshot" | "shortcut") => onShellMenuAction(action), setDark: (dark: boolean) => { media.matches = dark; for (const listener of themeListeners) listener(); } };
+  return { dom, win, document, byId, api, emit: (event: Record<string, unknown>) => onEvent(event), select: (value: unknown) => onSelection(value), doubleAlt: () => onDoubleAlt(), shellAction: (action: "model" | "screenshot" | "shortcut" | "workspace") => onShellMenuAction(action), setDark: (dark: boolean) => { media.matches = dark; for (const listener of themeListeners) listener(); } };
 }
 
 afterEach(() => { for (const dom of openDoms.splice(0)) dom.window.close(); });
+
+it("shows the actual default Full Access grant immediately, and reflects revocation", async () => {
+  const h = harness();
+  await expect.poll(() => h.api.onSessionEvent.mock.calls.length).toBe(1);
+  h.emit({ type: "access", status: { authorized: true, level: "full-access", generation: 1, sessionId: "session-1" } });
+  expect(h.byId("permission-label").textContent).toBe("完全访问");
+  expect(h.byId("access-full").getAttribute("aria-selected")).toBe("true");
+  expect(h.api.setOrbAccess).not.toHaveBeenCalled();
+  h.emit({ type: "access", status: { authorized: false, level: null, stopped: true } });
+  expect(h.byId("permission-label").textContent).toBe("访问权限");
+  expect(h.byId("access-full").getAttribute("aria-selected")).toBe("false");
+});
+
+it("switches workspace from the configured shell and clears previous conversation context", async () => {
+  const h = harness();
+  await expect.poll(() => h.api.onShellMenuAction.mock.calls.length).toBe(1);
+  h.emit({ type: "assistant-message", text: "old workspace answer" });
+  h.byId("prompt").textContent = "old workspace draft";
+  h.select({ text: "old selection", sourceLabel: "Editor" });
+  h.shellAction("workspace");
+  await expect.poll(() => h.api.setWorkspace.mock.calls.length).toBe(1);
+  await expect.poll(() => h.byId("prompt").textContent).toBe("");
+  expect(h.document.querySelectorAll(".orb-message").length).toBe(0);
+  expect(h.byId("selection-chip").hidden).toBe(true);
+  expect(h.byId("composer").hidden).toBe(false);
+});
+
+it("canceling workspace selection keeps the current draft and conversation", async () => {
+  const h = harness();
+  await expect.poll(() => h.api.onShellMenuAction.mock.calls.length).toBe(1);
+  h.api.chooseWorkspace.mockResolvedValueOnce({ ok: false, resolved: "" });
+  h.emit({ type: "assistant-message", text: "keep answer" });
+  h.byId("prompt").textContent = "keep draft";
+  h.shellAction("workspace");
+  await expect.poll(() => h.api.chooseWorkspace.mock.calls.length).toBe(1);
+  expect(h.api.setWorkspace).not.toHaveBeenCalled();
+  expect(h.byId("prompt").textContent).toBe("keep draft");
+  expect(h.document.querySelectorAll(".orb-message").length).toBe(1);
+});
 
 it("offers the workspace gate, then enables the reference composer", async () => {
   const h = harness(false);

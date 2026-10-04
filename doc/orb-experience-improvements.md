@@ -11,7 +11,7 @@
 | 输入时面板收起 | 焦点在输入框、未发送草稿或待回答问题存在时，阻止 hover 自动收起；失焦且无草稿后恢复原 180ms 收起 | 沿用参考 hover/pin 状态机，补 Pi 可连续输入的状态条件 |
 | 桌面工具期间面板闪烁 | 删除整窗 `hide/showInactive`，直接移植参考的 `applyFloatingOverlayGuard`；操作期间保持 transcript 可见、临时点击穿透和 GDI 排除；嵌套调用计数恢复 | `apps/desktop/src/floating-window.ts:848-868,906-961` → `src/main/floating-overlay-guard.ts`；80ms 等待沿用参考，Pi 主进程直接配对 begin/end，无 DSH IPC |
 | 通用操作 | 观察采用参考的前台或下一合格顶层窗口规则，排除 Orb 窗口和系统壳；动作前拒绝目标变化，动作后返回新窗口的 fresh observation | 保留 Pi 的 generation、授权和陈旧 observation 检查 |
-| 默认 Full Access | 新 Orb session 自动绑定 `full-access` grant；手动改档有效；Stop/hide/断连撤权后不静默恢复，创建新 session 再使用默认值 | 参考 `orb-permission.ts` 默认 `danger-full-access`；Pi grant 不跨 session 持久化 |
+| 默认 Full Access | 新 Orb session 自动绑定 `full-access` grant；手动改档有效；Stop/hide/断连立即撤权；2026-10-01 明确重开隐藏的 Orb 也选择完全访问，聚焦已显示窗口保留档位 | 参考 `orb-permission.ts` 默认 `danger-full-access`；Pi grant 不跨 session 持久化；新验证见 `doc/session-continuity.md` |
 | 页面中文 | 主面板、权限、截图、模型、历史、工具状态和托盘／右键菜单文案改中文；模型名、应用名和用户内容保留原文 | UI 文案适配，不改参考 DOM 和三档语义 |
 | 暂停按钮与光标重叠 | 执行中空输入框隐藏占位字和闪烁光标，缩小停止按钮并使用方形停止图标；输入新文本时光标正常出现 | 仅在参考几何上做 Pi queue 所需的覆盖样式 |
 
@@ -22,7 +22,7 @@
 ## 实测记录
 
 - `npm test`：42 文件、438 项通过；`npm run lint`、`npm run build` 通过。
-- `node evidence/p1-07/run-lifecycle-regression.mjs`：13/13 通过。实际隔离 Pi Web + 本地测试模型，验证默认完全访问、手动改档、连续三轮保权、Stop 不重授、隐藏撤权、换工作区／新会话绑定新 grant、断连撤权。
+- `node evidence/p1-07/run-lifecycle-regression.mjs`：当前 21/21 通过。实际隔离 Pi Web + 本地测试模型，验证默认完全访问、手动改档、连续三轮保权、Stop 不重授、隐藏撤权、明确重开默认值、原生／DOM 工具之间光效持续与 idle 隐藏、换工作区／新会话绑定新 grant、断连撤权。
 - 第一轮服务初始化曾出现 `fetch failed`，失败原件保存在 `evidence/p1-07/session-access-regression-startup-failure.json`。排查时补上 `OrbSessionController` 并发创建去重和过期创建拒绝，避免默认授权初始化与发消息创建出不同会话；失败后的再次创建、旧 generation 晚到和并发请求均有测试。当前通过记录不代表外部 Pi Web 永远可用。
 - `node evidence/p2-05/run-p2-05.mjs`：内容审计 25/25、打包产物启动 22/22 通过。
 - `node evidence/frontend-port/probe-interactions.mjs`：实际打包 Electron 的中文权限、草稿保持、工具卡片、问题、历史、停靠及 reduced-motion 通过。计算样式确认空运行输入的 caret 为透明、占位符为空、Stop 宽 36px；截图见 `after-tool-running.png`。

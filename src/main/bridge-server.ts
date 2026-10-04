@@ -30,6 +30,7 @@ import { MAX_SCREENSHOT_BYTES } from "@shared/screenshot";
 export const MAX_BRIDGE_FRAME_BYTES = Math.ceil(MAX_SCREENSHOT_BYTES * 1.5) + 256 * 1024;
 
 export interface BridgeExecutor {
+  browser?(value: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown>;
   /** Perform an observation. Returns a JSON-serializable result. */
   observe(input: { readonly sessionId: string; readonly generation: number; readonly signal?: AbortSignal }): Promise<unknown>;
   /** Perform one action. Returns a JSON-serializable result. */
@@ -171,6 +172,7 @@ export class BridgeServer {
       case "observe":
       case "act":
       case "batch":
+      case "browser":
       case "status":
       case "revoke": {
         const admission = this.#options.executor.accepts(sessionId, generation);
@@ -195,6 +197,7 @@ export class BridgeServer {
             return promoteRefusal(result);
           }
           if (type === "batch") return { ok: true, result: await this.#options.executor.batch(request.batch, sessionId, generation, signal, progress) };
+          if (type === "browser") return { ok: true, result: await this.#options.executor.browser?.(request.browser, sessionId, generation, signal) ?? { ok: false, reason: "not-configured", message: "Browser broker is unavailable." } };
           if (type === "revoke") {
             this.#options.executor.revoke();
             return { ok: true, result: { revoked: true } };
@@ -236,6 +239,7 @@ function promoteRefusal(result: unknown): BridgeResponse {
         ok: false,
         reason: record.reason,
         message: typeof record.message === "string" ? record.message : "The request was refused.",
+        ...(record.observation ? { result } : {}),
       };
     }
   }
@@ -290,6 +294,7 @@ export function writeHandshake(
   workspace: string,
   processId: number,
   generation: number,
+  orbSessionId: string | null,
 ): BridgeHandshakeFiles {
   mkdirSync(dataDir, { recursive: true });
   const pipePath = createPipePath(processId);
@@ -302,6 +307,7 @@ export function writeHandshake(
         token,
         pid: processId,
         workspace,
+        orbSessionId,
         pipePath,
         generation,
         createdAt: new Date().toISOString(),

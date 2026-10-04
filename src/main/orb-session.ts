@@ -39,7 +39,10 @@ export class OrbSessionController {
   #workspace: string | null = null;
   #generation = 0;
   #closeStream: (() => void) | null = null;
+  #streamEpoch = 0;
   #running = false;
+  #awaitingPromptDone = false;
+  #stopReason: string | null = null;
   #accumulator: AssistantAccumulator | null = null;
   #pendingQuestionId: string | null = null;
   #promptQueue: QueuedPrompt[] = [];
@@ -84,11 +87,13 @@ export class OrbSessionController {
    */
   beginGeneration(generation: number): void {
     this.#creating = null;
+    this.#streamEpoch++;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = null;
     this.#workspace = null;
     this.#running = false;
+    this.#awaitingPromptDone = false;
     this.#accumulator = null;
     this.#pendingQuestionId = null;
     this.#promptQueue = [];
@@ -109,9 +114,11 @@ export class OrbSessionController {
     }
     if (this.#creating?.workspace === workspace) return this.#creating.promise;
 
+    this.#streamEpoch++;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#running = false;
+    this.#awaitingPromptDone = false;
     this.#pendingQuestionId = null;
     this.#promptQueue = [];
 
@@ -135,6 +142,7 @@ export class OrbSessionController {
   async newConversation(workspace: string): Promise<string> {
     if (this.#running) throw new Error("The current conversation is still running.");
     this.#creating = null;
+    this.#streamEpoch++;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = null;
@@ -149,6 +157,7 @@ export class OrbSessionController {
   async openExistingSession(workspace: string, sessionId: string): Promise<string> {
     if (this.#running) throw new Error("The current conversation is still running.");
     this.#creating = null;
+    this.#streamEpoch++;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#sessionId = sessionId;
@@ -189,7 +198,11 @@ export class OrbSessionController {
     if (!sessionId) return;
     this.#promptQueue = [];
     await this.#deps.client.abort(sessionId);
+    this.#streamEpoch++;
+    this.#closeStream?.();
+    this.#closeStream = null;
     this.#running = false;
+    this.#awaitingPromptDone = false;
     this.#pendingQuestionId = null;
     this.#accumulator = null;
     this.#deps.emit({ type: "idle", stopReason: "aborted" });
@@ -213,18 +226,21 @@ export class OrbSessionController {
     this.#sessionId = null;
     this.#workspace = null;
     this.#running = false;
+    this.#awaitingPromptDone = false;
+    this.#streamEpoch++;
     this.#accumulator = null;
     this.#pendingQuestionId = null;
     this.#promptQueue = [];
   }
 
   async #subscribe(sessionId: string): Promise<void> {
+    const epoch = ++this.#streamEpoch;
     this.#closeStream?.();
     this.#closeStream = null;
     this.#closeStream = await this.#deps.client.openEventStream(
       sessionId,
-      (event) => this.#handleEvent(event),
-      (error) => this.#handleStreamError(error),
+      (event) => { if (epoch === this.#streamEpoch) this.#handleEvent(event); },
+      (error) => { if (epoch === this.#streamEpoch) this.#handleStreamError(error); },
     );
   }
 
@@ -238,11 +254,14 @@ export class OrbSessionController {
     try {
       await this.#subscribe(sessionId);
       this.#accumulator = { text: "" };
+      this.#awaitingPromptDone = true;
+      this.#stopReason = null;
       this.#modelInterval = performance.now();
       this.#afterToolsAt = 0;
       this.#deps.emit({ type: "turn-start" });
       await this.#deps.client.prompt(sessionId, next.text, next.images, this.#workspace ?? undefined);
     } catch (error) {
+      this.#awaitingPromptDone = false;
       this.#accumulator = null;
       this.#deps.emit({
         type: "error",
@@ -257,6 +276,7 @@ export class OrbSessionController {
   }
 
   #finishQueue(stopReason: string | null): void {
+    this.#awaitingPromptDone = false;
     if (this.#promptQueue.length > 0) {
       void this.#startNextPrompt();
       return;
@@ -272,6 +292,7 @@ export class OrbSessionController {
     this.#promptQueue = [];
     this.#accumulator = null;
     this.#running = false;
+    this.#awaitingPromptDone = false;
     this.#deps.emit({ type: "error", message: error.message });
     this.#deps.emit({ type: "idle", stopReason: null });
   }
@@ -283,6 +304,15 @@ export class OrbSessionController {
     if (typeof type !== "string") return;
 
     switch (type) {
+      case "agent_start":
+        // Extensions can start another run after a prompt has completed.
+        if (!this.#running) {
+          this.#running = true;
+          this.#stopReason = null;
+          this.#accumulator = { text: "" };
+          this.#deps.emit({ type: "turn-start" });
+        }
+        return;
       case "message_start":
         if ((record.message as { role?: string } | undefined)?.role === "assistant" && this.#afterToolsAt) {
           this.#modelInterval = this.#afterToolsAt;
@@ -350,9 +380,10 @@ export class OrbSessionController {
         // The first message_end of a turn belongs to the user message of that
         // turn; only an assistant message ends the reply.
         const message = record.message as
-          | { role?: string; content?: unknown }
+          | { role?: string; content?: unknown; stopReason?: string }
           | undefined;
         if (message?.role !== "assistant") return;
+        if (typeof message.stopReason === "string") this.#stopReason = message.stopReason;
         // Prefer streamed deltas, but fall back to the finalized content. The
         // accumulator starts as an empty string, so a truthiness-agnostic `??`
         // would keep the empty string and render a reply as nothing when no
@@ -364,18 +395,23 @@ export class OrbSessionController {
         return;
       }
       case "agent_end": {
-        const stopReason = typeof record.stopReason === "string" ? record.stopReason : null;
-        if (this.#accumulator) {
-          this.#emitAssistantMessage(this.#accumulator.text);
-          this.#accumulator = null;
-        }
-        if (this.#pendingQuestionId) {
-          this.#deps.emit({ type: "question-closed", id: this.#pendingQuestionId });
-          this.#pendingQuestionId = null;
-        }
-        this.#finishQueue(stopReason);
+        // Pi 1.0 may retry, compact or run extension follow-ups after agent_end.
+        // pi-web's prompt_done owns completion of a submitted logical prompt.
         return;
       }
+      case "agent_settled": {
+        // Extension-started runs have no wrapper-level prompt_done.
+        if (!this.#awaitingPromptDone) this.#completeRun();
+        return;
+      }
+      case "prompt_done": {
+        this.#completeRun();
+        return;
+      }
+      case "prompt_error":
+        this.#deps.emit({ type: "error", message: typeof record.errorMessage === "string" ? record.errorMessage : "pi-web prompt failed." });
+        // The wrapper sends prompt_done next; keep the queue locked until then.
+        return;
       case "error": {
         const message =
           typeof record.message === "string" ? record.message : "pi-web reported an error.";
@@ -390,6 +426,20 @@ export class OrbSessionController {
       default:
         return;
     }
+  }
+
+  /** Finish only the logical prompt or a settled extension run, once. */
+  #completeRun(): void {
+    if (!this.#running) return;
+    if (this.#accumulator) {
+      this.#emitAssistantMessage(this.#accumulator.text);
+      this.#accumulator = null;
+    }
+    if (this.#pendingQuestionId) {
+      this.#deps.emit({ type: "question-closed", id: this.#pendingQuestionId });
+      this.#pendingQuestionId = null;
+    }
+    this.#finishQueue(this.#stopReason);
   }
 
   /**

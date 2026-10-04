@@ -116,7 +116,7 @@ export interface ShellMenuEditFlags {
   readonly canSelectAll: boolean;
 }
 
-export type ShellMenuAction = "model" | "screenshot" | "shortcut";
+export type ShellMenuAction = "model" | "screenshot" | "shortcut" | "workspace";
 
 export interface WorkspaceStatus {
   readonly configured: boolean;
@@ -237,6 +237,7 @@ export type OpenSessionHistoryResult =
 export const SESSION_EVENT_CHANNEL_NAME = "orb:session-event";
 
 export type OrbSessionEvent =
+  | { readonly type: "access"; readonly status: DesktopTaskStatus }
   | { readonly type: "session"; readonly sessionId: string; readonly generation: number }
   | { readonly type: "turn-start" }
   | { readonly type: "queued"; readonly count: number }

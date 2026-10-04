@@ -1,0 +1,109 @@
+{
+  "capturedAt": "2026-10-01T07:06:52.496Z",
+  "sessionId": "01a0f615-ae56-7526-9b55-ab6610d4c3c0",
+  "model": {
+    "id": "gpt-6-sol",
+    "provider": "TZcode_gpt"
+  },
+  "method": "user Chrome Profile 1, Microsoft Playwright extension protocol 2, production Orb named pipe, real configured Pi model; user selected the existing Bilibili tab",
+  "source": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent\\sessions\\--D--workself-daily--\\2026-10-01T06-10-11-159Z_01a0f615-ae56-7526-9b55-ab6610d4c3c0.jsonl",
+  "screenshot": "live-official-profile.png",
+  "checks": [
+    {
+      "name": "existing Bilibili search tab returns inline DOM references",
+      "ok": true
+    },
+    {
+      "name": "official account certification is present in tool-returned DOM",
+      "ok": true
+    },
+    {
+      "name": "latest-published list and its first video are returned by the official account",
+      "ok": true
+    },
+    {
+      "name": "the first video was opened in an extension-owned tab",
+      "ok": true
+    },
+    {
+      "name": "real model navigation uses browser commands without advisor or native coordinate tools",
+      "ok": true
+    },
+    {
+      "name": "browser tools succeed and the model turn finishes",
+      "ok": true
+    }
+  ],
+  "navigationCalls": [
+    {
+      "name": "orb_browser",
+      "command": "browser_snapshot",
+      "at": "2026-10-01T06:20:43.703Z",
+      "elapsedMs": 351
+    },
+    {
+      "name": "orb_browser",
+      "command": "browser_click",
+      "at": "2026-10-01T06:20:50.326Z",
+      "elapsedMs": 2824
+    },
+    {
+      "name": "orb_browser",
+      "command": "browser_tabs",
+      "at": "2026-10-01T06:21:01.725Z",
+      "elapsedMs": 186
+    },
+    {
+      "name": "orb_browser",
+      "command": "browser_click",
+      "at": "2026-10-01T06:21:16.094Z",
+      "elapsedMs": 1853
+    }
+  ],
+  "pages": [
+    {
+      "url": "https://www.bilibili.com/?page=SearchResults&keyword=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F+%E7%BB%88%E6%9C%AB%E5%9C%B0",
+      "title": "明日方舟 终末地 - 搜索结果 - 哔哩哔哩",
+      "at": "2026-10-01T06:16:46.379Z",
+      "refs": 764
+    },
+    {
+      "url": "https://www.bilibili.com/?page=SearchResults&keyword=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F+%E7%BB%88%E6%9C%AB%E5%9C%B0",
+      "title": "明日方舟 终末地 - 搜索结果 - 哔哩哔哩",
+      "at": "2026-10-01T06:20:44.054Z",
+      "refs": 764
+    },
+    {
+      "url": "https://www.bilibili.com/?page=SearchResults&keyword=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F+%E7%BB%88%E6%9C%AB%E5%9C%B0",
+      "title": "明日方舟 终末地 - 搜索结果 - 哔哩哔哩",
+      "at": "2026-10-01T06:20:53.150Z",
+      "refs": 764
+    },
+    {
+      "url": "https://www.bilibili.com/?page=SearchResults&keyword=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F+%E7%BB%88%E6%9C%AB%E5%9C%B0",
+      "title": "明日方舟 终末地 - 搜索结果 - 哔哩哔哩",
+      "at": "2026-10-01T06:20:53.150Z",
+      "refs": 764
+    },
+    {
+      "url": "https://space.bilibili.com/1265652806",
+      "title": "明日方舟终末地的个人空间-明日方舟终末地个人主页-哔哩哔哩视频",
+      "at": "2026-10-01T06:21:01.911Z",
+      "refs": 345
+    },
+    {
+      "url": "https://space.bilibili.com/1265652806",
+      "title": "明日方舟终末地的个人空间-明日方舟终末地个人主页-哔哩哔哩视频",
+      "at": "2026-10-01T06:21:17.947Z",
+      "refs": 345
+    },
+    {
+      "url": "https://space.bilibili.com/1265652806",
+      "title": "明日方舟终末地的个人空间-明日方舟终末地个人主页-哔哩哔哩视频",
+      "at": "2026-10-01T06:21:17.947Z",
+      "refs": 345
+    }
+  ],
+  "note": "Initial extension tab selection involved the user. No raw snapshots, cookies or user account identifiers are exported. The final inspected page was the official profile; the opened video tab was later absent from the browser inventory.",
+  "passed": true
+}

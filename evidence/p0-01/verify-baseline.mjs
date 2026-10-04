@@ -20,7 +20,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const repo = resolve(import.meta.dirname, "..", "..");
-const baselinePath = join(repo, "evidence", "p0-01", "changed-files-baseline.json");
+// The original P0 snapshot remains historical after the authorized Pi Web 0.10 upgrade.
+const baselinePath = join(repo, "evidence", "personal-startup", "pi-web-baseline.json");
 const baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
 const piWebRepo = process.env.PI_ORB_P0_PI_WEB ?? baseline.piWebRepo;
 
