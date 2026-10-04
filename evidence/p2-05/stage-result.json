@@ -1,30 +1,36 @@
 {
-  "capturedAt": "2026-10-01T10:39:38.449Z",
+  "capturedAt": "2026-10-04T12:41:14.853Z",
   "steps": [
     {
       "name": "build and package the unpacked Windows app",
       "ok": true,
-      "ms": 33183,
-      "output": "  • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • duplicate dependency references  dependencies=[\"express@5.2.1\",\"debug@4.4.3\",\"http-errors@2.0.1\",\"iconv-lite@0.7.3\",\"on-finished@2.4.1\",\"qs@6.16.0\",\"raw-body@3.0.2\",\"type-is@2.1.0\",\"debug@4.4.3\",\"debug@4.4.3\",\"on-finished@2.4.1\",\"get-intrinsic@1.3.0\",\"call-bind-apply-helpers@1.0.2\",\"call-bind-apply-helpers@1.0.2\",\"es-object-atoms@1.1.2\",\"call-bound@1.0.4\",\"get-intrinsic@1.3.0\",\"side-channel-map@1.0.1\",\"debug@4.4.3\",\"debug@4.4.3\",\"http-errors@2.0.1\",\"on-finished@2.4.1\",\"send@1.2.1\",\"http-errors@2.0.1\"] |   • updating asar integrity executable resource  executablePath=release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe"
+      "ms": 110437,
+      "output": "  • searching for node modules  pm=npm searchDir=D:\\workself\\pi-orb |   • duplicate dependency references  dependencies=[\"express@5.2.1\",\"debug@4.4.3\",\"http-errors@2.0.1\",\"iconv-lite@0.7.3\",\"on-finished@2.4.1\",\"qs@6.16.0\",\"raw-body@3.0.2\",\"type-is@2.1.0\",\"debug@4.4.3\",\"debug@4.4.3\",\"on-finished@2.4.1\",\"get-intrinsic@1.3.0\",\"call-bind-apply-helpers@1.0.2\",\"call-bind-apply-helpers@1.0.2\",\"es-object-atoms@1.1.2\",\"call-bound@1.0.4\",\"get-intrinsic@1.3.0\",\"side-channel-map@1.0.1\",\"debug@4.4.3\",\"debug@4.4.3\",\"http-errors@2.0.1\",\"on-finished@2.4.1\",\"send@1.2.1\",\"http-errors@2.0.1\"] |   • updating asar integrity executable resource  executablePath=release\\0.1.0-preview.2\\win-unpacked\\pi-orb.exe |   • signing with signtool.exe  path=release\\0.1.0-preview.2\\win-unpacked\\pi-orb.exe"
     },
     {
       "name": "audit the packaged artifact",
       "ok": true,
-      "ms": 195,
-      "output": "  }, |   \"failed\": [], |   \"passedCount\": 27 | }"
+      "ms": 259,
+      "output": "  }, |   \"failed\": [], |   \"passedCount\": 30 | }"
+    },
+    {
+      "name": "load the independent packaged plugin with Pi",
+      "ok": true,
+      "ms": 39616,
+      "output": "    } |   ], |   \"passed\": true | }"
     },
     {
       "name": "start the packaged application and drive its renderer",
       "ok": true,
-      "ms": 7706,
+      "ms": 8881,
       "output": "      \"detail\": \"none\" |     } |   ] | }"
     }
   ],
   "passed": true,
   "artifactAudit": {
-    "capturedAt": "2026-10-01T10:40:11.768Z",
-    "version": "0.1.0-preview.1",
-    "appRoot": "release/0.1.0-preview.1/win-unpacked",
+    "capturedAt": "2026-10-04T12:43:05.477Z",
+    "version": "0.1.0-preview.2",
+    "appRoot": "release/0.1.0-preview.2/win-unpacked",
     "entries": {
       "count": 2842,
       "sample": [
@@ -64,7 +70,7 @@
     ],
     "sizes": {
       "executableBytes": 246090752,
-      "asarBytes": 36106006,
+      "asarBytes": 36116362,
       "unpackedNativeBytes": 1834010,
       "archiveEntryCount": 2842
     },
@@ -72,7 +78,7 @@
       {
         "name": "the unpacked Windows build exists",
         "ok": true,
-        "detail": "release/0.1.0-preview.1/win-unpacked/pi-orb.exe"
+        "detail": "release/0.1.0-preview.2/win-unpacked/pi-orb.exe"
       },
       {
         "name": "the archive contains package.json",
@@ -177,7 +183,22 @@
       {
         "name": "the packaged resources carry CHANGELOG.md",
         "ok": true,
-        "detail": "59640 bytes"
+        "detail": "60606 bytes"
+      },
+      {
+        "name": "the independent plugin ships outside ASAR at the app version",
+        "ok": true,
+        "detail": "resources/pi-plugin"
+      },
+      {
+        "name": "the independent plugin carries browser runtime dependencies",
+        "ok": true,
+        "detail": "MCP and Playwright are real files"
+      },
+      {
+        "name": "the independent plugin does not carry a second Pi SDK",
+        "ok": true,
+        "detail": "Pi and typebox remain host-provided peers"
       },
       {
         "name": "the packaged Koffi version matches the pinned production dependency",
@@ -192,7 +213,7 @@
       {
         "name": "the shipped manifest carries the project version",
         "ok": true,
-        "detail": "0.1.0-preview.1 vs 0.1.0-preview.1"
+        "detail": "0.1.0-preview.2 vs 0.1.0-preview.2"
       },
       {
         "name": "the shipped manifest names no repository-only entry point",
@@ -208,9 +229,9 @@
     "passed": true
   },
   "packagedSmoke": {
-    "capturedAt": "2026-10-01T10:40:11.920Z",
-    "executable": "release\\0.1.0-preview.1\\win-unpacked\\pi-orb.exe",
-    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1790851211920",
+    "capturedAt": "2026-10-04T12:43:45.314Z",
+    "executable": "release\\0.1.0-preview.2\\win-unpacked\\pi-orb.exe",
+    "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1791117825314",
     "checks": [
       {
         "name": "the packaged application stays alive",
@@ -220,7 +241,7 @@
       {
         "name": "the packaged application creates its window",
         "ok": true,
-        "detail": ""
+        "detail": "pi-orb"
       },
       {
         "name": "the packaged preload bridge reaches the renderer",
@@ -295,7 +316,7 @@
       {
         "name": "the dock gesture slides the window off the edge instead of snapping it",
         "ok": true,
-        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
+        "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
       },
       {
         "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -324,8 +345,8 @@
       }
     ],
     "passed": true,
-    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-36424",
-    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/47c53805-915f-4d0b-a032-ff099f8047a5"
+    "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-85764",
+    "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/64ce3908-2a46-47bc-967d-2b24819bfd0b"
   },
   "installer": "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
 }

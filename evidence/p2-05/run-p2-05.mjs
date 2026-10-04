@@ -56,6 +56,7 @@ function step(name, command, args, options = {}) {
 // `C:\Program Files\...` interpreter path at the space.
 step("build and package the unpacked Windows app", "npm", ["run", "package:win:dir"]);
 step("audit the packaged artifact", "node", ["evidence/p2-05/run-package-audit.mjs"]);
+step("load the independent packaged plugin with Pi", "node", ["evidence/personal-startup/run-plugin-load.mjs"]);
 step("start the packaged application and drive its renderer", "node", ["evidence/p2-05/run-packaged-smoke.mjs"]);
 
 const auditPath = join(evidenceDir, "package-audit.json");

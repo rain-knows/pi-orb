@@ -10,6 +10,14 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+### Windows 个人安装与启动（preview.2，本地构建）
+
+- 每用户安装后支持 Win+R `pi-orb`；第二实例唤回已有浮窗，不覆盖握手与快捷键。
+- 独立 Pi 插件与浏览器依赖随包；首次备份设置后通过官方 CLI 注册，移除旧同名本地包。无需克隆 Orb 源码。
+- 已有 Pi Web 直接复用，未运行从确认的官方入口隐藏启动；不打开浏览器、不重启已有服务，退出 Orb 保留共享后端。
+- 卸载经 Pi CLI 移除随包登记，清理本安装 Win+R 登记，保留用户数据。
+- 打包门禁加入真实 Pi 独立插件加载；干净机器安装/升级与 SmartScreen 仍未验证。
+
 ### Pi Web 0.10 / Pi 1.0
 
 - 开发 SDK 锁定 1.0.0，与 Pi Web 0.10 宿主一致。Orb 以 `prompt_done` / `agent_settled`

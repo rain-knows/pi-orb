@@ -1,6 +1,6 @@
 {
   "name": "pi-orb",
-  "version": "0.1.0-preview.1",
+  "version": "0.1.0-preview.2",
   "private": true,
   "type": "module",
   "description": "Electron desktop companion for pi-web: a floating orb window with an explicit, user-authorized desktop mode.",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "npm run typecheck && electron-vite build",
+    "build": "npm run typecheck && electron-vite build && node scripts/build-pi-plugin.mjs",
     "start": "electron-vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

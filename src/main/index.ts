@@ -87,6 +87,31 @@ import {
   unsnapDockedBall,
 } from "./floating-window-controller";
 import { startSelectionMonitor, type SelectionMonitor } from "./selection-monitor";
+import { preparePersonalStartup, probePersonalPiWeb, removeBundledPlugin } from "./personal-startup";
+import { mkdirSync } from "node:fs";
+
+// Electron's Chromium switch does not by itself relocate main-process configuration/handshake.
+// Make an explicit profile override consistent before the lock or installer cleanup uses it.
+const profileDirectory = app.commandLine.getSwitchValue("user-data-dir");
+if (profileDirectory) {
+  mkdirSync(profileDirectory, { recursive: true });
+  app.setPath("userData", profileDirectory);
+}
+
+// Installer cleanup never owns a window or bridge.
+if (process.argv.includes("--remove-bundled-plugin")) {
+  try {
+    removeBundledPlugin(app.getPath("userData"), join(process.resourcesPath, "pi-plugin"));
+    app.exit(0);
+  } catch { app.exit(1); }
+}
+// A secondary instance must exit before hooks or handshake ownership, including quit cleanup.
+if (!app.requestSingleInstanceLock()) app.exit(0);
+let wakeAfterStartup = false;
+app.on("second-instance", () => {
+  if (!window || window.isDestroyed()) wakeAfterStartup = true;
+  else void showOrb();
+});
 
 const generations = new RunGenerations();
 const shortcuts = new ShortcutRegistry(globalShortcut);
@@ -523,7 +548,7 @@ async function refreshPiWebState(): Promise<void> {
     piWebState = {
       baseUrl: client.baseUrl,
       reachable: false,
-      problem: `No pi-web service answered at ${client.baseUrl}. Start it yourself; Orb will not start, restart or stop it.`,
+      problem: `未连接到 ${client.baseUrl}。请检查 Pi Web 服务或重新打开 Orb；启动日志位于 Orb 用户数据目录。`,
     };
     markDisconnected();
     return;
@@ -1404,6 +1429,21 @@ void app.whenReady().then(async () => {
     console.warn(`[pi-orb] ${loaded.error}`);
   }
 
+  // Explicit-config dev/evidence sessions remain isolated from personal installation.
+  if (app.isPackaged && !process.env.PI_ORB_CONFIG) {
+    try {
+      await preparePersonalStartup({
+        userData: app.getPath("userData"), pluginSource: join(process.resourcesPath, "pi-plugin"),
+        baseUrl: piWebBaseUrl, password: piWebPassword, probe: () => probePersonalPiWeb(piWebBaseUrl),
+        pickFile: async (title, extension) => {
+          const result = await dialog.showOpenDialog({ title, properties: ["openFile"], filters: [{ name: extension, extensions: [extension] }] });
+          return result.canceled ? undefined : result.filePaths[0];
+        },
+        notify: message => { void dialog.showMessageBox({ type: "info", title: "pi-orb 安装提示", message }); },
+      });
+    } catch (error) { dialog.showErrorBox("pi-orb 启动准备未完成", describeError(error)); }
+  }
+
   session = new OrbSessionController({
     log: entry => console.log(`[pi-orb] session timing ${JSON.stringify(entry)}`),
     client,
@@ -1421,6 +1461,7 @@ void app.whenReady().then(async () => {
   registerIpc();
   createTray();
   window = createWindow();
+  if (wakeAfterStartup) { wakeAfterStartup = false; void showOrb(); }
   await startNativeSelectionMonitor();
   attachWakeController(window);
   if (!shortcutEdgeGuard.start()) {

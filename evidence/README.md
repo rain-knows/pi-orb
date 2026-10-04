@@ -6,6 +6,7 @@
 
 | 路径 | 内容 | 状态 |
 |---|---|---|
+| `personal-startup/` | 随包独立 Pi 插件、官方 CLI/后端隐藏启动、NSIS/ShellExecute 单实例与卸载、升级后的 Pi Web 源码保护基线 | 结果见该目录；干净机与 SmartScreen 仍未验证 |
 | `upgrade-0.10/` | Pi Web 0.10 / Pi 1.0：实际 provider 提示词审计与旧版本反证、插件/MCP、真实模型与桌面、生命周期及本地产物 | 聚焦与生产验证通过；上游 Windows 全量测试限制保留 |
 | `tool-speed/` | 四阶段工具速度优化：计时、原生批量/Stop、1500 次等待实验、真实模型对照和图片预算 | 见阶段记录；大控件通过，小控件定位失败保留，生产等待 600ms |
 | `p0-01/` | 环境与合同基线：支持版本、写入清单、N1–N8 对照、**可校验的变更文件 SHA-256 基线** | 已完成 |
@@ -25,7 +26,7 @@
 | `p2-02/` | P2-02 双 Alt 快捷手势 | 左右 Alt 纯状态检测器和预览触发已接入；真实键盘验收未完成 |
 | `p2-03/` | P2-03 参考 history 与选区上下文 | 复用 pi-web 公开 session summary/detail API；workspace 过滤、历史绑定、文本恢复和 Windows UI Automation 选区 chip 已接入；真实 UIA 与原生工具栏仍未验收 |
 | `p2-04/` | P2-04 参考桌面动作扩展 | 复用参考项目 Windows backend 接入热键、长按、同窗口拖拽、授权后的动作后 image block 和显式截图导出；`orb_open_app` 收窄为只激活已运行应用（不启动进程）；真实桌面动作、目标像素、保存对话框、剪贴板与 open-app 真机效果仍待验收 |
-| `p2-05/` | P2-05 Windows x64 打包与分发 | **通过**（产物内容审计 27/27、打包产物启动探测 22/22，后者验证 session Access preload 合同与参考壳层）；干净机安装／卸载／升级与 SmartScreen 未验证 |
+| `p2-05/` | P2-05 Windows x64 打包与分发 | **通过**（产物内容审计 30/30、打包产物启动探测 22/22，后者验证 session Access preload 合同与参考壳层）；干净机安装／卸载／升级与 SmartScreen 未验证 |
 | `p1-07/CONTRACT-MATRIX.md` | P1 合同对照：N1–N8 非破坏性不变量 + §7.1 发布必测项与 P1 证据映射 | 随每个发布版本维护 |
 | `frontend-port/` | 通用桌面体验：中文权限／工具过程、输入不收起、停止按钮和光标布局；真实打包 bridge → 原生输入 → 目标读回 | 交互探针与 native-target-probe 通过；不代替真实模型自主跨应用验收 |
 

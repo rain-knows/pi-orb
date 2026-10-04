@@ -1,0 +1,52 @@
+{
+  "capturedAt": "2026-10-04T13:07:07.309Z",
+  "version": "0.1.0-preview.2",
+  "root": "D:\\pi-orb-personal-runs\\install 中文 1791119227308",
+  "checks": [
+    {
+      "name": "NSIS installs in a per-user Chinese/space directory",
+      "ok": true,
+      "detail": "D:\\pi-orb-personal-runs\\install 中文 1791119227308\\app"
+    },
+    {
+      "name": "installer registers the actual executable for ShellExecute",
+      "ok": true,
+      "detail": "HKCU App Paths"
+    },
+    {
+      "name": "installed executable equals the audited build",
+      "ok": true,
+      "detail": "9c77ee90dc817b857c1bffe43b0ed37e80671e988e783b94340ffa928c87a801"
+    },
+    {
+      "name": "ShellExecute pi-orb starts the installed sandboxed renderer",
+      "ok": true,
+      "detail": 89144
+    },
+    {
+      "name": "second short-name startup preserves primary bridge identity",
+      "ok": true,
+      "detail": {
+        "mainPid": 89144,
+        "secondPid": 82632,
+        "bridgePid": 89144
+      }
+    },
+    {
+      "name": "second invocation restores the same page and draft",
+      "ok": true,
+      "detail": "same CDP page"
+    },
+    {
+      "name": "uninstall removes only this installation's App Paths registration",
+      "ok": true,
+      "detail": "registration and installed executable absent"
+    },
+    {
+      "name": "uninstall preserves the application profile",
+      "ok": true,
+      "detail": "profile and workspace config remain"
+    }
+  ],
+  "passed": true
+}

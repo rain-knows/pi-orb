@@ -153,7 +153,10 @@ const binaryExtensions = [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".dll", ".no
 // synthetic visual-review fixtures required by the reference-port stage; personal screenshots and
 // native binaries remain rejected.
 const approvedProductAssets = new Set(["src/renderer/orb-avatar.png"]);
+// Audit files eligible for source distribution; ignored local captures are not committed assets.
+const sourceCandidates = new Set(execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: repo, encoding: "utf8" }).split("\0"));
 for (const file of shipFiles) {
+  if (!sourceCandidates.has(relative(repo, file).split("\\").join("/"))) continue;
   const name = file.toLowerCase();
   if (binaryExtensions.some((extension) => name.endsWith(extension))) {
     const relativePath = relative(repo, file).split("\\").join("/");
@@ -286,7 +289,7 @@ check(
 );
 check(
   "the Pi SDK is pinned to the version the pi-web baseline uses",
-  pinned["@earendil-works/pi-coding-agent"] === "0.87.1",
+  pinned["@earendil-works/pi-coding-agent"] === JSON.parse(readFileSync(join(repo, "evidence/upgrade-0.10/environment.json"), "utf8")).versions.sdk,
   String(pinned["@earendil-works/pi-coding-agent"]),
 );
 
@@ -668,14 +671,18 @@ const allowedWriteFiles = new Set([
   "src/main/config-store.ts",
   "src/main/bridge-server.ts",
   "src/main/workspace.ts",
+  // Orb-owned runtime file/settings backups; Pi configuration changes go through official CLI.
+  "src/main/personal-startup.ts",
 ]);
 
 // `relative` yields backslashes on Windows, so paths are normalized before comparison: comparing
 // a backslash path against a forward-slash allowlist silently reported every file as unexpected.
 const toPosix = (path) => path.split(/\\/).join("/");
-const unexpectedWriteFiles = [...new Set(writeCalls.map((entry) => toPosix(entry.file)))].filter(
-  (file) => !allowedWriteFiles.has(file),
-);
+// The main entry creates only the explicitly requested Electron userData directory before setPath.
+const unexpectedWriteFiles = [...new Set(writeCalls.filter(entry =>
+  !allowedWriteFiles.has(toPosix(entry.file)) && !(toPosix(entry.file) === "src/main/index.ts"
+    && entry.call === "mkdirSync" && entry.text === "mkdirSync(profileDirectory, { recursive: true });"),
+).map(entry => toPosix(entry.file)))];
 check(
   "product writes only happen in the modules that own the Orb data directory and the chosen workspace",
   unexpectedWriteFiles.length === 0,

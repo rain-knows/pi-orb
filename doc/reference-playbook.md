@@ -667,3 +667,12 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 ## 16. 工具调用提速适配
 
 参考没有 Pi observation_id 批量桥接和请求关联计时。此前阶段见 [`tool-speed-optimization.md`](./tool-speed-optimization.md)，当前像素契约和小控件实测见 [`plugin-reference-and-pointing.md`](./plugin-reference-and-pointing.md)。桥接仅 v2，所有桌面工具 sequential；保留最新一张请求截图，历史不改；1500 次等待对照不满足缩短条件，生产保留 600ms。不复制 dsh 调度器或图片存储。
+
+## 17. 个人用户安装与启动适配
+
+参考没有 Pi 包登记、独立 Pi 插件分发和本机现有 Pi Web 的启动入口。实现见
+[`personal-user-installation.md`](./personal-user-installation.md)：沿用 §9.4 的每用户 NSIS，
+仅用 electron-builder 公开 include/hooks 登记 App Paths 与卸载清理，不复制上游自定义页面
+或字符串替换模板。用现有 Vite 构建独立插件，宿主 SDK 保持 peer，经官方 Pi CLI 注册。
+主进程单实例锁与既有唤醒出口结合；已有后端优先、未运行才隐藏启动官方入口，不重启共享服务。
+来源仍为固定旧提交的 desktop main/welcome/config，差异理由及真机证据见该阶段文档。
