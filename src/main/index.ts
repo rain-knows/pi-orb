@@ -37,6 +37,8 @@ import { DoubleAltDetector } from "./double-alt";
 import { WakeController } from "./window-toggle";
 import { OrbWindowLifecycle } from "./window-lifecycle";
 import { OrbSessionController } from "./orb-session";
+import { CodeAgentManager } from "./code-agent-manager";
+import { codeAgentRegistryPath } from "../shared/code-agent";
 import { PiWebClient, PiWebError } from "./pi-web-client";
 import { Win32TargetWindowReader } from "./target-window";
 import { RecordedTargetStore } from "./recorded-target";
@@ -45,8 +47,6 @@ import { ScreenshotFlow } from "./screenshot-flow";
 import { screenshotExportBytes, screenshotExportExtension } from "./screenshot-export";
 import { BridgeServer, createBridgeToken, removeHandshake, writeHandshake } from "./bridge-server";
 import { DesktopBroker } from "./desktop-broker";
-import { BrowserBroker } from "./browser-broker";
-import { waitForBrowserObservationWindow } from "./browser-observation-frame";
 import { ReferenceWindowsDriver } from "./reference-windows-driver";
 import { applyFloatingOverlayGuard, resetFloatingOverlayGuard, OVERLAY_GUARD_INPUT_APPLY_MS } from "./floating-overlay-guard";
 import { delay } from "./reference-windows/wait";
@@ -156,6 +156,7 @@ let window: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let observationFrame: BrowserWindow | null = null;
 let session: OrbSessionController;
+let codeAgents: CodeAgentManager | null = null;
 let wake: WakeController | null = null;
 let lifecycle: OrbWindowLifecycle | null = null;
 let lastWorkspaceProblem: string | null = null;
@@ -165,7 +166,6 @@ let lastDesktopProblem: string | null = null;
 // Stop and hide revoke it. An explicit reopen or new session selects Full Access again.
 let defaultAccessPending = true;
 let accessRevision = 0;
-const browserBroker = new BrowserBroker(() => desktopBroker?.status() ?? null);
 
 function grantDefaultAccess(sessionId: string, generation: number): void {
   if (!defaultAccessPending || !desktopBroker || generations.current !== generation || session.sessionId !== sessionId) return;
@@ -208,6 +208,7 @@ function emit(event: OrbSessionEvent): void {
     // Released against the controller's own generation, not `generations.current`:
     // a turn that ends after a workspace switch must not free the new run's lock.
     generations.release(session.generation);
+    if (session.sessionId && event.stopReason !== "aborted") void codeAgents?.deliverPending(session.sessionId);
   }
   if (window && !window.isDestroyed()) {
     window.webContents.send(IPC.sessionEvent, event);
@@ -482,23 +483,17 @@ async function startBridge(): Promise<void> {
         const broker = requireBroker();
         return broker.act(action, sessionId, generation, signal);
       },
-      batch: (value, sessionId, generation, signal, progress) => requireBroker().batch(value, sessionId, generation, signal, progress),
-      browser: async (value, sessionId, generation, signal) => {
-        const revision = accessRevision;
-        const result = await browserBroker.call(value, sessionId, generation, signal);
-        const stillLive = () => !signal?.aborted && generations.current === generation
-          && session.sessionId === sessionId && accessRevision === revision
-          && desktopBroker?.status().authorized && desktopBroker.status().level === "full-access";
-        try {
-          if (stillLive()) {
-            const target = await waitForBrowserObservationWindow(result, () => referenceDriver?.listWindows() ?? [], signal);
-            if (stillLive()) {
-              if (target) showObservationFrameForTarget(target.bounds);
-              else hideObservationFrame(observationFrame ?? undefined);
-            }
-          }
-        } catch (error) { console.warn(`[pi-orb] browser observation frame unavailable: ${describeError(error)}`); }
-        return result;
+      codeAgent: async (command, args, sessionId, _generation, signal) => {
+        if (!codeAgents || !session.workspace) throw new Error("Code agent sessions are unavailable.");
+        if (command === "status") return codeAgents.status(sessionId);
+        if (command === "stop") {
+          const id = (args as { session_id?: unknown })?.session_id;
+          if (typeof id !== "string" || !id.trim()) throw new Error("code_agent_stop requires session_id.");
+          return codeAgents.stop(sessionId, id);
+        }
+        const access = requireBroker().status();
+        if (!access.authorized || access.sessionId !== sessionId || !access.level) throw new Error("Code agent dispatch requires the calling session's Access grant.");
+        return codeAgents.dispatch(sessionId, session.workspace, access.level, args, signal);
       },
       status: () => desktopTaskStatus(),
       revoke: () => revokeDesktopOperations("the bridge revoked Access"),
@@ -721,7 +716,6 @@ function attachKeyboardEdgeRecovery(): void {
 function revokeDesktopOperations(reason: string): void {
   accessRevision++;
   defaultAccessPending = false;
-  browserBroker.revoke();
   const hadAuthority = desktopBroker?.status().authorized === true;
   const hadCapture = screenshotFlow?.pending !== null && screenshotFlow?.pending !== undefined;
   desktopBroker?.revoke();
@@ -1259,7 +1253,6 @@ function registerIpc(): void {
     const requestedRevision = accessRevision;
     return session.ensureSession(config.orbWorkspace).then((sessionId) => {
       if (accessRevision !== requestedRevision || generations.current !== parsed.generation || session.sessionId !== sessionId || !window?.isVisible()) return desktopTaskStatus();
-      browserBroker.revoke();
       desktopBroker?.authorize({ sessionId, generation: parsed.generation, level: parsed.level });
       defaultAccessPending = false;
       return desktopTaskStatus();
@@ -1450,6 +1443,18 @@ void app.whenReady().then(async () => {
     client,
     emit: (event) => emit(event),
   });
+  codeAgents = new CodeAgentManager({
+    client, registryPath: codeAgentRegistryPath(),
+    deliver: async (owner, text) => {
+      // A completion notice is a session event, not a desktop action. It must still arrive after
+      // the user hides Orb or revokes GUI Access while the background worker continues.
+      if (session.sessionId !== owner || session.running || session.pendingQuestionId || isQuitting) return false;
+      if (!generations.tryAcquire(session.generation)) return false;
+      try { await session.prompt(text); return true; }
+      catch (error) { generations.release(session.generation); throw error; }
+    },
+    log: error => console.warn(`[pi-orb] Code agent: ${describeError(error)}`),
+  });
   screenshotFlow = new ScreenshotFlow({
     // captureScreenshot refreshes this snapshot on demand using the reference Win32 window walk.
     recordedTarget,
@@ -1477,6 +1482,7 @@ void app.whenReady().then(async () => {
   // carry a real answer rather than "unknown". Desktop startup is slower (it loads a native driver
   // and shells out for the recorded target) and is not needed for the first render.
   await refreshPiWebState();
+  if (piWebState.reachable) await codeAgents.restore();
 
   // Started so the extension can reach the shell as soon as a session exists, and so a driver
   // problem is reported rather than crashing startup.
@@ -1557,4 +1563,5 @@ app.on("before-quit", () => {
   void bridge?.close();
   removeHandshake(app.getPath("userData"));
   session?.dispose();
+  codeAgents?.dispose();
 });

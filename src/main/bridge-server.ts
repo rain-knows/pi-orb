@@ -30,12 +30,11 @@ import { MAX_SCREENSHOT_BYTES } from "@shared/screenshot";
 export const MAX_BRIDGE_FRAME_BYTES = Math.ceil(MAX_SCREENSHOT_BYTES * 1.5) + 256 * 1024;
 
 export interface BridgeExecutor {
-  browser?(value: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown>;
+  codeAgent?(command: "dispatch" | "status" | "stop", args: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown>;
   /** Perform an observation. Returns a JSON-serializable result. */
   observe(input: { readonly sessionId: string; readonly generation: number; readonly signal?: AbortSignal }): Promise<unknown>;
   /** Perform one action. Returns a JSON-serializable result. */
   act(action: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown>;
-  batch(value: unknown, sessionId: string, generation: number, signal?: AbortSignal, progress?: (step: number, total: number) => void): Promise<unknown>;
   /** Report the task state for the session. */
   status(): unknown;
   /** Revoke the current session desktop Access grant. */
@@ -103,7 +102,7 @@ export class BridgeServer {
           const frame = buffer.slice(0, newline);
           buffer = buffer.slice(newline + 1);
           const requestId = (() => { try { const id = JSON.parse(frame).requestId; return typeof id === "string" && /^[a-zA-Z0-9-]{1,128}$/.test(id) ? id : randomUUID(); } catch { return randomUUID(); } })();
-          void withToolTiming(requestId, entry => this.#log(entry), () => timeToolPhase("executor-total", () => this.#handle(frame, controller.signal, (step, total) => { if (!socket.destroyed) socket.write(`${JSON.stringify({ type: "progress", requestId, step, total })}\n`); }))).then((response) => {
+          void withToolTiming(requestId, entry => this.#log(entry), () => timeToolPhase("executor-total", () => this.#handle(frame, controller.signal))).then((response) => {
             finished = true;
             socket.end(`${JSON.stringify(response)}\n`);
           });
@@ -132,7 +131,7 @@ export class BridgeServer {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 
-  async #handle(frame: string, signal: AbortSignal, progress: (step: number, total: number) => void): Promise<BridgeResponse> {
+  async #handle(frame: string, signal: AbortSignal): Promise<BridgeResponse> {
     let request: Record<string, unknown>;
     try {
       request = JSON.parse(frame) as Record<string, unknown>;
@@ -171,8 +170,7 @@ export class BridgeServer {
         return { ok: true, result: { version: BRIDGE_PROTOCOL_VERSION } };
       case "observe":
       case "act":
-      case "batch":
-      case "browser":
+      case "code-agent":
       case "status":
       case "revoke": {
         const admission = this.#options.executor.accepts(sessionId, generation);
@@ -196,8 +194,11 @@ export class BridgeServer {
             const result = await this.#options.executor.act(request.action, sessionId, generation, signal);
             return promoteRefusal(result);
           }
-          if (type === "batch") return { ok: true, result: await this.#options.executor.batch(request.batch, sessionId, generation, signal, progress) };
-          if (type === "browser") return { ok: true, result: await this.#options.executor.browser?.(request.browser, sessionId, generation, signal) ?? { ok: false, reason: "not-configured", message: "Browser broker is unavailable." } };
+          if (type === "code-agent") {
+            if (!["dispatch", "status", "stop"].includes(String(request.command))) return refuse("malformed", "Unknown Code agent command.");
+            if (!this.#options.executor.codeAgent) return refuse("not-configured", "Code agent sessions are unavailable.");
+            return { ok: true, result: await this.#options.executor.codeAgent(request.command as "dispatch" | "status" | "stop", request.arguments, sessionId, generation, signal) };
+          }
           if (type === "revoke") {
             this.#options.executor.revoke();
             return { ok: true, result: { revoked: true } };

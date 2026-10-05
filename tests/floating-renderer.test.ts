@@ -298,13 +298,13 @@ it("selects a session access tier and keeps screenshot confirmation explicit", a
 it("renders tool progress and answers a Pi select request in the reference card", async () => {
   const h = harness();
   await expect.poll(() => h.byId("composer").hidden).toBe(false);
-  h.emit({ type: "tool", phase: "start", id: "call-1", name: "orb_observe", detail: "Running", isError: false });
-  h.emit({ type: "tool", phase: "end", id: "call-1", name: "orb_observe", detail: "Completed", isError: false });
-  expect(h.document.querySelector(".orb-tool strong")?.textContent).toBe("观察桌面");
+  h.emit({ type: "tool", phase: "start", id: "call-1", name: "click", detail: "Running", isError: false });
+  h.emit({ type: "tool", phase: "end", id: "call-1", name: "click", detail: "Completed", isError: false });
+  expect(h.document.querySelector(".orb-tool strong")?.textContent).toBe("点击");
     expect(h.document.querySelector(".orb-tool-phase")?.textContent).toBe("完成");
-    h.emit({ type: "tool", phase: "update", id: "batch-1", name: "orb_batch", detail: "执行第 2/3 步", isError: false });
-    expect(h.document.querySelector(".orb-tool--running strong")?.textContent).toBe("批量操作");
-    expect(h.document.querySelector(".orb-tool--running p")?.textContent).toBe("执行第 2/3 步");
+    h.emit({ type: "tool", phase: "update", id: "tool-1", name: "input_text", detail: "输入中", isError: false });
+    expect(h.document.querySelector(".orb-tool--running strong")?.textContent).toBe("输入文字");
+    expect(h.document.querySelector(".orb-tool--running p")?.textContent).toBe("输入中");
   h.emit({ type: "question", id: "ask-1", method: "select", title: "Choose", message: "Pick one", options: ["First (Recommended)", "Second"], prefill: "" });
   expect(h.byId("question").hidden).toBe(false);
   expect(h.document.querySelector(".question-recommended")?.textContent).toBe("推荐");

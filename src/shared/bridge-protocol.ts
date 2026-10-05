@@ -80,8 +80,7 @@ export type BridgeRequest = ({ readonly version?: number; readonly requestId?: s
       readonly generation: number;
       readonly action: unknown;
     }
-  | { readonly type: "batch"; readonly token: string; readonly sessionId: string; readonly generation: number; readonly batch: unknown }
-  | { readonly type: "browser"; readonly token: string; readonly sessionId: string; readonly generation: number; readonly browser: unknown }
+  | { readonly type: "code-agent"; readonly token: string; readonly sessionId: string; readonly generation: number; readonly command: "dispatch" | "status" | "stop"; readonly arguments?: unknown }
   | { readonly type: "status"; readonly token: string; readonly sessionId: string; readonly generation: number }
   | { readonly type: "revoke"; readonly token: string; readonly sessionId: string; readonly generation: number });
 

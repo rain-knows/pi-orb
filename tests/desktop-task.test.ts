@@ -59,7 +59,7 @@ describe("session-level desktop access", () => {
     grant(controller);
     controller.recordOutcome(false, "driver failure");
     controller.observe("obs-2");
-    expect(controller.check(click("obs-2"), observation("obs-2"), { sessionId: "sess-1", generation: 1 })).toBe("batch-stopped");
+    expect(controller.check(click("obs-2"), observation("obs-2"), { sessionId: "sess-1", generation: 1 })).toBe("task-stopped");
     grant(controller, "workspace-write");
     controller.observe("obs-2");
     expect(controller.check(click("obs-2"), observation("obs-2"), { sessionId: "sess-1", generation: 1 })).toBeNull();

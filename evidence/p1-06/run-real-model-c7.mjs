@@ -1,9 +1,9 @@
-// P1-06 real-model acceptance harness for the reference Windows backend (C7, D6 and D8).
+// Current reference-toolset real-model acceptance harness for the Windows backend (C7, D6 and D8).
 //
 // C7 is "the point picked off the screenshot is the point that gets clicked". The automated P1-06
 // stage proves the product's half of that (a fraction read off the image maps onto the intended
 // cell); it cannot prove the model's half, which is that a real model, given the real screenshot,
-// actually calls orb_observe and then orb_click with a fraction that lands on the same cell.
+// actually calls the direct GUI tool with a screenshot fraction that lands on the same cell.
 //
 // This harness runs that real-model path end to end:
 //
@@ -26,8 +26,11 @@
 
 import { spawn, execFileSync } from "node:child_process";
 import { connect } from "node:net";
+import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
 import {
   existsSync,
+  appendFileSync,
   linkSync,
   mkdirSync,
   readFileSync,
@@ -41,49 +44,66 @@ import { tmpdir } from "node:os";
 
 const repo = resolve(import.meta.dirname, "..", "..");
 const testCase = process.argv[2] ?? "c7";
+const accessLevel = ["browser", "open-app"].includes(testCase) ? "full-access" : "workspace-write";
 const caseConfig = {
   c7: {
     slug: "real-c7",
     output: "real-model-c7-session-access.json",
-    what: "real model observes a disposable grid, clicks cell 0,0, then observes again",
+    what: "real model receives the automatic frontmost frame and clicks cell 0,0 with the direct click tool",
     instruction: [
-      "看刚才收到的目标窗口截图。先调用 orb_observe。",
-      "然后根据截图中左上角标记为 0,0 的格子，调用一次 orb_click。",
+      "直接根据刚才收到的目标窗口截图，调用一次 click。",
+      "根据截图中左上角标记为 0,0 的格子定位，调用一次 click。",
       "x/y 使用截图相对的 0–1000 坐标，不要使用屏幕绝对坐标，也不要点击别处。",
-      "动作返回后直接使用它附带的新截图和 observation_id，不要重复观察。",
+      "动作返回后直接使用它附带的新截图，不要额外调用观察工具。",
     ].join("\n"),
     targetEvent: "cell-mousedown",
-    expectedTool: "orb_click",
+    expectedTool: "click",
   },
   "d6-scroll": {
     slug: "real-d6-scroll",
     output: "real-model-d6-scroll-session-access.json",
-    what: "real model observes a disposable target and scrolls its labelled strip",
+    what: "real model receives the automatic frontmost frame and scrolls its labelled strip",
     instruction: [
-      "看刚才收到的目标窗口截图。先调用 orb_observe。",
+      "直接根据刚才收到的目标窗口截图，调用一次 scroll。",
       "根据截图找到标注为 s0-s9 的窄滚动区域，在该区域内向下滚动 3 格。",
-      "使用 orb_scroll 的截图相对 0–1000 坐标，把位置放在滚动区域内部；不要点击或输入。",
-      "动作返回后直接使用它附带的新截图和 observation_id，不要重复观察。",
+      "使用 scroll 的截图相对 0–1000 坐标，把位置放在滚动区域内部；不要点击或输入。",
+      "动作返回后直接使用它附带的新截图，不要额外调用观察工具。",
     ].join("\n"),
     targetEvent: "wheel",
-    expectedTool: "orb_scroll",
+    expectedTool: "scroll",
   },
   "d8-type": {
     slug: "real-d8-type",
     output: "real-model-d8-type-session-access.json",
-    what: "real model observes a disposable target, focuses its text field, and types a synthetic marker",
+    what: "real model receives the automatic frontmost frame, focuses its text field, and types a synthetic marker",
     instruction: [
-      "看刚才收到的目标窗口截图。先调用 orb_observe。",
-      "只对截图中标注 type here 的输入框操作：先用 orb_click 点击输入框中心，然后使用这个动作返回的新 observation_id。",
+      "直接根据刚才收到的目标窗口截图操作。",
+      "只对截图中标注 type here 的输入框操作：先用 click 点击输入框中心，然后使用这个动作返回的新截图。",
       "这个输入框位于网格下方的 controls 区域，在滚动条上方；不要点击窗口底部或网格单元格。",
-      "再调用 orb_type 输入且只输入这串无敏感测试文本：P1ORBD8TEST。",
-      "orb_type 返回后直接使用它附带的新截图，不要重复观察。不要点其它位置。",
+      "再调用 input_text 输入且只输入这串无敏感测试文本：P1ORBD8TEST。",
+      "input_text 返回后直接使用它附带的新截图，不要额外调用观察工具。不要点其它位置。",
     ].join("\n"),
     targetEvent: "text-input",
-    expectedTool: "orb_type",
+    expectedTool: "input_text",
+  },
+  browser: {
+    slug: "real-browser",
+    output: "real-model-browser-session-access.json",
+    what: "real model opens a local page in the visible default browser and clicks its completion button",
+    targetEvent: "browser-click",
+    expectedTool: "click",
+    resultTitle: "Pi Orb browser probe",
+  },
+  "open-app": {
+    slug: "real-open-app",
+    output: "real-model-open-app-session-access.json",
+    what: "real model launches a unique disposable application by name and clicks its completion button",
+    targetEvent: "native-click",
+    expectedTool: "click",
+    resultTitle: "Pi Orb native probe",
   },
 }[testCase];
-if (!caseConfig) throw new Error(`Unsupported test case: ${testCase}. Use c7, d6-scroll or d8-type.`);
+if (!caseConfig) throw new Error(`Unsupported test case: ${testCase}. Use c7, d6-scroll, d8-type, browser or open-app.`);
 
 const runRoot = join("D:\\pi-orb-p1-runs", `p1-06-${caseConfig.slug}-${Date.now()}`);
 const outPath = join(repo, "evidence", "p1-06", caseConfig.output);
@@ -93,7 +113,7 @@ const targetAppDir = join(repo, "evidence", "p1-05", "target-app");
 const extensionPath = join(repo, "pi-package", "extensions", "orb.ts");
 
 /** The pi-web snapshot prepared by the P0-02 harness (fixed HEAD, already built). */
-const piWebWorktree = join(tmpdir(), "pi-orb-p0-head-src");
+const piWebWorktree = process.env.PI_ORB_EVIDENCE_PI_WEB ?? join(tmpdir(), "pi-orb-p0-head-src");
 
 const WORKSPACE = join(runRoot, "orb-workspace");
 /**
@@ -110,6 +130,9 @@ const wakeLogPath = join(runRoot, "wake.jsonl");
 
 const PI_WEB_PORT = 40_000 + (process.pid % 10_000);
 const DEBUG_PORT = PI_WEB_PORT + 1;
+const browserUrl = `http://127.0.0.1:${PI_WEB_PORT + 2}/`;
+const probeAppName = `PiOrbProbe${Date.now()}`;
+const probeAppExe = join(runRoot, `${probeAppName}.exe`);
 const PI_WEB_PASSWORD = "p1-06-real-c7-password";
 const piWebBaseUrl = `http://127.0.0.1:${PI_WEB_PORT}`;
 const WAKE_CHORD = "Control+Alt+F11";
@@ -138,7 +161,7 @@ const report = {
     what: caseConfig.what,
     chain: "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
     backend: "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
-    accessLevel: "workspace-write",
+    accessLevel,
     targetSelection: "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically",
   },
   isolation: {
@@ -177,17 +200,20 @@ Add-Type -Namespace Q -Name N -MemberDefinition @'
 [DllImport("user32.dll")] public static extern System.IntPtr GetForegroundWindow();
 [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(System.IntPtr h, out uint pid);
 [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetWindowText(System.IntPtr h, System.Text.StringBuilder s, int n);
+[DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetClassName(System.IntPtr h, System.Text.StringBuilder s, int n);
 [DllImport("user32.dll")] public static extern System.IntPtr OpenInputDesktop(uint flags, bool inherit, uint access);
 '@
 $fg = [Q.N]::GetForegroundWindow()
 $sb = New-Object System.Text.StringBuilder 512
 [void][Q.N]::GetWindowText($fg, $sb, 512)
+$cb = New-Object System.Text.StringBuilder 256
+[void][Q.N]::GetClassName($fg, $cb, 256)
 $procId = 0
 [void][Q.N]::GetWindowThreadProcessId($fg, [ref]$procId)
 $name = ''
 try { $name = (Get-Process -Id $procId -ErrorAction Stop).ProcessName } catch { $name = '<gone>' }
 $desk = [Q.N]::OpenInputDesktop(0, $false, 0x0100)
-[ordered]@{ process = $name; title = $sb.ToString(); inputDesktopAccessible = ($desk -ne [System.IntPtr]::Zero) } | ConvertTo-Json -Compress
+[ordered]@{ process = $name; title = $sb.ToString(); className = $cb.ToString(); inputDesktopAccessible = ($desk -ne [System.IntPtr]::Zero) } | ConvertTo-Json -Compress
 `;
   try {
     const out = execFileSync(
@@ -204,7 +230,14 @@ $desk = [Q.N]::OpenInputDesktop(0, $false, 0x0100)
 
 function isInteractiveDesktop(sample) {
   const processName = String(sample?.process ?? "").toLowerCase();
-  return sample?.inputDesktopAccessible === true && !["lockapp", "logonui"].includes(processName);
+  const title = String(sample?.title ?? "").toLowerCase();
+  const className = String(sample?.className ?? "").toLowerCase();
+  const locked = ["lockapp", "logonui"].includes(processName)
+    || title.includes("windows 默认锁屏界面")
+    || title.includes("lock screen")
+    || title.includes("windows spotlight")
+    || className === "windows.ui.core.corewindow";
+  return sample?.inputDesktopAccessible === true && !locked;
 }
 
 /**
@@ -223,8 +256,16 @@ async function waitForInteractiveDesktop(timeoutMs = 600_000) {
     if (isInteractiveDesktop(last)) return last;
     // LockApp/LogonUI is a definitive environment state. Return immediately so a locked
     // workstation produces a useful evidence file instead of waiting through the full poll window.
-    const processName = String(last?.process ?? "").toLowerCase();
-    if (["lockapp", "logonui"].includes(processName)) return last;
+    if (!isInteractiveDesktop(last)) {
+      const processName = String(last?.process ?? "").toLowerCase();
+      const title = String(last?.title ?? "").toLowerCase();
+      const className = String(last?.className ?? "").toLowerCase();
+      if (["lockapp", "logonui"].includes(processName)
+        || title.includes("windows 默认锁屏界面")
+        || title.includes("lock screen")
+        || title.includes("windows spotlight")
+        || className === "windows.ui.core.corewindow") return last;
+    }
     if (Date.now() >= deadline) return last;
     await sleep(5000);
   }
@@ -260,7 +301,7 @@ function modelTurnFinished(requiredTool = null, minimumEntries = 0) {
       const calledOrbTool = entries.slice(minimumEntries).some((entry) => {
         const content = entry?.message?.content;
         return Array.isArray(content) && content.some(
-          (block) => block?.type === "toolCall" && (requiredTool ? block.name === requiredTool : typeof block.name === "string" && block.name.startsWith("orb_")),
+          (block) => block?.type === "toolCall" && (requiredTool ? block.name === requiredTool : ["click", "input_text", "scroll", "hotkey", "long_press", "drag", "wait", "long_wait", "screenshot", "open_in_browser", "open_in_finder", "list_apps", "open_app", "code_agent", "code_agent_status", "code_agent_stop"].includes(block.name)),
         );
       });
       if (!calledOrbTool) continue;
@@ -305,10 +346,14 @@ function modelHasToolCall(toolName) {
 let grid = null;
 let shell = null;
 let piWeb = null;
+let probeServer = null;
 let shellOut = "";
 let piWebLog = "";
 
 function shutdown(code) {
+  const nativePid = readJsonl(gridLogPath).find(entry => entry.kind === "native-ready")?.pid;
+  if (nativePid) try { execFileSync("taskkill.exe", ["/PID", String(nativePid), "/T", "/F"], { stdio: "ignore", windowsHide: true }); } catch { /* target already closed */ }
+  probeServer?.close();
   for (const child of [shell, piWeb, grid]) {
     try {
       if (!child?.pid) continue;
@@ -424,9 +469,9 @@ async function startTarget() {
   }
   throw new Error(`the target never reported geometry. stderr: ${stderr.slice(0, 400)}`);
 }
-function foregroundAndWake(hwnd) {
-  // The helper exits non-zero when it cannot foreground the window. That is a real outcome to record,
-  // not an exception to swallow, so the reason is parsed from stdout and lands in the report.
+function foregroundTarget(hwnd) {
+  // The current flow attaches the first frame automatically; it only needs the disposable target
+  // in front. The helper exits non-zero when it cannot foreground the window, so record that result.
   try {
     const raw = execFileSync(
       "powershell.exe",
@@ -441,8 +486,7 @@ function foregroundAndWake(hwnd) {
         String(hwnd),
         "-LogPath",
         wakeLogPath,
-        "-Chord",
-        "ctrl+alt+f11",
+        "-ForegroundOnly",
       ],
       { encoding: "utf8", timeout: 60000, windowsHide: true },
     );
@@ -532,6 +576,7 @@ function startShell() {
       cwd: repo,
       env: {
         ...process.env,
+        ...(testCase === "open-app" ? { PATH: `${runRoot};${process.env.PATH}`, PI_ORB_NATIVE_PROBE_LOG: gridLogPath } : {}),
         PI_ORB_CONFIG: configPath,
         PI_ORB_PI_WEB_URL: piWebBaseUrl,
         PI_ORB_PI_WEB_PASSWORD: PI_WEB_PASSWORD,
@@ -673,6 +718,30 @@ try {
 
   // The target first, so its window is what the orb records as "the window the user was looking at".
   const geometry = await startTarget();
+  if (testCase === "browser") {
+    const nonce = randomUUID();
+    probeServer = createServer((req, res) => {
+      if (req.method === "GET" && req.url === "/") {
+        appendFileSync(gridLogPath, `${JSON.stringify({ at: Date.now(), kind: "browser-page" })}\n`);
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        res.end(`<!doctype html><title>Pi Orb browser probe</title><style>body{margin:0;background:#15202b;color:white;font:24px sans-serif;display:grid;place-content:center;min-height:90vh}button{font:24px sans-serif;padding:45px 70px}</style><h1>Pi Orb browser probe</h1><button onclick="fetch('/complete',{method:'POST',body:'${nonce}'}).then(()=>this.textContent='COMPLETE')">MARK COMPLETE</button>`);
+      } else if (req.method === "POST" && req.url === "/complete") {
+        let body = "";
+        req.on("data", chunk => { body += chunk; });
+        req.on("end", () => {
+          if (body === nonce) appendFileSync(gridLogPath, `${JSON.stringify({ at: Date.now(), kind: "browser-click" })}\n`);
+          res.writeHead(body === nonce ? 200 : 403); res.end();
+        });
+      } else { res.writeHead(404); res.end(); }
+    });
+    await new Promise((done, fail) => { probeServer.once("error", fail); probeServer.listen(PI_WEB_PORT + 2, "127.0.0.1", done); });
+    caseConfig.instruction = `使用 open_in_browser 打开 ${browserUrl}，然后根据它返回的截图，仅点击标题 Pi Orb browser probe 页面内的 MARK COMPLETE 按钮。若截图显示页面仍在加载，可用 wait。不要使用 bash、code_agent 或网页文本工具；不得点击其他标签页或其他页面。完成后结束。`;
+  }
+  if (testCase === "open-app") {
+    execFileSync("C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe", ["/nologo", "/target:winexe", `/out:${probeAppExe}`, "/reference:System.Windows.Forms.dll", join(repo, "evidence/p1-06/native-app-probe.cs")], { windowsHide: true });
+    report.steps.nativeProbe = { name: probeAppName, executable: probeAppExe, initiallyRunning: false };
+    caseConfig.instruction = `使用 open_app 以确切名称 ${probeAppName} 启动测试应用。然后只根据它返回的截图，点击标题 Pi Orb native probe 窗口内的 MARK COMPLETE 按钮。若仍在加载可用 wait；不要使用 bash 或 code_agent，也不要点击别的窗口。完成后结束。`;
+  }
   const targetTitle = "P1-05 input target";
   report.steps.target = {
     pid: grid.pid,
@@ -784,7 +853,7 @@ try {
     )
   ) {
     throw new Error(
-      `no interactive desktop: foreground is ${desktopBeforeTarget?.process ?? "?"} and the input desktop is not accessible. ` +
+      `no interactive desktop: foreground is ${desktopBeforeTarget?.process ?? "?"} (${desktopBeforeTarget?.title ?? "untitled"}) and the input desktop is not accessible. ` +
         "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
     );
   }
@@ -817,51 +886,29 @@ try {
     )
   ) {
     throw new Error(
-      `no interactive desktop: foreground is ${desktopAtWake?.process ?? "?"} and the input desktop is not accessible. ` +
+      `no interactive desktop: foreground is ${desktopAtWake?.process ?? "?"} (${desktopAtWake?.title ?? "untitled"}) and the input desktop is not accessible. ` +
         "The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
     );
   }
-  const wake = foregroundAndWake(targetHandle);
-  report.steps.wake = wake;
+  const wake = foregroundTarget(targetHandle);
+  report.steps.foreground = wake;
+  if (!check("the disposable target is the foreground window before the first frame", wake?.ok === true, safe(wake))) {
+    throw new Error("the disposable target could not be foregrounded");
+  }
   await sleep(3000);
 
-  const access = await orb(client, `window.orb.setOrbAccess({ generation: ${generation}, level: 'workspace-write' })`);
+  const access = await orb(client, `window.orb.setOrbAccess({ generation: ${generation}, level: ${JSON.stringify(accessLevel)} })`);
   report.steps.access = { authorized: access?.authorized, level: access?.level, sessionId: access?.sessionId };
-  check("Workspace Write is granted to the isolated Orb session", access?.authorized === true && access?.level === "workspace-write", safe(report.steps.access));
+  check(`${accessLevel} is granted to the isolated Orb session`, access?.authorized === true && access?.level === accessLevel, safe(report.steps.access));
 
   const instruction = caseConfig.instruction;
 
-  // Capture for preview. Nothing is sent yet, and the preview must be the target window.
-  const capture = await orb(client, `window.orb.captureScreenshot({ generation: ${generation}, text: ${JSON.stringify(instruction)} })`);
-  report.steps.capture = capture
-    ? {
-        ok: capture.ok,
-        message: capture.message,
-        observationId: capture.observationId,
-        width: capture.width,
-        height: capture.height,
-        bytes: capture.bytes,
-        targetDescription: capture.targetDescription,
-        targetStale: capture.targetStale,
-      }
-    : null;
-  if (!check("a screenshot of the recorded target was captured for preview", capture?.ok === true, safe(report.steps.capture))) {
-    throw new Error("capture failed");
-  }
-  check(
-    "the preview describes the disposable target window, not the orb",
-    typeof capture.targetDescription === "string" && capture.targetDescription.includes(targetTitle),
-    String(capture.targetDescription),
-  );
-
-  // Confirming sends the image and the instruction as ONE user message - that is the whole point.
+  // Send a normal prompt. `before_agent_start` attaches the current target frame automatically;
+  // this is the current reference flow and does not require a preview or observe tool call.
   const gridBefore = readJsonl(gridLogPath).length;
-  const resolved = await orb(
-    client,
-    `window.orb.resolveScreenshot({ generation: ${generation}, observationId: ${JSON.stringify(capture.observationId)}, confirmed: true })`,
-  );
-  report.steps.resolve = resolved;
-  check("the confirmed screenshot was sent with the instruction", resolved?.ok === true && resolved?.sent === true, safe(resolved));
+  const sent = await orb(client, `window.orb.sendPrompt({ generation: ${generation}, text: ${JSON.stringify(instruction)} })`);
+  report.steps.prompt = sent;
+  check("the prompt was sent with automatic frontmost-window context", sent?.accepted !== false, safe(sent));
 
   // Wait for the real model to work. Long: a real turn includes screenshot understanding.
   const deadline = Date.now() + 420_000;
@@ -871,27 +918,22 @@ try {
   let d8FollowUpBaseline = 0;
   while (Date.now() < deadline) {
     await sleep(5000);
-    const events = readJsonl(gridLogPath);
-    const hit = events.find((event) => event.kind === caseConfig.targetEvent);
-    if (hit) {
-      await sleep(4000);
-      idleSeen = true;
-      break;
-    }
+    // Wait for the model turn to finish. A wheel outside the strip, a wrong-cell
+    // click, or a partial text event must not stop the run while it is correcting.
     const currentStatus = await orb(client, "window.orb.getStatus()");
     if (currentStatus?.busy === true) busySeen = true;
     const turnFinished = d8FollowUpSent
-      ? modelTurnFinished("orb_type", d8FollowUpBaseline)
+      ? modelTurnFinished("input_text", d8FollowUpBaseline)
       : modelTurnFinished();
     if ((busySeen && currentStatus?.busy === false) || turnFinished) {
-      if (testCase === "d8-type" && !d8FollowUpSent && !modelHasToolCall("orb_type")) {
+      if (testCase === "d8-type" && !d8FollowUpSent && !modelHasToolCall("input_text")) {
         d8FollowUpBaseline = sessionEntryCount();
         const response = await fetch(`${piWebBaseUrl}/api/agent/${encodeURIComponent(report.steps.model.sessionId)}`, {
           method: "POST",
           headers: { "content-type": "application/json", authorization: authHeader },
           body: JSON.stringify({
             type: "prompt",
-            message: "Continue the disposable-window task under the same session Access grant. The input field was clicked and that action returned a fresh observation. Use its observation_id for orb_type with exactly P1ORBD8TEST. Do not call orb_observe again or click/type anywhere else.",
+            message: "Continue the disposable-window task under the same session Access grant. The input field was clicked and that action returned a fresh screenshot. Use input_text with exactly P1ORBD8TEST. Do not call any observation tool or click/type anywhere else.",
           }),
         });
         report.steps.d8FollowUp = { status: response.status, accepted: response.ok };
@@ -934,8 +976,10 @@ try {
     report.targetLog.scrollEvents = scrollEvents;
     check("D6 (target's own log): the strip received wheel input", hits.some((event) => event.overScroller === true), safe(hits));
     check("D6 (target's own log): the strip scroll position changed", scrollEvents.some((event) => typeof event.scrollTop === "number" && event.scrollTop > 0), safe(scrollEvents));
-  } else {
+  } else if (testCase === "d8-type") {
     check("D8 (target's own log): the exact synthetic marker reached the text field", hits.some((event) => event.value === "P1ORBD8TEST"), safe(hits));
+  } else {
+    check("the disposable page or application recorded its completion click", hits.length > 0, safe(hits));
   }
 
   // 2. The real session record: did the model itself call the orb tools?
@@ -959,8 +1003,17 @@ try {
   report.sessionFiles = sessionFiles.map((file) => file.replace(agentDir, "<agentDir>"));
   const calls = [];
   const toolResults = [];
+  const firstFrames = [];
   for (const file of sessionFiles) {
-    for (const entry of readJsonl(file)) {
+    for (const [index, entry] of readJsonl(file).entries()) {
+      if (entry.type === "custom_message" && entry.customType === "computer-use" && Array.isArray(entry.content)) {
+        firstFrames.push({ file, index, imageCount: entry.content.filter(part => part?.type === "image").length });
+        // Save only the confirmed disposable target frame, never a user's window.
+        if (entry.content.some(part => part?.type === "text" && /<frontmost_window>P1-05 input target<\/frontmost_window>/u.test(part.text))) {
+          const frame = entry.content.find(part => part?.type === "image");
+          if (frame) writeFileSync(join(runRoot, `first-frame-${index}.png`), Buffer.from(frame.data, "base64"));
+        }
+      }
       const message = entry?.message;
       const content = message?.content;
       if (message?.role === "toolResult" && Array.isArray(content)) {
@@ -969,6 +1022,13 @@ try {
           toolCallId: message.toolCallId ?? null,
           text: content.filter((part) => part?.type === "text").map((part) => part.text ?? "").join("\n"),
           imageCount: content.filter((part) => part?.type === "image").length,
+          index,
+          ok: message.details?.ok === true,
+          observation: message.details?.result?.observation ? {
+            id: message.details.result.observation.observationId,
+            at: message.details.result.observation.at,
+            title: message.details.result.observation.window?.title,
+          } : null,
         });
       }
       if (!Array.isArray(content)) continue;
@@ -976,54 +1036,60 @@ try {
         if (block?.type !== "toolCall") continue;
         const name = typeof block.name === "string" ? block.name : typeof block.toolName === "string" ? block.toolName : null;
         if (!name) continue;
-        calls.push({ toolName: name, toolCallId: block.id ?? null, arguments: block.arguments ?? null });
+        calls.push({ toolName: name, toolCallId: block.id ?? null, arguments: block.arguments ?? null, file, index, at: Date.parse(entry.timestamp) });
       }
     }
   }
-  report.modelToolCalls = calls;
+  report.modelToolCalls = calls.map(({ file, ...call }) => ({ ...call, file: file.replace(agentDir, "<agentDir>") }));
   report.modelToolResults = toolResults;
-  const observeCalls = calls.filter((call) => call.toolName === "orb_observe");
   const actionCalls = calls.filter((call) => call.toolName === caseConfig.expectedTool);
-  const firstActionIndex = calls.findIndex((call) => call.toolName === caseConfig.expectedTool);
-  const firstObserveIndex = calls.findIndex((call) => call.toolName === "orb_observe");
-  check("the real model called orb_observe on its own", observeCalls.length > 0, safe(observeCalls.slice(0, 2)));
   check(`the real model called ${caseConfig.expectedTool} on its own`, actionCalls.length > 0, safe(actionCalls.slice(0, 2)));
-  check("the model observed before acting", firstObserveIndex >= 0 && firstObserveIndex < firstActionIndex, safe(calls.map((call) => call.toolName)));
+  check("the automatic frontmost screenshot preceded the GUI action", actionCalls.length > 0 && actionCalls.every(call => firstFrames.some(frame => frame.file === call.file && frame.index < call.index && frame.imageCount > 0)), safe(firstFrames.map(({ file, ...frame }) => ({ ...frame, file: file.replace(agentDir, "<agentDir>") }))));
   const actionCallIds = new Set(actionCalls.map((call) => call.toolCallId).filter(Boolean));
   const actionResults = toolResults.filter((result) => actionCallIds.has(result.toolCallId));
+  const hasFreshFrame = result => {
+    const call = calls.find(value => value.toolCallId === result?.toolCallId);
+    return result?.ok === true && result.imageCount > 0 && Boolean(result.observation?.id)
+      && result.observation.at >= call?.at && (result.observation.title ?? "").includes(caseConfig.resultTitle ?? "P1-05 input target");
+  };
   check(
     "the action tool result includes its fresh observation and screenshot",
-    actionResults.some((result) => result.imageCount > 0 && /action: .* completed/i.test(result.text) && /observation_id:/i.test(result.text)),
+    actionResults.length > 0 && actionResults.every(hasFreshFrame),
     safe(actionResults),
   );
   if (testCase === "d8-type") {
-    const clickIndex = calls.findIndex((call) => call.toolName === "orb_click");
-    const typeIndex = calls.findIndex((call) => call.toolName === "orb_type");
+    const clickIndex = calls.findIndex((call) => call.toolName === "click");
+    const typeIndex = calls.findIndex((call) => call.toolName === "input_text");
     check("D8: the model clicked the disposable field before typing", clickIndex >= 0 && clickIndex < typeIndex, safe(calls.map((call) => call.toolName)));
-    const clickObservationId = calls[clickIndex]?.arguments?.observation_id;
-    const typeObservationId = calls[typeIndex]?.arguments?.observation_id;
     const clickCallId = calls[clickIndex]?.toolCallId;
     const clickResult = toolResults.find((result) => result.toolCallId === clickCallId);
-    const freshObservationId = clickResult?.text.match(/(?:^|\n)observation_id:\s*([^\s]+)/u)?.[1] ?? null;
     check(
-      "D8: the focus click returned a fresh observation and screenshot",
-      typeof clickObservationId === "string" && typeof freshObservationId === "string" &&
-        freshObservationId !== clickObservationId && (clickResult?.imageCount ?? 0) > 0,
-      safe({ clickObservationId, freshObservationId, imageCount: clickResult?.imageCount ?? 0, clickResult: clickResult?.text }),
+      "D8: the focus click returned a fresh screenshot",
+      hasFreshFrame(clickResult),
+      safe({ imageCount: clickResult?.imageCount ?? 0, clickResult: clickResult?.text }),
     );
     check(
-      "D8: typing uses exactly the fresh observation returned by the focus click",
-      typeof freshObservationId === "string" && typeObservationId === freshObservationId,
-      safe({ freshObservationId, typeObservationId }),
+      "D8: input_text returned a fresh screenshot after typing",
+      hasFreshFrame(toolResults.find((result) => result.toolCallId === calls[typeIndex]?.toolCallId)) && toolResults.find(result => result.toolCallId === calls[typeIndex]?.toolCallId)?.observation.id !== clickResult?.observation?.id,
+      safe(toolResults.find((result) => result.toolCallId === calls[typeIndex]?.toolCallId)),
     );
   }
+  if (testCase === "browser" || testCase === "open-app") {
+    const openName = testCase === "browser" ? "open_in_browser" : "open_app";
+    const openCall = calls.find(call => call.toolName === openName);
+    check("the real model used the reference entry tool with the isolated target", Boolean(openCall) && (testCase === "browser" ? openCall.arguments?.url === browserUrl : openCall.arguments?.name === probeAppName), safe(openCall));
+    const firstClick = actionCalls[0];
+    check("a screenshot of the opened target preceded the model click", Boolean(firstClick) && toolResults.some(result => [openName, "wait"].includes(result.toolName) && result.index < firstClick.index && result.imageCount > 0 && (result.observation?.title ?? "").includes(caseConfig.resultTitle)), safe(toolResults));
+    check("the model used only GUI tools to reach the completion oracle", calls.every(call => [openName, "wait", "click"].includes(call.toolName)), safe(calls.map(call => call.toolName)));
+  }
   if (testCase === "c7" || testCase === "d6-scroll") {
-    const positionAction = actionCalls.find((call) => call.toolName === "orb_click" || call.toolName === "orb_scroll");
+    const positionAction = actionCalls.find((call) => call.toolName === "click" || call.toolName === "scroll");
     const args = positionAction?.arguments ?? null;
+    const position = args?.position;
     check(
       "the real model addressed the action in the 0-1000 screenshot space",
-      args && typeof args.x === "number" && typeof args.y === "number" && args.x >= 0 && args.x <= 1000 && args.y >= 0 && args.y <= 1000,
-      safe(args),
+      Array.isArray(position) && position.length === 2 && position.every((value) => typeof value === "number" && value >= 0 && value <= 1000),
+      safe({ args, position }),
     );
   }
 
@@ -1033,6 +1099,7 @@ try {
     .filter((line) => line.includes("[pi-orb] desktop ") || line.includes("[pi-orb] bridge "))
     .slice(-40);
   report.finishedAt = new Date().toISOString();
+  writeFileSync(join(runRoot, "result.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   writeFileSync(outPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
   console.log(`checks: ${report.checks.filter((c) => c.ok).length}/${report.checks.length}`);

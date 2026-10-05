@@ -69,9 +69,6 @@ export default {
   // The packaged app carries its own license obligations with it, not only in the repository.
   extraResources: [
     { from: "out/pi-plugin", to: "pi-plugin" },
-    // electron-builder deliberately filters a mapping's root node_modules directory.
-    // A separate mapping retains the plugin's independent runtime dependency graph.
-    { from: "out/pi-plugin/node_modules", to: "pi-plugin/node_modules" },
     { from: "LICENSE", to: "LICENSE" },
     { from: "THIRD_PARTY_NOTICES.md", to: "THIRD_PARTY_NOTICES.md" },
     { from: "CHANGELOG.md", to: "CHANGELOG.md" },

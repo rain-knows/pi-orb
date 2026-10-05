@@ -698,9 +698,9 @@ async function main() {
         const name = document.createElement('strong')
         name.textContent = ({
           read: '读取文件', write: '写入文件', edit: '编辑文件', bash: '执行命令',
-          orb_batch: '批量操作', orb_observe: '观察桌面', orb_click: '点击', orb_type: '输入文字', orb_scroll: '滚动',
-          orb_hotkey: '按键', orb_long_press: '长按', orb_drag: '拖动', orb_open_app: '切换应用',
-          orb_list_apps: '查看应用', orb_wait: '等待', orb_long_wait: '等待任务',
+          click: '点击', input_text: '输入文字', scroll: '滚动', hotkey: '按键', long_press: '长按', drag: '拖动',
+          open_app: '打开应用', list_apps: '查看应用', wait: '等待', long_wait: '等待任务', screenshot: '截图',
+          open_in_browser: '打开浏览器', open_in_finder: '打开文件',
         })[event.name] ?? event.name
         const phase = document.createElement('span')
         phase.className = 'orb-tool-phase'

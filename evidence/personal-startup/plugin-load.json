@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-10-04T14:11:56.379Z",
-  "root": "D:\\pi-orb-personal-runs\\plugin 中文 1791123087512",
+  "capturedAt": "2026-10-05T11:01:16.492Z",
+  "root": "D:\\pi-orb-personal-runs\\plugin 中文 1791198061110",
   "version": "0.1.0-preview.3",
   "checks": [
     {
@@ -9,11 +9,35 @@
       "detail": []
     },
     {
+      "name": "ordinary: packaged policy follows workspace boundary",
+      "ok": true,
+      "detail": {
+        "policyChars": 0
+      }
+    },
+    {
+      "name": "ordinary: packaged context projection preserves history and workspace boundary",
+      "ok": true,
+      "detail": {
+        "first": "image",
+        "persistedFirst": "image"
+      }
+    },
+    {
       "name": "ordinary: native tools follow workspace boundary",
       "ok": true,
-      "detail": [
-        "orb_browser"
-      ]
+      "detail": []
+    },
+    {
+      "name": "ordinary: active tool roster follows workspace boundary",
+      "ok": true,
+      "detail": {
+        "activeTools": [
+          "read",
+          "advisor"
+        ],
+        "activeToolCalls": []
+      }
     },
     {
       "name": "orb: real Pi loader accepts packaged independent extension",
@@ -21,23 +45,174 @@
       "detail": []
     },
     {
+      "name": "orb: packaged policy follows workspace boundary",
+      "ok": true,
+      "detail": {
+        "policyChars": 7463
+      }
+    },
+    {
+      "name": "orb: packaged context projection preserves history and workspace boundary",
+      "ok": true,
+      "detail": {
+        "first": "text",
+        "persistedFirst": "image"
+      }
+    },
+    {
       "name": "orb: native tools follow workspace boundary",
       "ok": true,
       "detail": [
-        "orb_batch",
-        "orb_browser",
-        "orb_click",
-        "orb_drag",
-        "orb_hotkey",
-        "orb_list_apps",
-        "orb_long_press",
-        "orb_long_wait",
-        "orb_observe",
-        "orb_open_app",
-        "orb_scroll",
-        "orb_type",
-        "orb_wait"
+        "click",
+        "code_agent",
+        "code_agent_status",
+        "code_agent_stop",
+        "drag",
+        "hotkey",
+        "input_text",
+        "list_apps",
+        "long_press",
+        "long_wait",
+        "open_app",
+        "open_in_browser",
+        "open_in_finder",
+        "screenshot",
+        "scroll",
+        "wait"
       ]
+    },
+    {
+      "name": "orb: active tool roster follows workspace boundary",
+      "ok": true,
+      "detail": {
+        "activeTools": [
+          "read",
+          "write",
+          "edit",
+          "bash",
+          "powershell",
+          "web_search",
+          "web_fetch",
+          "fetch_content",
+          "get_search_content",
+          "source_check",
+          "ask_user_question",
+          "click",
+          "input_text",
+          "scroll",
+          "hotkey",
+          "long_press",
+          "drag",
+          "wait",
+          "long_wait",
+          "screenshot",
+          "open_in_browser",
+          "open_in_finder",
+          "list_apps",
+          "open_app",
+          "code_agent",
+          "code_agent_status",
+          "code_agent_stop"
+        ],
+        "activeToolCalls": [
+          [
+            "read",
+            "write",
+            "edit",
+            "bash",
+            "powershell",
+            "web_search",
+            "web_fetch",
+            "fetch_content",
+            "get_search_content",
+            "source_check",
+            "ask_user_question",
+            "code_agent",
+            "code_agent_status",
+            "code_agent_stop"
+          ],
+          [
+            "read",
+            "write",
+            "edit",
+            "bash",
+            "powershell",
+            "web_search",
+            "web_fetch",
+            "fetch_content",
+            "get_search_content",
+            "source_check",
+            "ask_user_question",
+            "click",
+            "input_text",
+            "scroll",
+            "hotkey",
+            "long_press",
+            "drag",
+            "wait",
+            "long_wait",
+            "screenshot",
+            "open_in_browser",
+            "open_in_finder",
+            "list_apps",
+            "open_app",
+            "code_agent",
+            "code_agent_status",
+            "code_agent_stop"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "worker: real Pi loader accepts packaged independent extension",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "worker: packaged policy follows workspace boundary",
+      "ok": true,
+      "detail": {
+        "policyChars": 0
+      }
+    },
+    {
+      "name": "worker: packaged context projection preserves history and workspace boundary",
+      "ok": true,
+      "detail": {
+        "first": "image",
+        "persistedFirst": "image"
+      }
+    },
+    {
+      "name": "worker: native tools follow workspace boundary",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "worker: active tool roster follows workspace boundary",
+      "ok": true,
+      "detail": {
+        "activeTools": [
+          "read",
+          "write",
+          "web_search",
+          "web_fetch",
+          "fetch_content",
+          "get_search_content",
+          "source_check"
+        ],
+        "activeToolCalls": [
+          [
+            "read",
+            "write",
+            "web_search",
+            "web_fetch",
+            "fetch_content",
+            "get_search_content",
+            "source_check"
+          ]
+        ]
+      }
     }
   ],
   "passed": true

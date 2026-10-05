@@ -13,7 +13,7 @@ it("retains a pre-input surface change screenshot across the real named pipe", a
   const pipePath = `\\\\.\\pipe\\orb-surface-${process.pid}-${Date.now()}`;
   const observation = { observationId: "new-page", image: { data: "AQID", mimeType: "image/png" } };
   const server = new BridgeServer({ pipePath, token: "a".repeat(64), executor: {
-    accepts: () => true, status: () => ({}), revoke: () => {}, observe: async () => ({}), batch: async () => ({}),
+    accepts: () => true, status: () => ({}), revoke: () => {}, observe: async () => ({}),
     act: async () => ({ ok: false, reason: "surface-changed", message: "No input sent.", observation }),
   } });
   await server.listen();
@@ -25,25 +25,8 @@ it("retains a pre-input surface change screenshot across the real named pipe", a
   } finally { await server.close(); }
 });
 
-it("budgets declared waits and batches", () => {
+it("budgets declared waits", () => {
   expect(bridgeTimeoutMs({type:"act",sessionId:"s",generation:1,action:{kind:"longWait",waitSeconds:120}})).toBe(150_000);
-  expect(bridgeTimeoutMs({type:"batch",sessionId:"s",generation:1,batch:{actions:[{}, {}, {}]}})).toBe(90_000);
-  expect(bridgeTimeoutMs({type:"browser",sessionId:"s",generation:1,browser:{name:"browser_click"}})).toBeGreaterThan(90_000 + 15_000);
-});
-
-it("streams correlated progress and cancels a disconnected execution", async () => {
-  const pipePath=`\\\\.\\pipe\\orb-cancel-${process.pid}-${Date.now()}`;
-  let cancelled=false;let entered!:()=>void;const started=new Promise<void>(r=>entered=r);
-  const server=new BridgeServer({pipePath,token:"a".repeat(64),executor:{accepts:()=>true,status:()=>({}),revoke:()=>{},observe:async()=>({}),act:async()=>({}),batch:async(_batch,_id,_generation,signal,progress)=>{progress?.(1,2);entered();await new Promise<void>(r=>signal?.addEventListener("abort",()=>{cancelled=true;r();},{once:true}));return {ok:false,completed:0};}}});
-  await server.listen();
-  const handshake={version:2,token:"a".repeat(64),pid:1,workspace:dir,orbSessionId:"s",pipePath,generation:1,createdAt:"now"};
-  const controller=new AbortController();const updates:number[]=[];
-  try {
-    const client=new BridgeClient({pipePath,tokenFile:"unused"});
-    const pending=client.call({type:"batch",sessionId:"s",generation:1,batch:{actions:[{},{}]}},handshake,controller.signal,(step)=>updates.push(step));
-    await started;await new Promise(r=>setTimeout(r,20));expect(updates).toEqual([1]);controller.abort();
-    expect(await pending).toMatchObject({reason:"cancelled"});await new Promise(r=>setTimeout(r,20));expect(cancelled).toBe(true);
-  } finally {await server.close();}
 });
 
 beforeEach(() => {

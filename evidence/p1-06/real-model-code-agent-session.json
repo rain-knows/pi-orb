@@ -1,0 +1,145 @@
+{
+  "capturedAt": "2026-10-04T22:40:00.136Z",
+  "verification": {
+    "chain": "real model -> Pi Web -> orb extension -> named pipe -> Electron CodeAgentManager -> independent Pi Web worker",
+    "reference": "mini-yifan/dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7",
+    "model": {
+      "provider": "TZcode",
+      "id": "deepseek-v4.1-flash"
+    },
+    "marker": "P1ORBCODEAGENT"
+  },
+  "isolation": {
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-1791153600134",
+    "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-1791153600134\\orb-workspace",
+    "shellDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-1791153600134\\shell-data",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-code-agent-1791153600134",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)"
+  },
+  "checks": [
+    {
+      "name": "the isolated shell published a bridge handshake",
+      "ok": true,
+      "detail": "{\"version\":2,\"token\":\"<redacted>\",\"pid\":96868,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-1791153600134\\\\orb-workspace\",\"orbSessionId\":null,\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-96868\",\"generation\":1,\"createdAt\":\"2026-10-04T22:40:03.355Z\"}"
+    },
+    {
+      "name": "the isolated Orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "no renderer"
+    },
+    {
+      "name": "the isolated Orb session has a generation",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-1791153600134\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":\"01a10913-2254-7522-b657-448248394961\",\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:49424\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":true,\"level\":\"full-access\",\"sessionId\":\"01a10913-2254-7522-b657-448248394961\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+    },
+    {
+      "name": "Workspace Write is granted to the owner session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a10913-2254-7522-b657-448248394961\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "the owner prompt was accepted",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "the real model called code_agent",
+      "ok": true,
+      "detail": "[\"code_agent\",\"bash\"]"
+    },
+    {
+      "name": "the worker produced the requested marker file",
+      "ok": true,
+      "detail": "{\"markerPath\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-1791153600134\\\\orb-workspace\\\\background-proof.txt\",\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-1791153600134\\\\orb-workspace\"}"
+    },
+    {
+      "name": "the owner received a completion notice",
+      "ok": true,
+      "detail": "[\"Background Code agent session 01a10913-456a-7522-b657-4484a671fb47 finished this task:\\nCreate a file named background-proof.txt in the current working directory (D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace) containing exactly the text P1ORBCODEAGENT with no extra characters or trailing newline if possible.\\n\\nCreated D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace/background-proof.txt containing exactly `P1ORBCODEAGENT` (14 bytes, no trailing newline).\"]"
+    }
+  ],
+  "steps": {
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-1791153600134\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": null,
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:49424",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "sessionId": "01a10913-2254-7522-b657-448248394961",
+    "generation": 1,
+    "access": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a10913-2254-7522-b657-448248394961",
+      "generation": 1,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    },
+    "prompt": {},
+    "registryFiles": [
+      "<runRoot>\\shell-data\\code-agent-sessions.json"
+    ],
+    "markerPath": "<runRoot>\\orb-workspace\\background-proof.txt",
+    "shellTail": "requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"capture-and-png\",\"durationMs\":183.0017000000007}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:13.526Z\",\"event\":\"tool-timing\",\"requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"capture\",\"durationMs\":183.30519999999888}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:14.146Z\",\"event\":\"tool-timing\",\"requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"inspectForeground\",\"durationMs\":620.0832999999984}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:14.147Z\",\"event\":\"tool-timing\",\"requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"base64\",\"durationMs\":0.636899999999514}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:14.147Z\",\"event\":\"tool-timing\",\"requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"image\",\"bytes\":178890,\"width\":2560,\"height\":1600}\n[pi-orb] desktop {\"at\":\"2026-10-04T22:40:14.181Z\",\"event\":\"observe\",\"sessionId\":\"01a10913-2254-7522-b657-448248394961\",\"observationId\":\"obs-muuem5vq-1\",\"windowId\":\"8129762\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:14.181Z\",\"event\":\"tool-timing\",\"requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"executor-total\",\"durationMs\":1008.8259999999991}\n[pi-orb] session timing {\"event\":\"model-response-interval\",\"durationMs\":7161.9072}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:21.264Z\",\"event\":\"refused\",\"type\":\"observe\",\"reason\":\"unknown-session\",\"sessionId\":\"01a10913-456a-7522-b657-4484a671fb47\",\"generation\":1}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:21.264Z\",\"event\":\"tool-timing\",\"requestId\":\"4347a6a4-c28f-4daf-96ec-2e9f03bd15f5\",\"phase\":\"executor-total\",\"durationMs\":0.2415999999975611}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:21.289Z\",\"event\":\"tool-timing\",\"requestId\":\"2da84e39-1e2f-46dc-a500-a4f3bde69636\",\"phase\":\"executor-total\",\"durationMs\":984.3150999999998}\n[pi-orb] session timing {\"event\":\"tool-through-sse\",\"toolCallId\":\"call_00_ckwVSgfT2JHhEXgmLzGi2402\",\"durationMs\":1003.1216999999997}\n[pi-orb] session timing {\"event\":\"model-response-interval\",\"durationMs\":3562.5725999999995}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:26.603Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"window-enumeration\",\"durationMs\":34.3015000000014}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:26.626Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"window-enumeration\",\"durationMs\":23.38130000000092}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:26.649Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"listScreens\",\"durationMs\":21.3663000000015}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:26.790Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"capture-and-png\",\"durationMs\":140.6900999999998}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:26.790Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"capture\",\"durationMs\":140.80780000000232}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:27.273Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"inspectForeground\",\"durationMs\":483.45790000000125}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:27.274Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"base64\",\"durationMs\":0.2790999999997439}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:27.274Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"image\",\"bytes\":178890,\"width\":2560,\"height\":1600}\n[pi-orb] desktop {\"at\":\"2026-10-04T22:40:27.277Z\",\"event\":\"observe\",\"sessionId\":\"01a10913-2254-7522-b657-448248394961\",\"observationId\":\"obs-muuemg0b-2\",\"windowId\":\"8129762\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] bridge {\"at\":\"2026-10-04T22:40:27.278Z\",\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"executor-total\",\"durationMs\":800.5168000000012}\n",
+    "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:49424\n- Network:       http://127.0.0.1:49424\n✓ Ready in 510ms\n✓ Running next.config.ts took 197ms\n[pi-web] session_start dispatched to extensions for session 01a10913-2254-7522-b657-448248394961\n[pi-orb] timing {\"event\":\"tool-timing\",\"requestId\":\"2411abcb-2e8f-4947-8c02-e16ff562d501\",\"phase\":\"bridge-roundtrip\",\"durationMs\":1015.2366999999995}\n[pi-web] session_start dispatched to extensions for session 01a10913-456a-7522-b657-4484a671fb47\n[pi-orb] timing {\"event\":\"tool-timing\",\"requestId\":\"4347a6a4-c28f-4daf-96ec-2e9f03bd15f5\",\"phase\":\"bridge-roundtrip\",\"durationMs\":1.5064000000020314}\n[pi-orb] timing {\"event\":\"tool-timing\",\"requestId\":\"2da84e39-1e2f-46dc-a500-a4f3bde69636\",\"phase\":\"bridge-roundtrip\",\"durationMs\":988.5132999999987}\n[pi-orb] timing {\"event\":\"tool-timing\",\"requestId\":\"f575f239-d297-41c8-9e3c-c5fb31527308\",\"phase\":\"bridge-roundtrip\",\"durationMs\":804.015800000001}\n"
+  },
+  "passed": true,
+  "modelToolCalls": [
+    {
+      "name": "code_agent",
+      "arguments": {
+        "cwd": "D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace",
+        "task": "Create a file named background-proof.txt in the current working directory (D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace) containing exactly the text P1ORBCODEAGENT with no extra characters or trailing newline if possible."
+      },
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-code-agent-1791153600134-orb-workspace--\\2026-10-04T22-40-11-349Z_01a10913-2254-7522-b657-448248394961.jsonl"
+    },
+    {
+      "name": "bash",
+      "arguments": {
+        "command": "printf 'P1ORBCODEAGENT' > \"D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace/background-proof.txt\" && wc -c \"D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace/background-proof.txt\" && cat \"D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace/background-proof.txt\""
+      },
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-code-agent-1791153600134-orb-workspace--\\2026-10-04T22-40-20-330Z_01a10913-456a-7522-b657-4484a671fb47.jsonl"
+    }
+  ],
+  "modelToolResults": [
+    {
+      "toolName": "code_agent",
+      "toolCallId": "call_00_ckwVSgfT2JHhEXgmLzGi2402",
+      "isError": false,
+      "text": "{\"accepted\":true,\"created\":true,\"session_id\":\"01a10913-456a-7522-b657-4484a671fb47\"}\nTell the user the background Code agent is running. Continue a GUI action only if it does not need the result; otherwise end the turn. Do not poll with wait or sleep. A completion notice arrives when both sessions are idle."
+    },
+    {
+      "toolName": "bash",
+      "toolCallId": "call_00_gssnIfQA18X6cpGdc43T4757",
+      "isError": false,
+      "text": "14 D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace/background-proof.txt\nP1ORBCODEAGENT"
+    }
+  ],
+  "completionNotices": [
+    "Background Code agent session 01a10913-456a-7522-b657-4484a671fb47 finished this task:\nCreate a file named background-proof.txt in the current working directory (D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace) containing exactly the text P1ORBCODEAGENT with no extra characters or trailing newline if possible.\n\nCreated D:/pi-orb-p1-runs/p1-06-real-code-agent-1791153600134/orb-workspace/background-proof.txt containing exactly `P1ORBCODEAGENT` (14 bytes, no trailing newline)."
+  ],
+  "finishedAt": "2026-10-04T22:40:29.275Z"
+}

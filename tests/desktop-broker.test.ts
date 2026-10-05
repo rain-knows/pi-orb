@@ -47,90 +47,6 @@ const click = (observationId: string): DesktopAction => ({ kind: "click", observ
 const openApp = (observationId: string): DesktopAction => ({ kind: "openApp", observationId, name: "Notepad" });
 
 describe("DesktopBroker session access", () => {
-  it("returns a new surface captured before a later step without treating that step as completed", async () => {
-    let current = observation();
-    let calls = 0;
-    const driver: DesktopDriver = {
-      get lastObservation() { return current; },
-      async observe() { return { ok: true, observation: current, error: null }; },
-      async act() {
-        current = observation(`next-${++calls}`, true);
-        if (calls === 2) return { ok: false, refused: true, reason: "surface-changed", error: "changed", observation: current };
-        return { ok: true, refused: false, error: null, observation: current };
-      },
-    };
-    const broker = new DesktopBroker({ driver, isLive: () => true });
-    broker.authorize({ sessionId: "sess", generation: 1, level: "full-access" });
-    await broker.observe("sess", 1);
-    const step = { kind: "click", position: { x: 500, y: 500 } };
-    expect(await broker.batch({ observationId: "obs-1", actions: [step, step, step] }, "sess", 1)).toMatchObject({
-      ok: false, reason: "surface-changed", completed: 1, finalObservationId: "next-2", observationUsable: true,
-      observation: { observationId: "next-2" }, steps: [{ observation: { observationId: "next-1" } }],
-    });
-    expect(calls).toBe(2);
-  });
-  it("preserves completed screenshots after a later failure, without replaying or executing remaining steps", async () => {
-    let current: DesktopObservation | null = observation();
-    let calls = 0;
-    const driver: DesktopDriver = {
-      get lastObservation() { return current; },
-      async observe() { return { ok: true, observation: current, error: null }; },
-      async act() {
-        if (++calls === 2) return { ok: false, refused: false, error: "native failure" };
-        current = observation("completed-1", true);
-        return { ok: true, refused: false, error: null, observation: current };
-      },
-      consumeObservation() { current = null; },
-    };
-    const broker = new DesktopBroker({ driver, isLive: () => true });
-    broker.authorize({ sessionId: "sess", generation: 1, level: "full-access" });
-    await broker.observe("sess", 1);
-    const step = { kind: "click", position: { x: 500, y: 500 } };
-    expect(await broker.batch({ observationId: "obs-1", actions: [step, step, step] }, "sess", 1)).toMatchObject({
-      ok: false, completed: 1, finalObservationId: "completed-1", observationUsable: false,
-      steps: [{ observation: { image: { data: "AQID" } } }],
-    });
-    expect(calls).toBe(2);
-    expect(await broker.act(click("completed-1"), "sess", 1)).toMatchObject({ ok: false });
-  });
-  it("prevalidates every batch step, advances internal observations and refuses stale single actions", async () => {
-    const { broker, actions } = createBroker();
-    broker.authorize({sessionId:"sess",generation:1,level:"full-access"});const observed = await broker.observe("sess",1) as { observationId: string };
-    const step={kind:"click",position:{x:500,y:500}};
-    expect(await broker.batch({observationId:observed.observationId,actions:[step,{kind:"type",position:{x:-1,y:500},text:"bad"}]},"sess",1)).toMatchObject({ok:false,completed:0});
-    expect(actions).toHaveLength(0);
-    expect(await broker.batch({observationId:observed.observationId,actions:[step,step]},"sess",1)).toMatchObject({ok:true,completed:2});
-    expect(actions.map(a=>a.observationId)).toEqual([observed.observationId,"fresh-after-action"]);
-    expect(await broker.act(click(observed.observationId),"sess",1)).toMatchObject({reason:"stale-observation"});
-  });
-
-  it("rejects unsupported batches, invalid counts and read-only input", async () => {
-    const {broker,actions}=createBroker();broker.authorize({sessionId:"sess",generation:1,level:"read-only"});let observed = await broker.observe("sess",1) as { observationId: string };
-    const step={kind:"click",position:{x:500,y:500}};
-    expect(await broker.batch({observationId:observed.observationId,actions:[step,step]},"sess",1)).toMatchObject({reason:"access-level"});
-    broker.authorize({sessionId:"sess",generation:1,level:"full-access"});observed = await broker.observe("sess",1) as { observationId: string };
-    for(const steps of [[step],Array(9).fill(step),[step,{kind:"openApp",name:"app"}],[step,{...step,observationId:"old"}]])expect(await broker.batch({observationId:observed.observationId,actions:steps},"sess",1)).toMatchObject({reason:"malformed"});
-    expect(actions).toHaveLength(0);
-  });
-
-  it("returns the last completed readback and stops after window or area changes", async () => {
-    for(const change of ["title","region"]){
-      let current=observation();let calls=0;
-      const driver:DesktopDriver={get lastObservation(){return current;},async observe(){return {ok:true,observation:current,error:null};},async act(){calls++;current=observation("next",true);if(change==="title")current={...current,window:{...current.window,title:"dialog"}};else current={...current,coordinateSpace:{...current.coordinateSpace,windowRect:{x:0,y:0,width:99,height:99}}};return {ok:true,refused:false,error:null,observation:current};}};
-      const broker=new DesktopBroker({driver,isLive:()=>true});broker.authorize({sessionId:"sess",generation:1,level:"full-access"});await broker.observe("sess",1);
-      const step={kind:"click",position:{x:500,y:500}};
-      expect(await broker.batch({observationId:"obs-1",actions:[step,step]},"sess",1)).toMatchObject({reason:"surface-changed",completed:1,observation:{observationId:"next"}});expect(calls).toBe(1);
-    }
-  });
-
-  it("locks the entire batch until abort unwinds and never executes the next input", async () => {
-    let current=observation();let calls=0;let entered!:()=>void;const started=new Promise<void>(r=>entered=r);
-    const driver:DesktopDriver={get lastObservation(){return current;},async observe(){return {ok:true,observation:current,error:null};},async act(_action,_obs,signal){calls++;entered();await new Promise<void>(r=>signal?.addEventListener("abort",()=>r(),{once:true}));current=observation("next",true);return {ok:true,refused:false,error:null,observation:current};}};
-    const broker=new DesktopBroker({driver,isLive:()=>true});broker.authorize({sessionId:"sess",generation:1,level:"full-access"});await broker.observe("sess",1);
-    const controller=new AbortController();const step={kind:"click",position:{x:500,y:500}};
-    const pending=broker.batch({observationId:"obs-1",actions:[step,step]},"sess",1,controller.signal);await started;
-    expect(await broker.observe("sess",1)).toMatchObject({reason:"busy"});controller.abort();expect(await pending).toMatchObject({ok:false,completed:0});expect(calls).toBe(1);
-  });
   it("refuses actions until an access tier is selected", async () => {
     const { broker, actions } = createBroker();
     const result = await broker.act(click("obs-1"), "sess", 1) as Record<string, unknown>;
@@ -230,7 +146,7 @@ describe("DesktopBroker session access", () => {
     broker.authorize({ sessionId: "sess", generation: 1, level: "workspace-write" });
     const seen = await broker.observe("sess", 1) as Record<string, unknown>;
     expect(await broker.act(click(String(seen.observationId)), "sess", 1)).toMatchObject({ ok: false, reason: "action-failed" });
-    expect(await broker.act(click(String(seen.observationId)), "sess", 1)).toMatchObject({ ok: false, reason: "batch-stopped" });
+    expect(await broker.act(click(String(seen.observationId)), "sess", 1)).toMatchObject({ ok: false, reason: "task-stopped" });
     expect(actions).toHaveLength(1);
     broker.revoke();
     expect(broker.status()).toMatchObject({ authorized: false, level: null });

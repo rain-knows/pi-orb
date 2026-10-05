@@ -3,6 +3,9 @@
 - 文档版本：0.1；依据截至 2026-09-29 的对话和本机源码核对。
 - 项目暂定名称：**pi-orb**。定位：pi-web 的开源 Electron 桌面伴随项目，不是另一个 agent harness。
 - 本文件同时保留原始开发目标和当前验收状态；实现结论以 `doc/support-matrix.md` 和对应 evidence 为准。
+- 迁移说明：本文较早的 P2-04 段落仍使用旧 `orb_*` 名称和“只激活、不启动”的历史语义；当前
+  工具集与 `open_app` 行为以 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
+  和 [`toolset-comparison-2026-10-04.md`](./toolset-comparison-2026-10-04.md) 为准。
 - 第一原则：**非破坏性优先于功能数量、界面一致性和开发捷径。**
 - 前置研究：DeepSeek Orb → pi Computer Use 可行性调研（原文档不在当前仓库，暂不提供失效的仓内链接）。本文件采纳后续对话的新方向：Electron 悬浮窗是产品核心；不再把它排除在产品 MVP 之外。旧报告中“无浮球工具插件”的 MVP 只作为能力研究，不作为本项目最终范围。
 
@@ -38,7 +41,7 @@
 - 不复制 dsh/Cordis Host、私有 Session Controller 和 DeepSeek Orb 的整个后端。
 - 不以提示词、cwd 或隐藏工具宣称 OS 安全隔离；不强行增加多租户／多工作区权限框架。
 - 不照搬后台代理自动批准用户问题／危险操作的策略。
-- 不在 MVP 实现语音、全桌面常驻录制、多机器控制、通用调度中心和完整后台 code_agent 双轨。
+- 不在 MVP 实现语音、全桌面常驻录制、多机器控制、通用调度中心。2026-10-04 用户已明确要求参考 code_agent 双轨与完整工具集替换，当前要求见 `reference-toolset-transition.md`。
 - 不声称已知道 Codex 双 Alt 如何实现；只借鉴用户想要的交互，不推测或依赖其未公开内部协议。
 
 ## 2. 非破坏性合同（最高优先级）
@@ -206,7 +209,7 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | P2-01 Orb 风格体验 | M1；输入共存需 M3 | 贴边吸附、悬停展开、钉住、观察边框、主题；D1/overlay guard | 多屏／DPI／工作区切换保持可找回；overlay 不挡操作、不进入截图；关闭与收起语义清楚 | 不复制第三方品牌资产；不让视觉层拥有系统输入权限 |
 | P2-02 双 Alt 快捷手势 | P1-03 | 复用 `uiohook-napi` 物理左右 Alt keycode；双 Alt 触发后唤醒 Orb 并进入已有截图预览；D1/E1 | 区分左右 Alt；同步按、先后按、长按、重复、AltGr、焦点变化、锁屏／休眠恢复无卡键；不吞其他正常快捷键；同一按压只触发一次；退出卸载 hook | `deepseek-harness-orb` 没有双 Alt 产品手势，本项按本项目目标做最小适配，不宣称复刻 Codex 或参考项目内部行为；不全量记录按键；不自动上传截图 |
 | P2-03 选区与附加上下文 | M2、用户确认范围 | 已接入参考 history 会话入口（公开 session summary/detail）和参考项目同类 Windows UI Automation `TextPattern` 选区读取；选区结果以 composer chip 附加 | 历史按钮可列出当前 Orb workspace 会话并恢复 user/assistant transcript；选区文本只在用户发送时附加，并显示来源标签；真实 UIA、多屏/DPI、Esc/工具栏和其它平台仍需验收 | 不用模拟 Ctrl+C 静默覆盖用户剪贴板；应用标题不等于完整路径／URL；不 OCR 出文件路径再当可信 cwd |
-| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽、每个动作返回新图像与 observation、用户显式截图导出；**`open_app` 只激活已运行的应用，不启动进程** | Read Only 允许观察/应用列表/等待，Workspace Write 增加输入，Full Access 再允许 `open_app`；各动作复用 session grant、generation 和一动作一 observation；截图导出只接受当前预览 observation，保存由系统对话框完成并使用 `wx` 防覆盖；真实模型动作、跨应用切换及像素命中仍需 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；**`open_app` 不启动任何进程**——启动属于用户未授予的原生权限，`launch` 在 open-app 路径上不可达 |
+| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽、每个动作返回新图像与 observation、用户显式截图导出；`open_app` 按参考语义激活或启动应用 | Read Only 允许观察/应用列表/等待，Workspace Write 增加输入，Full Access 再允许 `open_app`；各动作复用 session grant、generation 和动作后 observation；截图导出保存到 Desktop 并复制剪贴板；真实模型动作、跨应用切换及像素命中仍需 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；应用名经过校验，只允许显示名或 executable base name |
 | P2-05 额外平台与分发 | P1-07、确认平台 | Windows x64 已落地：electron-builder 每用户 NSIS 安装包与解包产物，形态复用参考配置（`apps/desktop/scripts/electron-builder-config.mjs`）；产物内容审计 30/30 与打包产物启动探测 22/22 通过。macOS 签名／TCC 归属与 Linux 目标未做 | 干净目标机安装、权限拒绝／撤销、升级、卸载可复现；声明支持矩阵 | 不用 Windows 通过推断 macOS/Linux 可用；不照搬 Electron 身份到 Node helper；未签名产物必须在文档与人工项中如实标注为未验证 |
 | P2-06 原工具菜单上游集成 | P0-02 结论＋用户明确要求 | 通用可扩展模式接口的提案／可选 PR；W2/W3 | 关闭接口时普通行为不变；模式注册、工具校验、恢复／显示一致；合并与版本支持有记录 | 不是首版前提；上游不接受时不静默维护私有整仓 fork |
 | P2-07 后台任务衔接（可选） | v0.1、用户确认需求 | 复用已有 Pi 子代理／独立会话机制，结果通知回 Orb | 父子任务归属、独立停止、完成只通知一次、不得自动替用户批准问题 | 不将前期 DeepSeek 双轨当本项目刚性范围，不再造任务调度系统 |
@@ -298,6 +301,8 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 截至 2026-09-30，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、session Access broker 和参考项目 Windows native backend 已接入；产品侧 C7 坐标闭环、生命周期与打包证据已通过，但真实模型 C7/D6/D8 的最新复跑未完整通过，失败 JSON 原样保留并按支持矩阵标为未验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。P2-02 已复用现有 `uiohook-napi` 左右 Alt keycode，双 Alt 只唤醒并打开原有截图预览，纯状态测试通过；真实键盘、AltGr、锁屏恢复和人工体验仍未验证。P2-03 已复用 pi-web 公开 session summary/detail API 实现当前 Orb workspace 的 history 列表和 transcript 恢复；选区真实 UIA、多屏/DPI 和原生工具栏仍未验收。P2-04 已从固定参考提交接入 Windows 热键、长按、同窗口拖拽、session Access 后的动作后 image block 和显式截图导出；`orb_open_app` 经用户决定后开放，但**收窄为只激活已在运行的应用、绝不启动进程**（运行前置检查 → 激活 → 前台确属该应用，三步全过才重绑定，否则保留原目标），并已有单测与工具暴露证据；真实桌面动作、目标像素、保存对话框、剪贴板与 open-app 真机效果待验收（`manual-acceptance.md` §9／§10）。P2-05 已按参考项目的打包形态（electron-builder + JS 配置模块、每用户 NSIS、`asarUnpack` 原生模块、无更新源）产出 Windows x64 安装包与解包产物，产物内容审计 30/30、打包产物启动探测 22/22（验证 session Access preload 合同与参考壳层）；dsh 单体仓库的发布管道（随包 Node 运行时、自定义 NSIS 页面、签名链、上传与自动更新）明确未搬，理由见 [`p2-05-distribution.md`](./p2-05-distribution.md)。干净机安装／卸载／升级与 SmartScreen 属人工项（[`manual-acceptance.md`](./manual-acceptance.md) §9），当前保持未验证。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md)、[`lifecycle-and-delivery.md`](./lifecycle-and-delivery.md) 及 `evidence/` 为准。
 
 文档完成标准：全文回读；核对引用路径和固定提交；需求覆盖无遗漏；调用 Advisor 复核，有实质意见时落实修订。开发完成标准由各阶段验收决定，二者不得混淆。当前仍未完成的发布门槛是多显示器、高权限窗口、Chromium 内容输入、安装包在干净机上的安装／卸载／升级（P2-05 E 组）和部分人工交互体验。取消信号已接入 broker、driver 与 native backend，并由自动化竞态测试和真实 disposable target 日志验证。
+
+> 迁移校正：上方 2026-09-30 历史长段仍使用旧 `orb_*` 命名和旧 `open_app` 限制；当前状态以本表 P2-04、`reference-toolset-transition.md` 和 `support-matrix.md` 为准。当前 `open_app` 可激活或启动应用。
 
 ### 本次核验记录
 

@@ -1,5 +1,5 @@
 /** Build an independent Pi package using the existing Vite pipeline and locked dependencies.
- * Pi provides typebox and its SDK; browser dependencies ship alongside the extension outside ASAR.
+ * Pi provides typebox and its SDK; the extension ships without a separate browser gateway.
  */
 import { build } from "vite";
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -9,7 +9,7 @@ import { dirname, join, resolve } from "node:path";
 const repo = resolve(import.meta.dirname, "..");
 const out = join(repo, "out/pi-plugin");
 const manifest = JSON.parse(readFileSync(join(repo, "package.json"), "utf8"));
-const dependencies = Object.fromEntries(["@playwright/mcp", "@modelcontextprotocol/sdk"].map(name => [name, manifest.dependencies[name]]));
+const dependencies = {};
 await build({
   configFile: false,
   build: {

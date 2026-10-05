@@ -61,13 +61,13 @@ const server = createServer(async (request, response) => {
     if (command.type === "prompt") {
       observed.prompt = true;
       setTimeout(() => {
-        emit({ type: "tool_execution_start", toolCallId: "tool-1", toolName: "orb_batch", args: { actions: [{ kind: "click" }, { kind: "click" }, { kind: "click" }] } });
+        emit({ type: "tool_execution_start", toolCallId: "tool-1", toolName: "click", args: { screen_index: 0, position: [100, 100] } });
       }, 150);
       for (const step of [1, 2, 3]) setTimeout(() => {
-        emit({ type: "tool_execution_update", toolCallId: "tool-1", toolName: "orb_batch", partialResult: { content: [{ type: "text", text: `执行第 ${step}/3 步` }] } });
+        emit({ type: "tool_execution_update", toolCallId: "tool-1", toolName: "click", partialResult: { content: [{ type: "text", text: `执行第 ${step}/3 步` }] } });
       }, 250 + step * 200);
       setTimeout(() => {
-        emit({ type: "tool_execution_end", toolCallId: "tool-1", toolName: "orb_batch", isError: false });
+        emit({ type: "tool_execution_end", toolCallId: "tool-1", toolName: "click", isError: false });
         emit({ type: "extension_ui_request", id: "ask-1", method: "select", title: "Choose the next step", options: ["Continue (Recommended)", "Stop"] });
       }, 1500);
     }

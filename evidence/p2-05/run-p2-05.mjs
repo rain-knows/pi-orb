@@ -54,10 +54,15 @@ function step(name, command, args, options = {}) {
 // fails here rather than producing a stale package. The probes are launched through `node` on PATH
 // because this shell runs commands as a shell string, which would split an absolute
 // `C:\Program Files\...` interpreter path at the space.
-step("build and package the unpacked Windows app", "npm", ["run", "package:win:dir"]);
-step("audit the packaged artifact", "node", ["evidence/p2-05/run-package-audit.mjs"]);
-step("load the independent packaged plugin with Pi", "node", ["evidence/personal-startup/run-plugin-load.mjs"]);
-step("start the packaged application and drive its renderer", "node", ["evidence/p2-05/run-packaged-smoke.mjs"]);
+try {
+  step("build and package the unpacked Windows app", "npm", ["run", "package:win:dir"]);
+  step("audit the packaged artifact", "node", ["evidence/p2-05/run-package-audit.mjs"]);
+  step("load the independent packaged plugin with Pi", "node", ["evidence/personal-startup/run-plugin-load.mjs"]);
+  step("start the packaged application and drive its renderer", "node", ["evidence/p2-05/run-packaged-smoke.mjs"]);
+} catch {
+  // The failed step already records the command output. Persist this run's failure below rather
+  // than leaving an older successful stage-result.json behind when an intermediate gate fails.
+}
 
 const auditPath = join(evidenceDir, "package-audit.json");
 const smokePath = join(evidenceDir, "packaged-smoke.json");
@@ -77,10 +82,11 @@ console.log(
       steps: stage.steps.map(({ name, ok, ms }) => ({ name, ok, ms })),
       artifactAudit: stage.artifactAudit ? { passed: stage.artifactAudit.passed, checks: stage.artifactAudit.checks.length } : null,
       packagedSmoke: stage.packagedSmoke ? { passed: stage.packagedSmoke.passed, checks: stage.packagedSmoke.checks.length } : null,
-      failed:
-        stage.packagedSmoke?.checks.filter((entry) => !entry.ok).map((entry) => entry.name) ??
-        stage.artifactAudit?.checks.filter((entry) => !entry.ok).map((entry) => entry.name) ??
-        [],
+      failed: [
+        ...stage.steps.filter((entry) => !entry.ok).map((entry) => entry.name),
+        ...(stage.packagedSmoke?.checks.filter((entry) => !entry.ok).map((entry) => entry.name) ?? []),
+        ...(stage.artifactAudit?.checks.filter((entry) => !entry.ok).map((entry) => entry.name) ?? []),
+      ],
     },
     null,
     2,

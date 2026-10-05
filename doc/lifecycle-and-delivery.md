@@ -76,7 +76,7 @@ dsh 的随包 Node、发布上传、自动更新、签名链和自定义安装�
 - 干净账户/机器上的安装、覆盖升级、卸载和用户数据保留；
 - 未签名安装包的 SmartScreen 首次运行体验；
 - 多显示器、DPI 变化、锁屏/休眠后的真实键盘和浮球体验；
-- 高权限窗口、Chromium 内容输入和 `orb_open_app` 的真实桌面效果。
+- 高权限窗口、Chromium 内容输入和 `open_app` 的真实桌面效果。
 
 人工步骤集中在 [`manual-acceptance.md`](./manual-acceptance.md) §3、§4、§5、§9、§10，
 版本兼容性唯一记录在 [`support-matrix.md`](./support-matrix.md)。

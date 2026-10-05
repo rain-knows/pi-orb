@@ -1,5 +1,9 @@
 # pi-orb 复用评估与 P1 解阻塞报告
 
+> 本页是 2026-09-30 的旧阶段记录，包含已删除的 `orb_*`/观察 ID 契约，不代表当前运行时。
+> 当前工具迁移状态见 [`reference-toolset-transition.md`](./reference-toolset-transition.md)。
+> 本页的复用评估表和验收数字是历史快照；当前源码、工具名和后台任务以迁移文档与支持矩阵为准。
+
 更新时间：2026-09-30
 
 参考仓库：[`rain-knows/deepseek-harness-orb`](https://github.com/rain-knows/deepseek-harness-orb)，提交

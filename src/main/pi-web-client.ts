@@ -35,6 +35,7 @@ export interface AgentState {
   readonly provider: string | null;
   readonly modelId: string | null;
   readonly thinkingLevel: string | null;
+  readonly running?: boolean;
 }
 
 export interface PiWebModelChoice {
@@ -144,15 +145,18 @@ export class PiWebClient {
     }
   }
 
-  async createSession(cwd: string): Promise<string> {
+  async createSession(cwd: string, options?: { toolNames?: readonly string[]; provider?: string; modelId?: string; thinkingLevel?: string }): Promise<string> {
     const response = await this.#request("/api/agent/new", {
       method: "POST",
-      body: JSON.stringify({ cwd, type: "ensure_session" }),
+      body: JSON.stringify({ cwd, type: "ensure_session", ...options }),
     });
     const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     const sessionId = body.sessionId;
     if (typeof sessionId !== "string" || sessionId.length === 0) {
-      throw new PiWebError("pi-web did not return a session id.", response.status);
+      const detail = typeof body.error === "string" && body.error.trim().length > 0
+        ? body.error
+        : "pi-web did not return a session id.";
+      throw new PiWebError(detail, response.status, typeof body.code === "string" ? body.code : undefined);
     }
     return sessionId;
   }
@@ -212,15 +216,45 @@ export class PiWebClient {
     await this.#sessionCommand(sessionId, { type: "abort" });
   }
 
+  async queuePrompt(sessionId: string, text: string): Promise<void> {
+    await this.#sessionCommand(sessionId, { type: "prompt", message: text, streamingBehavior: "followUp" });
+  }
+
+  async clearQueue(sessionId: string): Promise<void> {
+    await this.#sessionCommand(sessionId, { type: "clear_queue" });
+  }
+
+  async setSessionName(sessionId: string, name: string): Promise<void> {
+    await this.#sessionCommand(sessionId, { type: "set_session_name", name });
+  }
+
+  async lastAssistantOutcome(sessionId: string): Promise<{ text: string; error: string | null }> {
+    // Pi Web's command adapter does not expose the SDK's get_messages command.
+    // Read its public history response, with a bounded tail and deferred media.
+    const response = await this.#request(`/api/sessions/${encodeURIComponent(sessionId)}?tail=1&tree=summary&deferThinking=1&deferMedia=1`, { method: "GET" });
+    const result = await response.json() as { error?: string; context?: { messages?: { role: string; stopReason?: string; errorMessage?: string; content?: { type: string; text?: string }[] }[] } };
+    if (!response.ok || !Array.isArray(result.context?.messages)) throw new PiWebError(result.error ?? "Could not read the background session outcome.", response.status);
+    const message = result.context.messages.findLast(item => item.role === "assistant");
+    const text = message?.content?.filter(block => block.type === "text").map(block => block.text ?? "").join("\n") ?? "";
+    const error = message?.stopReason === "error" || message?.stopReason === "aborted"
+      ? message.errorMessage || `Background prompt ${message.stopReason}.`
+      : null;
+    return { text, error };
+  }
+
   async getState(sessionId: string): Promise<AgentState> {
     const data = await this.#sessionCommand<{
       model?: { id?: string; provider?: string };
       thinkingLevel?: string;
+      isStreaming?: boolean;
+      isPromptRunning?: boolean;
+      isBashRunning?: boolean;
     }>(sessionId, { type: "get_state" });
     return {
       provider: data.model?.provider ?? null,
       modelId: data.model?.id ?? null,
       thinkingLevel: data.thinkingLevel ?? null,
+      running: data.isStreaming === true || data.isPromptRunning === true || data.isBashRunning === true,
     };
   }
 

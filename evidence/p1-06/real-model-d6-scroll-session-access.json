@@ -1,17 +1,17 @@
 {
-  "capturedAt": "2026-09-30T08:39:29.132Z",
+  "capturedAt": "2026-10-05T10:39:21.321Z",
   "testCase": "d6-scroll",
   "verification": {
-    "what": "real model observes a disposable target and scrolls its labelled strip",
+    "what": "real model receives the automatic frontmost frame and scrolls its labelled strip",
     "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
     "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
     "accessLevel": "workspace-write",
     "targetSelection": "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically"
   },
   "isolation": {
-    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\shell-data",
-    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\orb-config.json",
-    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d6-scroll-agent-1790757569129",
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1791196761316\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1791196761316\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d6-scroll-agent-1791196761317",
     "modelsJson": "hard link to the real file (no copy)",
     "authJson": "symlink to the real file (no copy)",
     "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
@@ -27,13 +27,14 @@
       "authJsonLinked": true
     },
     "interactiveDesktop": {
-      "process": "LockApp",
-      "title": "Windows Ĭ����������",
+      "process": "ChatGPT",
+      "title": "ChatGPT",
+      "className": "Chrome_WidgetWin_1",
       "inputDesktopAccessible": true
     },
-    "targetPid": 12528,
+    "targetPid": 103436,
     "target": {
-      "pid": 12528,
+      "pid": 103436,
       "windowBoundsDip": {
         "x": 120,
         "y": 90,
@@ -65,15 +66,15 @@
     },
     "piWeb": {
       "ok": true,
-      "baseUrl": "http://127.0.0.1:41196",
-      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:41196\n- Network:       http://127.0.0.1:41196\n✓ Ready in 495ms\n✓ Running next.config.ts took 153ms\n"
+      "baseUrl": "http://127.0.0.1:47452",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:47452\n- Network:       http://127.0.0.1:47452\n✓ Ready in 578ms\n✓ Running next.config took 102ms\n"
     },
     "handshake": {
-      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\shell-data\\bridge-token.json",
-      "pid": 24696,
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1791196761316\\shell-data\\bridge-token.json",
+      "pid": 106748,
       "generation": 1,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\orb-workspace",
-      "pipePath": "\\\\.\\pipe\\pi-orb-24696"
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1791196761316\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-106748"
     },
     "rendererTarget": {
       "title": "pi-orb",
@@ -85,16 +86,16 @@
     },
     "workspace": {
       "configured": true,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1790757569129\\orb-workspace",
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d6-scroll-1791196761316\\orb-workspace",
       "problem": null,
       "shortcut": "Control+Alt+F11",
       "shortcutRegistered": true,
       "shortcutProblem": null,
-      "generation": 2,
+      "generation": 1,
       "busy": false,
-      "sessionId": "01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56",
+      "sessionId": null,
       "piWeb": {
-        "baseUrl": "http://127.0.0.1:41196",
+        "baseUrl": "http://127.0.0.1:47452",
         "reachable": true,
         "problem": null
       },
@@ -109,10 +110,10 @@
         "bridgeReady": true
       }
     },
-    "generation": 2,
-    "session": "01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56",
+    "generation": 1,
+    "session": "01a10ba5-ce7c-7072-be8c-0653a9a74e53",
     "model": {
-      "sessionId": "01a0f178-3fdb-71eb-8c0e-1d6d8c18c76a",
+      "sessionId": "01a10ba5-d634-7072-be8c-06554ca03423",
       "selected": {
         "provider": "TZcode",
         "modelId": "deepseek-v4.1-flash"
@@ -124,31 +125,84 @@
       "declaredImageCapable": true
     },
     "interactiveDesktopBeforeTarget": {
-      "process": "LockApp",
-      "title": "Windows Ĭ����������",
+      "process": "electron",
+      "title": "pi-orb",
+      "className": "Chrome_WidgetWin_1",
       "inputDesktopAccessible": true
-    }
+    },
+    "testTarget": {
+      "pid": 103436,
+      "handle": 11340364,
+      "selection": "test harness only"
+    },
+    "interactiveDesktopAtWake": {
+      "process": "electron",
+      "title": "pi-orb",
+      "className": "Chrome_WidgetWin_1",
+      "inputDesktopAccessible": true
+    },
+    "foreground": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true
+    },
+    "access": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a10ba5-ce7c-7072-be8c-0653a9a74e53"
+    },
+    "prompt": {},
+    "waitedForIdle": true,
+    "bridgeDiagnostics": [
+      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-106748",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:39:39.376Z\",\"event\":\"authorize\",\"sessionId\":\"01a10ba5-ce7c-7072-be8c-0653a9a74e53\",\"generation\":1,\"level\":\"full-access\"}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:39:47.317Z\",\"event\":\"authorize\",\"sessionId\":\"01a10ba5-ce7c-7072-be8c-0653a9a74e53\",\"generation\":1,\"level\":\"workspace-write\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.472Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"window-enumeration\",\"durationMs\":27.423299999998562}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.493Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"window-enumeration\",\"durationMs\":20.988900000000285}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.515Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"listScreens\",\"durationMs\":20.665000000000873}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.545Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"capture-and-png\",\"durationMs\":29.92399999999907}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.546Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"capture\",\"durationMs\":30.445999999999913}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.569Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"inspectForeground\",\"durationMs\":23.24040000000241}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.569Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"base64\",\"durationMs\":0.16890000000057626}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.569Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"image\",\"bytes\":23930,\"width\":735,\"height\":786}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:39:47.597Z\",\"event\":\"observe\",\"sessionId\":\"01a10ba5-ce7c-7072-be8c-0653a9a74e53\",\"observationId\":\"obs-muv4bipe-1\",\"windowId\":\"11340364\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:47.597Z\",\"event\":\"tool-timing\",\"requestId\":\"e3d61b95-ccb4-4e96-97cc-a3f5b9abf8cc\",\"phase\":\"executor-total\",\"durationMs\":242.91310000000158}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:39:53.099Z\",\"event\":\"act-observation\",\"kind\":\"scroll\",\"observationId\":\"obs-muv4bipe-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.203Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"window-enumeration\",\"durationMs\":19.264899999998306}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.218Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"window-enumeration\",\"durationMs\":14.114799999999377}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.315Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"native-input\",\"durationMs\":97.33710000000065}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.916Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"post-action-wait\",\"durationMs\":600.6149000000005}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.932Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"window-enumeration\",\"durationMs\":15.586899999998423}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.946Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"listScreens\",\"durationMs\":14.356800000001385}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.966Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"capture-and-png\",\"durationMs\":19.794799999999668}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.966Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"capture\",\"durationMs\":19.9958000000006}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.991Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"inspectForeground\",\"durationMs\":24.622599999998783}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.991Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"base64\",\"durationMs\":0.06970000000001164}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.991Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"image\",\"bytes\":24078,\"width\":735,\"height\":786}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:39:53.993Z\",\"event\":\"act\",\"kind\":\"scroll\",\"observationId\":\"obs-muv4bipe-1\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:39:53.994Z\",\"event\":\"tool-timing\",\"requestId\":\"8c640f1a-a7a5-4f1e-b866-54173956f6a3\",\"phase\":\"executor-total\",\"durationMs\":895.8614000000016}"
+    ]
   },
   "checks": [
     {
       "name": "the isolated pi-web started",
       "ok": true,
-      "detail": "http://127.0.0.1:41196"
+      "detail": "http://127.0.0.1:47452"
     },
     {
       "name": "the isolated shell published its own handshake",
       "ok": true,
-      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\shell-data\\\\bridge-token.json\",\"pid\":24696,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-24696\"}"
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1791196761316\\\\shell-data\\\\bridge-token.json\",\"pid\":106748,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1791196761316\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-106748\"}"
     },
     {
       "name": "the isolated shell's pipe accepts a connection",
       "ok": true,
-      "detail": "\\\\.\\pipe\\pi-orb-24696"
+      "detail": "\\\\.\\pipe\\pi-orb-106748"
     },
     {
       "name": "the isolated shell is NOT the user's running orb",
       "ok": true,
-      "detail": "handshake pid 24696"
+      "detail": "handshake pid 106748"
     },
     {
       "name": "the orb renderer is reachable over CDP",
@@ -158,31 +212,456 @@
     {
       "name": "the wake shortcut registered",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:41196\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1791196761316\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:47452\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
     },
     {
       "name": "the isolated shell reports this run's workspace and a generation",
       "ok": true,
-      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1790757569129\\\\orb-workspace\",\"generation\":2}"
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1791196761316\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d6-scroll-1791196761316\\\\orb-workspace\",\"generation\":1}"
     },
     {
       "name": "the isolated shell created a real pi-web session",
       "ok": true,
-      "detail": "\"01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56\""
+      "detail": "\"01a10ba5-ce7c-7072-be8c-0653a9a74e53\""
     },
     {
       "name": "the session is served by a model that declares image input",
       "ok": true,
-      "detail": "{\"sessionId\":\"01a0f178-3fdb-71eb-8c0e-1d6d8c18c76a\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+      "detail": "{\"sessionId\":\"01a10ba5-d634-7072-be8c-06554ca03423\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
     },
     {
       "name": "an interactive desktop is available before target enumeration",
-      "ok": false,
-      "detail": "{\"process\":\"LockApp\",\"title\":\"Windows Ĭ����������\",\"inputDesktopAccessible\":true}"
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-orb\",\"className\":\"Chrome_WidgetWin_1\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the harness can foreground its disposable target by process id",
+      "ok": true,
+      "detail": "{\"pid\":103436,\"handle\":11340364,\"selection\":\"test harness only\"}"
+    },
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": true,
+      "detail": "{\"process\":\"electron\",\"title\":\"pi-orb\",\"className\":\"Chrome_WidgetWin_1\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the disposable target is the foreground window before the first frame",
+      "ok": true,
+      "detail": "{\"title\":\"P1-05 input target\",\"ok\":true,\"foregrounded\":true}"
+    },
+    {
+      "name": "Workspace Write is granted to the isolated Orb session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a10ba5-ce7c-7072-be8c-0653a9a74e53\"}"
+    },
+    {
+      "name": "the prompt was sent with automatic frontmost-window context",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "D6 (target's own log): the strip received wheel input",
+      "ok": true,
+      "detail": "[{\"at\":1791196793225,\"kind\":\"wheel\",\"clientPoint\":{\"x\":244,\"y\":415},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":0},{\"at\":1791196793294,\"kind\":\"wheel\",\"clientPoint\":{\"x\":244,\"y\":415},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":5.333333492279053},{\"at\":1791196793295,\"kind\":\"wheel\",\"clientPoint\":{\"x\":244,\"y\":415},\"deltaY\":100,\"overScroller\":true,\"elementUnderPoint\":\"DIV\",\"scrollerScrollTop\":34}]"
+    },
+    {
+      "name": "D6 (target's own log): the strip scroll position changed",
+      "ok": true,
+      "detail": "[{\"at\":1791196793235,\"kind\":\"scroll\",\"scrollTop\":0.6666666865348816},{\"at\":1791196793244,\"kind\":\"scroll\",\"scrollTop\":2},{\"at\":1791196793252,\"kind\":\"scroll\",\"scrollTop\":3.3333332538604736},{\"at\":1791196793295,\"kind\":\"scroll\",\"scrollTop\":5.333333492279053},{\"at\":1791196793296,\"kind\":\"scroll\",\"scrollTop\":34},{\"at\":1791196793303,\"kind\":\"scroll\",\"scrollTop\":49.33333206176758},{\"at\":1791196793310,\"kind\":\"scroll\",\"scrollTop\":67.33333587646484},{\"at\":1791196793318,\"kind\":\"scroll\",\"scrollTop\":88},{\"at\":1791196793328,\"kind\":\"scroll\",\"scrollTop\":110.66666412353516},{\"at\":1791196793335,\"kind\":\"scroll\",\"sc…"
+    },
+    {
+      "name": "the real model called scroll on its own",
+      "ok": true,
+      "detail": "[{\"toolName\":\"scroll\",\"toolCallId\":\"call_00_lgrrZZUzmx4enX8Ujrgp4787\",\"arguments\":{\"screen_index\":0,\"position\":[500,900],\"direction\":\"down\",\"scroll_level\":3},\"file\":\"C:\\\\Users\\\\JUSTLI~1\\\\AppData\\\\Local\\\\Temp\\\\pi-orb-real-d6-scroll-agent-1791196761317\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-d6-scroll-1791196761316-orb-workspace--\\\\2026-10-05T10-39-38-108Z_01a10ba5-ce7c-7072-be8c-0653a9a74e53.jsonl\",\"index\":6,\"at\":1791196793089}]"
+    },
+    {
+      "name": "the automatic frontmost screenshot preceded the GUI action",
+      "ok": true,
+      "detail": "[{\"index\":5,\"imageCount\":1,\"file\":\"<agentDir>\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-d6-scroll-1791196761316-orb-workspace--\\\\2026-10-05T10-39-38-108Z_01a10ba5-ce7c-7072-be8c-0653a9a74e53.jsonl\"}]"
+    },
+    {
+      "name": "the action tool result includes its fresh observation and screenshot",
+      "ok": true,
+      "detail": "[{\"toolName\":\"scroll\",\"toolCallId\":\"call_00_lgrrZZUzmx4enX8Ujrgp4787\",\"text\":\"<frontmost_app>electron</frontmost_app>\\n<frontmost_window>P1-05 input target</frontmost_window>\\n<focus_note>Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.</focus_note>\",\"imageCount\":1,\"ok\":true,\"observation\":{\"id\":\"obs-muv4bnnr-2\",\"at\":1791196793991,\"title\":\"P1-05 input target\"}}]"
+    },
+    {
+      "name": "the real model addressed the action in the 0-1000 screenshot space",
+      "ok": true,
+      "detail": "{\"args\":{\"screen_index\":0,\"position\":[500,900],\"direction\":\"down\",\"scroll_level\":3},\"position\":[500,900]}"
     }
   ],
-  "passed": false,
-  "error": "no interactive desktop: foreground is LockApp and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
-  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:41197/devtools/browser/fd31515a-6f8c-409d-82d4-9bc5a045462b\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-24696\n[pi-orb] desktop {\"at\":\"2026-09-30T08:39:35.631Z\",\"event\":\"revoke\"}\n[pi-orb] recorded target: pid 18188 \"Windows Ĭ����������\" (2560x1600, dpi 144)\n",
-  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:41196\n- Network:       http://127.0.0.1:41196\n✓ Ready in 495ms\n✓ Running next.config.ts took 153ms\n[pi-web] session_start dispatched to extensions for session 01a0f178-3a6c-71eb-8c0e-1d6b26d8cb56\n[pi-web] session_start dispatched to extensions for session 01a0f178-3fdb-71eb-8c0e-1d6d8c18c76a\n"
+  "passed": true,
+  "targetLog": {
+    "events": [
+      {
+        "kind": "ready",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "wheel",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": 100,
+        "overScroller": true,
+        "scrollTop": null
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 0.6666666865348816
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 2
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 3.3333332538604736
+      },
+      {
+        "kind": "wheel",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": 100,
+        "overScroller": true,
+        "scrollTop": null
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 5.333333492279053
+      },
+      {
+        "kind": "wheel",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": 100,
+        "overScroller": true,
+        "scrollTop": null
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 34
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 49.33333206176758
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 67.33333587646484
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 88
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 110.66666412353516
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 134
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 156.6666717529297
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 178
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 196.6666717529297
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 212
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 224.6666717529297
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 232.6666717529297
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 238
+      },
+      {
+        "kind": "scroll",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": 240
+      }
+    ],
+    "matches": [
+      {
+        "at": 1791196793225,
+        "kind": "wheel",
+        "clientPoint": {
+          "x": 244,
+          "y": 415
+        },
+        "deltaY": 100,
+        "overScroller": true,
+        "elementUnderPoint": "DIV",
+        "scrollerScrollTop": 0
+      },
+      {
+        "at": 1791196793294,
+        "kind": "wheel",
+        "clientPoint": {
+          "x": 244,
+          "y": 415
+        },
+        "deltaY": 100,
+        "overScroller": true,
+        "elementUnderPoint": "DIV",
+        "scrollerScrollTop": 5.333333492279053
+      },
+      {
+        "at": 1791196793295,
+        "kind": "wheel",
+        "clientPoint": {
+          "x": 244,
+          "y": 415
+        },
+        "deltaY": 100,
+        "overScroller": true,
+        "elementUnderPoint": "DIV",
+        "scrollerScrollTop": 34
+      }
+    ],
+    "cellDowns": [
+      {},
+      {},
+      {}
+    ],
+    "scrollEvents": [
+      {
+        "at": 1791196793235,
+        "kind": "scroll",
+        "scrollTop": 0.6666666865348816
+      },
+      {
+        "at": 1791196793244,
+        "kind": "scroll",
+        "scrollTop": 2
+      },
+      {
+        "at": 1791196793252,
+        "kind": "scroll",
+        "scrollTop": 3.3333332538604736
+      },
+      {
+        "at": 1791196793295,
+        "kind": "scroll",
+        "scrollTop": 5.333333492279053
+      },
+      {
+        "at": 1791196793296,
+        "kind": "scroll",
+        "scrollTop": 34
+      },
+      {
+        "at": 1791196793303,
+        "kind": "scroll",
+        "scrollTop": 49.33333206176758
+      },
+      {
+        "at": 1791196793310,
+        "kind": "scroll",
+        "scrollTop": 67.33333587646484
+      },
+      {
+        "at": 1791196793318,
+        "kind": "scroll",
+        "scrollTop": 88
+      },
+      {
+        "at": 1791196793328,
+        "kind": "scroll",
+        "scrollTop": 110.66666412353516
+      },
+      {
+        "at": 1791196793335,
+        "kind": "scroll",
+        "scrollTop": 134
+      },
+      {
+        "at": 1791196793344,
+        "kind": "scroll",
+        "scrollTop": 156.6666717529297
+      },
+      {
+        "at": 1791196793352,
+        "kind": "scroll",
+        "scrollTop": 178
+      },
+      {
+        "at": 1791196793360,
+        "kind": "scroll",
+        "scrollTop": 196.6666717529297
+      },
+      {
+        "at": 1791196793368,
+        "kind": "scroll",
+        "scrollTop": 212
+      },
+      {
+        "at": 1791196793378,
+        "kind": "scroll",
+        "scrollTop": 224.6666717529297
+      },
+      {
+        "at": 1791196793386,
+        "kind": "scroll",
+        "scrollTop": 232.6666717529297
+      },
+      {
+        "at": 1791196793394,
+        "kind": "scroll",
+        "scrollTop": 238
+      },
+      {
+        "at": 1791196793402,
+        "kind": "scroll",
+        "scrollTop": 240
+      }
+    ]
+  },
+  "sessionFiles": [
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d6-scroll-1791196761316-orb-workspace--\\2026-10-05T10-39-38-108Z_01a10ba5-ce7c-7072-be8c-0653a9a74e53.jsonl"
+  ],
+  "modelToolCalls": [
+    {
+      "toolName": "scroll",
+      "toolCallId": "call_00_lgrrZZUzmx4enX8Ujrgp4787",
+      "arguments": {
+        "screen_index": 0,
+        "position": [
+          500,
+          900
+        ],
+        "direction": "down",
+        "scroll_level": 3
+      },
+      "index": 6,
+      "at": 1791196793089,
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d6-scroll-1791196761316-orb-workspace--\\2026-10-05T10-39-38-108Z_01a10ba5-ce7c-7072-be8c-0653a9a74e53.jsonl"
+    }
+  ],
+  "modelToolResults": [
+    {
+      "toolName": "scroll",
+      "toolCallId": "call_00_lgrrZZUzmx4enX8Ujrgp4787",
+      "text": "<frontmost_app>electron</frontmost_app>\n<frontmost_window>P1-05 input target</frontmost_window>\n<focus_note>Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.</focus_note>",
+      "imageCount": 1,
+      "ok": true,
+      "observation": {
+        "id": "obs-muv4bnnr-2",
+        "at": 1791196793991,
+        "title": "P1-05 input target"
+      }
+    }
+  ],
+  "finishedAt": "2026-10-05T10:39:57.639Z"
 }

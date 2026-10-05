@@ -9,7 +9,7 @@ function fakeExecutor(options: { readonly live?: boolean; readonly fail?: string
   return {
     calls,
     browser: async () => { calls.push("browser"); return { ok: true, content: [{ type: "text", text: "current browser snapshot" }] }; },
-    batch: async () => ({ ok: true, completed: 2, steps: [] }),
+    codeAgent: async () => { calls.push("code-agent"); return { accepted: true, session_id: "worker" }; },
     observe: async () => {
       calls.push("observe");
       return { observationId: "obs-1" };
@@ -74,18 +74,14 @@ afterEach(async () => {
 });
 
 describe("bridge admission rules", () => {
-  it("routes authenticated browser calls through the live-session admission check", async () => {
-    const { pipePath, token, executor } = await start();
-    const response = await send(pipePath, { type: "browser", token, sessionId: "s", generation: 1, browser: { name: "browser_snapshot" } });
-    expect(response.parsed).toMatchObject({ ok: true, result: { ok: true, content: [{ text: "current browser snapshot" }] } });
-    expect(executor.calls).toEqual(["browser"]);
-  });
-
-  it("refuses an obsolete session's browser request before reaching its executor", async () => {
-    const { pipePath, token, executor } = await start({ live: false });
-    const response = await send(pipePath, { type: "browser", token, sessionId: "s", generation: 1, browser: { name: "browser_click", arguments: { target: "e7" } } });
-    expect(response.parsed).toMatchObject({ ok: false, reason: "stale-generation" });
-    expect(executor.calls).toEqual([]);
+  it("admits only the live caller for background dispatch", async () => {
+    const live = await start();
+    const response = await send(live.pipePath, { type: "code-agent", token: live.token, sessionId: "s", generation: 1, command: "dispatch", arguments: { task: "Build a document" } });
+    expect(response.parsed).toMatchObject({ ok: true, result: { accepted: true, session_id: "worker" } });
+    expect(live.executor.calls).toEqual(["code-agent"]);
+    const obsolete = await start({ live: false });
+    expect((await send(obsolete.pipePath, { type: "code-agent", token: obsolete.token, sessionId: "s", generation: 1, command: "dispatch", arguments: { task: "Build a document" } })).parsed).toMatchObject({ ok: false, reason: "stale-generation" });
+    expect(obsolete.executor.calls).toEqual([]);
   });
   it("keeps the transport ceiling above the validated screenshot payload", () => {
     expect(MAX_BRIDGE_FRAME_BYTES).toBeGreaterThan(10 * 1024 * 1024);
@@ -142,7 +138,6 @@ describe("bridge admission rules", () => {
     const pipePath = "\\\\.\\pipe\\pi-orb-test-" + process.pid + "-" + unique;
     const executor = {
       calls: [] as string[],
-      batch: async () => ({ ok: true, completed: 2, steps: [] }),
     observe: async () => ({}),
       act: async () => ({}),
       status: () => ({}),
@@ -245,7 +240,6 @@ describe("bridge admission rules", () => {
       pipePath,
       token,
       executor: {
-        batch: async () => ({ ok: true, completed: 2, steps: [] }),
     observe: async () => ({ ok: false, refused: true, reason: "no-target", message: "nothing to observe" }),
         act: async () => ({ ok: false, refused: true, reason: "no-task-authorization", message: "not approved" }),
         status: () => ({}),

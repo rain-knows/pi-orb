@@ -1,4 +1,7 @@
-# 工具调用提速实施记录
+# 工具调用提速实施记录（旧桥接设计）
+
+> 本页记录的显式 observation/batch 方案已退休。当前方案采用参考项目的自动首帧、直接 GUI
+> 工具和后台 `code_agent`，以 `reference-toolset-transition.md` 为准。
 
 本文保留此前四阶段的原始结果（三图预算与分数坐标）。2026-10-01 的当前实现改为最新一图和
 实际附件像素坐标；新插件来源、小控件结果与原生退出限制见 [后续阶段](./plugin-reference-and-pointing.md)。

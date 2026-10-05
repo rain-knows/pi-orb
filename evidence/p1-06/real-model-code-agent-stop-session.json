@@ -1,0 +1,172 @@
+{
+  "capturedAt": "2026-10-05T10:28:32.528Z",
+  "verification": {
+    "chain": "real model -> Pi Web -> orb extension -> named pipe -> Electron CodeAgentManager -> independent Pi Web worker",
+    "reference": "mini-yifan/dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7",
+    "model": {
+      "provider": "TZcode",
+      "id": "deepseek-v4.1-flash"
+    },
+    "mode": "stop",
+    "marker": "P1ORBCODEAGENTSTOP"
+  },
+  "isolation": {
+    "runRoot": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-stop-1791196112525",
+    "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-stop-1791196112525\\orb-workspace",
+    "shellDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-stop-1791196112525\\shell-data",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-code-agent-stop-1791196112525",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)"
+  },
+  "checks": [
+    {
+      "name": "the isolated shell published a bridge handshake",
+      "ok": true,
+      "detail": "{\"version\":2,\"token\":\"<redacted>\",\"pid\":107308,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-stop-1791196112525\\\\orb-workspace\",\"orbSessionId\":null,\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-107308\",\"generation\":1,\"createdAt\":\"2026-10-05T10:28:35.631Z\"}"
+    },
+    {
+      "name": "the isolated Orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "no renderer"
+    },
+    {
+      "name": "the isolated Orb session has a generation",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-stop-1791196112525\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:49268\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":true,\"level\":\"full-access\",\"sessionId\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+    },
+    {
+      "name": "Workspace Write is granted to the owner session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"generation\":1,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}"
+    },
+    {
+      "name": "the owner prompt was accepted",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "the real model called code_agent",
+      "ok": true,
+      "detail": "[\"code_agent\"]"
+    },
+    {
+      "name": "the product bridge accepted code_agent_stop",
+      "ok": true,
+      "detail": "{\"ok\":true,\"result\":{\"accepted\":true,\"session_id\":\"01a10b9c-0aee-70c2-9c63-af7f0a9ffa32\"}}"
+    },
+    {
+      "name": "the stopped worker is idle in the persistent registry",
+      "ok": true,
+      "detail": "{\"owner\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"session_id\":\"01a10b9c-0aee-70c2-9c63-af7f0a9ffa32\",\"task\":\"In the current working directory, perform the following, in this exact order:\\n\\n1. Run a sleep of 120 seconds (e.g. `sleep 120`, or the platform-equivalent 120-second wait) as a blocking command.\\n2. Only AFTER that 120-second sleep has fully completed, create a file named `must-not-exist-after-stop.txt` containing a single line of text (for example: created after 120s sleep).\\n\\nConstraints:\\n- You must not create `must-not-exist-after-stop.txt` before the 120-second sleep finishes. The file must not exist until the sleep has run to completion.\\n- Do not shorten, skip, or parallelize the sleep.\\n- Report back the exact path of the created file and confirm the sleep duration used.\",..."
+    },
+    {
+      "name": "the stopped worker did not produce the marker",
+      "ok": true,
+      "detail": "{\"markerPath\":null,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-code-agent-stop-1791196112525\\\\orb-workspace\"}"
+    },
+    {
+      "name": "stopping did not deliver a completion notice",
+      "ok": true,
+      "detail": "[]"
+    }
+  ],
+  "steps": {
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-stop-1791196112525\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": null,
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:49268",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "sessionId": "01a10b9b-ddc6-70c2-9c63-af7cd041a1fe",
+    "generation": 1,
+    "access": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a10b9b-ddc6-70c2-9c63-af7cd041a1fe",
+      "generation": 1,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    },
+    "prompt": {},
+    "stopResponse": {
+      "ok": true,
+      "result": {
+        "accepted": true,
+        "session_id": "01a10b9c-0aee-70c2-9c63-af7f0a9ffa32"
+      }
+    },
+    "registryFiles": [
+      "<runRoot>\\code-agent-sessions.json"
+    ],
+    "markerPath": null,
+    "workerSessionId": "01a10b9c-0aee-70c2-9c63-af7f0a9ffa32",
+    "registry": [
+      {
+        "path": "<runRoot>\\code-agent-sessions.json",
+        "value": [
+          {
+            "owner": "01a10b9b-ddc6-70c2-9c63-af7cd041a1fe",
+            "session_id": "01a10b9c-0aee-70c2-9c63-af7f0a9ffa32",
+            "task": "In the current working directory, perform the following, in this exact order:\n\n1. Run a sleep of 120 seconds (e.g. `sleep 120`, or the platform-equivalent 120-second wait) as a blocking command.\n2. Only AFTER that 120-second sleep has fully completed, create a file named `must-not-exist-after-stop.txt` containing a single line of text (for example: created after 120s sleep).\n\nConstraints:\n- You must not create `must-not-exist-after-stop.txt` before the 120-second sleep finishes. The file must not exist until the sleep has run to completion.\n- Do not shorten, skip, or parallelize the sleep.\n- Report back the exact path of the created file and confirm the sleep duration used.",
+            "cwd": "D:\\pi-orb-p1-runs\\p1-06-real-code-agent-stop-1791196112525\\orb-workspace\\in-the-current-working-directory-perform",
+            "status": "idle",
+            "pending": false,
+            "outcome": "",
+            "tools": [
+              "read",
+              "grep",
+              "find",
+              "ls",
+              "write",
+              "edit"
+            ]
+          }
+        ]
+      }
+    ],
+    "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:49269/devtools/browser/de7930f4-9447-4315-8564-7d1193fa08c8\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-107308\n[pi-orb] desktop {\"at\":\"2026-10-05T10:28:48.095Z\",\"event\":\"authorize\",\"sessionId\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"generation\":1,\"level\":\"full-access\"}\n[pi-orb] desktop {\"at\":\"2026-10-05T10:28:48.101Z\",\"event\":\"authorize\",\"sessionId\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"generation\":1,\"level\":\"workspace-write\"}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.259Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"window-enumeration\",\"durationMs\":30.860199999999168}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.282Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"window-enumeration\",\"durationMs\":22.57970000000023}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.311Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"listScreens\",\"durationMs\":28.181500000000597}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.393Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"capture-and-png\",\"durationMs\":81.79559999999947}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.393Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"capture\",\"durationMs\":82.23619999999937}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.412Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"inspectForeground\",\"durationMs\":19.25799999999981}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.413Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"base64\",\"durationMs\":0.5192999999999302}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.413Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"image\",\"bytes\":298856,\"width\":1920,\"height\":1230}\n[pi-orb] desktop {\"at\":\"2026-10-05T10:28:48.437Z\",\"event\":\"observe\",\"sessionId\":\"01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\",\"observationId\":\"obs-muv3xe3k-1\",\"windowId\":\"8456710\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:48.437Z\",\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"executor-total\",\"durationMs\":307.7687999999998}\n[pi-orb] session timing {\"event\":\"model-response-interval\",\"durationMs\":9757.214399999999}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:28:59.428Z\",\"event\":\"tool-timing\",\"requestId\":\"780599c4-2cef-44e3-82f6-bcb6ed020bb5\",\"phase\":\"executor-total\",\"durationMs\":1229.8983000000007}\n[pi-orb] session timing {\"event\":\"tool-through-sse\",\"toolCallId\":\"call_00_sjZWqJwVpDx3cdeYh7ua2223\",\"durationMs\":1252.2102999999988}\n[pi-orb] bridge {\"at\":\"2026-10-05T10:29:00.569Z\",\"event\":\"tool-timing\",\"requestId\":\"control-1791196140539-a8f2b802ab7a5\",\"phase\":\"executor-total\",\"durationMs\":26.889100000000326}\n",
+    "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:49268\n- Network:       http://127.0.0.1:49268\n✓ Ready in 626ms\n✓ Running next.config took 109ms\n[pi-web] session_start dispatched to extensions for session 01a10b9b-ddc6-70c2-9c63-af7cd041a1fe\n[pi-orb] timing {\"event\":\"tool-timing\",\"requestId\":\"4930f03d-e32e-4e67-9b82-36ec4650579e\",\"phase\":\"bridge-roundtrip\",\"durationMs\":312.4321}\n[pi-web] session_start dispatched to extensions for session 01a10b9c-0aee-70c2-9c63-af7f0a9ffa32\n[pi-orb] timing {\"event\":\"tool-timing\",\"requestId\":\"780599c4-2cef-44e3-82f6-bcb6ed020bb5\",\"phase\":\"bridge-roundtrip\",\"durationMs\":1231.7397999999994}\n"
+  },
+  "passed": true,
+  "modelToolCalls": [
+    {
+      "name": "code_agent",
+      "arguments": {
+        "task": "In the current working directory, perform the following, in this exact order:\n\n1. Run a sleep of 120 seconds (e.g. `sleep 120`, or the platform-equivalent 120-second wait) as a blocking command.\n2. Only AFTER that 120-second sleep has fully completed, create a file named `must-not-exist-after-stop.txt` containing a single line of text (for example: created after 120s sleep).\n\nConstraints:\n- You must not create `must-not-exist-after-stop.txt` before the 120-second sleep finishes. The file must not exist until the sleep has run to completion.\n- Do not shorten, skip, or parallelize the sleep.\n- Report back the exact path of the created file and confirm the sleep duration used."
+      },
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-code-agent-stop-1791196112525-orb-workspace--\\2026-10-05T10-28-46-663Z_01a10b9b-ddc6-70c2-9c63-af7cd041a1fe.jsonl"
+    }
+  ],
+  "modelToolResults": [
+    {
+      "toolName": "code_agent",
+      "toolCallId": "call_00_sjZWqJwVpDx3cdeYh7ua2223",
+      "isError": false,
+      "text": "{\"accepted\":true,\"created\":true,\"session_id\":\"01a10b9c-0aee-70c2-9c63-af7f0a9ffa32\"}\nTell the user the background Code agent is running. Continue a GUI action only if it does not need the result; otherwise end the turn. Do not poll with wait or sleep. A completion notice arrives when both sessions are idle."
+    }
+  ],
+  "completionNotices": [],
+  "finishedAt": "2026-10-05T10:29:00.597Z"
+}

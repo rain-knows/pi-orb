@@ -37,10 +37,8 @@ function observation(overrides: Partial<DesktopObservation> = {}): DesktopObserv
 const budget = { stopped: false };
 
 describe("Orb tool naming", () => {
-  it("prefixes every desktop tool so it cannot collide with a user extension", () => {
-    for (const name of Object.values(ORB_TOOLS)) {
-      expect(name.startsWith("orb_")).toBe(true);
-    }
+  it("uses the reference project's public tool names", () => {
+    expect(Object.values(ORB_TOOLS).every(name => !name.startsWith("orb_"))).toBe(true);
   });
 
   it("keeps the tool names distinct", () => {
@@ -50,7 +48,7 @@ describe("Orb tool naming", () => {
 
   it("exposes reference actions supported by the Windows backend", () => {
     expect(Object.values(ORB_TOOLS)).toEqual([
-      "orb_observe", "orb_batch", "orb_click", "orb_type", "orb_scroll", "orb_hotkey", "orb_long_press", "orb_drag", "orb_open_app", "orb_wait", "orb_long_wait", "orb_list_apps", "orb_browser",
+      "click", "input_text", "scroll", "hotkey", "long_press", "drag", "wait", "long_wait", "screenshot", "open_in_browser", "open_in_finder", "list_apps", "open_app",
     ]);
   });
 });
@@ -103,9 +101,9 @@ describe("validateAction", () => {
     expect(validateAction(action, null, budget)).toBe("observation-unknown");
   });
 
-  it("refuses everything once the batch was stopped", () => {
+  it("refuses everything once the task was stopped", () => {
     const action: DesktopAction = { kind: "click", observationId: "obs-1", position: { x: 1, y: 2 } };
-    expect(validateAction(action, observation(), { ...budget, stopped: true })).toBe("batch-stopped");
+    expect(validateAction(action, observation(), { ...budget, stopped: true })).toBe("task-stopped");
   });
 
   it("requires text and bounds its length", () => {
@@ -243,7 +241,7 @@ describe("describeRefusal", () => {
       "no-task-authorization",
       "stale-generation",
       "stale-observation",
-      "batch-stopped",
+      "task-stopped",
       "needs-position",
       "invalid-click-options",
       "invalid-long-wait",
@@ -261,7 +259,7 @@ describe("describeRefusal", () => {
   it("tells the model that authorization is needed rather than letting it retry blindly", () => {
     expect(describeRefusal("no-task-authorization")).toMatch(/access level/i);
     expect(describeRefusal("stale-observation")).toMatch(/observe/i);
-    expect(describeRefusal("batch-stopped")).toMatch(/stopped/i);
+    expect(describeRefusal("task-stopped")).toMatch(/stopped/i);
   });
 });
 
@@ -293,16 +291,14 @@ describe("describeOrbModeSection", () => {
   const section = describeOrbModeSection();
 
   it("states that access is session-level and a matching directory is not authorization", () => {
-    expect(section).toMatch(/never grants it/i);
-    expect(section).toMatch(/Read Only.*Workspace Write.*Full Access/s);
-    expect(section).toContain("New Orb sessions and explicitly reopening a hidden Orb default to Full Access");
-    expect(section).toMatch(/current foreground application/i);
-    expect(section).toMatch(/review and confirm/i);
+    expect(section).toMatch(/matching directory selects the mode but never grants authority/i);
+    expect(section).toMatch(/live session Access grant/i);
+    expect(section).toMatch(/frontmost window/i);
   });
 
   it("states the one-action-one-observation rule", () => {
     expect(section).toMatch(/fresh observation/i);
-    expect(section).toMatch(/superseded/i);
+    expect(section).toMatch(/automatic/i);
   });
 
   it("states that screen content is data, not instructions or authority", () => {

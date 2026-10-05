@@ -137,20 +137,20 @@ describe("OrbSessionController", () => {
     expect(controller.running).toBe(false);
   });
 
-  it("projects batch progress and measures new responses without counting same-response tool gaps", async () => {
+  it("projects tool progress and measures new responses without counting same-response tool gaps", async () => {
     const { controller, client, events, logs } = setup();
     await controller.ensureSession("C:\\orb");
-    await controller.prompt("batch");
+    await controller.prompt("tool progress");
     const deliver = client.delivered[0]!;
     deliver(assistantMessageStart());
-    deliver({ type: "tool_execution_start", toolName: "orb_batch", toolCallId: "one", args: {} });
-    deliver({ type: "tool_execution_update", toolName: "orb_batch", toolCallId: "one", partialResult: { content: [{ type: "text", text: "执行第 2/3 步" }] } });
-    expect(events.at(-1)).toMatchObject({ type: "tool", phase: "update", detail: "执行第 2/3 步" });
-    deliver({ type: "tool_execution_end", toolName: "orb_batch", toolCallId: "one", result: { details: { timing: { requestId: "request-1", extensionReturnedAt: 123 } } } });
+    deliver({ type: "tool_execution_start", toolName: "input_text", toolCallId: "one", args: {} });
+    deliver({ type: "tool_execution_update", toolName: "input_text", toolCallId: "one", partialResult: { content: [{ type: "text", text: "输入中" }] } });
+    expect(events.at(-1)).toMatchObject({ type: "tool", phase: "update", detail: "输入中" });
+    deliver({ type: "tool_execution_end", toolName: "input_text", toolCallId: "one", result: { details: { timing: { requestId: "request-1", extensionReturnedAt: 123 } } } });
     expect(events.at(-1)).toMatchObject({ requestId: "request-1", extensionReturnedAt: 123 });
-    deliver({ type: "tool_execution_start", toolName: "orb_wait", toolCallId: "two", args: {} });
+    deliver({ type: "tool_execution_start", toolName: "wait", toolCallId: "two", args: {} });
     expect(logs.filter(l => l.event === "model-response-interval")).toHaveLength(1);
-    deliver({ type: "tool_execution_end", toolName: "orb_wait", toolCallId: "two" });
+    deliver({ type: "tool_execution_end", toolName: "wait", toolCallId: "two" });
     deliver(assistantMessageStart());
     deliver(textDelta("done"));
     expect(logs.filter(l => l.event === "model-response-interval")).toHaveLength(2);
@@ -312,11 +312,11 @@ describe("OrbSessionController", () => {
     await controller.ensureSession("C:\\work\\orb");
     await controller.prompt("inspect");
     const deliver = client.delivered[0]!;
-    deliver({ type: "tool_execution_start", toolCallId: "call-1", toolName: "orb_observe", args: { target: "Editor", imageData: "secret pixels", password: "hidden" } });
-    deliver({ type: "tool_execution_end", toolCallId: "call-1", toolName: "orb_observe", isError: false });
+    deliver({ type: "tool_execution_start", toolCallId: "call-1", toolName: "click", args: { target: "Editor", imageData: "secret pixels", password: "hidden" } });
+    deliver({ type: "tool_execution_end", toolCallId: "call-1", toolName: "click", isError: false });
     const tools = events.filter((event) => event.type === "tool");
     expect(tools).toHaveLength(2);
-    expect(tools[0]).toMatchObject({ phase: "start", id: "call-1", name: "orb_observe" });
+    expect(tools[0]).toMatchObject({ phase: "start", id: "call-1", name: "click" });
     expect(JSON.stringify(tools)).not.toContain("secret pixels");
     expect(JSON.stringify(tools)).not.toContain("hidden");
     expect(tools[1]).toMatchObject({ phase: "end", detail: "Completed", isError: false });

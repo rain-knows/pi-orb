@@ -9,9 +9,8 @@
  * contract (`src/shared/orb-tools.ts`, `validateAction`). Keeping a second validator here would
  * leave two implementations of the same rule with no caller for one of them, which the project's
  * own rules forbid (N8, and `doc/reference-playbook.md` §6.2). What remains is the one function the
- * production path uses: `mapNormalizedToGlobal`, called from `windows.ts`. Model-facing pixel
- * positions are converted at the Pi extension boundary by `src/shared/pixel-coordinates.ts`,
- * ported from `dsh-orb-cordis@9cdc503`; this native seam continues to receive millifractions.
+ * production path uses: `mapNormalizedToGlobal`, called from `windows.ts`. Model-facing 0–1000
+ * positions are validated by the shared Orb contract; this native seam receives millifractions.
  *
  * @module @deepseek-ai/dsh-experimental-tool-computer-use/src/coordinates
  */

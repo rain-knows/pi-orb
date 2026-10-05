@@ -1,5 +1,10 @@
 # pi-orb 参考项目优先手册
 
+> **工具集迁移状态（2026-10-05）**：本手册早期的 `orb_*`、显式 `observation_id`、独立
+> `orb_batch` 和 Playwright 网关描述已被 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
+> 取代。当前实现以参考项目的 13 个直接 GUI 工具、自动首帧和后台 `code_agent` 为准；下文
+> 的旧契约只作为历史迁移记录，不得作为实现依据。
+
 本文件是 pi-orb 开发过程中**首先查阅**的参考索引与作业规程。任何 UI、交互、桌面能力、
 工具协议或工程约定的改动，都先在本文件里定位参考项目的对应实现，再决定“直接移植／薄适配／
 不适用”。本文件不替代 [`pi-orb-development-goals.md`](./pi-orb-development-goals.md)
@@ -7,6 +12,10 @@
 “这一块该看参考项目的哪个文件、怎么搬、搬到哪、凭什么算完成”。
 
 ## 0. 30 秒定位表
+
+2026-10-04 工具集替换以 [`reference-toolset-transition.md`](./reference-toolset-transition.md) 为当前目标。
+用户已要求完整复用插件参考的工具语义、自动首帧与后台任务；此前关于不搬自动观察、
+后台 code_agent、启动应用、打开路径/URL 的限制不再约束这一替换。保留 Pi/pi-web 非破坏式宿主边界。
 
 先按下表找到本文件对应章节，再打开参考文件。不确定时按 §10 的作业流程走完整流程。
 
@@ -59,10 +68,10 @@ Copyright (c) 2026 mini-yifan；上游 DeepSeek 归属见该仓 `THIRD-PARTY-NOT
 | 工作 | 插件参考路径 | pi-orb 处理 |
 |---|---|---|
 | 非破坏式宿主/helper 边界 | `docs/02-architecture.md`、`packages/host/src/runtime.ts` | 研究边界，保留 Pi 插件 + 现有 Electron 壳；不运行参考插件 |
-| 小控件坐标 | `packages/computer-use/src/coordinates.ts`、`coordinate-mode.ts`、`observe.ts`、`policy.ts` | 复用 pixel → HID millifraction、实际 attachment 尺寸和明确坐标提示；不搬 dsh 事件迁移和双模式兼容层 |
-| 图片尺寸 | `packages/computer-use/src/raster.ts`、`tests/raster.spec.ts` | 直接移植 PNG/JPEG 头尺寸解析；Pi context 在 SDK 归一化后取得实际出站图片尺寸 |
+| 小控件坐标 | `packages/computer-use/src/coordinates.ts`、`coordinate-mode.ts`、`observe.ts`、`policy.ts` | 当前采用参考插件默认的 0–1000 millifraction → HID 语义和明确坐标提示；不搬 dsh 事件迁移和 pixel 双模式兼容层 |
+| 截图上下文预算 | `packages/computer-use/presets/computer-use/agent.cordis.yml`、旧参考 `compaction-tool-result-pruner/src/index.ts` | Pi context 保留最新 Orb 观察图并按参考预算裁剪工具文字；不需要已删除的 pixel/raster 适配 |
 | Windows 抢焦点与光标 | `packages/host/src/windows-foreground.ts`、`packages/computer-use/src/windows-native.ts` | 对照当前窗口排除/焦点链；需要真实输入读回才能认定修复 |
-| 桌面工具与等待 | `packages/computer-use/src/plugin.ts`、`config.ts`、`policy.ts` | 保留 sequential、600ms 与动作后截图；批量只操作初始截图已有目标 |
+| 桌面工具与等待 | `packages/computer-use/src/plugin.ts`、`config.ts`、`policy.ts` | 保留 sequential、600ms 与动作后截图；同一步多个相互独立的 GUI 调用由宿主按顺序执行 |
 
 核对：`git -C D:\pi-orb-ref\dsh-orb-cordis rev-parse HEAD`；不得将此目录写成运行时依赖。
 旧单体仓库已 fetch：远端 HEAD `51f09764d7ff99947be08ebbb2ca2388faab3df4`，相对 `72f1d738`
@@ -116,9 +125,9 @@ pi-orb 没有它的已发布系统级安装需要升级，本轮不搬这些打�
 |---|---|---|
 | Cordis 装配与 `ctx.*` 服务模型 | `@deepseek-ai/cordis` `Context`、`ctx.tools.register`、`ctx.on('agent/pre-step')` | 换成 Pi 扩展的 `pi.registerTool` / `pi.on('session_start' \| 'before_agent_start')` |
 | dsh 会话、事件、附件持久化 | `@deepseek-ai/dsh-session`、`dsh/session` 事件映射、`@deepseek-ai/dsh-attachment` | 换成 pi-web HTTP + SSE 与 Pi `ImageContent` |
-| 自动前置观察与自动附图 | `plugin.ts` 的 `agent/pre-step` 瀑布、`observeDesktop` 自动附图 | pi-orb 由模型显式 `orb_observe`；不自动截屏、不自动上传 |
+| 自动前置观察与自动附图 | `plugin.ts` 的 `agent/pre-step` 瀑布、`observeDesktop` 自动附图 | pi-orb 由 `before_agent_start` 自动抓取并附加首帧；每个 GUI 动作返回新截图 |
 | 自动选择“最前台窗口”作为目标 | `backend.listScreens()` 自动选窗 + overlay 排除 | 每次 observe 按参考 `selectWindowsObservation` 选择当前窗口或下一个合格顶层窗口，排除 Orb；action 前绑定 observation 并校验，动作后重新选择实际窗口。截图分享在请求时同样选择窗口，另经用户预览确认 |
-| 后台 `code_agent` 双轨 | `code-agent.ts`、`presets/computer-use/agent.cordis.yml` | 属于 dsh 编排；pi-orb 用 Pi 会话／子代理另行评估（P2-07） |
+| 后台 `code_agent` 双轨 | `code-agent.ts`、`presets/computer-use/agent.cordis.yml` | 已由 Pi Web 独立会话、SSE、队列和完成通知适配 |
 | 私有工作区包依赖 | `package.json` 的 `peerDependencies: @deepseek-ai/dsh-*@workspace:^`、`"private": true`；`paths.ts:4` 的 `@deepseek-ai/dsh-home-paths`、`project-manager.ts` 的 `@deepseek-ai/dsh-app-boot` | 不能作为 npm 依赖安装；只能移植源码 + 保留 MIT 通知 |
 | 浮球 renderer 的宿主协议 | `dsh-app://app/api/<method>` 的 `client-request`/`server-response` RPC（`floating.js:15-31`）、`dsh-app://app/.dsh/remote-stream` NDJSON（`floating.js:7`、`:1046-1062`）、历史面板 iframe `dsh-app://app/index.html?surface=overlay` + `postMessage`（`floating.js:34-37`、`main.ts:786-788`）、模型目录 `/api/session/modelCatalog`（`main.ts:750-770`） | pi-orb 只移植 DOM/CSS/交互层；会话、历史、模型全部走 pi-web 公开 API |
 | 宿主子进程 IPC | `DesktopHostOrbCommand`（`host-process.ts:58-66`、`main.ts:964`）、overlay/observation-frame/sck 事件（`host-process.ts:28-48`、`main.ts:867-902`） | pi-orb 用 Electron 主进程 + 命名管道桥替代 |
@@ -276,14 +285,14 @@ D:\workself\pi-orb\
 | 参考文件 | 参考行数 | pi-orb 文件 | pi-orb 行数 | 判定 |
 |---|---|---|---|---|
 | `src/capture-exclude.ts` | 31 | `src/main/reference-windows/capture-exclude.ts` | 39 | 一致；`ReferenceWindowsDriver.#withGuiTurn` 写入本进程 HWND 排除列表，Windows backend 读取（见 §6.2） |
-| `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：原生边界只保留 `mapNormalizedToGlobal`。模型 pixel 校验/换算已按新插件固定提交移植到 `src/shared/pixel-coordinates.ts`，不恢复旧双模式接口 |
+| `src/coordinates.ts` | 211 | `src/main/reference-windows/coordinates.ts` | 48 | **裁剪**：原生边界只保留 `mapNormalizedToGlobal`；模型侧固定采用参考插件默认的 0–1000 millifraction 校验，不恢复旧 pixel 双模式接口 |
 | `src/wait.ts` | 34 | `src/main/reference-windows/wait.ts` | 38 | 逻辑一致（`delay` 供驱动使用，见 `windows.ts` 的指针/长按/双击/粘贴时序；`wait`/`long_wait` 工具未移植）。文件本身是 **adapted** 而非 unmodified：多出的 3 行是来源提交与许可证头，由 `evidence/p1-07/check-provenance.mjs` 逐行核对 |
 | `src/observation-limits.ts` | 13 | `src/main/reference-windows/observation-limits.ts` | 16 | 一致 |
 | `src/windows-foreground.ts` | 187 | `src/main/reference-windows/windows-foreground.ts` | 190 | 一致；参考自带的 10 条不变量已移植到 `tests/reference-windows-foreground.test.ts` |
 | `src/windows.ts` | 494 | `src/main/reference-windows/windows.ts` | 513 | **优于参考**：补了 `try/finally` 释放已按下的键与鼠标键（参考在 20ms 修饰键间隔或 80ms 长按期间被 abort 会留下卡键）。这是本项目刻意改进，不得“还原”成参考写法 |
 | `src/windows-native.ts` | 826 | `src/main/reference-windows/windows-native.ts` | 843 | **koffi 2.x 适配**：`INPUT.size` → `koffi.sizeof(INPUT)`（`:448`、`:466`、`:571`）、`EnumWindows` 句柄改用 `koffi.address()`（`:151-153`），并补 x64 `INPUT` 结构体大小校验（`:571-572`）。参考包声明 `koffi@^3.1.0`，本项目锁 `koffi@2.16.3`：已核对这些接口不变；**升级 koffi 时必须重看这几处** |
 | `src/backend.ts` | 277 | `src/main/reference-windows/backend.ts` | 100 | **裁剪**：删除 `createPlatformBackend` 平台工厂、macOS/unsupported 分支与 `ImageMediaType` 的 dsh 依赖；接口收窄为 Windows。`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句 |
-| `src/coordinate-mode.ts` | 346 | *（已删除）* | — | **删除**旧双模式文件；新插件的 attachment 尺寸绑定语义适配到 `pi-package/extensions/orb-image-space.ts`，见 §1.2 |
+| `src/coordinate-mode.ts` | 346 | *（已删除）* | — | **删除**旧双模式文件；当前 pi-orb 固定采用参考插件默认的 millifraction（0–1000）契约，适配落在 `src/shared/orb-tools.ts` 与 `pi-package/extensions/orb.ts` |
 
 **参考测试的移植状态**：`windows-foreground.spec.ts` 的 10 条不变量与 `windows.spec.ts` 的 13 条
 （键映射、UIPI 拒绝、Explorer 文件夹、空标题省略、剪贴板顺序、滚轮档位、focus 恢复、取消与 PNG
@@ -303,8 +312,8 @@ D:\workself\pi-orb\
 
 | 缺口 | 事实 | 影响 | 建议动作 |
 |---|---|---|---|
-| `coordinate-mode.ts` 只剩类型 | **已处理**：旧死文件删除；新插件的 pixel 公式直接移植到共享层 | 模型按实际附件像素输入，原生保持分数；没有双模式设置 | 通过 Pi context 绑定已归一化尺寸，禁止用 Win32 bounds 代替 attachment 尺寸 |
-| 后端声明与实际调用范围 | `inspectForeground`、`listApps` 已接入；`openApp` 保留在 backend 合同，但 Pi 的切换应用使用 `activateApp`；`openInBrowser/openInFinder/copyImageToClipboard/backend.withGuiTurn` 不在生产调用链 | 这些未开放方法不构成已支持的工具；主进程自身 `withGuiTurn` 配对参考 overlay guard | 新增能力前查参考方法与授权边界，不把声明当成已接入 |
+| `coordinate-mode.ts` 只剩类型 | **已处理**：旧死文件删除；pi-orb 固定参考插件默认的 millifraction 契约 | 模型和原生均使用截图的 0–1000 分数；没有双模式设置 | 保持 `src/shared/orb-tools.ts` 的单一坐标校验，不恢复 pixel 模式 |
+| 后端声明与实际调用范围 | `inspectForeground`、`listApps`、`openApp`、`openInBrowser`、`openInFinder` 和截图导出均已接入；`backend.withGuiTurn` 由主进程配对参考 overlay guard | 参考方法经过 Windows 适配后进入当前工具链；新增能力前仍需查参考方法与授权边界，不把声明当成已接入 | 工具注册和 broker 测试 |
 | 捕获排除列表恒为空 | **已修复**：`ReferenceWindowsDriver.#withGuiTurn` 写入 Orb HWND 排除列表，主进程直接复用 `floating-window.ts:848-868,906-961` 的计数式 `contentProtection`／点击穿透；删除整窗隐藏路径 | 工具调用期间保留面板，不进入截图、不截获原生输入 | `floating-overlay-guard.ts` 及参考 5 项测试；Orb 前台下仍能观察原生目标 |
 | 前台提示文案被截断 | **已修复**：`UNFOCUSED_WINDOW_NOTE` 已恢复参考原句，并由 `tests/reference-windows-input.test.ts` 钉住字面量 | — | 保持；该测试就是防止再次被简写的绊线 |
 | 观察新鲜度的实现方式不同 | 参考**没有** observation id／陈旧校验／限流（`grep observationId\|stale\|throttle` 无命中），靠“工具互斥 + 每次动作后重拍 + 策略禁止批式依赖动作”保证 | pi-orb 的 `observationId` + 拒绝原因 + session/generation 授权是**本项目新增**（旧 per-task 的 12 动作/5 分钟预算已删除），不是参考语义 | 保留（这是授权边界所需），但文档里必须继续标注为 pi-orb 新增，不得说成“参考项目语义” |
@@ -315,48 +324,47 @@ D:\workself\pi-orb\
 
 ### 6.3 必须保持的坐标语义
 
-- 当前模型位置是**最新附加截图的像素列/行**；`attached_size` 来自 Pi SDK 处理后的 PNG/JPEG。
-  来源为新插件 `9cdc503` 的 `coordinates.ts`、`raster.ts`、`coordinate-mode.ts`、`observe.ts`、`policy.ts`。
-- 换算链：`pixel / attached_size × 1000 → HID 分数 → screen.bounds + 分数 × bounds 尺寸`。
-  前一步直接复用新插件 `modelPositionToHid`，后一步保留旧原生 `mapNormalizedToGlobal`。
-- 旧参考支持 millifraction/pixel 两种模型编码；pi-orb 只保留 pixel 模型契约。
-  旧 `0–1000` 仅为内部原生单位；不可在同一个工具 schema/提示中混用两个单位。
+- 当前模型位置是**最新附加截图的 0–1000 millifraction 分数**；这是新插件固定提交
+  `9cdc503` 的默认 `coordinates.ts`/`policy.ts` 契约。
+- 换算链：`0–1000 分数 / 1000 → HID 分数 → screen.bounds + 分数 × bounds 尺寸`；
+  共享层校验和原生 `mapNormalizedToGlobal` 各保留一份职责，不引入 attachment 像素模式。
+- 参考插件虽包含可选 pixel 模式，pi-orb 不注册该模式，也不在同一工具 schema/提示中混用两种单位。
 - pi-orb 现状：驱动把 `coordinateSpace.windowRect` 固定为 `{x:0, y:0, width, height}`
   （`src/main/reference-windows-driver.ts:221-225`），后端的 `mapNormalizedToGlobal` 再加回
   `screen.bounds` 原点，因此整链等价于“窗口相对分数”。**这个等价关系是当前实现的正确性依据，
   改动任一侧都会产生混合单位缺陷**（`doc/cua-driver-integration.md` 与 `evidence/p1-06/` 记录过同类缺陷）。
-- `attached_size` 缺失、session/generation 不符、旧 observation_id 或越界坐标须在扩展边界拒绝。
-  批次先完整换算后再转发，禁止部分输入；主进程继续执行自身的新鲜度/授权/区域变化检查。
+- screenshot attachment 缺失、session/generation 不符或越界坐标须在扩展边界拒绝；freshness
+  token 只存在于 Pi/Electron 适配层，不能进入模型 schema。主进程继续执行自身的新鲜度、授权和区域变化检查。
 
 ## 7. C 面：工具契约与提示
 
 ### 7.1 参考工具面与 pi-orb 现状
 
-参考项目注册 13 个工具（`<REF>/src/plugin.ts:278-1013`），pi-orb 当前注册 12 个
-（`pi-package/extensions/orb.ts`）。下表按“可复用程度”排序：
+参考项目注册 13 个工具（`<REF>/src/plugin.ts:278-1013`），pi-orb 当前也注册同样的 13 个
+模型可见工具（`pi-package/extensions/orb.ts`）。下表按“可复用程度”排序：
 
 | 参考工具 | 参考参数要点 | pi-orb 对应 | 差距与建议 |
 |---|---|---|---|
-| 独立动作批量策略 | `policy.ts:20-30`（没有独立 batch 工具） | `orb_batch`（2–8 步） | Pi 必需适配：初始观察编号、内部推进、逐步截图及进度；菜单依赖禁止合批 |
-| `click` | `screen_index`、`position [x,y]`、`button(left/right)`、`count(1\|2)`、`modifiers` | `orb_click`（position） | 已对齐按钮、次数和修饰键；Windows backend 在 finally 中释放修饰键 |
-| `input_text` | `screen_index`、`position`、`text`、`replace`、`submit` | `orb_type`（position） | 已对齐；删除隐式上次点击位置 |
-| `scroll` | `position`、`direction(up/down)`、`scroll_level` | `orb_scroll`（`direction`、`amount`） | 已收窄为参考的纵向滚动 |
-| `hotkey` | `keys[]` | `orb_hotkey` | 一致；禁用组合校验来自 `coordinates.ts:47-64` |
-| `long_press` | `position`、`duration_seconds` | `orb_long_press` | 一致（1–10 秒区间） |
-| `drag` | `start/end position`（可跨屏） | `orb_drag`（同窗口） | pi-orb 明确不支持跨屏；保持现状并在 schema 描述中写明 |
-| `wait` | 无参数，固定 1 秒后重新观察 | `orb_wait` | 已移植，使用可取消等待并返回新观察 |
-| `long_wait` | `wait_seconds ∈ {10,30,60,120}` | `orb_long_wait` | 已移植，使用参考枚举并返回新观察 |
-| `list_apps` | 无参数 | `orb_list_apps` | 已移植，返回运行中应用列表和新观察 |
-| `open_app` | `name`（参考：显示名或 bundle id；**激活或启动**） | `orb_open_app`（`name`；**只激活**） | **已开放，但按用户决定收窄**：参考的 `activateApp` 失败后会 `launch`，pi-orb 只保留前半段。规则见 §7.5 |
-| `open_in_browser` | 可选 `url`（仅 http(s)） | 无 | 可选；移植时必须保留 URL 校验 |
-| `open_in_finder` | `path`、`reveal_only` | `orb` 无；仅有 `screenshot-export.ts` 的保存对话框 | Windows 对应 `open_in_explorer`；移植时必须保留路径解析与 realpath 校验 |
-| `screenshot` | 保存到 Desktop + 写剪贴板，返回路径 | `src/main/screenshot-export.ts`（显式用户导出） | pi-orb 的产品规则是“用户确认后导出”，**不照搬自动写桌面+剪贴板**；仅复用其文件命名/像素校验思路 |
+| 同一步多个独立动作 | `policy.ts:20-30`（没有独立 batch 工具） | Pi sequential tool calls | 允许模型在同一步发出多个已可见且互不依赖的 GUI 调用；不增加 batch 工具 |
+| `click` | `screen_index`、`position [x,y]`、`button(left/right)`、`count(1\|2)`、`modifiers` | `click` | 已对齐按钮、次数和修饰键；Windows backend 在 finally 中释放修饰键 |
+| `input_text` | `screen_index`、`position`、`text`、`replace`、`submit` | `input_text` | 已对齐；删除隐式上次点击位置 |
+| `scroll` | `position`、`direction(up/down)`、`scroll_level` | `scroll`（`direction`、`scroll_level`） | 已对齐参考纵向滚动 |
+| `hotkey` | `keys[]` | `hotkey` | 一致；禁用组合校验来自 `coordinates.ts:47-64` |
+| `long_press` | `position`、`duration_seconds` | `long_press` | 一致（1–10 秒区间） |
+| `drag` | `start/end position`（可跨屏） | `drag`（同窗口） | Windows 适配保留同窗口约束并在 schema 描述中写明 |
+| `wait` | 无参数，固定 1 秒后重新观察 | `wait` | 已移植，使用可取消等待并返回新观察 |
+| `long_wait` | `wait_seconds ∈ {10,30,60,120}` | `long_wait` | 已移植，使用参考枚举并返回新观察 |
+| `list_apps` | 无参数 | `list_apps` | 已移植，返回运行中应用列表和新观察 |
+| `open_app` | `name`（参考：显示名或 bundle id；**激活或启动**） | `open_app` | 已对齐 Windows `activateApp` / `launch` 语义 |
+| `open_in_browser` | 可选 `url`（仅 http(s)） | `open_in_browser` | 已移植并保留 URL 校验 |
+| `open_in_finder` | `path`、`reveal_only` | `open_in_finder` | Windows 对应 Explorer；保留路径解析与 realpath 校验 |
+| `screenshot` | 保存到 Desktop + 写剪贴板，返回路径 | `screenshot` | 已对齐参考行为；用户确认流程仍仅用于聊天分享，不影响模型工具 |
 
 ### 7.2 工具行为契约（参考项目已认定，pi-orb 应保持一致）
 
 | 契约 | 参考位置 | 含义 |
 |---|---|---|
-| 一动作一观察 | `<REF>/src/plugin.ts`（每个工具 `execute` 末尾 `recapture`） | 动作后必须重新截图；实现方式是**结构性**的：全部工具 `isConcurrencySafe: () => false`，策略禁止把“依赖前一步结果”的动作批量放进同一步 |
+| 一动作一观察 | `<REF>/src/plugin.ts`（每个工具 `execute` 末尾 `recapture`） | 动作后必须重新截图；Pi 适配在 Electron driver 完成动作后统一 recapture，工具注册保持 sequential |
 | 动作后等待 | `<REF>/src/config.ts:14`（`postActionWaitMs` 默认 600） | 展开的菜单需要等一拍才能被枚举；pi-orb 的等价常量在 `src/main/reference-windows/windows.ts` |
 | 截图快捷键禁用 | `<REF>/src/coordinates.ts:47-64` | `Win/Cmd + Shift + 3/4/5` 一律拒绝 |
 | 点击修饰键白名单 | `<REF>/src/coordinates.ts:73-92` | 只允许 shift/cmd/option/control，同族去重，字母与 `fn` 拒绝 |
@@ -368,7 +376,7 @@ D:\workself\pi-orb\
 | 图像能力前置检查 | `<REF>/src/plugin.ts`（`assertImageCapableRoute`） | 纯文本模型直接拒绝桌面工具；pi-orb 已有等价拒绝（`evidence/p1-04`） |
 | 前台元数据信封 | `<REF>/src/observe.ts:92-109`、`:133-144` | 每次观察带 `<frontmost_app>`/`<frontmost_window>`/`<frontmost_folder>`/`<focus_note>` 与 `<coordinate_space>`；pi-orb 目前不产生该信封 |
 | **文本长度无上限** | `<REF>/src/plugin.ts:367-441`（`input_text` 无长度校验） | 参考项目不限制输入文本长度；pi-orb 限制 200 字符（`ORB_LIMITS.maxTypedCharacters`）。这是 pi-orb 收紧，属于授权/限额边界，保留并继续标注为本项目差异 |
-| 失败即停与重试 | 参考项目**没有**重试、也没有“一步失败即停”的电路；pi-orb 的 `batch-stopped` 与拒绝不重试是新增 | 保留为 pi-orb 语义，不得描述成参考行为 |
+| 失败即停与重试 | 参考项目**没有**重试、也没有“一步失败即停”的电路；pi-orb 的 `task-stopped` 与拒绝不重试是 Pi 宿主新增 | 保留为 pi-orb 语义，不得描述成参考行为 |
 
 ### 7.3 提示词
 
@@ -407,27 +415,20 @@ D:\workself\pi-orb\
 
 未移植但已具备实现条件的（按需要取用）：`raster.ts`（头部校验）、`screenshot.ts`（`Desktop/Screenshot YYYY-MM-DD at HH.MM.SS.png`，冲突后缀 2–100 后报错）、`open.ts`（URL/路径校验）、`wait-args.ts`（等待取值）。
 
-### 7.5 `orb_open_app` 的目标重绑定规则（pi-orb 收窄，非参考语义）
+### 7.5 `open_app`：复用 backend，返回真实前台观察
 
-参考工具的语义是“把正在运行的应用前置，**或者启动它**”（`<REF>/src/windows.ts:398-404`：
-`activateApp` 失败即 `launch`）。pi-orb 的当前工具合同只保留前半段：session 完全访问允许切换
-已运行应用，自动启动尚未开放，因此这条路径上 `launch` 不可达。
+当前来源为插件参考 `9cdc503` 的 `packages/computer-use/src/plugin.ts:1013-1070` 和
+`windows.ts` 的 `openApp`。工具直接调用已有 `DesktopBackend.openApp`，由后端负责激活
+或启动；成功后等待参考 600ms，再采集实际前台窗口。返回 `Opened <name> (activated|launched)`
+及前台标签/截图，而不宣称截图一定已经属于请求的应用。应用冷启动较慢时，模型按返回图
+继续判断；不能把“600ms 后仍未成为前台”解释为启动失败并停止任务。
 
-判定顺序（三步全过才重绑定，任一步失败都保留原目标并使动作失败）：
-
-1. **运行前置检查**：`ops.listWindowApps()` 里必须出现匹配项。比较是**基名相等**（
-   `Notepad` == `notepad.exe`，忽略大小写与 `.exe` 后缀），**不是子串匹配**——子串会让
-   “标题里含 notepad 的浏览器窗口”被选中，正是本项目禁止的错目标类型。
-2. **激活**：调用 `ops.activateApp(match)`（返回 `false` 不启动任何东西，与 `backend.openApp`
-   不同）。失败即动作失败。
-3. **前台验证**：激活后前台窗口的应用必须仍等于请求的应用；否则说明前置的不是它，
-   动作失败且不改变当前 observation。
-
-通过后的行为：adopted 窗口成为动作返回的新 observation，并通过 `onTargetChanged` 上报壳层；
-后续普通 observe 仍以当时的前台应用为准。用户可随时 Revoke；任何撤权路径都会清除 grant。
-模型侧 `name` 参数在 `validateAction` 里已拒绝路径、参数样片段、shell 元字符与控制字符，
-`src/main/reference-windows-driver.ts` 的 `#openApp` 是唯一实现点，单测为
-`tests/reference-windows-open-app.test.ts`（含“未运行必须失败且不调用 launch”）。
+旧适配中的应用名单查找、`sameApp`、重复 activate/launch 和强制匹配后才能截图规则已删除。
+新观察始终绑定实际采集窗口，并经 `onTargetChanged` 上报壳层；后续坐标输入仍必须匹配
+该观察的新鲜度与实际前台。`name` 的路径/参数/控制字符校验由共享动作合同负责。
+真实 backend 报错时保留其错误及能采集到的新图，取消不继续捕获；失败停止属于 Pi bridge
+现有执行边界。单测为 `tests/reference-windows-open-app.test.ts`，冷启动真机探针见
+`node evidence/p1-06/run-real-model-c7.mjs open-app`。修复后探针因锁屏中止，仍未验收。
 
 ## 8. D 面：授权与生命周期
 
@@ -441,7 +442,7 @@ D:\workself\pi-orb\
 
 **不可让步的三条**（pi-orb 的宿主授权边界）：
 
-1. 每次 observe 按参考规则选择前台或最上层合格原生应用并排除 Orb；单步 action 只能使用最新 observation；orb_batch 整批绑定初始观察、仅包含初始可见且独立的目标，由宿主逐步采用新的观察；动作前目标身份变化时必须重新观察，批次内观察区域或身份变化时停止后续动作。
+1. 每个 GUI 工具按参考规则使用自动附加的前台截图；动作只允许使用最新截图，动作后由宿主重新采集。模型可以在同一步发出多个已可见且互不依赖的顺序调用，不能把依赖前一步创建的菜单、页面或对话框的动作放在同一步。
 2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话及明确重开隐藏的 Orb 默认完全访问，Stop／hide／断连立即撤权，不由后台事件静默重授。截图消息必须另经用户预览确认。cwd 匹配、`/orb` 字符串都不构成授权；2026-10-01 的重开默认值是用户明确要求的 shell 授权行为，详见 `doc/session-continuity.md`。
 3. 断连、换 workspace/session、收起、Stop、退出都必须撤权并释放按键／鼠标／监听器；turn idle 与普通回复完成不撤权。
 
@@ -453,8 +454,8 @@ D:\workself\pi-orb\
 
 | 参考规格测试 | 钉住的不变量 | pi-orb 对应测试 |
 |---|---|---|
-| `coordinates.spec.ts`（10） | 坐标校验、两种编码等价、禁用快捷键、点击修饰键别名与去重 | `coordinate-mapping.test.ts`、`orb-tools.test.ts`、`orb-image-space.test.ts`、`orb-pixel-extension.test.ts`；pixel 换算已覆盖；修饰键别名仍按现有收窄契约 |
-| `coordinate-mode.spec.ts`（9） | 两种编码切换、栅格缓存与日志重建、pixel 工具描述改写、投影折叠 | `orb-image-space.test.ts`、`orb-pixel-extension.test.ts` 覆盖 Pi 所需尺寸/会话绑定；不移植模式切换和 dsh 日志重建 |
+| `coordinates.spec.ts`（10） | 坐标校验、两种编码等价、禁用快捷键、点击修饰键别名与去重 | `coordinate-mapping.test.ts`、`orb-tools.test.ts`、`reference-windows-input.test.ts`；当前生产契约固定为 millifraction，旧 pixel 扩展测试已删除；修饰键别名仍按现有收窄契约 |
+| `coordinate-mode.spec.ts`（9） | 两种编码切换、栅格缓存与日志重建、pixel 工具描述改写、投影折叠 | 不适用：pi-orb 固定参考插件默认的 millifraction，不移植模式切换、栅格缓存或 dsh 日志重建 |
 | `tools.spec.ts`（26） | 13 个工具的往返、`postActionWaitMs` 结算、GUI turn 包裹范围、截图落盘与剪贴板 | `tests/desktop-broker.test.ts`、`orb-tools.test.ts`、`reference-windows-driver.test.ts`、`screenshot-export.test.ts`、`reference-windows-open-app.test.ts`（open-app 的前置检查／激活／前台验证三步）；**缺** 结算时序、GUI turn 范围、Desktop 落盘/剪贴板 |
 | `observe.spec.ts`（9） | 观察信封与前台标签、`settleMs`、`persistCapture` 过滤、abort 重抛 | `tests/screenshot-flow.test.ts`；**缺** 信封/标签格式与 `requireScreen` 越界文案 |
 | `overlay-guard.spec.ts`（17） | 包裹范围、overlay id 传递、观察框显示/隐藏与 abort、turn 结束收起 | 无；`withGuiTurn` 的窗口隐藏也未测 |
@@ -462,9 +463,9 @@ D:\workself\pi-orb\
 | `windows.spec.ts`（13） | 键名映射、扩展键、剪贴板恢复、焦点恢复时序、UIPI 拒绝、截图失败包装 | `tests/reference-windows-input.test.ts`（13/13，逐条对应） |
 | `wait.spec.ts`（5）、`wait-args.spec.ts`（2） | `delay` 的取消语义与等待取值 | 无（`wait.ts` 已移植但无测试、无工具） |
 | `raster.spec.ts`（3）、`screenshot.spec.ts`（11） | 栅格可用性、Desktop 落盘命名与去重 | 无（对应模块未移植） |
-| `open.spec.ts`（6） | 长按时长、URL 校验、路径黑名单 | 部分：`orb_open_app` 的 name 校验与激活规则见 `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`；URL/path 模块未移植 |
+| `open.spec.ts`（6） | 长按时长、URL 校验、路径黑名单 | 部分：`open_app` 的 name 校验与激活/启动规则见 `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`；URL/path 模块由 `open_in_browser`/`open_in_finder` 适配 |
 | `unsupported.spec.ts`（4）、`loader-composition.spec.ts`（3）、`preset*.spec.ts`、`macos.spec.ts`（40） | 平台回退、Cordis 装配、preset 目录、macOS | 不适用 |
-| `code-agent.spec.ts`（28）、`pre-step.spec.ts`（4） | 后台代理编排、自动前置观察 | 不适用（pi-orb 不自动观察、无 code_agent） |
+| `code-agent.spec.ts`（28）、`pre-step.spec.ts`（4） | 后台代理编排、自动前置观察 | `tests/code-agent-manager.test.ts`、`src/main/code-agent-manager.ts`；前置观察由 `before_agent_start` 适配，Pi 不暴露 observe 工具 |
 | `apps/desktop/tests/floating-window.spec.ts` | 停靠、拖动、多屏、展开几何；并断言 CSS `--chrome:12px` 与 tab `6px/72px/#75757F` 与主进程常量一致 | `tests/floating-geometry.test.ts`；**CSS 与主进程常量的一致性**由 `tests/renderer-reference-parity.test.ts` 补上 |
 | `apps/desktop/tests/floating-renderer.spec.ts`（104 KB） | renderer DOM 状态机与交互（JSDOM 跑真实 `floating.html`+`floating.js`，只 fake `fetch` 与 `window.dshDesktop`） | 部分：`tests/renderer-reference-parity.test.ts` 钉住令牌/状态/id 与参考一致；**交互时序本身**仍靠打包探测（`evidence/p2-05/packaged-smoke.json`）与人工验收，没有 JSDOM 状态机测试 |
 | `apps/desktop/tests/observation-frame-window.spec.ts` | 观察框 CSS 不得含 `animation`/`@keyframes`，stroke/glow 回退值同步 | 不适用（无观察框） |
@@ -667,7 +668,9 @@ git -C D:\pi-orb-ref\deepseek-harness-orb checkout 72f1d738458a223696685a909e806
 
 ## 16. 工具调用提速适配
 
-参考没有 Pi observation_id 批量桥接和请求关联计时。此前阶段见 [`tool-speed-optimization.md`](./tool-speed-optimization.md)，当前像素契约和小控件实测见 [`plugin-reference-and-pointing.md`](./plugin-reference-and-pointing.md)。桥接仅 v2，所有桌面工具 sequential；保留最新一张请求截图，历史不改；1500 次等待对照不满足缩短条件，生产保留 600ms。不复制 dsh 调度器或图片存储。
+参考没有独立 batch 工具。pi-orb 现在使用自动首帧、动作后 recapture 和同一步顺序调用来减少
+模型往返；freshness token 只在桥接内部用于防止跨会话误操作，不进入工具 schema。保留参考
+项目的 600ms post-action settle，不复制 dsh 调度器或图片存储。
 
 ## 17. 个人用户安装与启动适配
 

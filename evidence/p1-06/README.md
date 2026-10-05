@@ -1,14 +1,24 @@
 # P1-06 Orb 模式与工具闭环
 
+2026-10-05 当前参考合同：C7 20/20、D6 21/21、D8 22/22、可见浏览器 22/22；后台
+完成 8/8、产品桥停止 10/10、真实 provider 失败回读 12/12。均为有限样本。
+`open_app` 冷启动旧适配已按参考修正，修复后运行因锁屏中止，仍未验收。
+下方较早 D 组及旧 orb_* 判定保留为历史，当前结论以本段及对应 session-access JSON 为准。
+
 > 运行方式：
 > - `node evidence/p1-06/run-p1-06-tools.mjs`（工具暴露：真实 pi-web + 本机假 provider 捕获工具 schema）
 > - `node evidence/p1-06/run-p1-06.mjs`（工具闭环：真实 Electron 壳 + 真实驱动 + 丢弃式目标；含 C7 取点↔落点断言）
 > - `node evidence/p1-06/run-real-model-c7.mjs`（真实模型 C7：隔离真实 pi-web + 真实模型；**需解锁的交互式桌面**）
 > - `node evidence/p1-06/run-real-model-c7.mjs d6-scroll`（真实模型 D6；**需解锁的交互式桌面**）
 > - `node evidence/p1-06/run-real-model-c7.mjs d8-type`（真实模型 D8；**需解锁的交互式桌面**）
+> - `node evidence/p1-06/run-real-model-c7.mjs browser`（真实可见网页闭环）
+> - `node evidence/p1-06/run-real-model-c7.mjs open-app`（独立 WinForms 应用冷启动闭环）
+> - `node evidence/p1-06/run-real-code-agent.mjs`（真实模型后台 `code_agent`：独立 worker、产物和完成通知）
+> - `$env:PI_ORB_EVIDENCE_PI_WEB='...'; node evidence/p1-06/run-real-code-agent.mjs stop`（真实模型后台停止：worker 取消、注册表和通知）
+> - `node evidence/p1-06/run-real-code-agent.mjs failure`（真实 provider 错误回读，要求错误全文一致）
 >
 > 历史结果：旧版 `tool-exposure.json`（7/7）、`loop-verification.json`（迁移前）、`loop-verification-reference-backend.json`（旧授权模型）与 `real-model-*-reference-backend.json`；当前 session Access 闭环由脚本写入 `loop-verification-session-access.json`。真实模型新合同结果独立写入 `real-model-*-session-access.json`，不覆盖历史记录。
-> 状态：工具暴露 11/11；session Access 桌面闭环及生命周期按当前探针结果记录。新 session-access 真实模型记录中，C7 在截图前失败、D6 因 `LockApp`/不可交互桌面中止、D8 本轮未完成；失败或未完成 JSON 原样保留，暂不宣称稳定通过。旧 Cua 链路只作迁移基线，不代表最终生产后端。
+> 状态：下方旧 `orb_*` 表格属于迁移前历史；当前 Orb 工作区以 13 个直接 GUI 工具加 3 个后台工具为准。后台真实模型完成闭环已通过 8/8（`real-model-code-agent-session.json`），停止闭环已通过 10/10（`real-model-code-agent-stop-session.json`）；C7/D6/D8 和后台失败仍按当前支持矩阵标为未验证。旧 Cua 链路只作迁移基线，不代表最终生产后端。
 
 ## 1. 交付内容
 
@@ -24,20 +34,20 @@
 | 壳侧授权 IPC 与界面 | `src/main/index.ts`、`src/renderer/index.html`、`src/renderer/floating.js` |
 | 单测 | `tests/orb-tools.test.ts`、`desktop-task.test.ts`、`desktop-broker.test.ts`、`bridge-server.test.ts` |
 
-## 2. 工具暴露实测（11/11，真实 pi-web 装配 + 假 provider）
+## 2. 工具暴露实测（7/7，真实 pi-web 装配 + 假 provider）
 
 判定来自**本机假 provider 实际收到的工具 schema**，而不是注册调用是否成功。
 
 | 断言 | 实测 |
 |---|---|
 | 普通会话**没有**任何 Orb 工具 | 通过（`orbTools=[]`） |
-| Orb 会话获得当前支持的 11 个工具 | `orb_click, orb_drag, orb_hotkey, orb_long_press, orb_observe, orb_scroll, orb_type, orb_open_app, orb_wait, orb_long_wait, orb_list_apps` |
+| Orb 会话获得当前支持的 16 个工具 | `click, input_text, scroll, hotkey, long_press, drag, wait, long_wait, screenshot, open_in_browser, open_in_finder, list_apps, open_app, code_agent, code_agent_status, code_agent_stop` |
 | 普通会话只保留 pi-web 自身工具 | `bash, read`（与 P0-02/P1-01 的基线一致） |
 | Orb 提示段只出现在 Orb 模式 | `orb=true normal=false` |
 | 提示段包含"一动作一观察" | 通过（`observe again`） |
 | 提示段声明屏幕内容为不可信输入 | 通过（`untrusted input`） |
 
-此脚本现作为 N3 回归门禁，验证普通会话不因安装扩展而新增模型可见的 GUI 能力，Orb 会话则只获得当前支持的工具。P1 初始工具集合为四个；后续阶段加入热键、长按、拖拽、应用激活、等待和应用列表后扩展为 11 个。
+此脚本现作为 N3 回归门禁，验证普通会话不因安装扩展而新增模型可见的 GUI 能力，Orb 会话则只获得当前支持的工具。当前证据由 provider 实收 schema 判定，覆盖 13 个参考 GUI 工具和 3 个后台工具。
 
 ## 3. 历史产品侧闭环（迁移前 Cua，38/38）
 
@@ -137,7 +147,7 @@ broker 对策略拒绝返回 `{ ok:false, refused:true, reason }`，而桥服务
 | 文本输入 → Chromium 内容 | 驱动拒绝（后台投递不支持该窗口类）；前台升级尚未做到稳定投递 |
 | 元素寻址 | Chromium 内容不暴露可编辑元素，因此坐标是唯一可行寻址方式 |
 
-因此工具集注册了 `orb_type` 与 `orb_scroll`，在这类窗口上被驱动拒绝时会**如实报回**给模型与用户，不会静默成功；`orb_scroll` 可以按驱动规定请求前台升级，但目标是否实际收到滚轮需逐次核验。
+因此工具集注册了 `input_text` 与 `scroll`，在这类窗口上被驱动拒绝时会**如实报回**给模型与用户，不会静默成功；`scroll` 可以按驱动规定请求前台升级，但目标是否实际收到滚轮需逐次核验。
 
 ## 5.1 真实模型 C7 验收：本轮在截图前失败
 
@@ -180,14 +190,14 @@ node evidence/p1-06/run-real-model-c7.mjs
 
 | # | 项 | 结果（真实模型侧） | 自动化已证明的部分 + 判据来源 |
 |---|---|---|---|
-| D1 | 模型**实际发起** `orb_observe` | **失败（最新复跑）** | 最新记录的模型工具调用为空；旧通过记录仍在 Git 历史 |
-| D2 | 随后发起 `orb_click`，坐标来自该次观察（分数 0–1000） | **失败（最新复跑）** | 最新运行没有产生点击调用 |
+| D1 | 模型**实际发起** `click`（使用自动附加截图） | **失败（最新复跑）** | 最新记录的模型工具调用为空；旧通过记录仍在 Git 历史 |
+| D2 | 随后发起 `click`，坐标来自当前截图（分数 0–1000） | **失败（最新复跑）** | 最新运行没有产生点击调用 |
 | D3 | 每次动作后产生**新的观察**（一动作一观察） | **未验证（最新复跑未进入动作）** | 需重新取得同一运行内的 observe→click→observe |
 | D4 | 目标窗口报告**命中预期位置** | **失败（最新复跑）** | 目标日志没有 `cell-mousedown` |
 | D5 | Access 控件显示当前权限档；撤权后不再执行 | **产品探针通过；人工未验证** | 新探针走 `revokeOrbAccess()`，并断言后续动作被拒 `no-task-authorization`：`loop-verification-session-access.json`；`tests/desktop-task.test.ts`。**人工点击** Access 控件的体验未验证 |
-| D6 | 让模型滚动（`orb_scroll`），目标收到 `wheel` 并动作后观察 | **环境中止** | 前台为 `LockApp`/不可交互桌面，未向模型发送动作；结果见 `real-model-d6-scroll-session-access.json` |
-| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含任何 `orb_*`；当前 Orb 会话获得 11 个：`tool-exposure.json`（11/11，判据是 provider **实收** schema，不是 UI 标签） |
-| D8 | 让模型输入非敏感文本（`orb_type`）并动作后观察 | **本轮未完成** | 没有生成新的 session-access JSON；旧记录仅作历史 |
+| D6 | 让模型滚动（`scroll`），目标收到 `wheel` 并动作后观察 | **环境中止** | 前台为 `LockApp`/不可交互桌面，未向模型发送动作；结果见 `real-model-d6-scroll-session-access.json` |
+| D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含 GUI 或后台工具；当前 Orb 会话获得 16 个：`tool-exposure.json`（7/7，判据是 provider **实收** schema，不是 UI 标签） |
+| D8 | 让模型输入非敏感文本（`input_text`）并动作后观察 | **本轮未完成** | 没有生成新的 session-access JSON；旧记录仅作历史 |
 
 小结：工具注册、授权、目标日志中的滚动/输入动作和普通会话隔离已通过；最新真实模型 C7/D6/D8
 闭环均未完整通过，不能把一次动作成功写成稳定的模型闭环。旧 Cua JSON 仅用于迁移对照。
@@ -207,13 +217,21 @@ D6 的动作到达判据是 backend 的目标自身日志看到 `wheel` 且 `scr
 
 | 项 | 原因 |
 |---|---|
-| **真实模型动作后观察合同** | 最新 D6/D8 均缺少动作后的 `orb_observe`，C7 最新运行未发起工具调用；失败 JSON 保留在 `evidence/p1-06/`。 |
+| **open_app 修复后的真实冷启动闭环** | 新独立 WinForms 探针因锁屏中止，未向模型发送动作；见 `real-model-open-app-session-access.json`。 |
 | **失败即停（batch-stopped）由真实驱动失败触发** | 由单测覆盖（`tests/desktop-broker.test.ts`）；本次整链路中未构造真实驱动失败。 |
 | 普通 vs 高权限窗口、多显示器 | 未对高权限窗口测试（不自动提权）；仅 1 个显示器。 |
 | 同一任务锁在多会话并发下的行为 | 单任务锁由单测覆盖；整链路只覆盖单会话场景。 |
 | MacOS/Linux | 未在非 Windows 平台运行。 |
 
 ## 7. 安全与非破坏性确认
+
+2026-10-05 后台闭环复测：`run-real-code-agent.mjs complete` 为 8/8，`stop` 为 10/10，
+`failure` 为 12/12。failure 在隔离 worker 的公开 provider-request 钩子只改模型 ID，
+触发实际 provider 503；最终助手、注册表、前台单次失败通知的错误全文必须一致。
+该失败可能只发出 `agent_settled`，不能仅依赖 `prompt_error`。管理器经现有 Pi Web
+`GET /api/sessions/{id}` 回读最终助手 stopReason/errorMessage。停止证据是产品桥
+执行停止，不表示模型自主调用了 `code_agent_stop`。修复前的误报成功记录保留在
+`real-model-code-agent-failure-before-fix-session.json`。
 
 - 输入只发往丢弃式目标窗口；未截图、未落盘像素、未输入真实凭据。
 - 令牌写在壳自己的数据目录（`0600`），不在环境变量里；桥只监听命名管道，无 TCP 端口。

@@ -1,5 +1,10 @@
 # Desktop tool alignment
 
+> 本页记录迁移前的 `orb_*` 工具契约，现已废弃。当前模型可见工具、自动首帧和后台任务见
+> [`reference-toolset-transition.md`](./reference-toolset-transition.md) 与
+> [`toolset-comparison-2026-10-04.md`](./toolset-comparison-2026-10-04.md)。
+> 下文的工具名、工具数量和“只激活不启动”描述均是历史记录，不是当前验收契约。
+
 ## Source
 
 The behavior baseline is `rain-knows/deepseek-harness-orb`, MIT, commit

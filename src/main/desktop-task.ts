@@ -28,7 +28,7 @@ export interface DesktopTaskState {
   readonly lastObservationId: string | null;
 }
 
-const READ_ONLY_ACTIONS = new Set<DesktopAction["kind"]>(["wait", "longWait", "listApps"]);
+const READ_ONLY_ACTIONS = new Set<DesktopAction["kind"]>(["wait", "longWait", "listApps", "screenshot"]);
 
 export function accessAllows(level: OrbAccessLevel, kind: DesktopAction["kind"]): boolean {
   if (level === "full-access") return true;
@@ -92,7 +92,7 @@ export class DesktopTaskController {
     if (grant.sessionId !== request.sessionId) return "no-task-authorization";
     if (grant.generation !== request.generation) return "stale-generation";
     if (!accessAllows(grant.level, action.kind)) return "access-level";
-    if (this.#stopped) return "batch-stopped";
+    if (this.#stopped) return "task-stopped";
     if (this.#lastObservationId === null || observation === null) return "observation-unknown";
     if (this.#lastObservationId !== observation.observationId) return "stale-observation";
     return validateAction(action, observation, { stopped: false });
@@ -118,6 +118,8 @@ export type ActResult =
       readonly refused: false;
       readonly observation: DesktopObservation;
       readonly apps?: readonly string[];
+      readonly paths?: readonly string[];
+      readonly app?: { readonly name: string; readonly kind: "activated" | "launched" };
     }
   | {
       readonly ok: false;

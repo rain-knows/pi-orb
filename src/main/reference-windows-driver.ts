@@ -13,6 +13,10 @@ import type { WindowsDesktopOps } from "./reference-windows/windows";
 import { selectWindowsObservation } from "./reference-windows/windows-foreground";
 import { runWithCaptureExcludeWindowIds } from "./reference-windows/capture-exclude";
 import type { CaptureTarget } from "@shared/screenshot";
+import { homedir } from "node:os";
+import { pairScreenshotFiles, writeDesktopScreenshots } from "./reference-windows/screenshot";
+import { requireBrowserUrl, resolveFinderOpen } from "./reference-windows/open";
+import { stat } from "node:fs/promises";
 
 export interface ReferenceWindowInfo {
   readonly windowId: number;
@@ -57,24 +61,6 @@ function message(error: unknown): string {
 
 function positionOf(position: ScreenshotPosition): [number, number] {
   return [position.x, position.y];
-}
-
-/**
- * Compare an application label with a process base name.
- *
- * The model may write `Notepad` or `notepad.exe` for the same application, so the comparison is
- * case-insensitive and ignores a single trailing `.exe`. It is deliberately an equality test and
- * not a substring test: a substring match would let `notepad` select an unrelated process or a
- * window whose *title* merely contains the word, which is the class of wrong-target failure this
- * product must not have.
- */
-function sameApp(left: string, right: string): boolean {
-  const normalize = (value: string): string => {
-    const lowered = value.trim().toLowerCase();
-    return lowered.endsWith(".exe") ? lowered.slice(0, -4) : lowered;
-  };
-  const a = normalize(left);
-  return a.length > 0 && a === normalize(right);
 }
 
 /**
@@ -167,7 +153,10 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     if (!screen || !target || observation.window.id !== String(target.windowId)) {
       return { ok: false, refused: true, error: "The observation target is no longer available." };
     }
-    if (action.kind === "openApp") return this.#openApp(action, target, signal);
+    if (action.kind === "openApp") return this.#openApp(action, signal);
+    if (action.kind === "screenshot") return this.#screenshot(signal);
+    if (action.kind === "openInBrowser") return this.#openInBrowser(action.url, signal);
+    if (action.kind === "openInFinder") return this.#openInFinder(action.path, action.revealOnly ?? false, signal);
     try {
       const abort = signal ?? new AbortController().signal;
       if (action.kind === "wait" || action.kind === "longWait") {
@@ -183,7 +172,7 @@ export class ReferenceWindowsDriver implements DesktopDriver {
       }
       const observationAfterAction = await this.#withGuiTurn(async () => {
         if (!this.#isCurrentForeground(target)) {
-          // No input has run. Return the new surface so a batch can stop with a current
+          // No input has run. Return the new surface so the caller can reassess the current
           // screenshot, including when the window changed between completed steps.
           const fresh = await this.observe({ includeImage: true, signal });
           const error = new Error("The foreground window changed after the observation. Observe again before acting.");
@@ -242,6 +231,39 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     }
   }
 
+  async #screenshot(signal?: AbortSignal): Promise<ActResult> {
+    const screens = await this.#options.backend.listScreens(signal);
+    const screen = screens[0];
+    if (!screen) return { ok: false, refused: false, error: "No application window is available." };
+    const captured = await this.#options.backend.capture(screen, signal);
+    const files = pairScreenshotFiles([captured], [{ screenIndex: screen.index }]);
+    const paths = await writeDesktopScreenshots(files, { home: homedir() });
+    const first = files[0];
+    const firstPath = paths[0];
+    if (!first || !firstPath) return { ok: false, refused: false, error: "Screenshot produced no file." };
+    await this.#options.backend.copyImageToClipboard({ path: firstPath, mediaType: first.mediaType }, signal);
+    const fresh = await this.observe({ includeImage: true, signal });
+    if (!fresh.ok || !fresh.observation) return { ok: false, refused: false, error: fresh.error ?? "Observation unavailable." };
+    return { ok: true, refused: false, error: null, observation: fresh.observation, paths };
+  }
+
+  async #openInBrowser(url: string | undefined, signal?: AbortSignal): Promise<ActResult> {
+    const normalized = url === undefined || url.trim() === "" ? undefined : requireBrowserUrl(url);
+    await this.#options.backend.openInBrowser(normalized === undefined ? {} : { url: normalized }, signal);
+    const fresh = await this.observe({ includeImage: true, signal });
+    if (!fresh.ok || !fresh.observation) return { ok: false, refused: false, error: fresh.error ?? "Observation unavailable." };
+    return { ok: true, refused: false, error: null, observation: fresh.observation };
+  }
+
+  async #openInFinder(path: string | undefined, revealOnly: boolean, signal?: AbortSignal): Promise<ActResult> {
+    const target = await resolveFinderOpen(path, revealOnly);
+    const info = await stat(target.path);
+    await this.#options.backend.openInFinder({ path: target.path, revealOnly: target.revealOnly && info.isFile() }, signal);
+    const fresh = await this.observe({ includeImage: true, signal });
+    if (!fresh.ok || !fresh.observation) return { ok: false, refused: false, error: fresh.error ?? "Observation unavailable." };
+    return { ok: true, refused: false, error: null, observation: fresh.observation };
+  }
+
   consumeObservation(): void {
     this.#observation = null;
     this.#screen = null;
@@ -298,72 +320,24 @@ export class ReferenceWindowsDriver implements DesktopDriver {
     };
   }
 
-  /**
-   * Bring an already running application forward and continue against its window.
-   *
-   * The reference backend's `openApp` activates a running application *or launches it*. pi-orb
-   * keeps only the first half: starting a process is separate authority, so this path never reaches
-   * `launch`. It therefore uses
-   * {@link WindowsDesktopOps.activateApp}, which returns `false` instead of starting anything,
-   * and it fails closed at three separate points:
-   *
-   *   1. the requested application must appear in the running-application list, compared as a base
-   *      name (`Notepad` == `notepad.exe`) and never as a substring;
-   *   2. the activation itself must succeed;
-   *   3. the resulting foreground window must belong to that application — otherwise the current
-   *      observation stays authoritative and the action fails.
-   *
-   * On success the adopted window is reported through `onTargetChanged`; the grant remains bound to
-   * the Orb session and generation while later observations follow the foreground application.
-   */
-  async #openApp(action: { readonly name: string }, currentTarget: TargetWindow, signal?: AbortSignal): Promise<ActResult> {
+  /** Port of plugin.ts open_app @9cdc503: backend operation, settle, actual foreground frame. */
+  async #openApp(action: { readonly name: string }, signal?: AbortSignal): Promise<ActResult> {
     try {
       const abort = signal ?? new AbortController().signal;
       abort.throwIfAborted();
-      const requested = action.name.trim();
-      const running = this.#options.ops.listWindowApps();
-      const match = running.find((name) => sameApp(name, requested));
-      if (match === undefined) {
-        return {
-          ok: false,
-          refused: false,
-          error: `"${requested}" is not running. pi-orb only brings an already running application forward and does not launch new ones.`,
-        };
-      }
-
-      const adopted = await this.#withGuiTurn(async () => {
-        abort.throwIfAborted();
-        if (!this.#isCurrentForeground(currentTarget)) {
-          throw new Error("The foreground window changed after the observation. Observe again before switching apps.");
-        }
-        if (!this.#options.ops.activateApp(match)) {
-          throw new Error(`"${requested}" could not be brought to the foreground.`);
-        }
-        // Match the reference tool's post-action settle before inspecting and recapturing the
-        // newly activated application. Without this delay a slow window manager can return the
-        // previous foreground surface as the "fresh" observation.
+      let app: { kind: "activated" | "launched"; name: string } | undefined;
+      let openError: string | null = null;
+      try {
+        app = await this.#withGuiTurn(() => this.#options.backend.openApp({ name: action.name.trim() }, abort), abort);
         await timeToolPhase("post-action-wait", () => delay(this.#options.postActionWaitMs ?? POST_ACTION_WAIT_MS, abort));
-        const foreground = this.#findForegroundTarget();
-        if (!foreground || !sameApp(foreground.appName, match)) {
-          throw new Error(
-            `"${requested}" did not become the foreground window, so the target was left unchanged.`,
-          );
-        }
-        const screens = await timeToolPhase("listScreens", () => this.#options.backend.listScreens(abort));
-        const screen = screens.find((candidate) => candidate.windowId === foreground.windowId);
-        if (!screen) throw new Error(`No observation surface is available for "${requested}".`);
-        const captured = await timeToolPhase("capture", () => this.#options.backend.capture(screen, abort));
+      } catch (error) {
         abort.throwIfAborted();
-        const next = this.#makeObservation(foreground, screen, captured, true,
-          await timeToolPhase("inspectForeground", () => this.#options.backend.inspectForeground(abort)));
-        this.#target = foreground;
-        this.#screen = screen;
-        this.#observation = next;
-        this.#publishTarget(foreground);
-        return next;
-      }, signal);
-      abort.throwIfAborted();
-      return { ok: true, refused: false, error: null, observation: adopted };
+        openError = message(error);
+      }
+      const fresh = await this.observe({ includeImage: true, signal: abort });
+      if (!fresh.ok || !fresh.observation) throw new Error(fresh.error ?? "Observation unavailable.");
+      if (openError !== null) return { ok: false, refused: false, error: openError, observation: fresh.observation };
+      return { ok: true, refused: false, error: null, observation: fresh.observation, app: app! };
     } catch (error) {
       return { ok: false, refused: false, error: message(error) };
     }

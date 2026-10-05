@@ -1,4 +1,8 @@
-# 公用 Playwright 与扩展认证
+# 公用 Playwright 与扩展认证（已废弃）
+
+> 本页只保留历史证据。当前产品已删除 Playwright/MCP 浏览器网关和扩展认证，使用参考项目
+> 的 `open_in_browser` 与截图式 Computer Use 工具；实现依据见 `reference-toolset-transition.md`。
+> 下文全部为已删除实现的历史调查，不得按其中的 `orb_browser`、MCP 或普通工作区开放规则操作当前版本。
 
 2026-10-01 用户明确要求配置扩展 token，并将浏览器工具开放给普通 Pi Web。这个要求覆盖先前“普通 cwd 无任何 GUI 工具”的范围约束；原生桌面工具仍只在 Orb 工作区注册。
 

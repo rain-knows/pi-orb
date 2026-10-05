@@ -37,7 +37,7 @@ export const FOCUS_NOTE = "Keyboard focus is not on an operable app. Click the t
  *
  * Restored verbatim from the reference (commit `72f1d73`, `src/backend.ts:79-80`). The earlier
  * pi-orb copy stopped after "bring this window forward first", so a model that needed focus on a
- * specific control was never told to click inside the window first. `orb_hotkey` does bring the
+ * specific control was never told to click inside the window first. `hotkey` does bring the
  * recorded target forward before posting keys, so the copy matches the executor.
  */
 export const UNFOCUSED_WINDOW_NOTE = "Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.";

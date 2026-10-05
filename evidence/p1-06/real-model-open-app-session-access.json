@@ -1,0 +1,195 @@
+{
+  "capturedAt": "2026-10-05T10:59:25.506Z",
+  "testCase": "open-app",
+  "verification": {
+    "what": "real model launches a unique disposable application by name and clicks its completion button",
+    "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
+    "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
+    "accessLevel": "full-access",
+    "targetSelection": "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-open-app-agent-1791197965503",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "LockApp",
+      "title": "Windows Ĭ����������",
+      "className": "Windows.UI.Core.CoreWindow",
+      "inputDesktopAccessible": true
+    },
+    "targetPid": 105132,
+    "nativeProbe": {
+      "name": "PiOrbProbe1791197965504",
+      "executable": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\PiOrbProbe1791197965504.exe",
+      "initiallyRunning": false
+    },
+    "target": {
+      "pid": 105132,
+      "windowBoundsDip": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBoundsDip": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "scaleFactor": 1.5,
+      "cell00": {
+        "cell": "0,0",
+        "centreInContent": {
+          "x": 60,
+          "y": 45
+        },
+        "dipScreenPoint": {
+          "x": 187,
+          "y": 191
+        },
+        "physicalScreenPoint": {
+          "x": 281,
+          "y": 287
+        }
+      }
+    },
+    "piWeb": {
+      "ok": true,
+      "baseUrl": "http://127.0.0.1:46712",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:46712\n- Network:       http://127.0.0.1:46712\n✓ Ready in 711ms\n✓ Running next.config took 113ms\n"
+    },
+    "handshake": {
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\shell-data\\bridge-token.json",
+      "pid": 103852,
+      "generation": 1,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-103852"
+    },
+    "rendererTarget": {
+      "title": "pi-orb",
+      "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
+    },
+    "shortcut": {
+      "registered": true,
+      "problem": null
+    },
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": null,
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:46712",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "generation": 1,
+    "session": "01a10bb8-44f4-7725-b650-1eaf13f2ca2e",
+    "model": {
+      "sessionId": "01a10bb8-4ffd-7725-b650-1eb1f04b8e57",
+      "selected": {
+        "provider": "TZcode",
+        "modelId": "deepseek-v4.1-flash"
+      },
+      "input": [
+        "text",
+        "image"
+      ],
+      "declaredImageCapable": true
+    },
+    "interactiveDesktopBeforeTarget": {
+      "process": "LockApp",
+      "title": "Windows Ĭ����������",
+      "className": "Windows.UI.Core.CoreWindow",
+      "inputDesktopAccessible": true
+    }
+  },
+  "checks": [
+    {
+      "name": "the isolated pi-web started",
+      "ok": true,
+      "detail": "http://127.0.0.1:46712"
+    },
+    {
+      "name": "the isolated shell published its own handshake",
+      "ok": true,
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\shell-data\\\\bridge-token.json\",\"pid\":103852,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-103852\"}"
+    },
+    {
+      "name": "the isolated shell's pipe accepts a connection",
+      "ok": true,
+      "detail": "\\\\.\\pipe\\pi-orb-103852"
+    },
+    {
+      "name": "the isolated shell is NOT the user's running orb",
+      "ok": true,
+      "detail": "handshake pid 103852"
+    },
+    {
+      "name": "the orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "{\"title\":\"pi-orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+    },
+    {
+      "name": "the wake shortcut registered",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:46712\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+    },
+    {
+      "name": "the isolated shell reports this run's workspace and a generation",
+      "ok": true,
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"generation\":1}"
+    },
+    {
+      "name": "the isolated shell created a real pi-web session",
+      "ok": true,
+      "detail": "\"01a10bb8-44f4-7725-b650-1eaf13f2ca2e\""
+    },
+    {
+      "name": "the session is served by a model that declares image input",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a10bb8-4ffd-7725-b650-1eb1f04b8e57\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+    },
+    {
+      "name": "an interactive desktop is available before target enumeration",
+      "ok": false,
+      "detail": "{\"process\":\"LockApp\",\"title\":\"Windows Ĭ����������\",\"className\":\"Windows.UI.Core.CoreWindow\",\"inputDesktopAccessible\":true}"
+    }
+  ],
+  "passed": false,
+  "error": "no interactive desktop: foreground is LockApp (Windows Ĭ����������) and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
+  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:46713/devtools/browser/9ce478b0-41c7-4b32-b09a-5ed4ffea1af2\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-103852\n[pi-orb] desktop {\"at\":\"2026-10-05T10:59:50.004Z\",\"event\":\"authorize\",\"sessionId\":\"01a10bb8-44f4-7725-b650-1eaf13f2ca2e\",\"generation\":1,\"level\":\"full-access\"}\n",
+  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:46712\n- Network:       http://127.0.0.1:46712\n✓ Ready in 711ms\n✓ Running next.config took 113ms\n[pi-web] session_start dispatched to extensions for session 01a10bb8-44f4-7725-b650-1eaf13f2ca2e\n[pi-web] session_start dispatched to extensions for session 01a10bb8-4ffd-7725-b650-1eb1f04b8e57\n"
+}

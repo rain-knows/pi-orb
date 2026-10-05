@@ -149,7 +149,7 @@ The same commit's Electron shell is reused outside that directory:
 
 They retain the reference implementation's window selection, physical coordinate mapping, GDI
 capture, per-monitor DPI handling, Win32 `SendInput`, clipboard restoration and input cleanup. The
-model-facing `orb_*` schemas, Pi session, authorization, bridge and screenshot confirmation flow
+model-facing Computer Use schemas, Pi session, authorization, bridge and screenshot confirmation flow
 remain pi-orb code. No reference plugin lifecycle, attachment store, configuration store, bundled
 `dsh` runtime, installer pages, or macOS/multi-display runtime was imported. This entry records both
 the source commit and the local adaptation boundary.
@@ -165,12 +165,9 @@ the source commit and the local adaptation boundary.
 
 ## 5. Trademarks
 
-Browser integration additionally distributes `@playwright/mcp` 0.0.83, Playwright / Playwright Core
-1.64.0-alpha-1790635538000 (Microsoft, Apache-2.0), and `@modelcontextprotocol/sdk` 1.31.0 (MIT).
-Their license texts remain in the packaged dependency directories. pi-orb uses their public
-`createConnection`, Client and InMemoryTransport APIs; it does not vendor the browser extension or
-implement its CDP protocol. The Chrome extension is installed separately from Microsoft's official
-Chrome Web Store listing. The Pi engine and credentials remain owned by Pi Web.
+The browser DOM gateway and its Playwright/MCP extension integration are not part of the current
+runtime or packaged Pi plugin. Browser interaction uses the visible Computer Use window and the
+user's explicit `open_in_browser` action. The Pi engine and credentials remain owned by Pi Web.
 
 pi-orb is an independent open-source project. It is not affiliated with, endorsed by, or an official
 product of the pi-web, Pi, Cua or DeepSeek projects. The MIT licenses of those projects do not grant
@@ -184,27 +181,39 @@ trademark rights.
 - A component that declares a license in `package.json` but ships no license text is recorded as
   such rather than assumed to be either MIT or MPL beyond its own declaration.
 
-工具提速的批量提示与动作后截图语义参考并适配自 `packages/experimental/tool-computer-use/src/policy.ts:20-30` 与 `plugin.ts:330-360`，固定提交 `72f1d738458a223696685a909e806b683eff5885`，Copyright (c) 2026 DeepSeek，MIT。Pi 批量桥接为运行时边界适配，不搬 dsh 调度器。
+参考项目的 GUI 工具名称、0–1000 坐标、自动首帧、动作后截图、同一步顺序调用和后台
+`code_agent` 语义参考并适配自
+`dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7` 的
+`packages/computer-use/src/{plugin,policy,code-agent,code-agent-completion}.ts`（MIT，Copyright (c) 2026 mini-yifan / DeepSeek）。
+pi-orb 没有批量桥接协议，也没有搬入 dsh 的调度器；Pi 的 `sequential` 工具执行模式负责宿主侧顺序。
 
-`orb-image-context.ts` 的请求图片预算模式参考 `packages/attachment/attachment-local/src/request-image.ts`（同固定提交、MIT）；使用 Pi 公开钩子适配，未复制 dsh 附件实现。
+## 7. dsh-orb-cordis Computer Use adaptation
 
-## 7. dsh-orb-cordis pixel observation adaptation
-
-Source: [rain-knows/dsh-orb-cordis](https://github.com/rain-knows/dsh-orb-cordis), pinned commit
+Source: [mini-yifan/dsh-orb-cordis](https://github.com/mini-yifan/dsh-orb-cordis), pinned commit
 `9cdc50302d202f4497569731be488a8afa500da7`. The plugin is MIT licensed by mini-yifan;
 its Computer Use sources derive from DeepSeek Harness under the upstream MIT notice.
 
-- `src/shared/observation-raster.ts` ← `packages/computer-use/src/raster.ts` (PNG/JPEG header parser;
-  unused screenshot-export policy removed).
-- `src/shared/pixel-coordinates.ts` ← `packages/computer-use/src/coordinates.ts:166-215` (pixel
-  validator and pixel branch of `modelPositionToHid`; Cordis imports and dual-mode switch removed).
-- `pi-package/extensions/orb-image-space.ts` and `orb.ts` adapt `coordinate-mode.ts`, `observe.ts`
-  and `policy.ts`'s actual attachment-size binding and pixel copy to Pi's public context hook;
-  Pi session/generation/observation checks are local runtime integration.
-- `tests/orb-image-space.test.ts` adapts `packages/computer-use/tests/raster.spec.ts`'s header cases.
+The model-facing contract uses the reference project's direct 0–1000 screenshot-fraction position
+space. The old pixel-raster adapter and its deleted `orb-image-space` extension path are not part
+of the release.
 
-No Cordis runtime, dsh session engine, credentials, installer-consent policy, automatic screenshot
-pipeline or helper download mechanism is imported.
+- `src/shared/computer-use-policy.ts` directly ports `packages/computer-use/src/policy.ts`, retaining
+  the default millifraction policy and removing the unused Cordis coordinate-mode switch.
+- `src/shared/foreground-envelope.ts` directly ports `packages/computer-use/src/observe.ts:82-111`,
+  replacing only the foreground type import with the Pi contract.
+- `pi-package/extensions/computer-use-context.ts` ports the Unicode head/middle/tail algorithm from
+  `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885`,
+  `packages/compaction/compaction-tool-result-pruner/src/index.ts` (MIT, Copyright (c) 2026 DeepSeek).
+  Budgets follow the new plugin's `packages/computer-use/presets/computer-use/agent.cordis.yml`.
+  Pi's public context hook replaces Cordis service/session rewrites; latest-observation image
+  projection is a Pi host adaptation and never changes persisted history.
+
+- `src/main/reference-windows-driver.ts` adapts `packages/computer-use/src/plugin.ts:1013-1070`
+  for `open_app`: use the existing backend, settle, and recapture the actual foreground. Pi result
+  metadata and cancellation replace Cordis rendering and event boundaries.
+
+No Cordis runtime, dsh session engine, credentials, installer-consent policy or helper download
+mechanism is imported.
 
 ```text
 MIT License

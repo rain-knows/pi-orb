@@ -1,5 +1,8 @@
 # Orb 通用桌面交互改进（2026-09-30）
 
+> 本页包含迁移前 `orb_*` 语义和实现记录。当前工具集已切换为参考项目的 13 个直接 GUI
+> 工具；以 [`reference-toolset-transition.md`](./reference-toolset-transition.md) 为准。
+
 参考固定提交：`rain-knows/deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885`，MIT。原文件见 `packages/experimental/tool-computer-use/src/windows-foreground.ts`、`windows.ts`、`overlay-guard.ts`、`capture-exclude.ts`、`config.ts`，以及 `apps/desktop/src/orb-permission.ts`、`apps/desktop/renderer/floating.{html,css,js}`。来源和许可证见 `THIRD_PARTY_NOTICES.md`。
 
 | 用户反馈 | 本轮实现 | 参考复用与 Pi 差异 |
@@ -15,7 +18,7 @@
 | 页面中文 | 主面板、权限、截图、模型、历史、工具状态和托盘／右键菜单文案改中文；模型名、应用名和用户内容保留原文 | UI 文案适配，不改参考 DOM 和三档语义 |
 | 暂停按钮与光标重叠 | 执行中空输入框隐藏占位字和闪烁光标，缩小停止按钮并使用方形停止图标；输入新文本时光标正常出现 | 仅在参考几何上做 Pi queue 所需的覆盖样式 |
 
-截图预览和桌面工具仍是两条权限路径：桌面工具要求 Orb session 的 Access grant；用户主动分享截图须预览确认。普通 Pi Web 会话不会自动获得 Orb 工具。`orb_open_app` 仍只激活已运行应用，不启动新程序。
+截图预览和桌面工具仍是两条权限路径：桌面工具要求 Orb session 的 Access grant；用户主动分享截图须预览确认。普通 Pi Web 会话不会自动获得 Orb 工具。当前 `open_app` 遵循参考项目语义，可激活运行中的应用或启动指定应用；本页其余 `orb_*` 名称和旧“只激活”约束均为迁移前历史记录。
 
 验证：`tests/reference-windows-driver.test.ts` 覆盖 Orb 前台下的原生窗口、动作前窗口变化拒绝、动作后新窗口观察；`tests/floating-renderer.test.ts` 覆盖输入和提问时不收起、工具状态和中文权限；`tests/floating-overlay-guard.test.ts` 直接移植参考 5 项，覆盖嵌套恢复、输入期间不转发鼠标事件、不重复 blur。完整测试、lint、build、生命周期及打包探针的实测结果见下方记录。原生应用和真实模型跨应用长任务不能由 JSDOM 或伪造 Pi Web 事件代替。
 
@@ -27,4 +30,4 @@
 - `node evidence/p2-05/run-p2-05.mjs`：内容审计 25/25、打包产物启动 22/22 通过。
 - `node evidence/frontend-port/probe-interactions.mjs`：实际打包 Electron 的中文权限、草稿保持、工具卡片、问题、历史、停靠及 reduced-motion 通过。计算样式确认空运行输入的 caret 为透明、占位符为空、Stop 宽 36px；截图见 `after-tool-running.png`。
 - 同一打包探针另经真实 bridge／broker／Win32 驱动选择一次性目标，Orb 前台下不使用快捷键锁定，按目标自己报告的几何点击 `0,0`，目标日志确认只收到一次 `0,0` 点击，并返回 fresh observation。记录在 `evidence/frontend-port/native-target-probe.json`，这是实际原生输入证据，**不是模型视觉决策或任意应用的后台点击证据**。
-- 真实模型自主跨应用长任务、高权限窗口、多屏／DPI、任意原生软件仍未完成联合验收；本轮没有改写之前 C7/D6/D8 的失败记录。自动启动应用仍未开放，文件／命令任务依赖当前 Pi 会话实际已启用的工具。
+- 真实模型自主跨应用长任务、高权限窗口、多屏／DPI、任意原生软件仍未完成联合验收；本轮没有改写之前 C7/D6/D8 的失败记录。应用启动已按参考语义接入，真实启动效果仍待验收；文件／命令任务依赖当前 Pi 会话实际已启用的工具。

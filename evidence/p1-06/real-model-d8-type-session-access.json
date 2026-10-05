@@ -1,0 +1,477 @@
+{
+  "capturedAt": "2026-10-05T10:36:53.490Z",
+  "testCase": "d8-type",
+  "verification": {
+    "what": "real model receives the automatic frontmost frame, focuses its text field, and types a synthetic marker",
+    "chain": "target app <- reference Windows backend <- ReferenceWindowsDriver <- desktop-broker <- bridge <- pi-web <- real model",
+    "backend": "deepseek-harness-orb Windows backend @ 72f1d738458a223696685a909e806b683eff5885",
+    "accessLevel": "workspace-write",
+    "targetSelection": "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically"
+  },
+  "isolation": {
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1791196613487\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1791196613487\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-d8-type-agent-1791196613488",
+    "modelsJson": "hard link to the real file (no copy)",
+    "authJson": "symlink to the real file (no copy)",
+    "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
+  },
+  "model": {
+    "provider": "TZcode",
+    "id": "deepseek-v4.1-flash"
+  },
+  "steps": {
+    "agentDir": {
+      "settings": "written (real provider/model, extension declared)",
+      "modelsJsonLinked": true,
+      "authJsonLinked": true
+    },
+    "interactiveDesktop": {
+      "process": "explorer",
+      "title": "",
+      "className": "Shell_TrayWnd",
+      "inputDesktopAccessible": true
+    },
+    "targetPid": 67392,
+    "target": {
+      "pid": 67392,
+      "windowBoundsDip": {
+        "x": 120,
+        "y": 90,
+        "width": 502,
+        "height": 530
+      },
+      "contentBoundsDip": {
+        "x": 127,
+        "y": 146,
+        "width": 488,
+        "height": 467
+      },
+      "scaleFactor": 1.5,
+      "cell00": {
+        "cell": "0,0",
+        "centreInContent": {
+          "x": 60,
+          "y": 45
+        },
+        "dipScreenPoint": {
+          "x": 187,
+          "y": 191
+        },
+        "physicalScreenPoint": {
+          "x": 281,
+          "y": 287
+        }
+      }
+    },
+    "piWeb": {
+      "ok": true,
+      "baseUrl": "http://127.0.0.1:48732",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:48732\n- Network:       http://127.0.0.1:48732\n✓ Ready in 621ms\n✓ Running next.config took 111ms\n"
+    },
+    "handshake": {
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1791196613487\\shell-data\\bridge-token.json",
+      "pid": 106988,
+      "generation": 1,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1791196613487\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-106988"
+    },
+    "rendererTarget": {
+      "title": "pi-orb",
+      "url": "file:///D:/workself/pi-orb/out/renderer/index.html"
+    },
+    "shortcut": {
+      "registered": true,
+      "problem": null
+    },
+    "workspace": {
+      "configured": true,
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-d8-type-1791196613487\\orb-workspace",
+      "problem": null,
+      "shortcut": "Control+Alt+F11",
+      "shortcutRegistered": true,
+      "shortcutProblem": null,
+      "generation": 1,
+      "busy": false,
+      "sessionId": null,
+      "piWeb": {
+        "baseUrl": "http://127.0.0.1:48732",
+        "reachable": true,
+        "problem": null
+      },
+      "desktopTask": {
+        "authorized": false,
+        "level": null,
+        "sessionId": null,
+        "generation": null,
+        "stopped": false,
+        "stoppedReason": null,
+        "lastObservationId": null,
+        "bridgeReady": true
+      }
+    },
+    "generation": 1,
+    "session": "01a10ba3-8d56-75a9-b7e8-46d05b4b37da",
+    "model": {
+      "sessionId": "01a10ba3-94e2-75a9-b7e8-46d38c123c6e",
+      "selected": {
+        "provider": "TZcode",
+        "modelId": "deepseek-v4.1-flash"
+      },
+      "input": [
+        "text",
+        "image"
+      ],
+      "declaredImageCapable": true
+    },
+    "interactiveDesktopBeforeTarget": {
+      "process": "explorer",
+      "title": "",
+      "className": "Shell_TrayWnd",
+      "inputDesktopAccessible": true
+    },
+    "testTarget": {
+      "pid": 67392,
+      "handle": 11799034,
+      "selection": "test harness only"
+    },
+    "interactiveDesktopAtWake": {
+      "process": "explorer",
+      "title": "",
+      "className": "Shell_TrayWnd",
+      "inputDesktopAccessible": true
+    },
+    "foreground": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true
+    },
+    "access": {
+      "authorized": true,
+      "level": "workspace-write",
+      "sessionId": "01a10ba3-8d56-75a9-b7e8-46d05b4b37da"
+    },
+    "prompt": {},
+    "waitedForIdle": true,
+    "bridgeDiagnostics": [
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:11.594Z\",\"event\":\"authorize\",\"sessionId\":\"01a10ba3-8d56-75a9-b7e8-46d05b4b37da\",\"generation\":1,\"level\":\"full-access\"}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:19.580Z\",\"event\":\"authorize\",\"sessionId\":\"01a10ba3-8d56-75a9-b7e8-46d05b4b37da\",\"generation\":1,\"level\":\"workspace-write\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.735Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"window-enumeration\",\"durationMs\":39.555200000002515}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.758Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"window-enumeration\",\"durationMs\":22.81340000000273}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.787Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"listScreens\",\"durationMs\":28.16649999999936}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.816Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"capture-and-png\",\"durationMs\":28.877400000001217}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.817Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"capture\",\"durationMs\":29.27889999999752}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.838Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"inspectForeground\",\"durationMs\":21.49279999999999}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.839Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"base64\",\"durationMs\":0.10469999999986612}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.839Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"image\",\"bytes\":18252,\"width\":735,\"height\":786}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:19.868Z\",\"event\":\"observe\",\"sessionId\":\"01a10ba3-8d56-75a9-b7e8-46d05b4b37da\",\"observationId\":\"obs-muv48cps-1\",\"windowId\":\"11799034\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:19.868Z\",\"event\":\"tool-timing\",\"requestId\":\"27806737-f8ab-478c-92a0-4afbe79d683e\",\"phase\":\"executor-total\",\"durationMs\":257.28030000000217}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:24.877Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-muv48cps-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:24.997Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"window-enumeration\",\"durationMs\":17.342599999999948}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.015Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"window-enumeration\",\"durationMs\":17.204200000000128}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.169Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"native-input\",\"durationMs\":153.90029999999751}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.777Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"post-action-wait\",\"durationMs\":608.1285000000025}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.797Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"window-enumeration\",\"durationMs\":19.857599999999366}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.817Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"listScreens\",\"durationMs\":19.649200000003475}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.839Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"capture-and-png\",\"durationMs\":21.493399999999383}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.839Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"capture\",\"durationMs\":21.678400000000693}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.854Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"inspectForeground\",\"durationMs\":15.078800000002957}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.854Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"base64\",\"durationMs\":0.04820000000108848}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.854Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"image\",\"bytes\":18519,\"width\":735,\"height\":786}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:25.857Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muv48cps-1\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:25.857Z\",\"event\":\"tool-timing\",\"requestId\":\"6d312496-8dce-4de8-9d33-f117d7053f11\",\"phase\":\"executor-total\",\"durationMs\":980.986399999998}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:29.292Z\",\"event\":\"act-observation\",\"kind\":\"type\",\"observationId\":\"obs-muv48hcu-2\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:29.404Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"window-enumeration\",\"durationMs\":22.0483000000022}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:29.422Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"window-enumeration\",\"durationMs\":17.456500000000233}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:29.720Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"native-input\",\"durationMs\":297.97329999999783}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.327Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"post-action-wait\",\"durationMs\":606.3992999999973}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.345Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"window-enumeration\",\"durationMs\":18.577900000000227}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.363Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"listScreens\",\"durationMs\":17.5028999999995}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.396Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"capture-and-png\",\"durationMs\":32.80240000000049}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.396Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"capture\",\"durationMs\":32.9561999999969}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.413Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"inspectForeground\",\"durationMs\":16.538799999998446}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.413Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"base64\",\"durationMs\":0.06970000000001164}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.413Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"image\",\"bytes\":19218,\"width\":735,\"height\":786}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T10:37:30.416Z\",\"event\":\"act\",\"kind\":\"type\",\"observationId\":\"obs-muv48hcu-2\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T10:37:30.416Z\",\"event\":\"tool-timing\",\"requestId\":\"571b73d0-8ad3-4290-a086-b4827ba08e62\",\"phase\":\"executor-total\",\"durationMs\":1124.6358999999975}"
+    ]
+  },
+  "checks": [
+    {
+      "name": "the isolated pi-web started",
+      "ok": true,
+      "detail": "http://127.0.0.1:48732"
+    },
+    {
+      "name": "the isolated shell published its own handshake",
+      "ok": true,
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1791196613487\\\\shell-data\\\\bridge-token.json\",\"pid\":106988,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1791196613487\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-106988\"}"
+    },
+    {
+      "name": "the isolated shell's pipe accepts a connection",
+      "ok": true,
+      "detail": "\\\\.\\pipe\\pi-orb-106988"
+    },
+    {
+      "name": "the isolated shell is NOT the user's running orb",
+      "ok": true,
+      "detail": "handshake pid 106988"
+    },
+    {
+      "name": "the orb renderer is reachable over CDP",
+      "ok": true,
+      "detail": "{\"title\":\"pi-orb\",\"url\":\"file:///D:/workself/pi-orb/out/renderer/index.html\"}"
+    },
+    {
+      "name": "the wake shortcut registered",
+      "ok": true,
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1791196613487\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:48732\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+    },
+    {
+      "name": "the isolated shell reports this run's workspace and a generation",
+      "ok": true,
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1791196613487\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-d8-type-1791196613487\\\\orb-workspace\",\"generation\":1}"
+    },
+    {
+      "name": "the isolated shell created a real pi-web session",
+      "ok": true,
+      "detail": "\"01a10ba3-8d56-75a9-b7e8-46d05b4b37da\""
+    },
+    {
+      "name": "the session is served by a model that declares image input",
+      "ok": true,
+      "detail": "{\"sessionId\":\"01a10ba3-94e2-75a9-b7e8-46d38c123c6e\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+    },
+    {
+      "name": "an interactive desktop is available before target enumeration",
+      "ok": true,
+      "detail": "{\"process\":\"explorer\",\"title\":\"\",\"className\":\"Shell_TrayWnd\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the harness can foreground its disposable target by process id",
+      "ok": true,
+      "detail": "{\"pid\":67392,\"handle\":11799034,\"selection\":\"test harness only\"}"
+    },
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": true,
+      "detail": "{\"process\":\"explorer\",\"title\":\"\",\"className\":\"Shell_TrayWnd\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the disposable target is the foreground window before the first frame",
+      "ok": true,
+      "detail": "{\"title\":\"P1-05 input target\",\"ok\":true,\"foregrounded\":true}"
+    },
+    {
+      "name": "Workspace Write is granted to the isolated Orb session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"workspace-write\",\"sessionId\":\"01a10ba3-8d56-75a9-b7e8-46d05b4b37da\"}"
+    },
+    {
+      "name": "the prompt was sent with automatic frontmost-window context",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "D8 (target's own log): the exact synthetic marker reached the text field",
+      "ok": true,
+      "detail": "[{\"at\":1791196649674,\"kind\":\"text-input\",\"value\":\"P1ORBD8TEST\"}]"
+    },
+    {
+      "name": "the real model called input_text on its own",
+      "ok": true,
+      "detail": "[{\"toolName\":\"input_text\",\"toolCallId\":\"call_00_SOpr8OakAzSpGY2AbzjE5662\",\"arguments\":{\"position\":[500,750],\"screen_index\":0,\"text\":\"P1ORBD8TEST\"},\"file\":\"C:\\\\Users\\\\JUSTLI~1\\\\AppData\\\\Local\\\\Temp\\\\pi-orb-real-d8-type-agent-1791196613488\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1791196613487-orb-workspace--\\\\2026-10-05T10-37-10-359Z_01a10ba3-8d56-75a9-b7e8-46d05b4b37da.jsonl\",\"index\":8,\"at\":1791196649285}]"
+    },
+    {
+      "name": "the automatic frontmost screenshot preceded the GUI action",
+      "ok": true,
+      "detail": "[{\"index\":5,\"imageCount\":1,\"file\":\"<agentDir>\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1791196613487-orb-workspace--\\\\2026-10-05T10-37-10-359Z_01a10ba3-8d56-75a9-b7e8-46d05b4b37da.jsonl\"}]"
+    },
+    {
+      "name": "the action tool result includes its fresh observation and screenshot",
+      "ok": true,
+      "detail": "[{\"toolName\":\"input_text\",\"toolCallId\":\"call_00_SOpr8OakAzSpGY2AbzjE5662\",\"text\":\"<frontmost_app>electron</frontmost_app>\\n<frontmost_window>P1-05 input target</frontmost_window>\",\"imageCount\":1,\"ok\":true,\"observation\":{\"id\":\"obs-muv48kvi-3\",\"at\":1791196650414,\"title\":\"P1-05 input target\"}}]"
+    },
+    {
+      "name": "D8: the model clicked the disposable field before typing",
+      "ok": true,
+      "detail": "[\"click\",\"input_text\"]"
+    },
+    {
+      "name": "D8: the focus click returned a fresh screenshot",
+      "ok": true,
+      "detail": "{\"imageCount\":1,\"clickResult\":\"<frontmost_app>electron</frontmost_app>\\n<frontmost_window>P1-05 input target</frontmost_window>\"}"
+    },
+    {
+      "name": "D8: input_text returned a fresh screenshot after typing",
+      "ok": true,
+      "detail": "{\"toolName\":\"input_text\",\"toolCallId\":\"call_00_SOpr8OakAzSpGY2AbzjE5662\",\"text\":\"<frontmost_app>electron</frontmost_app>\\n<frontmost_window>P1-05 input target</frontmost_window>\",\"imageCount\":1,\"ok\":true,\"observation\":{\"id\":\"obs-muv48kvi-3\",\"at\":1791196650414,\"title\":\"P1-05 input target\"}}"
+    }
+  ],
+  "passed": true,
+  "targetLog": {
+    "events": [
+      {
+        "kind": "ready",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "mouse-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-down",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "text-input",
+        "cell": null,
+        "offsetInCell": null,
+        "value": "P1ORBD8TEST",
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "key-up",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      }
+    ],
+    "matches": [
+      {
+        "at": 1791196649674,
+        "kind": "text-input",
+        "value": "P1ORBD8TEST"
+      }
+    ],
+    "cellDowns": [
+      {}
+    ]
+  },
+  "sessionFiles": [
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1791196613487-orb-workspace--\\2026-10-05T10-37-10-359Z_01a10ba3-8d56-75a9-b7e8-46d05b4b37da.jsonl"
+  ],
+  "modelToolCalls": [
+    {
+      "toolName": "click",
+      "toolCallId": "call_00_PYvwY8ffFaUO7TVQX4RE7539",
+      "arguments": {
+        "screen_index": 0,
+        "position": [
+          500,
+          750
+        ]
+      },
+      "index": 6,
+      "at": 1791196644864,
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1791196613487-orb-workspace--\\2026-10-05T10-37-10-359Z_01a10ba3-8d56-75a9-b7e8-46d05b4b37da.jsonl"
+    },
+    {
+      "toolName": "input_text",
+      "toolCallId": "call_00_SOpr8OakAzSpGY2AbzjE5662",
+      "arguments": {
+        "position": [
+          500,
+          750
+        ],
+        "screen_index": 0,
+        "text": "P1ORBD8TEST"
+      },
+      "index": 8,
+      "at": 1791196649285,
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-d8-type-1791196613487-orb-workspace--\\2026-10-05T10-37-10-359Z_01a10ba3-8d56-75a9-b7e8-46d05b4b37da.jsonl"
+    }
+  ],
+  "modelToolResults": [
+    {
+      "toolName": "click",
+      "toolCallId": "call_00_PYvwY8ffFaUO7TVQX4RE7539",
+      "text": "<frontmost_app>electron</frontmost_app>\n<frontmost_window>P1-05 input target</frontmost_window>",
+      "imageCount": 1,
+      "ok": true,
+      "observation": {
+        "id": "obs-muv48hcu-2",
+        "at": 1791196645854,
+        "title": "P1-05 input target"
+      }
+    },
+    {
+      "toolName": "input_text",
+      "toolCallId": "call_00_SOpr8OakAzSpGY2AbzjE5662",
+      "text": "<frontmost_app>electron</frontmost_app>\n<frontmost_window>P1-05 input target</frontmost_window>",
+      "imageCount": 1,
+      "ok": true,
+      "observation": {
+        "id": "obs-muv48kvi-3",
+        "at": 1791196650414,
+        "title": "P1-05 input target"
+      }
+    }
+  ],
+  "finishedAt": "2026-10-05T10:37:33.919Z"
+}

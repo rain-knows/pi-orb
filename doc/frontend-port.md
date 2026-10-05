@@ -1,5 +1,9 @@
 # Floating renderer port: fixed reference baseline
 
+> 本页旧 `orb_*` 工具和“只激活已运行应用”段落属于迁移前历史；当前工具集、自动首帧和
+> `open_app` 启动语义以 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
+> 与 [`reference-playbook.md`](./reference-playbook.md) 为准。
+
 Source repository: `rain-knows/deepseek-harness-orb`, MIT, commit
 `72f1d738458a223696685a909e806b683eff5885`. Both the preferred sparse
 checkout and the complete local checkout reported that exact commit before work.

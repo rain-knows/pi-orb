@@ -1,5 +1,8 @@
 # pi-orb 支持矩阵
 
+> 工具集已于 2026-10-05 切换到参考项目的 13 个 Computer Use 工具；本页旧版 Playwright
+> 行仅为历史证据，当前没有浏览器 DOM 网关。当前契约见 `reference-toolset-transition.md`。
+
 本文件是 pi-orb 唯一的版本兼容性声明来源。**没有经过验收的组合一律标记为“未验证”**，不因代码可以编译、依赖可以安装或文档宣称跨平台而视为支持。
 
 - 维护规则见 [`pi-orb-development-goals.md`](./pi-orb-development-goals.md) §7.2（上游更新策略）。
@@ -20,9 +23,9 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | Electron | `44.4.5` | 首个实测点 | `evidence/p0-03/README.md`（真实 Electron 腿 16/16） |
 | Pi SDK | `@earendil-works/pi-coding-agent@1.0.0` | 当前源码与 Pi Web 宿主一致；提示词/插件/模型闭环已验证 | `evidence/upgrade-0.10/`；旧 P0 为历史记录 |
 | Pi CLI | `@earendil-works/pi-coding-agent@1.0.1` | 本机全局命令与扩展更新完成；Orb 会话由 Pi Web 的 SDK 驱动 | `evidence/upgrade-0.10/environment.json` |
-| pi-web | `@agegr/pi-web@0.10.0`，上游 `6fcd7d44981ab51a21d6cd6eb06d361d0e3d3068` | 本机源码保留 Endfield 与 Windows 保存修复；生产构建、原生 MCP、提示词和 Orb 闭环通过；全量测试限制见升级记录 | `doc/pi-web-0.10-compatibility.md`、`evidence/upgrade-0.10/` |
+| pi-web | P0/P1 隔离验收使用 `@agegr/pi-web@0.9.3`，固定提交 `95a58744532c7fccaa933aa7757a1419ace67ed2` | 固定快照已完成生产构建、条件插件加载与工具暴露验收；本机当前 `@agegr/pi-web@0.10.0` (`62dc24b11aa9f4f7cc7ed9597fa584a94758cfdf`) 含用户未提交改动，未纳入支持基线 | `evidence/p0-02/result.json`、`evidence/p1-06/tool-exposure.json` |
 | 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；桌面闭环和历史真实模型运行记录存在，但 2026-09-30 C7/D6/D8 复跑未完整通过，暂不宣称稳定支持 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
-| 新插件参考 | `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`（MIT） | 已检出/核对；pixel 适配两种夹具及依赖更新复跑共 21/21 任务通过；不是运行时依赖 | `doc/reference-playbook.md` §1.2、`doc/plugin-reference-and-pointing.md` |
+| 新插件参考 | `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`（MIT） | 已检出/核对；13 个工具、默认 millifraction 契约和后台 code_agent 作为当前移植基线；不是运行时依赖 | `doc/reference-playbook.md` §1.2、`doc/reference-toolset-transition.md` |
 | Windows FFI | `koffi@2.16.3`（MIT，精确锁定） | 替换 2.14.1；原生回调/截图压力探针 1000 枚举 + 50 捕获通过；并非对间歇退出根因的证明 | `evidence/tool-speed/native-callback-stress.json`；`doc/plugin-reference-and-pointing.md` |
 | 快捷键边沿监听 | `uiohook-napi@1.5.5` | Windows Node 环境可加载并完成 `start/stop`；hook 不可用时快捷键失败而不静默降级；真实长按仍需 Electron 人工复测 | `src/main/shortcut-edge-guard.ts`、`tests/shortcut-edge-guard.test.ts` |
 | renderer 构建 | `vite@7.3.6` + `electron-vite@5.0.0`，原生 HTML/CSS/JS renderer | 构建通过；已删除 React 与 Vite React 插件 | 本仓库 `npm run build` |
@@ -43,7 +46,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 |---|---|---|
 | `electron` | **精确** `44.4.5` | 窗口、沙箱与跨 origin 行为必须锁定版本实测；P0-03 的第一个实测点就是该版本 |
 | `deepseek-harness-orb` Windows backend | **精确** `72f1d738458a223696685a909e806b683eff5885` | 直接导入并保留 MIT 通知；只在 pi-orb 的 Pi/授权/bridge 边界做薄适配 |
-| `@earendil-works/pi-coding-agent` | **精确** `1.0.0` | 与 pi-web `0.10.0` 的宿主依赖对齐；扩展 API 以该版本的类型声明为准 |
+| `@earendil-works/pi-coding-agent` | **精确** `1.0.0` | P0/P1 固定快照与当前 Pi Web 工作树都使用该宿主 SDK；扩展 API 以该版本的类型声明为准 |
 | `vite` | `7.3.6` | `electron-vite@5` 的 peer 范围是 `^5 \|\| ^6 \|\| ^7`，不含 `8` |
 | `typescript` | `5.9.3` | `typescript-eslint@8` 的 peer 上限为 `<6.1.0`，且不使用 TS 7 预览版 |
 | `eslint` | `9.39.5` | 使用 `typescript-eslint@8` 支持的稳定主版本 |
@@ -70,7 +73,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **历史 Cua 运行时工具目录**：57 个工具；窗口 id 为 bigint；窗口有前序 zIndex | 历史探针已验证，不属于当前生产能力 | `evidence/p1-05/cua-runtime-probe.json` |
 | **历史 Cua 坐标空间差异**：`getScreenSize` 报 1707x1067 而物理为 2560x1600；窗口 bounds 为物理像素，动作为屏幕 DIP | 历史探针已实测，不属于当前生产能力 | `evidence/p1-05/input-verification.json` |
 | **点击坐标换算的正确性**（两种记录矛盾，以产品整链路实测为准） | **产品整链路实测已裁决**：当前实现「分数 × 驱动上报窗口尺寸」命中 `1,2`（`loop-verification-session-access.json`）；曾据一次直调探针改成「屏幕 DIP − 物理原点」，**同链路实测落 `0,1`**，故不采用。P1-05 记录的那条规则与本次链路实测相矛盾，其**逐次落点归属存疑**（与本次探针同类问题） | `evidence/p1-06/loop-verification-session-access.json`；`doc/cua-driver-integration.md` §1 记录了两侧数字与残留疑问 |
-| **模型坐标契约：最新附加截图的像素列/行** | 已验证：Pi 归一化尺寸 → HID 分数 → 原生位置；会话/代次/观察绑定与整批预检；紧凑及 28×24 DIP 真实模型各 7/7 任务 | `tests/orb-image-space.test.ts`、`tests/orb-pixel-extension.test.ts`；`evidence/tool-speed/real-model-pixels{,-tiny}.json` |
+| **模型坐标契约：最新附加截图的 0–1000 millifraction** | 已验证：截图分数 → HID 分数 → 原生位置；会话/代次/观察绑定和动作后新截图均有自动化覆盖 | `tests/coordinate-mapping.test.ts`、`tests/orb-tools.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/loop-verification-session-access.json` |
 | **截图取点→输入落点在**同一次运行**内一致（C7 产品侧闭环）** | 已验证（自动化闭环：取的是截图分数，落点由目标自身日志判定） | `evidence/p1-06/loop-verification-session-access.json`（当前运行全项通过）——取分数 `(611.6,360.4)` → 目标 JSONL 命中 `1,2` |
 | **历史 Cua 后台点击**：4/4 瞄准格子命中，且不抢前台 | 历史验证；当前参考 Win32 backend 使用可见 GUI／SendInput，不声明任意后台窗口点击支持 | `evidence/p1-05/input-verification.json` |
 | **历史 Cua 后台输入文本**：向原生应用投递并读回 | 历史验证；不属于当前参考 Windows backend 的后台投递能力 | 同上 |
@@ -81,7 +84,10 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **历史 Cua 拒绝结果解析**：驱动拒绝不能被适配器误报为成功 | 历史探针已验证；当前 broker/参考 backend 有独立拒绝合同 | `tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts` |
 | **按键/鼠标无残留** | 已验证（直接采样 OS 全局键态，输入前后差分；不依赖目标窗口日志，因后者含测试自身的 ALT 解锁） | 同上 |
 | **C6：真实 native 按下中途取消释放** | 已验证；disposable target 自身日志收到 `mouse-down=1`、匹配 `mouse-up=1`，取消错误也正确上报 | `evidence/p1-05/reference-cancel.json`（5/5） |
-| **原生桌面工具仅限 Orb 模式**：Orb 工作区当前 13 个工具；按用户要求，`orb_browser` 也开放给普通 Pi/Pi Web | 顺序工具及会话路由见 `tests/public-browser-extension.test.ts`；认证与普通 Pi Web 实测见 `doc/public-playwright.md`，桌面证据见 `evidence/tool-speed/` | `pi-package/extensions/orb.ts`、`pi-package/extensions/browser.ts`、`tests/orb-tools.test.ts` |
+| **参考工具集仅限 Orb 模式**：Orb 工作区当前 13 个 GUI 工具，并提供 `code_agent`、`code_agent_status`、`code_agent_stop`；普通 Pi/Pi Web 会话不新增 Computer Use 或后台任务工具 | 真实 Pi loader 的工作区边界与活跃工具 roster 见 `evidence/personal-startup/plugin-load.json`；工具契约见 `doc/reference-toolset-transition.md` | `pi-package/extensions/orb.ts`、`pi-package/extensions/code-agent.ts`、`tests/orb-tools.test.ts` |
+| **真实模型后台 `code_agent` 完成闭环**：模型调用、独立 Pi Web worker、产物写入和 owner 单次完成通知 | 已验证（8/8；真实 provider `TZcode/deepseek-v4.1-flash`，隔离 workspace，凭据仅硬链/符号链） | `evidence/p1-06/real-model-code-agent-complete-session.json`、`evidence/p1-06/run-real-code-agent.mjs` |
+| **真实模型后台 `code_agent_stop` 停止闭环**：模型调用、产品桥停止、worker 注册表归零、无产物和无完成通知 | 已验证（10/10；真实 provider `TZcode/deepseek-v4.1-flash`，隔离 workspace，凭据仅硬链/符号链） | `evidence/p1-06/real-model-code-agent-stop-session.json`、`evidence/p1-06/run-real-code-agent.mjs stop` |
+| **真实后台 provider 失败回读**：最终助手错误、持久注册表与前台单次失败通知的错误全文一致 | 已验证（12/12；隔离 worker 的实际请求触发真实 provider 503）；同时覆盖只有 settled、没有 prompt_error 的结束路径 | `evidence/p1-06/real-model-code-agent-failure-session.json`、`tests/code-agent-manager.test.ts`、`tests/pi-web-image-model.test.ts` |
 | **桌面工具闭环**：session Access、新鲜度、拒绝零副作用、真实点击落点为目标格心 | **已验证（当前 session Access backend）**；自动前台观察、Read Only/Workspace Write、点击、滚动、撤权均由 disposable 目标与壳日志证明 | `evidence/p1-06/loop-verification-session-access.json` |
 | 桥准入：无会话/错误令牌/浏览器来源/旧代次均被拒 | 已验证 | `evidence/p1-06/` + `tests/bridge-server.test.ts` |
 | Orb 扩展仅凭握手文件连接壳的命名管道：无需额外设置 `PI_ORB_BRIDGE_PIPE` | 已验证（隔离管道测试 + 当前壳只读探针） | `tests/bridge-client.test.ts`；2026-09-28 `hello.ok=true`，无效会话返回 `unknown-session` |
@@ -90,21 +96,23 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
 | **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性、打包配置与产物审计记录、CI 与发布流程、renderer 参考一致性 | 已验证（且多次反向对照可证伪） | `evidence/p1-07/release-gate.json`（66/66） |
 | **session Access 生命周期**：新会话与明确重开默认完全访问；turn idle 保留 grant 并隐藏观察框；Stop、隐藏、断连撤权；workspace/session 切换替换为新会话 grant | 当前探针 21/21 通过；原生与 DOM 工具结束后的模型思考期间仍显示光效；首次启动失败保留 | `evidence/p1-07/session-access-regression.json`；`doc/session-continuity.md` |
-| **浏览器 DOM 工具**：现有 Chrome 登录标签页、MCP 快照与元素引用，完全访问及撤权关闭连接 | 一次性 Chrome＋公共 MCP 5/5；用户 Chrome 扩展＋真实 Pi 模型 B 站实测 6/6；新标签页选页仍由用户执行 | `evidence/browser-connection/dom-probe.json`；`evidence/browser-connection/live-extension-probe.json`；`doc/session-continuity.md` |
+| **浏览器窗口工具**：通过 `open_in_browser` 打开默认浏览器或 http(s) 地址，再使用参考项目 GUI 工具观察和操作可见窗口 | 当前代码和打包审计已移除 DOM/Playwright 网关；真实模型浏览器闭环仍待人工验收 | `pi-package/extensions/orb.ts`；`doc/toolset-comparison-2026-10-04.md` |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab 与**停靠滑动动画**、拖动 IPC、收起还原、hover/pin、系统主题、参考 GIF 状态动效、History/Access/New、连续 prompt、问题卡片、**观察框**、**布局变化后仍可找回** | 已接入；JSDOM、打包探测和 renderer parity 自动化通过；跨应用真实模型流程、多屏/DPI 与逐状态人工视觉验收仍未验证 | `tests/floating-geometry.test.ts`、`tests/floating-dock-animation.test.ts`、`tests/floating-recovery.test.ts`、`tests/renderer-reference-parity.test.ts`、`tests/observation-frame.test.ts`、`tests/floating-renderer.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/main/observation-frame.ts`、`src/main/index.ts`、`src/renderer/index.html`、`src/renderer/floating.js`、`src/renderer/floating.css`、`evidence/frontend-port/visual-review.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览、锁屏／休眠后清除遗失的按键状态 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘及真实锁屏／休眠体验未验证）。参考项目固定提交 `72f1d738458a223696685a909e806b683eff5885` 无对应全局手势；本项是 Pi 接入所需的独立能力 | `tests/double-alt.test.ts`、`tests/double-alt-recovery.test.ts`、`tests/shortcut-edge-guard.test.ts`、`src/main/double-alt.ts`、`src/main/shortcut-edge-guard.ts`、`src/main/index.ts` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/floating.js`、`evidence/p2-03/README.md` |
-| **P2-04/P2-06 桌面操作扩展**：参考按钮/次数/修饰键、replace/submit、纵向滚动、等待、应用列表、前台信息、热键、长按、同窗口拖拽、动作后回图与显式截图导出 | 已接入自动化；真实桌面动作、目标像素、保存对话框、剪贴板和真实模型仍需人工验收 | `doc/desktop-tools-port.md`、`tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows-input.test.ts` |
+| **P2-04/P2-06 桌面操作扩展**：参考按钮/次数/修饰键、replace/submit、纵向滚动、等待、应用列表、前台信息、热键、长按、同窗口拖拽、动作后回图、显式截图导出、浏览器/文件夹打开及应用激活或启动 | 已接入自动化；真实桌面动作、目标像素、保存对话框、剪贴板和真实模型仍需人工验收 | `doc/desktop-tools-port.md`、`tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows-input.test.ts` |
 | **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 当前 preview.3 本机构建，内容审计 30/30、实际启动 22/22；旧 preview.1 发布与 GitHub runner 动画失败披露保留在发布记录 | `electron-builder.config.mjs`、`evidence/p2-05/`、`doc/release-process.md` §9 |
 | **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留，Koffi 版本和二进制匹配验证环境 | 已验证（30/30，新增头文件残留反证） | `evidence/p2-05/package-audit.json`、`evidence/tool-speed/package-audit-koffi-headers-rejected.json` |
 | **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、session Access bridge 存在且旧选窗 API 不存在 | 已验证（22/22；桌面 native action 闭环另由 session Access 探针证明） | `evidence/p2-05/packaged-smoke.json` |
 | **参考项目 Windows 后端自带的规格测试已移植**：窗口选择 10 条不变量 + 输入 13 条（键映射、UIPI 拒绝、剪贴板顺序、滚轮档位、PNG 头等） | 已验证（23/23，逐条对应参考 spec） | `tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts` |
-| **独立随包 Pi 插件**：无源码目录时加载，完整工具清单保持工作区边界 | 真实 Pi 1.0 加载 4/4；普通会话仅公用浏览器工具，Orb 会话完整工具集合 | `evidence/personal-startup/plugin-load.json` |
+| **独立随包 Pi 插件**：无源码目录时加载，完整工具清单保持工作区边界 | 真实 Pi 1.0 加载并检查 15/15；普通会话保持宿主原有活跃工具，Orb 会话获得参考 host roster、13 个 GUI 工具和 3 个后台任务工具；worker 激活已加载的宿主 web 工具，隔离 GUI/前台提示与图片投影；不改写历史。工具 inventory 为受控 fixture，不代表实际搜索服务验证 | `evidence/personal-startup/plugin-load.json` |
 | **个人启动与后端复用**：官方 CLI 注册/移除，隐藏 Pi Web 启动、同 PID 复用、真实 API 会话与模型偏好保留 | 隔离用户设置/随机端口 7/7；preview.3 新增 Win32 无控制台探针；不等同于新用户环境安装 | `evidence/personal-startup/backend-startup.json` |
 | **个人安装与短命令**：NSIS 安装至中文/空格目录、App Paths/ShellExecute、单实例保留草稿、卸载清理与应用配置保留 | 当前开发机 8/8；完整干净用户环境、交互安装/升级向导与 SmartScreen 仍未验证 | `evidence/personal-startup/installer-smoke.json` |
 | **当前账户 preview.2 → preview.3 升级**：静默升级、真实短命令启动、无控制台、同实例唤回、图标与数据保留 | 本机 11/11；模型/凭据字节不变、工作区和快捷键保留；完整干净用户与交互向导仍未验证 | `evidence/windows-startup-and-workspaces/current-user-upgrade.json` |
 | **工作区入口与默认完全访问界面**：原生菜单入口、同目录无操作、切换前停止旧任务、实际授权/撤权标签同步 | 单测及实际 Electron/Pi Web UI 生命周期 25/25；参考底板图标用于安装器/快捷方式/托盘 | `evidence/windows-startup-and-workspaces/ui-lifecycle.json`、`doc/windows-startup-and-workspaces.md` |
-| **`orb_open_app` 的收窄语义**：只激活已在运行的应用、不启动进程；`name` 拒绝路径／参数片段／shell 元字符；激活后必须验证前台窗口确属该应用才重绑定 | 已验证（自动化：前置检查失败、前台不匹配、`launch` 不可达三条失败路径均有断言） | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`evidence/p1-06/tool-exposure.json` |
+| **`open_app` 的参考语义**：直接使用 backend 激活/启动；成功后 600ms 返回当时的真实前台截图，慢启动不误报失败；`name` 拒绝路径／参数片段／shell 元字符 | 单测验证实际观察绑定、慢启动、后续 wait、新图、错误和取消；真实冷启动修复后尚未验收 | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`doc/reference-toolset-transition.md` |
+| **当前参考工具合同的真实 C7/D6/D8**：自动首帧、模型自主调用、目标实际落点/滚动/输入和动作后新图 | 有限样本通过：C7 20/20、D6 21/21、D8 22/22；存在更早模型取点失败，不代表任意任务稳定成功 | `evidence/p1-06/real-model-c7-session-access.json`、`real-model-d6-scroll-session-access.json`、`real-model-d8-type-session-access.json` |
+| **可见默认浏览器闭环**：模型 open_in_browser → wait → click，本地页面收到完成请求 | 有限样本通过 22/22；没有使用 DOM/Playwright 网关，不代表任意网站或登录态覆盖 | `evidence/p1-06/real-model-browser-session-access.json` |
 
 ## 3. 未验证（不得宣称支持）
 
@@ -115,16 +123,13 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | 多显示器 | 本机仅 1 个显示器 | 多屏坐标、跳屏选区与截图分辨率未测；不得宣称已支持 |
 | elevated（高权限）窗口 | 未测试；按目标要求不自动提权 | 高权限窗口的截图与输入语义未知；不得由普通窗口结果外推 |
 | 被遮挡窗口 / DirectComposition 类窗口的截图 | 已测可靠的正常路径，但未构造遮挡场景 | 见 `evidence/p1-04/README.md` §4.4 |
-| **向 Chromium/Electron 内容输入文本** | 后台投递对该窗口类不可用；前台升级已实现但未做到稳定投递 | 见 `evidence/p1-05/README.md` §4 |
+| **不同 Chromium 页面输入的广泛稳定性** | 丢弃式 Electron 前台输入已通过当前合同 D8 22/22，未覆盖任意浏览器/页面/IME | 有限样本不能外推广泛支持；旧 Cua 后台投递记录不是当前实现依据 |
 | 失败即停由真实驱动失败触发 | 由单测覆盖（`tests/desktop-broker.test.ts`）；整链路未构造真实驱动失败 | 部分验证 |
 | 同一任务锁在多会话并发下的行为 | 单测覆盖；整链路只覆盖单会话 | 未验证 |
 | 驱动内建授权语义（`desktopCaptureAuthorized`、`desktopUnlocked`、`escalate_session`） | 本阶段未使用；状态实测均为 false | **未验证**；产品侧授权仍由 pi-orb 自己的任务授权与代次绑定负责 |
 | 窗口拖动/置顶/展开收起的人工体验 | P2-01 已接入参考几何和 IPC；真实 Electron 拖动、多显示器、DPI、停靠动画和置顶体验尚未人工复测 | 属人工确认；不得据自动断言宣称交互体验已验收 |
 | **快捷键的按键人工体验** | OS 注册、冲突诊断与释放已验证；真实 Electron + native hook 集成探针通过，但探针使用合成 F24 输入；真实键盘、AltGr/非 US 布局、锁屏/休眠恢复仍未复测 | 属人工确认；步骤见 `evidence/p1-03/README.md` |
 | **P2-04 真机动作与目标像素** | 新动作和动作后 Pi image block 已通过自动化；尚未在 disposable target 上验证真实热键、拖拽、长按落点及回图像素 | 目前不得宣称真实桌面已验收；需按 `evidence/p2-04/README.md` 补做交互式桌面验收 |
-| **真实模型 C7：自主观察→截图坐标点击→再次观察** | 本轮新合同在截图前失败：唤醒快捷键未触发目标记录，未产生 Orb 工具调用 | `evidence/p1-06/real-model-c7-session-access.json`；旧 `reference-backend` JSON 保留为历史；需在同一模型/脚本下稳定通过后再移入已验证 |
-| **真实模型 D6：自主调用 `orb_scroll` 并动作后观察** | 本轮因 `LockApp`/不可交互桌面中止，未向模型发送动作 | `evidence/p1-06/real-model-d6-scroll-session-access.json`；旧 `reference-backend` JSON 保留为历史；需解锁桌面后稳定复验 |
-| **真实模型 D8：自主调用 `orb_type` 并动作后观察** | 本轮未完成，没有生成新的 session-access JSON | 旧 `evidence/p1-06/real-model-d8-type-reference-backend.json` 仅作历史；需在同一模型/脚本下稳定通过后再移入已验证 |
 | 窗口位置的**跨启动**恢复 | 防抖保存已实现，但未做「移动→退出→重启→恢复」实测 | 未验证；不得宣称已支持 |
 | **「存在但不可访问」的工作区**（`no-read-access` / `no-write-access`） | 本机以当前账户无法构造该状态而不改动 ACL（属对用户环境的破坏性操作） | 分支有单测，未真机构造；不得据此宣称已覆盖 |
 | 网络驱动器（UNC）路径的实际访问 | 只测了归一化，未做真机访问 | 不得宣称支持网络路径工作区 |
@@ -142,7 +147,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **未签名安装包的 SmartScreen 提示与绕过体验** | v0.1 不做代码签名；提示文案与用户侧行为需真实环境 | 未验证；不得宣称"可直接分发" |
 | **卸载后的用户数据与工作区保留** | 需要一次真实的安装→使用→卸载流程 | 未验证；代码侧写入面已由发布门禁审计（只写 Orb userData 与用户确认的工作区） |
 | **安装后的浮球观感、真实按键、多屏、DPI** | 属 P2-01/P1 人工项，打包不改变其状态 | 未验证 |
-| **`orb_open_app` 的真实桌面效果** | 切换应用、新目标窗口的前台验证与面板显示需要在 disposable target 上真机确认 | 未验证；步骤见 `doc/manual-acceptance.md` §10（F 组） |
+| **`open_app` 修复后的真实桌面效果** | 旧重复适配曾误报冷启动失败，现改为参考 backend；修复后运行因 LockApp/输入桌面不可访问中止，未向模型发送动作 | `evidence/p1-06/real-model-open-app-session-access.json`；解锁后运行 `node evidence/p1-06/run-real-model-c7.mjs open-app` |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）
 

@@ -1,0 +1,4251 @@
+{
+  "scope": "Selected existing local sessions, metadata only. No browser actions or model calls performed.",
+  "samples": [
+    {
+      "label": "recent-browser-task",
+      "sessionFile": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent\\sessions\\--D--workself-daily--\\2026-10-04T13-33-14-411Z_01a1071e-632a-7489-bbe9-d4af5ffe60cd.jsonl",
+      "fileSha256": "69abb94bec247cd24debcf05c28cfb52404947d2075143693442b6041d45e8f4",
+      "modelEvents": [
+        {
+          "provider": "TZcode_gpt",
+          "modelId": "gpt-6-sol",
+          "timestamp": "2026-10-04T13:33:44.792Z"
+        }
+      ],
+      "thinkingEvents": [
+        {
+          "thinkingLevel": "high",
+          "timestamp": "2026-10-04T13:33:44.792Z"
+        }
+      ],
+      "logicalToolsRecordedInSystem": [
+        {
+          "name": "read",
+          "description": "Read the contents of a file. Supports text files and images (jpg, png, gif, webp, bmp). Images are sent as attachments. For text files, output is truncated to 2000 lines or 50KB (whichever is hit first). Use offset/limit for large files. When you need the full file, continue with offset until complete.\n\nCodemode: `tools.read(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "path"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the file to read (relative or absolute)"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Line number to start reading from (1-indexed)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of lines to read"
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "powershell",
+          "description": "Execute a PowerShell command in the current working directory. Returns stdout and stderr. Output is truncated to last 2000 lines or 50KB (whichever is hit first). If truncated, full output is saved to a temp file. Optionally provide a timeout in seconds.\n\nCodemode: `tools.powershell(args)` resolves to `{ output, truncated, full_output_path?, exit_code, wall_time_seconds }`.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "command"
+            ],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Shell command to execute"
+              },
+              "timeout": {
+                "type": "number",
+                "description": "Timeout in seconds (optional, no default timeout)"
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "edit",
+          "description": "Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. If two changes affect the same block or nearby lines, merge them into one edit instead of emitting overlapping edits. Do not include large unchanged regions just to connect distant changes.\n\nCodemode: `tools.edit(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "path",
+              "edits"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the file to edit (relative or absolute)"
+              },
+              "edits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "oldText",
+                    "newText"
+                  ],
+                  "properties": {
+                    "oldText": {
+                      "type": "string",
+                      "description": "Exact text for one targeted replacement. It must be unique in the original file and must not overlap with any other edits[].oldText in the same call."
+                    },
+                    "newText": {
+                      "type": "string",
+                      "description": "Replacement text for this targeted edit."
+                    }
+                  }
+                },
+                "description": "One or more targeted replacements. Each edit is matched against the original file, not incrementally. Do not include overlapping or nested edits. If two changes touch the same block or nearby lines, merge them into one edit instead."
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "write",
+          "description": "Write content to a file. Creates the file if it doesn't exist, overwrites if it does. Automatically creates parent directories.\n\nCodemode: `tools.write(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "path",
+              "content"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the file to write (relative or absolute)"
+              },
+              "content": {
+                "type": "string",
+                "description": "Content to write to the file"
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "subagent",
+          "description": "Delegate one child with {agent,task?}; otherwise set exactly one workflow source, with optional args.\nWorkflow script: write it as one ```js workflow block in this reply, then call subagent({workflow:true,...}). workflow:'./path.js' (any value with '/') loads a file from request cwd; other strings name a resource.\nagent/task exclude workflow; task excludes action. agent may target management actions. action is management/control; validate accepts workflow:true or a path without launching.\nScripts: JavaScript statement bodies with explicit return, top-level await, plain helpers/Promise chains; nested async function/arrow/method helpers are rejected. Await runs.run('key',{agent,task}) before .output; await runs.all([{key,agent,task},...]) for an ordered array, not a key map. Observe every stored run promise with direct await, Promise.race or Promise.all. Await/return runs.steer(key,message,options?) for a prior key, never raw run ids; queued/delivered/missed/failed receipts are not compliance proof.\nBefore advanced orchestration (runs.lanes, rolling fanout, mission state, handoffs), read {action:\"guide\",topic:\"workflows\"} or the pi-subagents skill. Raw-script sandboxes add deeply frozen args; all sandboxes provide runs, emit, console, JavaScript and enabled mission state, with no filesystem/shell/Pi tools/host globals. External CLI agents support native options only when their runner declares them; read guide tool-reference before passing model, structured output, acceptance/agentContract, tool budget, fast, fork context or skills/tools.\nModel override: first call {action:\"models\"}; copy exact provider/id, not agent names. Thinking uses model suffix, not watchdog-only thinking.\nNamed resources: {workflow:'review',args:{task:'...'}} or {workflow:'run-ci',args:{command:'npm test'}}. Raw scripts also accept bounded plain-data args; raw-script args persist as evidence, so never include secrets. worktree:true requires clean source; baseRef defaults to HEAD at allocation or a supported named ref, never full 40/64-character commit IDs or revision expressions.\n\nSAFETY-CRITICAL SUBAGENT GUIDANCE:\n• Direct parent execution is the default. Invoke subagents only when delegation is authorized by the operator's current request or applicable user/project instructions; task size, complexity, risk, tool-call count, or recipe fit do not independently authorize delegation.\n• First call {action:\"list\",capabilities:true}: executable, non-disabled agents only; external-cli requires runner.available === true. Passive PATH/PATHEXT/X_OK is not authentication/version/launch proof; preflight is authoritative.\n• Workflow, child launch, prompt runtime, extension load or child tooling failure is a lane infrastructure blocker. Stop; report exact failure, run/status and repo/cwd/worktree/branch/ref; verify clean worktree or capture partial diff before same-protocol retry or asking the owner. Never silently switch to interactive_shell, pi -ne, Codex/Claude/Cursor CLI or foreground/external mode: governed-workflow fallback requires explicit owner approval, not Pi core's generic pi -ne hint. Explicit foreground/CLI requests and work outside that protocol remain valid.\n• Omit action for execution. For an authorized delegated multi-step/parallel workflow: exactly one top-level subagent workflow call with async:true; children launch only inside it.\n• Async follows asyncByDefault (normally true); async:false only to block the parent, not for final reviews/gates. Consume results at dependency barriers. Native async completion wakes this session: return control, no sleep/poll or bg_wait merely for a wake. bg_wait is for provider/detached work without native notification needing a same-turn result.\n• Ordinary child subagents are not orchestrators; only configured fanout within depth/session limits. For an authorized delegated workflow, keep one writer per cwd/worktree and isolate concurrent writers. Use fresh-context read-only reviewers when independent review was requested, then parent synthesis/fixes. Oracle/advisor unknowns use supervisor dialogue; one-shot only when requested.\n• Bind durable output on runs.run/runs.all, not task filename prose; return actual outputReference/outputPathMapping/artifactPaths, evidence and residual risks.\n• children.list is workflow-only, not an exhaustive list of direct native children: resume only resumable rows. When an intended child's exact run id is known, inspect it with {action:\"status\",id}; if status identifies the candidate, attempt {action:\"resume\",id,message}. Resume authoritatively checks eligibility, may reject it, and otherwise detaches a follow-up/challenge with the stored agent/model/tool contract. Use a labeled same-role fallback only when no known candidate exists or resume rejects eligibility. Scripts await runs.run(newKey,{resume:runId,task}); continue from latest returned runId. Each distinct resume pass needs a new stable key; same-key reuse requires identical launch parameters.\n• Named resources own authority; raw scripts (workflow:true or a path) cannot use runs.host. Granted commands/relative outputs use workflow cwd, never per-step cwd.\n• Inspect asyncId/asyncDir (status.json, events.jsonl, logs) with status/debug.run; control with interrupt/stop/resume/steer. For local Pi children explicitly granted subagent_command, command.status/yield/cancel targets one exact toolCallId without interrupting the child. Read {action:\"guide\",topic:\"tool-reference\"} for controls/evidence gates.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "agent": {
+                "type": "string",
+                "description": "One-child agent or management target."
+              },
+              "task": {
+                "type": "string",
+                "description": "One-child task; requires agent."
+              },
+              "extensionBindings": {
+                "type": "object",
+                "maxProperties": 16,
+                "additionalProperties": true,
+                "description": "Child-only plain JSON; package.name/1; depth 16, 256 props, 16 KiB."
+              },
+              "action": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Management/control only; omit for execution. validate accepts workflow: true or a script path. Discover actions with guide topic tool-reference."
+              },
+              "capabilities": {
+                "type": "boolean",
+                "description": "list: compact capability rows/details without system prompts."
+              },
+              "name": {
+                "type": "string",
+                "description": "schedule.create name."
+              },
+              "id": {
+                "type": "string",
+                "description": "Run id/prefix for status/control."
+              },
+              "runId": {
+                "type": "string",
+                "description": "Target run ID; prefer id."
+              },
+              "dir": {
+                "type": "string",
+                "description": "Async directory for status/control."
+              },
+              "handoffPath": {
+                "type": "string",
+                "description": "Existing manifest for worktree/lane actions."
+              },
+              "repo": {
+                "type": "string",
+                "description": "worktree.cleanup repo; default cwd."
+              },
+              "planId": {
+                "type": "string",
+                "description": "Reserved; cleanup is plan-only."
+              },
+              "laneId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "description": "Exact manifest run id for lane actions."
+              },
+              "merge": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "lane.recordMerge evidence; read guide tool-reference."
+              },
+              "supersession": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "lane.recordSupersession evidence; read guide tool-reference."
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Zero-based child/transcript index."
+              },
+              "childId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "description": "Child-scoped stop identity."
+              },
+              "toolCallId": {
+                "type": "string",
+                "description": "Command tool-call id."
+              },
+              "view": {
+                "type": "string",
+                "enum": [
+                  "fleet",
+                  "transcript"
+                ],
+                "description": "status view: fleet overview or transcript tail with id/dir and optional index."
+              },
+              "lines": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "description": "Transcript tail lines; default 80."
+              },
+              "topic": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string",
+                "description": "resume/steer guidance or project.open prompt."
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "steer",
+                  "follow_up",
+                  "auto",
+                  "plan",
+                  "apply"
+                ],
+                "description": "steer delivery mode; worktree.cleanup supports plan only, no apply/removal."
+              },
+              "steeringRecovery": {
+                "type": "boolean",
+                "description": "steer: pause/revive after missed acknowledgment; default true in direct steer mode, forced false by extension RPC for exact ownership."
+              },
+              "additional": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "grant-spawn-budget: root interactive parent + native user confirmation only; total grants capped at original configured cap."
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "session",
+                  "user",
+                  "project"
+                ],
+                "description": "watchdog.configure scope; default session, persistent only if explicit."
+              },
+              "target": {
+                "type": "string",
+                "enum": [
+                  "main",
+                  "children",
+                  "child"
+                ],
+                "description": "Watchdog target."
+              },
+              "focus": {
+                "type": "boolean",
+                "description": "Focus inspector.open/project.open pane."
+              },
+              "thinking": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "watchdog.configure only: off/minimal/low/medium/high/xhigh/max, inherit, false=off; true invalid. Dispatch ignores this; use model suffix."
+              },
+              "at": {
+                "type": "string",
+                "description": "schedule.create: delay (+10m) or zoned ISO timestamp."
+              },
+              "every": {
+                "type": "string",
+                "description": "schedule.create interval, e.g. 30m/6h/2d/2w."
+              },
+              "sessionOnly": {
+                "type": "boolean"
+              },
+              "quiet": {
+                "type": "boolean"
+              },
+              "on": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "description": "Reserved calendar selector."
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "overlap": {
+                "type": "string",
+                "enum": [
+                  "skip"
+                ]
+              },
+              "catchUp": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "latest"
+                ],
+                "description": "Missed schedule occurrences; default latest."
+              },
+              "missionId": {
+                "type": "string",
+                "description": "Existing mission to attach to a workflow or schedule.create; read guide missions for lifecycle and retention."
+              },
+              "mission": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "false disables; true invalid. Object: exactly one non-empty title or summary; objective/labels optional; goal only true, requires budget.tokens."
+              },
+              "missionUpdate": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Mission patch; read guide missions."
+              },
+              "missionStatus": {
+                "type": "string"
+              },
+              "missionScope": {
+                "type": "string",
+                "description": "project (default) or global pointer index."
+              },
+              "runMode": {
+                "type": "string",
+                "description": "Attached run mode."
+              },
+              "runStatus": {
+                "type": "string",
+                "description": "Attached run status."
+              },
+              "summary": {
+                "type": "string",
+                "description": "Mission close summary."
+              },
+              "config": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "description": "create/update agent config; object or JSON string."
+              },
+              "workflow": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                ],
+                "description": "true: run the one ```js workflow block written in this same reply (false invalid). String with '/': script file read from request cwd. Other string: named workflow resource. Raw scripts (true or path) have no runs.host."
+              },
+              "args": {
+                "type": "object",
+                "maxProperties": 16,
+                "additionalProperties": true,
+                "description": "Plain-JSON args for workflow; 16 fields/object, 64 items/array, depth 8, 16 KiB total; raw-script args are exposed deeply frozen and persisted, so do not include secrets."
+              },
+              "globalConcurrencyLimit": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "maxSubagentSpawnsPerRun": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "preflight": {
+                "type": "object",
+                "required": [
+                  "version",
+                  "lanes"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "coverage": {
+                    "type": "string",
+                    "enum": [
+                      "complete",
+                      "partial"
+                    ]
+                  },
+                  "lanes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        "mode": {
+                          "type": "string",
+                          "enum": [
+                            "mutation",
+                            "review",
+                            "scout",
+                            "gate"
+                          ]
+                        },
+                        "decision": {
+                          "type": "string",
+                          "maxLength": 256
+                        },
+                        "claims": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 256
+                          },
+                          "maxItems": 16
+                        },
+                        "expectedOutput": {
+                          "type": "string",
+                          "maxLength": 256
+                        },
+                        "independence": {
+                          "type": "string",
+                          "maxLength": 256
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "maxItems": 64
+                  }
+                },
+                "additionalProperties": false,
+                "description": "workflow: true or a script path only; display-only hints; coverage warns."
+              },
+              "chatProgress": {
+                "type": "string",
+                "enum": [
+                  "auto",
+                  "off",
+                  "live-card"
+                ],
+                "description": "auto: live card only for watched foreground in same Git repository. live-card requires same-repo async:false; async: omit or auto/off."
+              },
+              "isolation": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "worktree"
+                ],
+                "description": "Shared cwd or managed git worktrees."
+              },
+              "worktree": {
+                "type": "boolean",
+                "description": "Isolate each workflow child in a managed git worktree; child worktree:false overrides default."
+              },
+              "baseRef": {
+                "type": "string"
+              },
+              "lane": {
+                "type": "object",
+                "required": [
+                  "version",
+                  "key"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "key": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "mutation",
+                      "review",
+                      "scout",
+                      "gate"
+                    ]
+                  },
+                  "sourceRef": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "claims": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "maxItems": 20
+                  },
+                  "outputPaths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256
+                    },
+                    "maxItems": 10
+                  }
+                },
+                "additionalProperties": false,
+                "description": "Display/triage only; sourceRef is opaque, never resolved by status."
+              },
+              "context": {
+                "type": "string",
+                "enum": [
+                  "fresh",
+                  "fork",
+                  "profile"
+                ],
+                "description": "fresh/fork overrides every child; profile requires agent's declared defaultContext, ignoring config. Omitted: defaultSubagentContext wins over each agent defaultContext; implicit fork needs persisted parent + leaf, else fresh. forkContext may prune forks before spawn."
+              },
+              "async": {
+                "type": "boolean",
+                "description": "Background; default asyncByDefault. false only to block parent."
+              },
+              "timeoutMs": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Foreground and single async runs use config timeoutMs, else 30m; async composites have no default parent deadline. Alias maxRuntimeMs; must agree."
+              },
+              "maxRuntimeMs": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Alias timeoutMs (same defaults)."
+              },
+              "checkpointBeforeDeadlineMs": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647,
+                "description": "Async single-agent runs only: the runner requests that the child checkpoint and stop this many ms before the run deadline (best-effort; the deadline kill still applies)."
+              },
+              "toolTimeoutMs": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Per-tool deadline (ms); fast builtins default 5m."
+              },
+              "toolBudget": {
+                "type": "object",
+                "required": [
+                  "hard"
+                ],
+                "properties": {
+                  "soft": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "hard": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "block": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "*"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "description": "soft <= hard; after hard block read/grep/find/ls or '*' for all."
+              },
+              "usageBudget": {
+                "type": "object",
+                "properties": {
+                  "tokens": {
+                    "type": "object",
+                    "required": [
+                      "hard"
+                    ],
+                    "properties": {
+                      "soft": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "hard": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "costUsd": {
+                    "type": "object",
+                    "required": [
+                      "hard"
+                    ],
+                    "properties": {
+                      "soft": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "hard": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false,
+                "minProperties": 1,
+                "description": "tokens or costUsd; soft <= hard. Root-only reported usage; blocks launches. Running children are not stopped."
+              },
+              "agentScope": {
+                "type": "string",
+                "description": "user/project/both (default); project wins collisions."
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Execution/project-pane directory."
+              },
+              "machine": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "description": "Herdr saved machine id or label; runs an external CLI agent there. cwd then means the directory on that machine."
+              },
+              "artifacts": {
+                "type": "boolean",
+                "description": "Debug artifacts; default true."
+              },
+              "includeProgress": {
+                "type": "boolean",
+                "description": "Full result progress; default false."
+              },
+              "share": {
+                "type": "boolean",
+                "description": "Upload session to GitHub Gist; default false."
+              },
+              "sessionDir": {
+                "type": "string",
+                "description": "Session log directory; default temp, independent of share."
+              },
+              "control": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "needsAttentionAfterMs": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "activeNoticeAfterMs": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "activeNoticeAfterTurns": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "activeNoticeAfterTokens": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "failedToolAttemptsBeforeAttention": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "notifyOn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "active_long_running",
+                        "needs_attention"
+                      ]
+                    }
+                  },
+                  "notifyChannels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "event",
+                        "async",
+                        "intercom"
+                      ]
+                    }
+                  }
+                }
+              },
+              "output": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "Child output path or false; relative workflow paths use managed artifact routing. Bind durable output here, not task prose; return outputReference/outputPathMapping/artifactPaths."
+              },
+              "outputMode": {
+                "type": "string",
+                "enum": [
+                  "inline",
+                  "file-only"
+                ],
+                "description": "Default inline; file-only requires output path."
+              },
+              "skill": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "description": "Skills: names/CSV/array; false disables, true uses default."
+              },
+              "model": {
+                "type": "string",
+                "description": "Child model provider/id; bare id only if unique. Suffix :off/minimal/low/medium/high/xhigh/max overrides agent thinking default."
+              },
+              "fast": {
+                "type": "boolean",
+                "description": "Native OpenAI-Codex priority tier; default false, may cost more/quota."
+              },
+              "outputSchema": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "Structured output schema override; false disables an agent default."
+              },
+              "agentContract": {
+                "type": "object",
+                "required": [
+                  "version"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1
+                  }
+                },
+                "additionalProperties": false,
+                "description": "Compatibility behavior. Omit for the default behavior."
+              },
+              "acceptance": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "attested",
+                      "checked"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "reviewed"
+                    ],
+                    "deprecated": true
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^\\s*\\{[\\s\\S]*$"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                ],
+                "description": "Evidence policy; omit for read-only/review. false disables; true invalid. Prefer object; see guide tool-reference for levels, evidence and review.required."
+              },
+              "gate": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "command": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "output": {
+                        "type": "string",
+                        "enum": [
+                          "json"
+                        ]
+                      },
+                      "schema": {
+                        "type": "object"
+                      },
+                      "timeoutMs": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "command"
+                    ],
+                    "additionalProperties": false
+                  }
+                ],
+                "description": "Host gate command run after the child finishes: a string, or an object; with output \"json\", passing stdout becomes structuredOutput (not with outputSchema). Cannot be combined with acceptance except false (treated as omitted)."
+              }
+            }
+          }
+        },
+        {
+          "name": "bg_wait",
+          "description": "Wait for background, provider, or detached work that has no native completion notification, then return.\n\nOrdinary async subagent runs already notify this session natively when they complete or need attention. In an interactive chat, return control instead of calling this merely to wait. Use this tool for provider jobs, remembered detached foreground runs, or other background work without a native notification path. Headless runs auto-drain current-session subagent work at agent_end; use this tool only when the current turn must receive non-notifying background work results.\n\n• { } — return when the first initially active async run or registered provider item finishes, or when a subagent needs attention.\n• { all: true } — wait for every async run, provider item, and remembered detached foreground descendant that was active when the call began.\n• { id: \"...\" } — wait for one async or remembered detached foreground subagent run (id or prefix). Named async runs that already finished return their terminal result references.\n• { id: \"...\", nonBlocking: true } — resolve the prefix once, persist an exact-run wake subscription, and return immediately. Use this for detached work without native completion delivery; the originating interactive session wakes on completion, failure, attention, reconciliation failure, or timeout.\n• { stopOnAttention: false } — for blocking waits only, keep waiting through idle or long-thinking attention; supervisor/contact requests still stop the wait.\n• { timeoutMs: 600000 } — stop waiting after N ms; active work keeps running. Omitted values use waitTool.defaultTimeoutMs, then 30 minutes. Window expiry returns a non-error window_elapsed result with active work identities.\n\nNon-blocking subscriptions are visible in subagent status and differ from disabling waitTool: waitTool.enabled=false returns immediately without registering any future wake. Provider jobs are session-scoped and identified exactly, so replacing one job with another cannot hide a completion. Provider extensions must be explicitly loaded in this process. In a child agent, keep `bg_wait` in the child tool allowlist and load each provider through the agent's extensions or subagentOnlyExtensions; this tool never loads providers or grants tools itself.\n\nCodemode: `tools.bg_wait(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Async run or remembered detached foreground run id/prefix to wait for one specific run. Ordinary async subagent runs already notify this session natively; use bg_wait for provider, detached, or other background work without native notification, or when same-turn blocking results are truly needed. Omit to wait across every active async run started in this session only when a same-turn wait is truly needed."
+              },
+              "nonBlocking": {
+                "type": "boolean",
+                "description": "When true, resolve id to one exact run, persist a wake subscription, and return immediately. Use this only for provider, detached, or other background work without a native completion notification; ordinary async subagent runs already notify this session natively and do not need a subscription. The originating session is woken on completion, failure, attention, reconciliation failure, or timeout. Requires id and cannot be combined with all."
+              },
+              "all": {
+                "type": "boolean",
+                "description": "Wait for ALL active runs to finish. Ordinary async subagent runs already notify this session natively; use all only when a same-turn result from tracked background work is truly needed. Default false: return when the first tracked run or provider item finishes or needs attention. Ignored when id targets a single run."
+              },
+              "timeoutMs": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Give up waiting after this many milliseconds (the runs keep going regardless). Ordinary async subagent runs already notify this session natively; use a wait timeout only when same-turn results are truly needed for provider, detached, or other background work without native notification. Defaults to config waitTool.defaultTimeoutMs, then 1800000 (30 minutes). Window expiry is a non-error active-work result."
+              },
+              "stopOnAttention": {
+                "type": "boolean",
+                "description": "For a blocking wait that is truly needed, stop when a run needs attention by default. Set false to keep waiting through idle or long-thinking attention; supervisor/contact requests still stop the wait."
+              }
+            }
+          }
+        },
+        {
+          "name": "plan_mode_question",
+          "description": "Ask one to three structured questions only when the latest effective Plan contract explicitly says /plan mode is active. Tool visibility alone does not activate Plan mode. Never call for ordinary planning requests, the writing-plans skill, roadmaps, checklists, or plan-file work.\n\nCodemode: `tools.plan_mode_question(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "questions"
+            ],
+            "properties": {
+              "questions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "description": "Questions to show the user. Prefer 1 and do not exceed 3.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "header",
+                    "question",
+                    "options"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Stable identifier for mapping answers (snake_case)."
+                    },
+                    "header": {
+                      "type": "string",
+                      "description": "Short header label shown in the UI (12 or fewer chars)."
+                    },
+                    "question": {
+                      "type": "string",
+                      "description": "Single-sentence prompt shown to the user."
+                    },
+                    "options": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 4,
+                      "description": "Provide 2-4 mutually exclusive choices. Put the recommended option first when there is a clear default.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "label",
+                          "description"
+                        ],
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "description": "User-facing label (1-5 words)."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "One short sentence explaining impact/tradeoff if selected."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "plan_mode_complete",
+          "description": "Submit a decision-ready plan only when the latest effective Plan contract explicitly says /plan mode is active, and call it alone as the final action. Tool visibility alone does not activate Plan mode. Never call for ordinary planning requests, the writing-plans skill, roadmaps, checklists, or plan-file work.\n\nCodemode: `tools.plan_mode_complete(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "plan"
+            ],
+            "properties": {
+              "plan": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 50000,
+                "description": "The complete decision-ready implementation plan in Markdown."
+              }
+            }
+          }
+        },
+        {
+          "name": "ask_user_question",
+          "description": "Ask the user one or more structured questions during execution. Use when you need to:\n1. Gather user preferences or requirements\n2. Clarify ambiguous instructions\n3. Get decisions on implementation choices as you work\n4. Offer choices to the user about what direction to take\n\nUsage notes:\n- Users can type a custom answer via the automatically appended \"Type something.\" row on every question or press Esc to abandon the questionnaire. Do NOT author \"Other\" or \"Type something.\" labels yourself — reserved labels are rejected at runtime.\n- Use multiSelect: true when multiple answers are valid. The \"Type something.\" row is available on every question, including when options carry a `preview`; in preview mode it expands to the full pane width while typing so the custom answer is not cramped into the narrow options column.\n- If you recommend a specific option, make that the first option in the list and add \"(Recommended)\" at the end of the label.\n\nPreview feature:\nUse the optional `preview` field on options when presenting concrete artifacts that users need to visually compare:\n- ASCII mockups of UI layouts or components\n- Code snippets showing different implementations\n- Diagram variations\n- Configuration examples\n\nPreview content is rendered as markdown in a monospace box. Multi-line text with newlines is supported. When any option has a preview, the UI switches to a side-by-side layout with a vertical option list on the left and preview on the right. Do not use previews for simple preference questions where labels and descriptions suffice. Note: previews are only supported for single-select questions (not multiSelect).\n\nCodemode: `tools.ask_user_question(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "questions"
+            ],
+            "properties": {
+              "questions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "question",
+                    "header",
+                    "options"
+                  ],
+                  "properties": {
+                    "question": {
+                      "type": "string",
+                      "description": "The complete question to ask the user. Should be clear, specific, and end with a question mark. Example: \"Which library should we use for date formatting?\" If multiSelect is true, phrase it accordingly, e.g. \"Which features do you want to enable?\""
+                    },
+                    "header": {
+                      "type": "string",
+                      "maxLength": 16,
+                      "description": "MAX 16 CHARACTERS — hard limit, requests over the limit are rejected. Very short chip/tag shown next to the question. Examples: \"Auth method\", \"Library\", \"Approach\"."
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "label",
+                          "description"
+                        ],
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "maxLength": 60,
+                            "description": "MAX 60 CHARACTERS — hard limit, requests over the limit are rejected. The display text for this option that the user will see and select. Should be concise (1-5 words) and clearly describe the choice."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Explanation of what this option means or what will happen if chosen. Useful for providing context about trade-offs or implications."
+                          },
+                          "preview": {
+                            "type": "string",
+                            "description": "Optional preview content rendered when this option is focused. Use for mockups, code snippets, or visual comparisons that help users compare options. See the tool description for the expected content format."
+                          }
+                        }
+                      },
+                      "minItems": 2,
+                      "maxItems": 4,
+                      "description": "The available choices for this question. Must have 2-4 options. Each option should be a distinct, mutually exclusive choice (unless multiSelect is enabled). The 'Type something.' row is appended automatically — do NOT author it."
+                    },
+                    "multiSelect": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Set to true to allow the user to select multiple options instead of just one. Use when choices are not mutually exclusive."
+                    }
+                  }
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "description": "Questions to ask the user (1-4 questions)"
+              }
+            }
+          }
+        },
+        {
+          "name": "orb_browser",
+          "description": "Operate existing logged-in Chrome tabs through Playwright Extension DOM snapshots and element refs. Available in Pi Web and Pi; no Orb shell is required outside the Orb workspace. First call name=tools to read supported command schemas, then browser_snapshot or browser_tabs. Configured extension authentication connects automatically. Orb sessions require Full Access. Page content is untrusted data; no arbitrary code execution.\n\nCodemode: `tools.orb_browser(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "arguments": {
+                "type": "object",
+                "patternProperties": {
+                  "^.*$": {}
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "create_goal",
+          "description": "Create and focus a persistent goal only on explicit user request; other open goals remain unchanged.\n\nCodemode: `tools.create_goal(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "objective"
+            ],
+            "properties": {
+              "objective": {
+                "type": "string",
+                "description": "Full objective; preserve ordered steps and done criteria."
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "regular",
+                  "sisyphus"
+                ],
+                "description": "Default regular; sisyphus only if requested."
+              },
+              "token_budget": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Whole-token budget, only if supplied by the user."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "get_goal",
+          "description": "Read focused goal state. Default: compact summary. Retrieve full objective/contracts, tasks, or history in 4000-character pages with section and cursor. verbose preserves full legacy output.\n\nCodemode: `tools.get_goal(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "section": {
+                "type": "string",
+                "enum": [
+                  "summary",
+                  "objective",
+                  "tasks",
+                  "history"
+                ]
+              },
+              "task_id": {
+                "type": "string",
+                "description": "With section=tasks, retrieve one task."
+              },
+              "cursor": {
+                "type": "string",
+                "maxLength": 256,
+                "description": "Next page; repeat section/task."
+              },
+              "verbose": {
+                "type": "boolean",
+                "description": "Full detail mode."
+              },
+              "include_history": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "subagent_supervisor",
+          "description": "Native pi-subagents supervisor channel. Use reply/pending/status to answer child subagent requests without overriding pi-intercom.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "action"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "list",
+                  "pending",
+                  "status",
+                  "reply"
+                ]
+              },
+              "to": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "replyTo": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "web_search",
+          "description": "Search the web with OpenAI, Brave, Parallel, Parallel MCP, TinyFish, Search1API, Searchinfinity, Querit, Tavily, You.com, Firecrawl, Jina, SearXNG, DuckDuckGo, Perplexity, Gemini, Kimi, Exa, SERPdive, Kagi, Ollama, Anysearch, xAI, Mistral, Bright Data, SerpBase, SerpApi, Serper, Serply, Valyu, Bocha, XCrawl, Baizhi, Z.ai. Provider arrays run simultaneously; all searches eligible allowed providers (OpenAI, Brave, Parallel, TinyFish, Search1API, Searchinfinity, Querit, Tavily, Firecrawl, Jina, SearXNG, Perplexity, Gemini, Exa, SERPdive, Kagi, Ollama, Bocha); explicit-only allowed providers (Parallel MCP, You.com, DuckDuckGo, Kimi, Anysearch, xAI, Mistral, Bright Data, SerpBase, SerpApi, Serper, Serply, Valyu, XCrawl, Baizhi, Z.ai) remain excluded. The default workflow is none: it returns bounded source-linked search results or provider answers without a curator or generated summary, identifies the providers used, and stores full results for retrieval by responseId. For comprehensive research, prefer queries (plural) with 2-4 varied angles over a single query. When includeContent is true, full page content is fetched in the background. Set workflow to \"summary-review\" to open the curator with an auto-generated summary draft or \"auto-summary\" to generate a summary without the browser curator. The configured provider is used when provider is omitted or set to auto; omit provider unless explicitly overriding it.\n\nCodemode: `tools.web_search(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Single search query. For research tasks, prefer 'queries' with multiple varied angles instead."
+              },
+              "queries": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Multiple queries searched concurrently (up to three at a time), each returning source-linked search results or a provider answer. Prefer this for research — vary phrasing, scope, and angle across 2-4 queries to maximize coverage. Good: ['React vs Vue performance benchmarks 2026', 'React vs Vue developer experience comparison', 'React ecosystem size vs Vue ecosystem']. Bad: ['React vs Vue', 'React vs Vue comparison', 'React vs Vue review'] (too similar, redundant results)."
+              },
+              "numResults": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20,
+                "description": "Results per query (default: 5, max: 20)"
+              },
+              "includeContent": {
+                "type": "boolean",
+                "description": "Fetch full page content (async)"
+              },
+              "recencyFilter": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ],
+                "description": "Filter by recency"
+              },
+              "domainFilter": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Limit to domains (prefix with - to exclude)"
+              },
+              "provider": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "all",
+                      "openai",
+                      "brave",
+                      "parallel",
+                      "parallel-mcp",
+                      "tinyfish",
+                      "search1api",
+                      "searchinfinity",
+                      "querit",
+                      "tavily",
+                      "you",
+                      "firecrawl",
+                      "jina",
+                      "searxng",
+                      "duckduckgo",
+                      "perplexity",
+                      "gemini",
+                      "kimi",
+                      "exa",
+                      "serpdive",
+                      "kagi",
+                      "ollama",
+                      "anysearch",
+                      "xai",
+                      "mistral",
+                      "brightdata",
+                      "serpbase",
+                      "serpapi",
+                      "serper",
+                      "serply",
+                      "valyu",
+                      "bocha",
+                      "xcrawl",
+                      "baizhi",
+                      "zai"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "openai",
+                        "brave",
+                        "parallel",
+                        "parallel-mcp",
+                        "tinyfish",
+                        "search1api",
+                        "searchinfinity",
+                        "querit",
+                        "tavily",
+                        "you",
+                        "firecrawl",
+                        "jina",
+                        "searxng",
+                        "duckduckgo",
+                        "perplexity",
+                        "gemini",
+                        "kimi",
+                        "exa",
+                        "serpdive",
+                        "kagi",
+                        "ollama",
+                        "anysearch",
+                        "xai",
+                        "mistral",
+                        "brightdata",
+                        "serpbase",
+                        "serpapi",
+                        "serper",
+                        "serply",
+                        "valyu",
+                        "bocha",
+                        "xcrawl",
+                        "baizhi",
+                        "zai"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                ],
+                "description": "Search provider or non-empty list of allowed providers to search simultaneously; all searches eligible allowed providers (OpenAI, Brave, Parallel, TinyFish, Search1API, Searchinfinity, Querit, Tavily, Firecrawl, Jina, SearXNG, Perplexity, Gemini, Exa, SERPdive, Kagi, Ollama, Bocha); explicit-only allowed providers (Parallel MCP, You.com, DuckDuckGo, Kimi, Anysearch, xAI, Mistral, Bright Data, SerpBase, SerpApi, Serper, Serply, Valyu, XCrawl, Baizhi, Z.ai) remain excluded; omit this field to use the configured provider, or use auto when none is configured"
+              },
+              "workflow": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "summary-review",
+                  "auto-summary"
+                ],
+                "description": "Search workflow mode: none = no curator (default), summary-review = open curator with auto summary draft, auto-summary = generate summary without opening curator"
+              },
+              "proxy": {
+                "type": "string",
+                "description": "http(s) or socks proxy URL (e.g. http://host:port or socks5h://host:port) used for every outbound request in this call (search APIs and content fetches). Node fetch ignores HTTP(S)_PROXY env vars, so set this (or `proxy` in web-search.json) when direct access is blocked; empty string forces direct access."
+              }
+            }
+          }
+        },
+        {
+          "name": "source_check",
+          "description": "Gather web sources for a claim and return a bounded machine-readable research artifact with exact passage citations for manual review.\n\nCodemode: `tools.source_check(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "claim"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string",
+                "description": "The assertion to gather web sources for."
+              },
+              "queries": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Search queries (default: the claim)."
+              },
+              "numResults": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20,
+                "description": "Results per query (default: 5, max: 20)."
+              },
+              "fetchContent": {
+                "type": "boolean",
+                "description": "Fetch up to 5 result pages for exact passage extraction."
+              },
+              "recencyFilter": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ],
+                "description": "Filter by recency."
+              },
+              "domainFilter": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Limit to domains; prefix with - to exclude."
+              },
+              "provider": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "all",
+                      "openai",
+                      "brave",
+                      "parallel",
+                      "parallel-mcp",
+                      "tinyfish",
+                      "search1api",
+                      "searchinfinity",
+                      "querit",
+                      "tavily",
+                      "you",
+                      "firecrawl",
+                      "jina",
+                      "searxng",
+                      "duckduckgo",
+                      "perplexity",
+                      "gemini",
+                      "kimi",
+                      "exa",
+                      "serpdive",
+                      "kagi",
+                      "ollama",
+                      "anysearch",
+                      "xai",
+                      "mistral",
+                      "brightdata",
+                      "serpbase",
+                      "serpapi",
+                      "serper",
+                      "serply",
+                      "valyu",
+                      "bocha",
+                      "xcrawl",
+                      "baizhi",
+                      "zai"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "openai",
+                        "brave",
+                        "parallel",
+                        "parallel-mcp",
+                        "tinyfish",
+                        "search1api",
+                        "searchinfinity",
+                        "querit",
+                        "tavily",
+                        "you",
+                        "firecrawl",
+                        "jina",
+                        "searxng",
+                        "duckduckgo",
+                        "perplexity",
+                        "gemini",
+                        "kimi",
+                        "exa",
+                        "serpdive",
+                        "kagi",
+                        "ollama",
+                        "anysearch",
+                        "xai",
+                        "mistral",
+                        "brightdata",
+                        "serpbase",
+                        "serpapi",
+                        "serper",
+                        "serply",
+                        "valyu",
+                        "bocha",
+                        "xcrawl",
+                        "baizhi",
+                        "zai"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                ],
+                "description": "Search provider or non-empty list of allowed providers to search simultaneously; all searches eligible allowed providers (OpenAI, Brave, Parallel, TinyFish, Search1API, Searchinfinity, Querit, Tavily, Firecrawl, Jina, SearXNG, Perplexity, Gemini, Exa, SERPdive, Kagi, Ollama, Bocha); explicit-only allowed providers (Parallel MCP, You.com, DuckDuckGo, Kimi, Anysearch, xAI, Mistral, Bright Data, SerpBase, SerpApi, Serper, Serply, Valyu, XCrawl, Baizhi, Z.ai) remain excluded"
+              },
+              "proxy": {
+                "type": "string",
+                "description": "http(s) or socks proxy URL (e.g. http://host:port or socks5h://host:port) used for every outbound request in this call (search APIs and result-page fetches). Empty string forces direct access."
+              }
+            }
+          }
+        },
+        {
+          "name": "fetch_content",
+          "description": "Fetch URL(s). Available modes: readable (default): extract readable content as markdown; raw: return the exact textual body using direct HTTP only; answer: answer a prompt using only fetched content. Direct image URLs return resized image content when supported by the selected mode. Supports YouTube transcripts, GitHub repositories, PDFs, and local videos when supported by the selected mode. Full original content is stored for retrieval with get_search_content.\n\nCodemode: `tools.fetch_content(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Single URL to fetch"
+              },
+              "urls": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Multiple URLs (parallel)"
+              },
+              "forceClone": {
+                "type": "boolean",
+                "description": "Force cloning large GitHub repositories that exceed the size threshold"
+              },
+              "prompt": {
+                "type": "string",
+                "description": "Question or instruction for video analysis, or the page-local question required by answer mode."
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "readable",
+                  "raw",
+                  "answer"
+                ],
+                "description": "Fetch mode. readable (default): extract readable content as markdown; raw: return the exact textual body using direct HTTP only; answer: answer a prompt using only fetched content."
+              },
+              "answerModel": {
+                "type": "string",
+                "description": "Optional provider/model-id override for answer mode. Defaults to fetch.answerProvider + fetch.answerModel when configured, otherwise the current Pi model."
+              },
+              "timestamp": {
+                "type": "string",
+                "description": "Extract video frame(s) at a timestamp or time range. Single: '1:23:45', '23:45', or '85' (seconds). Range: '23:41-25:00' extracts evenly-spaced frames across that span (default 6). Use frames with ranges to control density; single+frames uses a fixed 5s interval. YouTube requires yt-dlp + ffmpeg; local videos require ffmpeg. Use a range when you know the approximate area but not the exact moment — you'll get a contact sheet to visually identify the right frame."
+              },
+              "frames": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12,
+                "description": "Number of frames to extract. Use with timestamp range for custom density, with single timestamp to get N frames at 5s intervals, or alone to sample across the entire video. Requires yt-dlp + ffmpeg for YouTube, ffmpeg for local video."
+              },
+              "model": {
+                "type": "string",
+                "description": "Override the Gemini model for video/YouTube analysis (e.g. 'gemini-3.6-flash'). Defaults to config or gemini-3.6-flash."
+              },
+              "auth": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ],
+                "description": "Opt into an authFetch profile for local browser-cookie fetching. Use a profile name, or true only when exactly one profile exists."
+              },
+              "proxy": {
+                "type": "string",
+                "description": "http(s) or socks proxy URL (e.g. http://host:port or socks5h://host:port) used for this fetch. Needed when the target is unreachable directly; localhost and NO_PROXY hosts always bypass the proxy. Empty string forces direct access."
+              }
+            }
+          }
+        },
+        {
+          "name": "get_search_content",
+          "description": "Retrieve bounded pages of full stored search results or fetched content, or find matching passages, from a previous web_search, source_check, or fetch_content call.\n\nCodemode: `tools.get_search_content(args)` resolves to a string.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "responseId"
+            ],
+            "properties": {
+              "responseId": {
+                "type": "string",
+                "description": "The responseId from web_search, source_check, or fetch_content"
+              },
+              "query": {
+                "type": "string",
+                "description": "Get content for this query (web_search)"
+              },
+              "queryIndex": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Get content for query at index"
+              },
+              "url": {
+                "type": "string",
+                "description": "Get content for this URL"
+              },
+              "urlIndex": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Get content for URL at index"
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Character offset in stored search or fetched URL content (default 0). Ignored when findText is supplied."
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 30000,
+                "description": "Requested maximum stored-content characters (default and max use maxInlineContentChars). Search-page continuation guidance shares the global output cap and may reduce returnedChars. Ignored when findText is supplied."
+              },
+              "findText": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "minItems": 1,
+                    "maxItems": 10
+                  }
+                ],
+                "description": "Text or texts to find in the selected stored content. When supplied, offset and limit are ignored."
+              },
+              "findMode": {
+                "type": "string",
+                "enum": [
+                  "exact",
+                  "case-insensitive",
+                  "fuzzy"
+                ],
+                "description": "Matching mode for findText (default: case-insensitive). Requires findText."
+              }
+            }
+          }
+        },
+        {
+          "name": "orb_observe",
+          "description": "Observe the current foreground application: its identity, geometry and screenshot. The Orb window is excluded.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_click",
+          "description": "Click at a pixel position in the attached screenshot. Supports right button, double-click and modifiers. Returns a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id from the orb_observe result this action was decided from."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "button": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "left"
+                  },
+                  {
+                    "type": "string",
+                    "const": "right"
+                  }
+                ],
+                "description": "Mouse button; default left."
+              },
+              "count": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "const": 1
+                  },
+                  {
+                    "type": "number",
+                    "const": 2
+                  }
+                ],
+                "description": "1 single click or 2 double-click; default 1."
+              },
+              "modifiers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Modifiers held for this click: shift, control, option or cmd."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_type",
+          "description": "Click the specified screenshot pixel position, type text, optionally replace field contents and press Enter. Returns a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "text",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this action was decided from."
+              },
+              "text": {
+                "type": "string",
+                "description": "Text to type (1-200 characters). Never type credentials or other secrets."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "replace": {
+                "type": "boolean",
+                "description": "Select all in the focused field before typing."
+              },
+              "submit": {
+                "type": "boolean",
+                "description": "Press Enter after typing."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_scroll",
+          "description": "Scroll inside the observed window. Requires an authorized desktop task.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "direction",
+              "amount",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this action was decided from."
+              },
+              "direction": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "up"
+                  },
+                  {
+                    "type": "string",
+                    "const": "down"
+                  }
+                ],
+                "description": "Scroll direction."
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Scroll ticks (1-10)."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_hotkey",
+          "description": "Press a key chord in the observed window. System screenshot shortcuts are refused.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "keys"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this key chord was decided from."
+              },
+              "keys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "description": "Key names in press order, for example [\"ctrl\", \"c\"]."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_long_press",
+          "description": "Hold the left mouse button at a point in the observed window for 1-10 seconds.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "x",
+              "y",
+              "duration_seconds"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this press was decided from."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "duration_seconds": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Hold duration in seconds (1-10)."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_open_app",
+          "description": "Bring an already running application to the foreground and continue against its window. Launching an application that is not running is not available.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "name"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this action was decided from."
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "Display name or executable base name of an application that is already running, for example Notepad."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_drag",
+          "description": "Drag between two points inside the observed window.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "start_x",
+              "start_y",
+              "end_x",
+              "end_y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this drag was decided from."
+              },
+              "start_x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Start pixel column in the attached screenshot."
+              },
+              "start_y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Start pixel row in the attached screenshot."
+              },
+              "end_x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "End pixel column in the attached screenshot."
+              },
+              "end_y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "End pixel row in the attached screenshot."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_wait",
+          "description": "Wait one second for the current window, then return a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The current observation_id."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_long_wait",
+          "description": "Wait 10, 30, 60 or 120 seconds for a visible long-running task, then return a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "wait_seconds"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The current observation_id."
+              },
+              "wait_seconds": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "const": 10
+                  },
+                  {
+                    "type": "number",
+                    "const": 30
+                  },
+                  {
+                    "type": "number",
+                    "const": 60
+                  },
+                  {
+                    "type": "number",
+                    "const": 120
+                  }
+                ],
+                "description": "10, 30, 60 or 120 seconds."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_list_apps",
+          "description": "List running applications, then return a fresh screenshot of the authorized target.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The current observation_id."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_batch",
+          "description": "Execute 2–8 GUI actions in order, using targets already visible in the initial screenshot. Later targets must not depend on UI created by earlier actions. Never batch opening a menu with choosing its new item, or navigation with input on the new page. Returns each completed step's screenshot and the final observation. Failure or surface change stops remaining actions.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "actions"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "x",
+                        "y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "button": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "left"
+                            },
+                            {
+                              "type": "string",
+                              "const": "right"
+                            }
+                          ],
+                          "description": "Mouse button; default left."
+                        },
+                        "count": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "const": 1
+                            },
+                            {
+                              "type": "number",
+                              "const": 2
+                            }
+                          ],
+                          "description": "1 single click or 2 double-click; default 1."
+                        },
+                        "modifiers": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Modifiers held for this click: shift, control, option or cmd."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "click"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "text",
+                        "x",
+                        "y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "text": {
+                          "type": "string",
+                          "description": "Text to type (1-200 characters). Never type credentials or other secrets."
+                        },
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "replace": {
+                          "type": "boolean",
+                          "description": "Select all in the focused field before typing."
+                        },
+                        "submit": {
+                          "type": "boolean",
+                          "description": "Press Enter after typing."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "type"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "keys",
+                        "kind"
+                      ],
+                      "properties": {
+                        "keys": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "minItems": 1,
+                          "maxItems": 4,
+                          "description": "Key names in press order, for example [\"ctrl\", \"c\"]."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "hotkey"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "direction",
+                        "amount",
+                        "x",
+                        "y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "direction": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "up"
+                            },
+                            {
+                              "type": "string",
+                              "const": "down"
+                            }
+                          ],
+                          "description": "Scroll direction."
+                        },
+                        "amount": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10,
+                          "description": "Scroll ticks (1-10)."
+                        },
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "scroll"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "x",
+                        "y",
+                        "duration_seconds",
+                        "kind"
+                      ],
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "duration_seconds": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 10,
+                          "description": "Hold duration in seconds (1-10)."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "longPress"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "start_x",
+                        "start_y",
+                        "end_x",
+                        "end_y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "start_x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Start pixel column in the attached screenshot."
+                        },
+                        "start_y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Start pixel row in the attached screenshot."
+                        },
+                        "end_x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "End pixel column in the attached screenshot."
+                        },
+                        "end_y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "End pixel row in the attached screenshot."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "drag"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "minItems": 2,
+                "maxItems": 8
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "codemode",
+          "description": "Run JavaScript that calls other tools. The input is raw JavaScript (not JSON, no code fence), run as an async function body in a QuickJS sandbox: top-level `await` and `return` work. No Node, file system, network, or timers.\n- `await tools.<name>({ ...args })` resolves to a string, or an object if the tool's declaration says so, and rejects with an Error on failure. Calls still running when the script ends are cancelled.\n- Optional first line: `// @options: {\"max_output_tokens\": 10000, \"timeout_ms\": 60000}`\n\nGlobals:\n- `text(value)`, `image(dataUrlOrImageBlock)`, `console.log(...)`, and top-level `return` add output; `exit()` ends the script.\n- `store(key, value)` and `load(key)` keep JSON values across codemode calls.\n- `ALL_TOOLS`, `searchTools(query, { limit?, namespace? })`, `describeTool(name)`, `describeNamespace(name)`: find unlisted tools, such as MCP tools.\n- `models`: classifiers and image generation. Read C:\\Users\\JUSTLIKEZYP\\AppData\\Roaming\\npm\\node_modules\\@agegr\\pi-web\\node_modules\\@earendil-works\\pi-coding-agent\\docs\\codemode.md first.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "code"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Raw JavaScript source."
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "grammar",
+            "variants": {
+              "openai_lark": "\nstart: options_source | plain_source\noptions_source: OPTIONS_LINE NEWLINE SOURCE\nplain_source: SOURCE\n\nOPTIONS_LINE: /[ \\t]*\\/\\/ @options:[^\\r\\n]*/\nNEWLINE: /\\r?\\n/\nSOURCE: /[\\s\\S]+/\n"
+            }
+          }
+        }
+      ],
+      "systemSectionCharacters": {
+        "preamble": 169,
+        "tools": 1728,
+        "rules": 5117,
+        "docs": 1478,
+        "project_context": 629,
+        "skills": 8280,
+        "cwd": 30,
+        "engineering": 540,
+        "tool_policy": 3392,
+        "workflow": 1693,
+        "delivery_contract": 594,
+        "orb_mode": 3137,
+        "mcp_servers": 276
+      },
+      "firstUserAt": "2026-10-04T13:34:50.046Z",
+      "lastAssistantAt": "2026-10-04T13:45:49.860Z",
+      "elapsedMs": 659814,
+      "assistantResponses": 27,
+      "toolCounts": {
+        "orb_browser": 23,
+        "codemode": 3
+      },
+      "browserCommandCounts": {
+        "tools": 1,
+        "browser_tabs": 4,
+        "browser_navigate": 2,
+        "browser_type": 2,
+        "browser_click": 6,
+        "browser_wait_for": 2,
+        "browser_snapshot": 3,
+        "browser_press_key": 3
+      },
+      "completedToolResults": 26,
+      "errors": 2,
+      "sumPairedToolIntervalsMs": 42317,
+      "toolIntervalFractionOfElapsed": 0.06413474100276745,
+      "browserTextCharacters": 1195179,
+      "automaticSnapshotCharacters": 1093753,
+      "browserPairedIntervalsMs": {
+        "sum": 41340,
+        "median": 564,
+        "max": 10527
+      },
+      "firstResponseUsage": {
+        "input": 17528,
+        "output": 54,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 33,
+        "totalTokens": 17582,
+        "cost": {
+          "input": 0.035056,
+          "output": 0.00054,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.035595999999999996
+        }
+      },
+      "lastResponseUsage": {
+        "input": 38679,
+        "output": 163,
+        "cacheRead": 361984,
+        "cacheWrite": 0,
+        "reasoning": 91,
+        "totalTokens": 400826,
+        "cost": {
+          "input": 0.077358,
+          "output": 0.0016300000000000002,
+          "cacheRead": 0.07239680000000001,
+          "cacheWrite": 0,
+          "total": 0.1513848
+        }
+      },
+      "lastResponseInputPlusCacheRead": 400663,
+      "calls": [
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:35:09.622Z",
+          "command": "tools",
+          "argumentKeys": [],
+          "resultAt": "2026-10-04T13:35:09.667Z",
+          "pairedMs": 45,
+          "textChars": 8811,
+          "textBlockChars": [
+            8811
+          ],
+          "error": false
+        },
+        {
+          "tool": "codemode",
+          "at": "2026-10-04T13:35:26.778Z",
+          "referencedMembers": [
+            "tools.mcp__chrome_devtools"
+          ],
+          "resultAt": "2026-10-04T13:35:26.871Z",
+          "pairedMs": 93,
+          "textChars": 505,
+          "textBlockChars": [
+            44,
+            461
+          ],
+          "error": true
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:35:41.772Z",
+          "command": "browser_tabs",
+          "argumentKeys": [
+            "action"
+          ],
+          "tabAction": "list",
+          "resultAt": "2026-10-04T13:35:42.336Z",
+          "pairedMs": 564,
+          "textChars": 690,
+          "textBlockChars": [
+            304,
+            386
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:36:06.651Z",
+          "command": "browser_navigate",
+          "argumentKeys": [
+            "url"
+          ],
+          "resultAt": "2026-10-04T13:36:12.894Z",
+          "pairedMs": 6243,
+          "textChars": 23446,
+          "textBlockChars": [
+            220,
+            23226
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.008146639511201629
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:36:31.046Z",
+          "command": "browser_type",
+          "argumentKeys": [
+            "element",
+            "target",
+            "text",
+            "submit"
+          ],
+          "resultAt": "2026-10-04T13:36:34.659Z",
+          "pairedMs": 3613,
+          "textChars": 23926,
+          "textBlockChars": [
+            460,
+            23466
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9858299595141701
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:36:41.081Z",
+          "command": "browser_tabs",
+          "argumentKeys": [
+            "action",
+            "index"
+          ],
+          "tabAction": "select",
+          "resultAt": "2026-10-04T13:36:41.554Z",
+          "pairedMs": 473,
+          "textChars": 66355,
+          "textBlockChars": [
+            328,
+            66027
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.08653846153846154
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:37:05.925Z",
+          "command": "browser_click",
+          "argumentKeys": [
+            "element",
+            "target"
+          ],
+          "resultAt": "2026-10-04T13:37:09.775Z",
+          "pairedMs": 3850,
+          "textChars": 66627,
+          "textBlockChars": [
+            522,
+            66105
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9991993594875901
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:37:26.107Z",
+          "command": "browser_tabs",
+          "argumentKeys": [
+            "action",
+            "index"
+          ],
+          "tabAction": "select",
+          "resultAt": "2026-10-04T13:37:26.282Z",
+          "pairedMs": 175,
+          "textChars": 30900,
+          "textBlockChars": [
+            406,
+            30494
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.033846153846153845
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:38:01.105Z",
+          "command": "browser_click",
+          "argumentKeys": [
+            "element",
+            "target"
+          ],
+          "resultAt": "2026-10-04T13:38:03.801Z",
+          "pairedMs": 2696,
+          "textChars": 31322,
+          "textBlockChars": [
+            690,
+            30632
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9953917050691244
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:38:19.927Z",
+          "command": "browser_tabs",
+          "argumentKeys": [
+            "action",
+            "index"
+          ],
+          "tabAction": "select",
+          "resultAt": "2026-10-04T13:38:20.174Z",
+          "pairedMs": 247,
+          "textChars": 28667,
+          "textBlockChars": [
+            507,
+            28160
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.05761316872427984
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:38:42.941Z",
+          "command": "browser_click",
+          "argumentKeys": [
+            "element",
+            "target"
+          ],
+          "resultAt": "2026-10-04T13:38:44.293Z",
+          "pairedMs": 1352,
+          "textChars": 28757,
+          "textBlockChars": [
+            666,
+            28091
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9629629629629629
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:39:02.573Z",
+          "command": "browser_wait_for",
+          "argumentKeys": [
+            "time"
+          ],
+          "requestedWaitSeconds": 3,
+          "resultAt": "2026-10-04T13:39:05.707Z",
+          "pairedMs": 3134,
+          "textChars": 28191,
+          "textBlockChars": [
+            31,
+            28160
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9711934156378601
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:39:40.286Z",
+          "command": "browser_snapshot",
+          "argumentKeys": [
+            "depth"
+          ],
+          "resultAt": "2026-10-04T13:39:40.515Z",
+          "pairedMs": 229,
+          "textChars": 4985,
+          "textBlockChars": [
+            4985
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:39:57.490Z",
+          "command": "browser_navigate",
+          "argumentKeys": [
+            "url"
+          ],
+          "resultAt": "2026-10-04T13:40:00.025Z",
+          "pairedMs": 2535,
+          "textChars": 21250,
+          "textBlockChars": [
+            633,
+            20617
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.18789808917197454
+        },
+        {
+          "tool": "codemode",
+          "at": "2026-10-04T13:40:32.545Z",
+          "referencedMembers": [
+            "searchTools"
+          ],
+          "resultAt": "2026-10-04T13:40:32.660Z",
+          "pairedMs": 115,
+          "textChars": 4191,
+          "textBlockChars": [
+            47,
+            4144
+          ],
+          "error": false
+        },
+        {
+          "tool": "codemode",
+          "at": "2026-10-04T13:40:57.606Z",
+          "referencedMembers": [
+            "tools.mcp__chrome_devtools__list_pages"
+          ],
+          "resultAt": "2026-10-04T13:40:58.375Z",
+          "pairedMs": 769,
+          "textChars": 121,
+          "textBlockChars": [
+            47,
+            74
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:41:24.979Z",
+          "command": "browser_press_key",
+          "argumentKeys": [
+            "key"
+          ],
+          "resultAt": "2026-10-04T13:41:25.315Z",
+          "pairedMs": 336,
+          "textChars": 29764,
+          "textBlockChars": [
+            669,
+            29095
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.5537190082644629
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:41:49.348Z",
+          "command": "browser_wait_for",
+          "argumentKeys": [
+            "time",
+            "text"
+          ],
+          "requestedWaitSeconds": 10,
+          "resultAt": "2026-10-04T13:41:59.875Z",
+          "pairedMs": 10527,
+          "textChars": 118797,
+          "textBlockChars": [
+            24,
+            118773
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.22988505747126436
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:42:34.331Z",
+          "command": "browser_snapshot",
+          "argumentKeys": [
+            "target",
+            "depth"
+          ],
+          "resultAt": "2026-10-04T13:42:34.715Z",
+          "pairedMs": 384,
+          "textChars": 80745,
+          "textBlockChars": [
+            80745
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:42:59.700Z",
+          "command": "browser_click",
+          "argumentKeys": [
+            "element",
+            "target"
+          ],
+          "resultAt": "2026-10-04T13:43:00.731Z",
+          "pairedMs": 1031,
+          "textChars": 119226,
+          "textBlockChars": [
+            0,
+            119226
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9938006676204101
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:43:21.055Z",
+          "command": "browser_type",
+          "argumentKeys": [
+            "element",
+            "target",
+            "text"
+          ],
+          "resultAt": "2026-10-04T13:43:21.233Z",
+          "pairedMs": 178,
+          "textChars": 424,
+          "textBlockChars": [
+            424
+          ],
+          "error": true,
+          "reason": "browser-error"
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:43:45.445Z",
+          "command": "browser_snapshot",
+          "argumentKeys": [
+            "target",
+            "depth"
+          ],
+          "resultAt": "2026-10-04T13:43:45.568Z",
+          "pairedMs": 123,
+          "textChars": 1001,
+          "textBlockChars": [
+            1001
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:44:05.682Z",
+          "command": "browser_click",
+          "argumentKeys": [
+            "element",
+            "target"
+          ],
+          "resultAt": "2026-10-04T13:44:06.730Z",
+          "pairedMs": 1048,
+          "textChars": 119226,
+          "textBlockChars": [
+            0,
+            119226
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9995231282784931
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:44:26.443Z",
+          "command": "browser_press_key",
+          "argumentKeys": [
+            "key"
+          ],
+          "resultAt": "2026-10-04T13:44:26.808Z",
+          "pairedMs": 365,
+          "textChars": 119217,
+          "textBlockChars": [
+            0,
+            119217
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9995231282784931
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:44:47.736Z",
+          "command": "browser_press_key",
+          "argumentKeys": [
+            "key"
+          ],
+          "resultAt": "2026-10-04T13:44:48.133Z",
+          "pairedMs": 397,
+          "textChars": 119218,
+          "textBlockChars": [
+            0,
+            119218
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.9990462565569862
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-04T13:45:08.855Z",
+          "command": "browser_click",
+          "argumentKeys": [
+            "element",
+            "target"
+          ],
+          "resultAt": "2026-10-04T13:45:10.650Z",
+          "pairedMs": 1795,
+          "textChars": 123634,
+          "textBlockChars": [
+            0,
+            123634
+          ],
+          "error": false,
+          "snapshotLinesAlsoInPreviousFraction": 0.23548843794242566
+        }
+      ],
+      "caveats": [
+        "Entry timestamp intervals include scheduling and transport; these are not isolated backend timings.",
+        "Provider-reported input and cacheRead are recorded separately; their sum is not newly billed input.",
+        "toolsAdded is a logical session record, not a proof of final provider tool declarations under Code mode.",
+        "Conversation completion is not independent verification of task success."
+      ]
+    },
+    {
+      "label": "earlier-connection-failures",
+      "sessionFile": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent\\sessions\\--D--workself-daily--\\2026-10-01T09-32-18-333Z_01a0f6ce-ba1d-76e8-9a5e-1a75a56bff38.jsonl",
+      "fileSha256": "bb92d6238411b3b69dc47353a0896f6fa0166e89bc69e73a85edee1defc4dc10",
+      "modelEvents": [
+        {
+          "provider": "TZcode_gpt",
+          "modelId": "gpt-6-sol",
+          "timestamp": "2026-10-01T09:32:36.771Z"
+        }
+      ],
+      "thinkingEvents": [
+        {
+          "thinkingLevel": "high",
+          "timestamp": "2026-10-01T09:32:36.771Z"
+        }
+      ],
+      "logicalToolsRecordedInSystem": [
+        {
+          "name": "read",
+          "description": "Read the contents of a file. Supports text files and images (jpg, png, gif, webp, bmp). Images are sent as attachments. For text files, output is truncated to 2000 lines or 50KB (whichever is hit first). Use offset/limit for large files. When you need the full file, continue with offset until complete.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "path"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the file to read (relative or absolute)"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Line number to start reading from (1-indexed)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of lines to read"
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "powershell",
+          "description": "Execute a PowerShell command in the current working directory. Returns stdout and stderr. Output is truncated to last 2000 lines or 50KB (whichever is hit first). If truncated, full output is saved to a temp file. Optionally provide a timeout in seconds.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "command"
+            ],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Shell command to execute"
+              },
+              "timeout": {
+                "type": "number",
+                "description": "Timeout in seconds (optional, no default timeout)"
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "edit",
+          "description": "Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. If two changes affect the same block or nearby lines, merge them into one edit instead of emitting overlapping edits. Do not include large unchanged regions just to connect distant changes.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "path",
+              "edits"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the file to edit (relative or absolute)"
+              },
+              "edits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "oldText",
+                    "newText"
+                  ],
+                  "properties": {
+                    "oldText": {
+                      "type": "string",
+                      "description": "Exact text for one targeted replacement. It must be unique in the original file and must not overlap with any other edits[].oldText in the same call."
+                    },
+                    "newText": {
+                      "type": "string",
+                      "description": "Replacement text for this targeted edit."
+                    }
+                  }
+                },
+                "description": "One or more targeted replacements. Each edit is matched against the original file, not incrementally. Do not include overlapping or nested edits. If two changes touch the same block or nearby lines, merge them into one edit instead."
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "write",
+          "description": "Write content to a file. Creates the file if it doesn't exist, overwrites if it does. Automatically creates parent directories.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "path",
+              "content"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the file to write (relative or absolute)"
+              },
+              "content": {
+                "type": "string",
+                "description": "Content to write to the file"
+              }
+            }
+          },
+          "constrainedSampling": {
+            "type": "json_schema",
+            "strict": "prefer"
+          }
+        },
+        {
+          "name": "mcpScript",
+          "description": "Run trusted JavaScript that makes multiple MCP tool calls in one request — loop, filter, chain, or fan out between calls. For a single MCP call, search, describe, status check, or auth action, use the mcp tool instead. Discover with await tools.search({ query }) — resolves to { items: [{ path, name, server, description? }], total, hasMore, nextOffset }, not an { ok, data } envelope. Inspect with await tools.describe({ path }) — resolves to the tool descriptor with inputTypeScript, or { path, error: { code, message, suggestions } }. Then call tools.call(path, args) — resolves to { ok: true, data } or { ok: false, error: { code, message } } — or use direct flat calls when the name is already known; use emit(value) for user-visible output. Load the mcp-scripting skill for the full workflow guide.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "code"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Trusted JavaScript MCP script. Use tools.<prefixedToolName>(args) and emit(value)."
+              },
+              "timeoutMs": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Execution timeout in milliseconds (default: 30000)"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp",
+          "description": "MCP gateway — URL installation, server status, tool search/describe, auth, and single MCP tool calls. When a user supplies an MCP endpoint URL, install it with the install action. When one request needs several MCP calls with logic between them, use mcpScript. Non-MCP Pi tools should be called directly, not through mcp.\n\nServers: context7, anysearch, amap, deepwiki, chrome-devtools\n\nUsage:\n  mcp({ action: \"install\", url: \"https://example.com/mcp\" }) → Install, connect, and authenticate an MCP URL\n  mcp({ })                              → Show server status and tool counts\n  mcp({ server: \"name\" })               → List tools from server\n  mcp({ search: \"query\" })              → Search MCP tools by name/description\n  mcp({ describe: \"tool_name\" })        → Show tool details and parameters\n  mcp({ instructions: \"name\" })         → Show full server usage instructions\n  mcp({ connect: \"server-name\" })       → Connect to a server and refresh metadata\n  mcp({ tool: \"name\", args: { key: \"value\" } })         → Call a tool (object args; JSON string also accepted)\n  mcp({ action: \"ui-messages\" })        → Retrieve accumulated messages from completed UI sessions\n  mcp({ action: \"auth-start\", server: \"name\" })      → Open OAuth and watch for completion\n  mcp({ action: \"auth-complete\", server: \"name\", args: { redirectUrl: \"...\" } }) → Complete manual OAuth\n\nMode: action > tool (call) > connect > describe > instructions > search > server (list) > nothing (status)",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "description": "Tool name to call (e.g., 'xcodebuild_list_sims')"
+              },
+              "args": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "description": "Arguments as a JSON string (e.g., '{\"key\": \"value\"}')"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": true,
+                    "description": "Arguments as a JSON object (e.g., { \"key\": \"value\" })"
+                  }
+                ],
+                "description": "Tool arguments as a JSON object, or as a JSON string encoding one"
+              },
+              "connect": {
+                "type": "string",
+                "description": "Server name to connect (lazy connect + metadata refresh)"
+              },
+              "describe": {
+                "type": "string",
+                "description": "Tool name to describe (shows parameters)"
+              },
+              "instructions": {
+                "type": "string",
+                "description": "Server name to show that server's usage instructions"
+              },
+              "search": {
+                "type": "string",
+                "description": "Search tools by name/description"
+              },
+              "searchMode": {
+                "type": "string",
+                "enum": [
+                  "lexical",
+                  "semantic"
+                ],
+                "description": "Search backend (default: lexical; semantic is available when a System One key is configured)"
+              },
+              "regex": {
+                "type": "boolean",
+                "description": "Treat search as regex (default: substring match)"
+              },
+              "includeSchemas": {
+                "type": "boolean",
+                "description": "Include parameter schemas in search results (default: true)"
+              },
+              "limit": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Maximum search results to return (default: 12)"
+              },
+              "offset": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Search result offset (default: 0)"
+              },
+              "server": {
+                "type": "string",
+                "description": "Server name: filters searches, disambiguates calls and describe operations, and optionally names an install"
+              },
+              "action": {
+                "type": "string",
+                "description": "Action: 'install', 'ui-messages', 'auth-start', or 'auth-complete'"
+              },
+              "url": {
+                "type": "string",
+                "description": "MCP endpoint URL for action: 'install'"
+              },
+              "target": {
+                "type": "string",
+                "description": "Install target: 'global' (default) or 'project'"
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__context7",
+          "description": "Namespace-proxy for MCP server \"context7\". Forwards `{tool, args}` through the adapter's executeCall, so it inherits the same auth / lifecycle / output-guard rules as the `mcp` proxy.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "tool"
+            ],
+            "properties": {
+              "tool": {
+                "type": "string",
+                "description": "Underlying MCP tool name to call on this server."
+              },
+              "args": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true,
+                "description": "Arguments for the underlying tool. When mcp is available, use mcp({ search: '...' }) to inspect schemas; for unique names use mcp({ describe: 'tool_name' }) with the exact tool name returned by search."
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__anysearch",
+          "description": "Namespace-proxy for MCP server \"anysearch\". Forwards `{tool, args}` through the adapter's executeCall, so it inherits the same auth / lifecycle / output-guard rules as the `mcp` proxy.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "tool"
+            ],
+            "properties": {
+              "tool": {
+                "type": "string",
+                "description": "Underlying MCP tool name to call on this server."
+              },
+              "args": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true,
+                "description": "Arguments for the underlying tool. When mcp is available, use mcp({ search: '...' }) to inspect schemas; for unique names use mcp({ describe: 'tool_name' }) with the exact tool name returned by search."
+              }
+            }
+          }
+        },
+        {
+          "name": "mcp__chrome_devtools",
+          "description": "Namespace-proxy for MCP server \"chrome-devtools\". Forwards `{tool, args}` through the adapter's executeCall, so it inherits the same auth / lifecycle / output-guard rules as the `mcp` proxy.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "tool"
+            ],
+            "properties": {
+              "tool": {
+                "type": "string",
+                "description": "Underlying MCP tool name to call on this server."
+              },
+              "args": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true,
+                "description": "Arguments for the underlying tool. When mcp is available, use mcp({ search: '...' }) to inspect schemas; for unique names use mcp({ describe: 'tool_name' }) with the exact tool name returned by search."
+              }
+            }
+          }
+        },
+        {
+          "name": "bg_wait",
+          "description": "Wait for background, provider, or detached work that has no native completion notification, then return.\n\nOrdinary async subagent runs already notify this session natively when they complete or need attention. In an interactive chat, return control instead of calling this merely to wait. Use this tool for provider jobs, remembered detached foreground runs, or other background work without a native notification path. Headless runs auto-drain current-session subagent work at agent_end; use this tool only when the current turn must receive non-notifying background work results.\n\n• { } — return when the first initially active async run or registered provider item finishes, or when a subagent needs attention.\n• { all: true } — wait for every async run, provider item, and remembered detached foreground descendant that was active when the call began.\n• { id: \"...\" } — wait for one async or remembered detached foreground subagent run (id or prefix). Named async runs that already finished return their terminal result references.\n• { id: \"...\", nonBlocking: true } — resolve the prefix once, persist an exact-run wake subscription, and return immediately. Use this for detached work without native completion delivery; the originating interactive session wakes on completion, failure, attention, reconciliation failure, or timeout.\n• { stopOnAttention: false } — for blocking waits only, keep waiting through idle or long-thinking attention; supervisor/contact requests still stop the wait.\n• { timeoutMs: 600000 } — stop waiting after N ms; active work keeps running. Omitted values use waitTool.defaultTimeoutMs, then 30 minutes. Window expiry returns a non-error window_elapsed result with active work identities.\n\nNon-blocking subscriptions are visible in subagent status and differ from disabling waitTool: waitTool.enabled=false returns immediately without registering any future wake. Provider jobs are session-scoped and identified exactly, so replacing one job with another cannot hide a completion. Provider extensions must be explicitly loaded in this process. In a child agent, keep `bg_wait` in the child tool allowlist and load each provider through the agent's extensions or subagentOnlyExtensions; this tool never loads providers or grants tools itself.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Async run or remembered detached foreground run id/prefix to wait for one specific run. Ordinary async subagent runs already notify this session natively; use bg_wait for provider, detached, or other background work without native notification, or when same-turn blocking results are truly needed. Omit to wait across every active async run started in this session only when a same-turn wait is truly needed."
+              },
+              "nonBlocking": {
+                "type": "boolean",
+                "description": "When true, resolve id to one exact run, persist a wake subscription, and return immediately. Use this only for provider, detached, or other background work without a native completion notification; ordinary async subagent runs already notify this session natively and do not need a subscription. The originating session is woken on completion, failure, attention, reconciliation failure, or timeout. Requires id and cannot be combined with all."
+              },
+              "all": {
+                "type": "boolean",
+                "description": "Wait for ALL active runs to finish. Ordinary async subagent runs already notify this session natively; use all only when a same-turn result from tracked background work is truly needed. Default false: return when the first tracked run or provider item finishes or needs attention. Ignored when id targets a single run."
+              },
+              "timeoutMs": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Give up waiting after this many milliseconds (the runs keep going regardless). Ordinary async subagent runs already notify this session natively; use a wait timeout only when same-turn results are truly needed for provider, detached, or other background work without native notification. Defaults to config waitTool.defaultTimeoutMs, then 1800000 (30 minutes). Window expiry is a non-error active-work result."
+              },
+              "stopOnAttention": {
+                "type": "boolean",
+                "description": "For a blocking wait that is truly needed, stop when a run needs attention by default. Set false to keep waiting through idle or long-thinking attention; supervisor/contact requests still stop the wait."
+              }
+            }
+          }
+        },
+        {
+          "name": "subagents_enable",
+          "description": "Enable pi-subagents delegation and management tools without launching work. Call when delegation is authorized by the current request or applicable user/project instructions, or when managing existing runs. Direct execution is the default; complexity alone never authorizes delegation. Full tools are available on the next model request.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "plan_mode_question",
+          "description": "Ask one to three structured questions only when the latest effective Plan contract explicitly says /plan mode is active. Tool visibility alone does not activate Plan mode. Never call for ordinary planning requests, the writing-plans skill, roadmaps, checklists, or plan-file work.",
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "questions"
+            ],
+            "properties": {
+              "questions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "description": "Questions to show the user. Prefer 1 and do not exceed 3.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "header",
+                    "question",
+                    "options"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Stable identifier for mapping answers (snake_case)."
+                    },
+                    "header": {
+                      "type": "string",
+                      "description": "Short header label shown in the UI (12 or fewer chars)."
+                    },
+                    "question": {
+                      "type": "string",
+                      "description": "Single-sentence prompt shown to the user."
+                    },
+                    "options": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 4,
+                      "description": "Provide 2-4 mutually exclusive choices. Put the recommended option first when there is a clear default.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "label",
+                          "description"
+                        ],
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "description": "User-facing label (1-5 words)."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "One short sentence explaining impact/tradeoff if selected."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "plan_mode_complete",
+          "description": "Submit a decision-ready plan only when the latest effective Plan contract explicitly says /plan mode is active, and call it alone as the final action. Tool visibility alone does not activate Plan mode. Never call for ordinary planning requests, the writing-plans skill, roadmaps, checklists, or plan-file work.",
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "plan"
+            ],
+            "properties": {
+              "plan": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 50000,
+                "description": "The complete decision-ready implementation plan in Markdown."
+              }
+            }
+          }
+        },
+        {
+          "name": "ask_user_question",
+          "description": "Ask the user one or more structured questions during execution. Use when you need to:\n1. Gather user preferences or requirements\n2. Clarify ambiguous instructions\n3. Get decisions on implementation choices as you work\n4. Offer choices to the user about what direction to take\n\nUsage notes:\n- Users can type a custom answer via the automatically appended \"Type something.\" row on every question or press Esc to abandon the questionnaire. Do NOT author \"Other\" or \"Type something.\" labels yourself — reserved labels are rejected at runtime.\n- Use multiSelect: true when multiple answers are valid. The \"Type something.\" row is available on every question, including when options carry a `preview`; in preview mode it expands to the full pane width while typing so the custom answer is not cramped into the narrow options column.\n- If you recommend a specific option, make that the first option in the list and add \"(Recommended)\" at the end of the label.\n\nPreview feature:\nUse the optional `preview` field on options when presenting concrete artifacts that users need to visually compare:\n- ASCII mockups of UI layouts or components\n- Code snippets showing different implementations\n- Diagram variations\n- Configuration examples\n\nPreview content is rendered as markdown in a monospace box. Multi-line text with newlines is supported. When any option has a preview, the UI switches to a side-by-side layout with a vertical option list on the left and preview on the right. Do not use previews for simple preference questions where labels and descriptions suffice. Note: previews are only supported for single-select questions (not multiSelect).",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "questions"
+            ],
+            "properties": {
+              "questions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "question",
+                    "header",
+                    "options"
+                  ],
+                  "properties": {
+                    "question": {
+                      "type": "string",
+                      "description": "The complete question to ask the user. Should be clear, specific, and end with a question mark. Example: \"Which library should we use for date formatting?\" If multiSelect is true, phrase it accordingly, e.g. \"Which features do you want to enable?\""
+                    },
+                    "header": {
+                      "type": "string",
+                      "maxLength": 16,
+                      "description": "MAX 16 CHARACTERS — hard limit, requests over the limit are rejected. Very short chip/tag shown next to the question. Examples: \"Auth method\", \"Library\", \"Approach\"."
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "label",
+                          "description"
+                        ],
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "maxLength": 60,
+                            "description": "MAX 60 CHARACTERS — hard limit, requests over the limit are rejected. The display text for this option that the user will see and select. Should be concise (1-5 words) and clearly describe the choice."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Explanation of what this option means or what will happen if chosen. Useful for providing context about trade-offs or implications."
+                          },
+                          "preview": {
+                            "type": "string",
+                            "description": "Optional preview content rendered when this option is focused. Use for mockups, code snippets, or visual comparisons that help users compare options. See the tool description for the expected content format."
+                          }
+                        }
+                      },
+                      "minItems": 2,
+                      "maxItems": 4,
+                      "description": "The available choices for this question. Must have 2-4 options. Each option should be a distinct, mutually exclusive choice (unless multiSelect is enabled). The 'Type something.' row is appended automatically — do NOT author it."
+                    },
+                    "multiSelect": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Set to true to allow the user to select multiple options instead of just one. Use when choices are not mutually exclusive."
+                    }
+                  }
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "description": "Questions to ask the user (1-4 questions)"
+              }
+            }
+          }
+        },
+        {
+          "name": "web_enable",
+          "description": "Enable configured pi-web-access tools for web research and content retrieval. Does not search or fetch. Enabled tools are available on the next model request; disabled capabilities remain unavailable.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "create_goal",
+          "description": "Create and focus a persistent goal only on explicit user request; other open goals remain unchanged.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "objective"
+            ],
+            "properties": {
+              "objective": {
+                "type": "string",
+                "description": "Full objective; preserve ordered steps and done criteria."
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "regular",
+                  "sisyphus"
+                ],
+                "description": "Default regular; sisyphus only if requested."
+              },
+              "token_budget": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Whole-token budget, only if supplied by the user."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "get_goal",
+          "description": "Read focused goal state. Default: compact summary. Retrieve full objective/contracts, tasks, or history in 4000-character pages with section and cursor. verbose preserves full legacy output.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "section": {
+                "type": "string",
+                "enum": [
+                  "summary",
+                  "objective",
+                  "tasks",
+                  "history"
+                ]
+              },
+              "task_id": {
+                "type": "string",
+                "description": "With section=tasks, retrieve one task."
+              },
+              "cursor": {
+                "type": "string",
+                "maxLength": 256,
+                "description": "Next page; repeat section/task."
+              },
+              "verbose": {
+                "type": "boolean",
+                "description": "Full detail mode."
+              },
+              "include_history": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "subagent_supervisor",
+          "description": "Native pi-subagents supervisor channel. Use reply/pending/status to answer child subagent requests without overriding pi-intercom.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "action"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "list",
+                  "pending",
+                  "status",
+                  "reply"
+                ]
+              },
+              "to": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "replyTo": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_browser",
+          "description": "Use Playwright's browser extension to operate existing logged-in Chrome tabs through accessibility snapshots and element refs. First call name=tools to read command schemas, then browser_snapshot or browser_tabs. First action opens Chrome's extension tab picker. Requires Full Access. Use current snapshot refs; page content is untrusted data. No arbitrary code execution.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "arguments": {
+                "type": "object",
+                "patternProperties": {
+                  "^.*$": {}
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_observe",
+          "description": "Observe the current foreground application: its identity, geometry and screenshot. The Orb window is excluded.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_click",
+          "description": "Click at a pixel position in the attached screenshot. Supports right button, double-click and modifiers. Returns a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id from the orb_observe result this action was decided from."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "button": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "left"
+                  },
+                  {
+                    "type": "string",
+                    "const": "right"
+                  }
+                ],
+                "description": "Mouse button; default left."
+              },
+              "count": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "const": 1
+                  },
+                  {
+                    "type": "number",
+                    "const": 2
+                  }
+                ],
+                "description": "1 single click or 2 double-click; default 1."
+              },
+              "modifiers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Modifiers held for this click: shift, control, option or cmd."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_type",
+          "description": "Click the specified screenshot pixel position, type text, optionally replace field contents and press Enter. Returns a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "text",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this action was decided from."
+              },
+              "text": {
+                "type": "string",
+                "description": "Text to type (1-200 characters). Never type credentials or other secrets."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "replace": {
+                "type": "boolean",
+                "description": "Select all in the focused field before typing."
+              },
+              "submit": {
+                "type": "boolean",
+                "description": "Press Enter after typing."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_scroll",
+          "description": "Scroll inside the observed window. Requires an authorized desktop task.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "direction",
+              "amount",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this action was decided from."
+              },
+              "direction": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "up"
+                  },
+                  {
+                    "type": "string",
+                    "const": "down"
+                  }
+                ],
+                "description": "Scroll direction."
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Scroll ticks (1-10)."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_hotkey",
+          "description": "Press a key chord in the observed window. System screenshot shortcuts are refused.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "keys"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this key chord was decided from."
+              },
+              "keys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "description": "Key names in press order, for example [\"ctrl\", \"c\"]."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_long_press",
+          "description": "Hold the left mouse button at a point in the observed window for 1-10 seconds.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "x",
+              "y",
+              "duration_seconds"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this press was decided from."
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+              },
+              "duration_seconds": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Hold duration in seconds (1-10)."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_open_app",
+          "description": "Bring an already running application to the foreground and continue against its window. Launching an application that is not running is not available.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "name"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this action was decided from."
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "description": "Display name or executable base name of an application that is already running, for example Notepad."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_drag",
+          "description": "Drag between two points inside the observed window.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "start_x",
+              "start_y",
+              "end_x",
+              "end_y"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The observation_id this drag was decided from."
+              },
+              "start_x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Start pixel column in the attached screenshot."
+              },
+              "start_y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Start pixel row in the attached screenshot."
+              },
+              "end_x": {
+                "type": "number",
+                "minimum": 0,
+                "description": "End pixel column in the attached screenshot."
+              },
+              "end_y": {
+                "type": "number",
+                "minimum": 0,
+                "description": "End pixel row in the attached screenshot."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_wait",
+          "description": "Wait one second for the current window, then return a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The current observation_id."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_long_wait",
+          "description": "Wait 10, 30, 60 or 120 seconds for a visible long-running task, then return a fresh screenshot.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "wait_seconds"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The current observation_id."
+              },
+              "wait_seconds": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "const": 10
+                  },
+                  {
+                    "type": "number",
+                    "const": 30
+                  },
+                  {
+                    "type": "number",
+                    "const": 60
+                  },
+                  {
+                    "type": "number",
+                    "const": 120
+                  }
+                ],
+                "description": "10, 30, 60 or 120 seconds."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_list_apps",
+          "description": "List running applications, then return a fresh screenshot of the authorized target.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "description": "The current observation_id."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "orb_batch",
+          "description": "Execute 2–8 GUI actions in order, using targets already visible in the initial screenshot. Later targets must not depend on UI created by earlier actions. Never batch opening a menu with choosing its new item, or navigation with input on the new page. Returns each completed step's screenshot and the final observation. Failure or surface change stops remaining actions.",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "observation_id",
+              "actions"
+            ],
+            "properties": {
+              "observation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "x",
+                        "y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "button": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "left"
+                            },
+                            {
+                              "type": "string",
+                              "const": "right"
+                            }
+                          ],
+                          "description": "Mouse button; default left."
+                        },
+                        "count": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "const": 1
+                            },
+                            {
+                              "type": "number",
+                              "const": 2
+                            }
+                          ],
+                          "description": "1 single click or 2 double-click; default 1."
+                        },
+                        "modifiers": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Modifiers held for this click: shift, control, option or cmd."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "click"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "text",
+                        "x",
+                        "y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "text": {
+                          "type": "string",
+                          "description": "Text to type (1-200 characters). Never type credentials or other secrets."
+                        },
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "replace": {
+                          "type": "boolean",
+                          "description": "Select all in the focused field before typing."
+                        },
+                        "submit": {
+                          "type": "boolean",
+                          "description": "Press Enter after typing."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "type"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "keys",
+                        "kind"
+                      ],
+                      "properties": {
+                        "keys": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "minItems": 1,
+                          "maxItems": 4,
+                          "description": "Key names in press order, for example [\"ctrl\", \"c\"]."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "hotkey"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "direction",
+                        "amount",
+                        "x",
+                        "y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "direction": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "up"
+                            },
+                            {
+                              "type": "string",
+                              "const": "down"
+                            }
+                          ],
+                          "description": "Scroll direction."
+                        },
+                        "amount": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10,
+                          "description": "Scroll ticks (1-10)."
+                        },
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "scroll"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "x",
+                        "y",
+                        "duration_seconds",
+                        "kind"
+                      ],
+                      "properties": {
+                        "x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel column in the attached screenshot, from 0 to attached_size width. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Pixel row in the attached screenshot, from 0 to attached_size height. Not a 0-1000 fraction or desktop coordinate."
+                        },
+                        "duration_seconds": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 10,
+                          "description": "Hold duration in seconds (1-10)."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "longPress"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "start_x",
+                        "start_y",
+                        "end_x",
+                        "end_y",
+                        "kind"
+                      ],
+                      "properties": {
+                        "start_x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Start pixel column in the attached screenshot."
+                        },
+                        "start_y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Start pixel row in the attached screenshot."
+                        },
+                        "end_x": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "End pixel column in the attached screenshot."
+                        },
+                        "end_y": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "End pixel row in the attached screenshot."
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "drag"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "minItems": 2,
+                "maxItems": 8
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      ],
+      "systemSectionCharacters": {
+        "preamble": 14257,
+        "project_context": 629,
+        "skills": 8280,
+        "cwd": 30,
+        "orb_mode": 3137
+      },
+      "firstUserAt": "2026-10-01T09:33:55.017Z",
+      "lastAssistantAt": "2026-10-01T09:46:19.668Z",
+      "elapsedMs": 744651,
+      "assistantResponses": 9,
+      "toolCounts": {
+        "orb_observe": 2,
+        "orb_browser": 4,
+        "orb_click": 1
+      },
+      "browserCommandCounts": {
+        "tools": 1,
+        "browser_tabs": 2,
+        "browser_snapshot": 1
+      },
+      "completedToolResults": 7,
+      "errors": 3,
+      "sumPairedToolIntervalsMs": 276509,
+      "toolIntervalFractionOfElapsed": 0.3713269706211366,
+      "browserTextCharacters": 9019,
+      "automaticSnapshotCharacters": 0,
+      "browserPairedIntervalsMs": {
+        "sum": 270109,
+        "median": 90012,
+        "max": 90028
+      },
+      "firstResponseUsage": {
+        "input": 11957,
+        "output": 60,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 42,
+        "totalTokens": 12017,
+        "cost": {
+          "input": 0.023913999999999998,
+          "output": 0.0006000000000000001,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.024513999999999998
+        }
+      },
+      "lastResponseUsage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "totalTokens": 0,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      },
+      "lastResponseInputPlusCacheRead": 0,
+      "calls": [
+        {
+          "tool": "orb_observe",
+          "at": "2026-10-01T09:34:10.909Z",
+          "resultAt": "2026-10-01T09:34:13.078Z",
+          "pairedMs": 2169,
+          "textChars": 577,
+          "textBlockChars": [
+            470,
+            107
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-01T09:35:12.010Z",
+          "command": "tools",
+          "argumentKeys": [],
+          "resultAt": "2026-10-01T09:35:12.057Z",
+          "pairedMs": 47,
+          "textChars": 8764,
+          "textBlockChars": [
+            8764
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-01T09:36:16.616Z",
+          "command": "browser_tabs",
+          "argumentKeys": [
+            "action"
+          ],
+          "tabAction": "list",
+          "resultAt": "2026-10-01T09:37:46.644Z",
+          "pairedMs": 90028,
+          "textChars": 85,
+          "textBlockChars": [
+            85
+          ],
+          "error": true,
+          "reason": "browser-error"
+        },
+        {
+          "tool": "orb_observe",
+          "at": "2026-10-01T09:38:40.989Z",
+          "resultAt": "2026-10-01T09:38:42.526Z",
+          "pairedMs": 1537,
+          "textChars": 425,
+          "textBlockChars": [
+            318,
+            107
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_click",
+          "at": "2026-10-01T09:39:35.771Z",
+          "resultAt": "2026-10-01T09:39:38.465Z",
+          "pairedMs": 2694,
+          "textChars": 463,
+          "textBlockChars": [
+            356,
+            107
+          ],
+          "error": false
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-01T09:41:14.458Z",
+          "command": "browser_snapshot",
+          "argumentKeys": [
+            "depth",
+            "boxes"
+          ],
+          "resultAt": "2026-10-01T09:42:44.480Z",
+          "pairedMs": 90022,
+          "textChars": 85,
+          "textBlockChars": [
+            85
+          ],
+          "error": true,
+          "reason": "browser-error"
+        },
+        {
+          "tool": "orb_browser",
+          "at": "2026-10-01T09:44:21.285Z",
+          "command": "browser_tabs",
+          "argumentKeys": [
+            "action"
+          ],
+          "tabAction": "list",
+          "resultAt": "2026-10-01T09:45:51.297Z",
+          "pairedMs": 90012,
+          "textChars": 85,
+          "textBlockChars": [
+            85
+          ],
+          "error": true,
+          "reason": "browser-error"
+        }
+      ],
+      "caveats": [
+        "Entry timestamp intervals include scheduling and transport; these are not isolated backend timings.",
+        "Provider-reported input and cacheRead are recorded separately; their sum is not newly billed input.",
+        "toolsAdded is a logical session record, not a proof of final provider tool declarations under Code mode.",
+        "Conversation completion is not independent verification of task success."
+      ]
+    }
+  ]
+}

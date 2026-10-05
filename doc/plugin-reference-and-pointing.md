@@ -1,5 +1,10 @@
 # 插件参考更新、小控件取点与调用耗时
 
+> 本页的 pixel 坐标实验和旧扩展证据属于 2026-10-01 的历史记录。当前运行时已按
+> `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7` 的默认 millifraction 契约
+> 固定为截图相对的 0–1000 坐标；请以 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
+> 和 [`toolset-comparison-2026-10-04.md`](./toolset-comparison-2026-10-04.md) 作为当前实现依据。
+
 ## 参考核对（2026-10-01）
 
 - 新插件：`rain-knows/dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`，完整只读检出

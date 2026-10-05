@@ -11,12 +11,12 @@
 
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const repo = resolve(import.meta.dirname, "..", "..");
-const piWebWorktree = join(tmpdir(), "pi-orb-p0-head-src");
+const piWebWorktree = process.env.PI_ORB_EVIDENCE_PI_WEB ?? join(tmpdir(), "pi-orb-p0-head-src");
 const runRoot = join("D:\\pi-orb-p1-runs", `p1-06-tools-${Date.now()}`);
 const piWebPort = 31411;
 const modelPort = 31412;
@@ -70,7 +70,11 @@ const modelServer = createServer(async (req, res) => {
   report.requests.push({
     index: report.requests.length + 1,
     tools: [...tools].sort(),
-    orbTools: tools.filter((name) => String(name).startsWith("orb_")).sort(),
+    orbTools: tools.filter((name) => [
+      "click", "input_text", "scroll", "hotkey", "long_press", "drag", "wait", "long_wait",
+      "screenshot", "open_in_browser", "open_in_finder", "list_apps", "open_app",
+      "code_agent", "code_agent_status", "code_agent_stop",
+    ].includes(name)).sort(),
     containsOrbModeSection: serialized.includes("orb_mode"),
     // The prompt must state the rules the executor enforces, or the model is told one thing and
     // judged by another.
@@ -221,7 +225,11 @@ try {
   // -------------------------------------------------------------------------
   // Assertions, judged from the tool schemas the provider actually received.
   // -------------------------------------------------------------------------
-  const expectedOrbTools = ["orb_click", "orb_drag", "orb_hotkey", "orb_list_apps", "orb_long_press", "orb_long_wait", "orb_observe", "orb_open_app", "orb_scroll", "orb_type", "orb_wait"];
+  const expectedOrbTools = [
+    "click", "code_agent", "code_agent_status", "code_agent_stop", "drag", "hotkey", "input_text",
+    "list_apps", "long_press", "long_wait", "open_app", "open_in_browser", "open_in_finder",
+    "screenshot", "scroll", "wait",
+  ];
 
   check(
     "a normal session is offered no Orb tool",

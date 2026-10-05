@@ -8,10 +8,9 @@
  *  1. **Nothing runs without a live authorization.** The controller holds the task grant; the
  *     broker refuses before touching the driver, so desktop authority cannot be bypassed by a
  *     malformed request.
- *  2. **One action, one observation.** An action must name the observation it was decided
- *     from, and a successful action returns the fresh screenshot and observation id for the next
- *     action.
- *  3. **A failure stops the batch.** The controller records the outcome, and a failed action
+ *  2. **One action, one observation.** An action is validated against the latest internal
+ *     observation, and a successful action returns the fresh screenshot for the next action.
+ *  3. **A failure stops the task.** The controller records the outcome, and a failed action
  *     makes the next one refuse until the user changes the Access level.
  *
  * It is deliberately narrow: it holds no session engine, no model, and no policy of its own
@@ -79,47 +78,6 @@ export class DesktopBroker {
 
   act(action: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown> {
     return this.#exclusive(abort => this.#act(action, sessionId, generation, abort), signal);
-  }
-
-  /** Pi adaptation of reference policy.ts:20: ordered independent targets from one frame. */
-  batch(value: unknown, sessionId: string, generation: number, signal?: AbortSignal,
-    progress?: (step: number, total: number) => void): Promise<unknown> {
-    return this.#exclusive(async abort => {
-      const batch = value as { observationId?: unknown; actions?: unknown[] } | null;
-      if (!batch || typeof batch.observationId !== "string" || !Array.isArray(batch.actions) || batch.actions.length < 2 || batch.actions.length > 8) {
-        return { ok: false, reason: "malformed", message: "Batch needs an observation and 2–8 actions.", completed: 0, steps: [] };
-      }
-      const initial = this.#currentObservation();
-      const actions: DesktopAction[] = [];
-      for (const input of batch.actions) {
-        if (!input || typeof input !== "object" || "observationId" in input) return { ok: false, reason: "malformed", message: "Batch steps do not supply observation IDs.", completed: 0, steps: [] };
-        const parsed = parseAction({ ...input, observationId: batch.observationId });
-        if (!parsed.ok || !["click", "type", "hotkey", "scroll", "longPress", "drag"].includes(parsed.action.kind)) {
-          return { ok: false, reason: "malformed", message: "Unsupported or malformed batch step.", completed: 0, steps: [] };
-        }
-        if (!this.#options.isLive(sessionId, generation)) return refusal("stale-generation");
-        const reason = this.#controller.check(parsed.action, initial, { sessionId, generation });
-        if (reason) return { ...refusal(reason) as object, completed: 0, steps: [] };
-        actions.push(parsed.action);
-      }
-      const steps: Record<string, unknown>[] = [];
-      const partial = (result: Record<string, unknown>) => ({ ...result, completed: steps.length, steps,
-        finalObservationId: (result.observation as DesktopObservation | undefined)?.observationId ?? (steps.at(-1)?.observation as DesktopObservation | undefined)?.observationId ?? null,
-        observationUsable: this.#controller.state.lastObservationId !== null && !this.#controller.state.stopped });
-      const sameSurface = (next: DesktopObservation) => JSON.stringify([next.window, next.coordinateSpace]) === JSON.stringify([initial!.window, initial!.coordinateSpace]);
-      for (const [index, action] of actions.entries()) {
-        if (abort.aborted) return partial({ ok: false, reason: "cancelled", message: "Batch cancelled; remaining actions were not executed." });
-        progress?.(index + 1, actions.length);
-        const current = this.#currentObservation();
-        if (!current) return partial({ ok: false, reason: "observation-unknown" });
-        const result = await this.#act({ ...action, observationId: current.observationId }, sessionId, generation, abort) as Record<string, unknown>;
-        if (result.ok !== true) return partial(result);
-        steps.push(result);
-        const next = result.observation as DesktopObservation;
-        if (!sameSurface(next) && index + 1 < actions.length) return partial({ ok: false, reason: "surface-changed", message: "Window or observation area changed; remaining actions were not executed. Use the latest observation.", observation: next });
-      }
-      return { ok: true, completed: steps.length, steps, observation: this.#currentObservation() };
-    }, signal);
   }
 
   constructor(options: DesktopBrokerOptions) {
@@ -286,7 +244,7 @@ export class DesktopBroker {
     if (!result.ok) {
       // A failed action spends its input observation and cannot be retried from that picture.
       this.#consumeObservation();
-      // A failure stops the batch; the message says so, because the model must not retry
+      // A failure stops the task; the message says so, because the model must not retry
       // blindly from the same observation.
       const suffix = result.refused ? " The driver refused the action." : "";
       this.#log({ event: "act-failed", kind: parsed.action.kind, error: result.error, refused: result.refused });
@@ -295,6 +253,7 @@ export class DesktopBroker {
         refused: result.refused,
         reason: signal.aborted ? "cancelled" : "action-failed",
         message: `${result.error ?? "The action failed."}${suffix} The task was stopped; observe again and ask the user before continuing.`,
+        ...(result.observation ? { observation: result.observation } : {}),
       };
     }
 
@@ -309,6 +268,8 @@ export class DesktopBroker {
       observationId: parsed.action.observationId,
       observation: nextObservation,
       ...(result.apps ? { apps: result.apps } : {}),
+      ...(result.paths ? { paths: result.paths } : {}),
+      ...(result.app ? { app: result.app } : {}),
       next: "Use this fresh observation for the next action.",
     };
   }
@@ -456,10 +417,19 @@ export function parseAction(value: unknown): ParseResult {
     return { ok: true, action: { kind: "openApp", observationId, name: record.name } };
   }
 
-  if (kind === "wait" || kind === "listApps") return { ok: true, action: { kind, observationId } };
+  if (kind === "wait" || kind === "listApps" || kind === "screenshot") return { ok: true, action: { kind, observationId } };
   if (kind === "longWait") {
     if (typeof record.waitSeconds !== "number") return { ok: false, message: "A long wait needs waitSeconds." };
     return { ok: true, action: { kind, observationId, waitSeconds: record.waitSeconds } };
+  }
+  if (kind === "openInBrowser") {
+    if (record.url !== undefined && typeof record.url !== "string") return { ok: false, message: "open_in_browser url must be text." };
+    return { ok: true, action: { kind, observationId, ...(typeof record.url === "string" ? { url: record.url } : {}) } };
+  }
+  if (kind === "openInFinder") {
+    if (record.path !== undefined && typeof record.path !== "string") return { ok: false, message: "open_in_finder path must be text." };
+    if (record.revealOnly !== undefined && typeof record.revealOnly !== "boolean") return { ok: false, message: "open_in_finder revealOnly must be boolean." };
+    return { ok: true, action: { kind, observationId, ...(typeof record.path === "string" ? { path: record.path } : {}), ...(typeof record.revealOnly === "boolean" ? { revealOnly: record.revealOnly } : {}) } };
   }
 
   return { ok: false, message: `Unknown action kind: ${String(kind)}` };
