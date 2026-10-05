@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-05T11:01:16.648Z",
+  "capturedAt": "2026-10-05T12:10:53.397Z",
   "executable": "release\\0.1.0-preview.3\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1791198076648",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1791202253397",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": ""
+      "detail": "pi-orb"
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -86,7 +86,7 @@
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
       "ok": true,
-      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":8,\"settled\":\"0:34\"}"
+      "detail": "{\"docked\":\"left\",\"before\":{\"x\":-52,\"width\":96},\"distinctFrames\":9,\"settled\":\"0:34\"}"
     },
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
@@ -115,6 +115,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-105208",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/7d199713-919f-4b5c-9406-3c3657de822f"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-110404",
+  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/a2f6204a-4d08-45d5-9018-10b4bb527237"
 }

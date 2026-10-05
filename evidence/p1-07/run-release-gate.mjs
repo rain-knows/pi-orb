@@ -678,15 +678,32 @@ const allowedWriteFiles = new Set([
 // `relative` yields backslashes on Windows, so paths are normalized before comparison: comparing
 // a backslash path against a forward-slash allowlist silently reported every file as unexpected.
 const toPosix = (path) => path.split(/\\/).join("/");
+// The new background adapter creates only the requested task cwd and atomically persists its
+// registry beside the Orb config. Audit these exact calls, rather than allowing every future
+// write in the manager. The runtime constructor must still use the shared Orb-owned registry path.
+const codeAgentWriteLines = new Set([
+  "mkdirSync(cwd, { recursive: true });",
+  "mkdirSync(dirname(this.#options.registryPath), { recursive: true });",
+  'writeFileSync(temporary, JSON.stringify([...this.#tasks.values()]), { encoding: "utf8", mode: 0o600 });',
+  "renameSync(temporary, this.#options.registryPath);",
+]);
+const registryBinding = readFileSync(join(repo, "src/main/index.ts"), "utf8")
+  .includes("client, registryPath: codeAgentRegistryPath(),")
+  && readFileSync(join(repo, "src/shared/code-agent.ts"), "utf8")
+    .includes("return join(dirname(resolveOrbConfigPath()), CODE_AGENT_REGISTRY);")
+  && readFileSync(join(repo, "src/main/code-agent-manager.ts"), "utf8")
+    .includes("const temporary = `${this.#options.registryPath}.tmp`;");
 // The main entry creates only the explicitly requested Electron userData directory before setPath.
 const unexpectedWriteFiles = [...new Set(writeCalls.filter(entry =>
   !allowedWriteFiles.has(toPosix(entry.file)) && !(toPosix(entry.file) === "src/main/index.ts"
-    && entry.call === "mkdirSync" && entry.text === "mkdirSync(profileDirectory, { recursive: true });"),
+    && entry.call === "mkdirSync" && entry.text === "mkdirSync(profileDirectory, { recursive: true });")
+  && !(toPosix(entry.file) === "src/main/code-agent-manager.ts" && registryBinding
+    && codeAgentWriteLines.has(entry.text)),
 ).map(entry => toPosix(entry.file)))];
 check(
   "product writes only happen in the modules that own the Orb data directory and the chosen workspace",
   unexpectedWriteFiles.length === 0,
-  JSON.stringify({ writeFiles: [...new Set(writeCalls.map((entry) => toPosix(entry.file)))], unexpected: unexpectedWriteFiles }),
+  JSON.stringify({ writeFiles: [...new Set(writeCalls.map((entry) => toPosix(entry.file)))], registryBinding, unexpected: unexpectedWriteFiles }),
 );
 
 // No write call may target a pi-web path. A string mentioning pi-web in a comment is fine; a write

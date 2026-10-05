@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-10-04T14:41:27.590Z",
+  "capturedAt": "2026-10-05T12:06:52.857Z",
   "projectVersion": "0.1.0-preview.3",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "14539 ms"
+      "detail": "13085 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "8720 ms"
+      "detail": "9822 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "14492 ms"
+      "detail": "14684 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4825 ms"
+      "detail": "4897 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -45,7 +45,7 @@
     {
       "name": "the release ignore rules exclude dependencies and build output",
       "ok": true,
-      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".playwright-mcp/\",\".tmp/\",\"evidence/browser-connection/dom-result.png\",\"evidence/browser-connection/live-official-profile.png\",\"evidence/frontend-port/after-access.png\",\"evidence/frontend-port/after-ball.png\",\"evidence/frontend-port/after-dark.png\",\"evidence/frontend-port/after-dock.png\",\"evidence/frontend-port/after-history.png\",\"evidence/frontend-port/after-input.png\"]}"
+      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".playwright-mcp/\",\".tmp/\",\"evidence/browser-connection/dom-result.png\",\"evidence/browser-connection/live-official-profile.png\",\"node_modules/\",\"out/\",\"release/\"]}"
     },
     {
       "name": "no build output or dependency directory is staged for release",
@@ -320,7 +320,7 @@
     {
       "name": "product writes only happen in the modules that own the Orb data directory and the chosen workspace",
       "ok": true,
-      "detail": "{\"writeFiles\":[\"src/main/bridge-server.ts\",\"src/main/config-store.ts\",\"src/main/index.ts\",\"src/main/personal-startup.ts\",\"src/main/workspace.ts\"],\"unexpected\":[]}"
+      "detail": "{\"writeFiles\":[\"src/main/bridge-server.ts\",\"src/main/code-agent-manager.ts\",\"src/main/config-store.ts\",\"src/main/index.ts\",\"src/main/personal-startup.ts\",\"src/main/workspace.ts\"],\"registryBinding\":true,\"unexpected\":[]}"
     },
     {
       "name": "no product write targets pi-web or a node_modules path",
@@ -335,9 +335,10 @@
   ],
   "passed": true,
   "writeSurface": {
-    "writeCallCount": 11,
+    "writeCallCount": 15,
     "files": [
       "src/main/bridge-server.ts",
+      "src/main/code-agent-manager.ts",
       "src/main/config-store.ts",
       "src/main/index.ts",
       "src/main/personal-startup.ts",

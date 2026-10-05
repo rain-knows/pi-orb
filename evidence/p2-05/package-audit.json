@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-05T11:00:57.012Z",
+  "capturedAt": "2026-10-05T12:10:53.239Z",
   "version": "0.1.0-preview.3",
   "appRoot": "release/0.1.0-preview.3/win-unpacked",
   "entries": {
@@ -149,12 +149,12 @@
     {
       "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
       "ok": true,
-      "detail": "14450 bytes"
+      "detail": "14688 bytes"
     },
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "61947 bytes"
+      "detail": "63477 bytes"
     },
     {
       "name": "the independent plugin ships outside ASAR at the app version",

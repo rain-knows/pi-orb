@@ -31,7 +31,7 @@ P1/P2 的实现与分阶段证据保留；个人用户安装与启动改进见�
 
 ### 安装与启动
 
-1. 安装本地构建的 `pi-orb-0.1.0-preview.3-win-x64.exe`。按用户安装，不请求提权；包含独立 Pi 插件，不包含 Pi Web/Node。它未签名，SmartScreen 的实际体验仍待验收。
+1. 从 [preview.3 Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.3) 下载并安装 `pi-orb-0.1.0-preview.3-win-x64.exe`。按用户安装，不请求提权；包含独立 Pi 插件，不包含 Pi Web/Node。它未签名，SmartScreen 的实际体验仍待验收。
 2. 从开始菜单打开 **pi-orb**，或按 **Win+R** 输入 **`pi-orb`**。首次启动通过已安装 Pi CLI 自动注册随包插件，并备份 Pi 的用户设置；旧的同名本地 Orb 插件登记由官方 CLI 移除，不修改模型、凭据与其他插件。
 3. 已有 Pi Web 服务会直接复用。尚未运行时，从全局安装或首次选定的 `bin/pi-web.js` 定位 Pi Web 包，直接隐藏启动其 Next.js 正式生产入口，等待就绪，不打开浏览器或终端。源码版 Pi Web 需先完成生产构建。默认地址为 `http://127.0.0.1:30141`。
 4. 选择专用工作区，检查模型和 Access，再开始聊天。新会话默认完全访问；右键悬浮球或托盘选择「切换工作区…」可更换文件夹。切换先停止旧任务并清理旧上下文，历史仍可在原目录查看。重复运行 `pi-orb` 会唤回已有窗口；退出 Orb 保留共享 Pi Web 服务。
@@ -41,7 +41,7 @@ P1/P2 的实现与分阶段证据保留；个人用户安装与启动改进见�
 安装器会在卸载前调用 Pi CLI 移除随包插件声明，并清理 Win+R 登记；保留模型、凭据、历史和工作区。若 Node/Pi CLI 已被移除导致插件清理失败，会提示手动执行 `pi remove "<安装目录>\resources\pi-plugin"`。
 App Paths 支持 Win+R/ShellExecute；PowerShell 直接输入 `pi-orb` 不属于这个入口。
 
-完整实现与验证见[个人用户安装与启动](./doc/personal-user-installation.md)。现有 [preview.1 Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) 不包含以上改进。
+完整实现与验证见[个人用户安装与启动](./doc/personal-user-installation.md)。历史 [preview.1 Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) 不包含以上改进。
 
 浏览器任务使用 `open_in_browser` 打开用户默认浏览器，再通过可见窗口截图工具完成操作；这与参考项目的 Computer Use 语义一致。DOM/Playwright 网关和浏览器扩展认证已移除，历史说明见[工具集对比报告](./doc/toolset-comparison-2026-10-04.md)。
 
@@ -78,14 +78,14 @@ npm run dev
 |---|---|---|
 | 质量与发布门禁 | 483 个单元测试，P2-05 产物审计 30/30、打包 smoke 22/22 | 类型、lint、构建、插件加载、产物内容和 renderer 启动 |
 | 后台任务 | 真实模型完成 8/8、产品桥停止 10/10、真实 provider 失败回读 12/12 | Pi Web 独立 worker；错误全文与单次通知一致，不代替 GUI 实测 |
-| 真实模型 GUI 闭环 | 点击 20/20、滚动 21/21、输入 22/22、可见浏览器 22/22 | 当前参考工具合同的有限样本；应用冷启动修复后复验因锁屏中止，未宣称任意任务稳定成功 |
+| 真实模型 GUI 闭环 | 点击 20/20、滚动 21/21、输入 22/22、可见浏览器 22/22、应用冷启动 22/22 | 当前参考工具合同的有限样本；有目标自身读回和动作后新图，未宣称任意任务稳定成功 |
 | 工具往返（迁移前历史） | 旧实现三动作批量中位 11.03s，单步中位 18.99s | 仅用于解释本次迁移动机；不代表当前工具协议或性能承诺 |
 | 原生依赖 | 实际 Electron 中 1000 次枚举 + 50 次截图通过 | 有限压力样本，未确认历史间歇退出的精确根因 |
 | Windows 打包 | 包内容审计 30/30，实际打包产物启动 22/22 | 不等同于干净机器安装、卸载或升级验收 |
 
 完整来源与原始记录见[像素取点实施记录](./doc/plugin-reference-and-pointing.md)、[浮窗体验记录](./doc/orb-experience-improvements.md)和[支持矩阵](./doc/support-matrix.md)。
 
-以下仍未验证：多显示器与 DPI 变化、高权限窗口、不同 Chromium 页面输入的稳定性、应用冷启动修复后的真实模型闭环、广泛跨应用流程、真实键盘/锁屏/休眠恢复，以及干净机器安装、卸载、升级和 SmartScreen 体验。历史失败和原生退出记录保留。后续发布仍采用 GitHub **prerelease**；当前 preview.3 仅本地构建，不宣称完整 v0.1 已完成。
+以下仍未验证：多显示器与 DPI 变化、高权限窗口、不同 Chromium 页面输入的稳定性、广泛跨应用流程、真实键盘/锁屏/休眠恢复，以及干净机器安装、卸载、升级和 SmartScreen 体验。历史失败和原生退出记录保留。preview.3 采用 GitHub **prerelease**，不宣称完整 v0.1 已完成。
 
 ## 开发与构建
 

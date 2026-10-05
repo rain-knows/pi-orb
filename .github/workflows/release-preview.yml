@@ -106,6 +106,14 @@ jobs:
       - name: Build the installer
         run: npm run package:win
 
+      # The installer command rebuilds win-unpacked. Audit and start that final artifact too;
+      # evidence from the earlier directory build alone does not describe this rebuild.
+      - name: Audit the installer build's unpacked artifact
+        run: node evidence/p2-05/run-package-audit.mjs
+
+      - name: Start the installer build's unpacked artifact
+        run: node evidence/p2-05/run-packaged-smoke.mjs
+
       # A published release must be traceable to the evidence it was built from, so the records that
       # were just produced travel with the artifact instead of staying in a log.
       - name: Collect the release evidence
@@ -155,14 +163,16 @@ jobs:
           ### 本版内容与使用
 
           - 参考 Orb 浮窗：聊天、历史、模型选择、问题卡片、停靠与中文交互改进。
-          - 桌面工具按实际附加截图像素取点，串行批量执行独立动作，每步返回新观察。
-          - 模型请求仅保留最新一张 Orb 工具截图，持久历史不变；生产等待保留 600ms。
+          - 参考的 13 个直接 GUI 工具与 3 个后台工具；自动首帧、动作后截图和 0–1000 millifraction 取点。
+          - 删除旧 observe/batch/DOM 网关；独立后台 session 支持继续、状态、停止及完成/失败单次通知。
+          - 模型请求仅保留最新一张 Orb 观察图，工具文本按参考预算裁剪，持久历史不变；生产等待保留 600ms。
           - Koffi 锁定 2.16.3，原生模块版本与二进制纳入包内容审计。
-          - 专用真实模型夹具三个完整轮次 21/21 任务通过；有限样本不外推到任意应用。
+          - 真实模型点击 20/20、滚动 21/21、输入 22/22、可见浏览器 22/22、应用冷启动 22/22；后台完成 8/8、产品桥停止 10/10、provider 失败回读 12/12。均为有限样本。
 
-          安装器只包含 Electron 桌面壳，不包含 pi-web 或 Pi 插件。请按
+          安装器包含 Electron 桌面壳与独立 Pi 插件，不包含 Pi Web 或 Node。首次通过已安装 Pi CLI
+          自动注册插件。请按
           [README](https://github.com/${{ github.repository }}/blob/${{ github.sha }}/README.md#快速开始)
-          安装同版本 Pi 插件、启动 pi-web，并选择 Orb 专用工作区。新 Orb 会话默认 Full Access；
+          准备 Pi/Node/Pi Web，并选择 Orb 专用工作区。新 Orb 会话默认 Full Access；
           开始桌面任务前检查 Access。Stop、隐藏、断连和会话/工作区切换撤销旧授权。
 
           ### What this build has not been verified to do
@@ -195,7 +205,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $version = (Get-Content package.json | ConvertFrom-Json).version
-          $tag = if ('${{ github.ref_type }}' -eq 'tag') { '${{ github.ref_name }}' } else { "v$version-preview.${{ github.run_number }}" }
+          $tag = if ('${{ github.ref_type }}' -eq 'tag') { '${{ github.ref_name }}' } else { "v$version" }
           if (gh release view $tag 2>$null) { throw "release $tag already exists" }
           gh release create $tag `
             --title "pi-orb $version — Windows x64 preview (unsigned)" `

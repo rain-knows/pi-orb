@@ -66,8 +66,9 @@ notes 里同时保留：未签名提示与「不要为此关闭安全设置」�
 的授权说明（工作区不是沙箱、截图内容是未受信输入）。
 
 未验证清单直接抽取本次提交的 support matrix §3，不再维护手写子集；另附本版改进、
-同版本插件安装入口和新会话默认 Full Access 的说明。安装器只分发 Electron 桌面壳，
-Pi 插件仍需要完整源码检出后通过 `pi install <repo>/pi-package` 单独注册。
+同版本插件安装入口和新会话默认 Full Access 的说明。当前安装器分发 Electron 桌面壳和
+独立 Pi 插件，通过已安装 Pi CLI 自动注册；Pi Web 和 Node 仍由用户安装。源码开发时才
+通过 `pi install <repo>/pi-package` 注册源码插件。
 
 ## 6. 一次发布留下的东西
 
@@ -119,3 +120,11 @@ release notes 必须准确说明构建机器、runner 结果及本机验证结�
 本机完整 P2-05 通过；安装器构建后再审计 27/27、启动 22/22，停靠动画采到 9 个位置。
 发布附带 `github-runner-failure.log` 和 `release-provenance.json`，不宣称 Actions 通过。
 原生动作、人工安装和未验证项的边界保持不变。
+
+## 10. preview.3（2026-10-05）
+
+`v0.1.0-preview.3` 使用本机 Windows 发布流程（§9）。安装器包含当前参考工具集、独立
+Pi 插件和启动改进；Pi Web/Node 不随包。发布门禁 66/66（无跳过），完整 P2-05 及安装器
+构建后的内容审计/启动探测通过；原始记录、源提交和 SHA-256 随 Release 上传。
+本次不以历史失败的 GitHub runner 产物发布，也不宣称本次 Actions runner 已通过。
+后台及真实模型 GUI 有限样本验收见工具集迁移记录；完整未验证清单仍来自支持矩阵 §3。
