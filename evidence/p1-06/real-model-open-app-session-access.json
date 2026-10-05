@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-05T10:59:25.506Z",
+  "capturedAt": "2026-10-05T11:46:42.801Z",
   "testCase": "open-app",
   "verification": {
     "what": "real model launches a unique disposable application by name and clicks its completion button",
@@ -9,9 +9,9 @@
     "targetSelection": "the test harness foregrounds its disposable target by process id; pi-orb observes the foreground automatically"
   },
   "isolation": {
-    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\shell-data",
-    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\orb-config.json",
-    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-open-app-agent-1791197965503",
+    "shellUserDataDir": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791200802798\\shell-data",
+    "orbConfig": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791200802798\\orb-config.json",
+    "agentDir": "C:\\Users\\JUSTLI~1\\AppData\\Local\\Temp\\pi-orb-real-open-app-agent-1791200802798",
     "modelsJson": "hard link to the real file (no copy)",
     "authJson": "symlink to the real file (no copy)",
     "realAgentDir": "C:\\Users\\JUSTLIKEZYP\\.pi\\agent"
@@ -27,19 +27,19 @@
       "authJsonLinked": true
     },
     "interactiveDesktop": {
-      "process": "LockApp",
-      "title": "Windows Ĭ����������",
-      "className": "Windows.UI.Core.CoreWindow",
+      "process": "chrome",
+      "title": "�ֶ��Ű� �� ��¶ϣ�������ն� - Google Chrome",
+      "className": "Chrome_WidgetWin_1",
       "inputDesktopAccessible": true
     },
-    "targetPid": 105132,
+    "targetPid": 107336,
     "nativeProbe": {
-      "name": "PiOrbProbe1791197965504",
-      "executable": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\PiOrbProbe1791197965504.exe",
+      "name": "PiOrbProbe1791200802798",
+      "executable": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791200802798\\PiOrbProbe1791200802798.exe",
       "initiallyRunning": false
     },
     "target": {
-      "pid": 105132,
+      "pid": 107336,
       "windowBoundsDip": {
         "x": 120,
         "y": 90,
@@ -71,15 +71,15 @@
     },
     "piWeb": {
       "ok": true,
-      "baseUrl": "http://127.0.0.1:46712",
-      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:46712\n- Network:       http://127.0.0.1:46712\n✓ Ready in 711ms\n✓ Running next.config took 113ms\n"
+      "baseUrl": "http://127.0.0.1:47308",
+      "log": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:47308\n- Network:       http://127.0.0.1:47308\n✓ Ready in 786ms\n✓ Running next.config took 138ms\n"
     },
     "handshake": {
-      "path": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\shell-data\\bridge-token.json",
-      "pid": 103852,
+      "path": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791200802798\\shell-data\\bridge-token.json",
+      "pid": 88828,
       "generation": 1,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\orb-workspace",
-      "pipePath": "\\\\.\\pipe\\pi-orb-103852"
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791200802798\\orb-workspace",
+      "pipePath": "\\\\.\\pipe\\pi-orb-88828"
     },
     "rendererTarget": {
       "title": "pi-orb",
@@ -91,7 +91,7 @@
     },
     "workspace": {
       "configured": true,
-      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791197965503\\orb-workspace",
+      "workspace": "D:\\pi-orb-p1-runs\\p1-06-real-open-app-1791200802798\\orb-workspace",
       "problem": null,
       "shortcut": "Control+Alt+F11",
       "shortcutRegistered": true,
@@ -100,7 +100,7 @@
       "busy": false,
       "sessionId": null,
       "piWeb": {
-        "baseUrl": "http://127.0.0.1:46712",
+        "baseUrl": "http://127.0.0.1:47308",
         "reachable": true,
         "problem": null
       },
@@ -116,9 +116,9 @@
       }
     },
     "generation": 1,
-    "session": "01a10bb8-44f4-7725-b650-1eaf13f2ca2e",
+    "session": "01a10be3-8aab-7100-9a44-1a811e38f397",
     "model": {
-      "sessionId": "01a10bb8-4ffd-7725-b650-1eb1f04b8e57",
+      "sessionId": "01a10be3-9430-7100-9a44-1a82b1af5d2d",
       "selected": {
         "provider": "TZcode",
         "modelId": "deepseek-v4.1-flash"
@@ -130,32 +130,97 @@
       "declaredImageCapable": true
     },
     "interactiveDesktopBeforeTarget": {
-      "process": "LockApp",
-      "title": "Windows Ĭ����������",
-      "className": "Windows.UI.Core.CoreWindow",
+      "process": "ChatGPT",
+      "title": "ChatGPT",
+      "className": "Chrome_WidgetWin_1",
       "inputDesktopAccessible": true
-    }
+    },
+    "testTarget": {
+      "pid": 107336,
+      "handle": 6228830,
+      "selection": "test harness only"
+    },
+    "interactiveDesktopAtWake": {
+      "process": "ChatGPT",
+      "title": "ChatGPT",
+      "className": "Chrome_WidgetWin_1",
+      "inputDesktopAccessible": true
+    },
+    "foreground": {
+      "title": "P1-05 input target",
+      "ok": true,
+      "foregrounded": true
+    },
+    "access": {
+      "authorized": true,
+      "level": "full-access",
+      "sessionId": "01a10be3-8aab-7100-9a44-1a811e38f397"
+    },
+    "prompt": {},
+    "waitedForIdle": true,
+    "bridgeDiagnostics": [
+      "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-88828",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:05.555Z\",\"event\":\"authorize\",\"sessionId\":\"01a10be3-8aab-7100-9a44-1a811e38f397\",\"generation\":1,\"level\":\"full-access\"}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:13.679Z\",\"event\":\"authorize\",\"sessionId\":\"01a10be3-8aab-7100-9a44-1a811e38f397\",\"generation\":1,\"level\":\"full-access\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.854Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"window-enumeration\",\"durationMs\":37.83100000000195}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.874Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"window-enumeration\",\"durationMs\":18.974500000000262}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.896Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"listScreens\",\"durationMs\":21.691800000000512}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.930Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"capture-and-png\",\"durationMs\":33.278699999998935}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.930Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"capture\",\"durationMs\":33.64730000000054}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.951Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"inspectForeground\",\"durationMs\":20.36819999999716}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.952Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"base64\",\"durationMs\":0.6820999999981723}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.952Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"image\",\"bytes\":18247,\"width\":735,\"height\":786}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:13.982Z\",\"event\":\"observe\",\"sessionId\":\"01a10be3-8aab-7100-9a44-1a811e38f397\",\"observationId\":\"obs-muv6q8wx-1\",\"windowId\":\"6228830\",\"elementCount\":0,\"coordinateSpace\":{\"action\":\"screenshot-fraction\",\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:13.982Z\",\"event\":\"tool-timing\",\"requestId\":\"864f5653-7248-4d40-81dc-ee18a51164c0\",\"phase\":\"executor-total\",\"durationMs\":263.47729999999865}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:18.861Z\",\"event\":\"act-observation\",\"kind\":\"openApp\",\"observationId\":\"obs-muv6q8wx-1\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:18.969Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"window-enumeration\",\"durationMs\":23.4461999999985}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:19.845Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"post-action-wait\",\"durationMs\":602.6599999999999}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:19.965Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"window-enumeration\",\"durationMs\":28.136900000001333}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:19.995Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"window-enumeration\",\"durationMs\":29.23410000000149}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.019Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"listScreens\",\"durationMs\":23.573599999999715}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.040Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"capture-and-png\",\"durationMs\":21.18239999999787}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.040Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"capture\",\"durationMs\":21.283699999999953}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.064Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"inspectForeground\",\"durationMs\":24.11109999999826}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.064Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"base64\",\"durationMs\":0.03229999999894062}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.064Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"image\",\"bytes\":10796,\"width\":728,\"height\":499}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:20.072Z\",\"event\":\"act\",\"kind\":\"openApp\",\"observationId\":\"obs-muv6q8wx-1\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:20.072Z\",\"event\":\"tool-timing\",\"requestId\":\"c3171ad3-4fd0-40e0-b929-9c1936e3ac43\",\"phase\":\"executor-total\",\"durationMs\":1212.4360000000015}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:22.983Z\",\"event\":\"act-observation\",\"kind\":\"click\",\"observationId\":\"obs-muv6qdmo-2\",\"coordinateSpace\":{\"present\":true,\"space\":1000,\"hasWindowRect\":true}}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.089Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"window-enumeration\",\"durationMs\":18.340699999997014}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.108Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"window-enumeration\",\"durationMs\":18.410499999998137}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.261Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"native-input\",\"durationMs\":153.3224999999984}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.869Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"post-action-wait\",\"durationMs\":607.9938999999977}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.891Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"window-enumeration\",\"durationMs\":20.964599999999336}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.915Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"listScreens\",\"durationMs\":24.5425000000032}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.932Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"capture-and-png\",\"durationMs\":16.610500000002503}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.932Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"capture\",\"durationMs\":16.8070000000007}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.956Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"inspectForeground\",\"durationMs\":23.646700000004785}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.956Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"base64\",\"durationMs\":0.03589999999530846}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.956Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"image\",\"bytes\":8707,\"width\":728,\"height\":499}",
+      "[pi-orb] desktop {\"at\":\"2026-10-05T11:47:23.960Z\",\"event\":\"act\",\"kind\":\"click\",\"observationId\":\"obs-muv6qdmo-2\"}",
+      "[pi-orb] bridge {\"at\":\"2026-10-05T11:47:23.960Z\",\"event\":\"tool-timing\",\"requestId\":\"346b8ee4-f730-44b3-a1cb-bf22c65c977a\",\"phase\":\"executor-total\",\"durationMs\":977.6413999999968}"
+    ]
   },
   "checks": [
     {
       "name": "the isolated pi-web started",
       "ok": true,
-      "detail": "http://127.0.0.1:46712"
+      "detail": "http://127.0.0.1:47308"
     },
     {
       "name": "the isolated shell published its own handshake",
       "ok": true,
-      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\shell-data\\\\bridge-token.json\",\"pid\":103852,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-103852\"}"
+      "detail": "{\"path\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791200802798\\\\shell-data\\\\bridge-token.json\",\"pid\":88828,\"generation\":1,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791200802798\\\\orb-workspace\",\"pipePath\":\"\\\\\\\\.\\\\pipe\\\\pi-orb-88828\"}"
     },
     {
       "name": "the isolated shell's pipe accepts a connection",
       "ok": true,
-      "detail": "\\\\.\\pipe\\pi-orb-103852"
+      "detail": "\\\\.\\pipe\\pi-orb-88828"
     },
     {
       "name": "the isolated shell is NOT the user's running orb",
       "ok": true,
-      "detail": "handshake pid 103852"
+      "detail": "handshake pid 88828"
     },
     {
       "name": "the orb renderer is reachable over CDP",
@@ -165,31 +230,187 @@
     {
       "name": "the wake shortcut registered",
       "ok": true,
-      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:46712\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
+      "detail": "{\"configured\":true,\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791200802798\\\\orb-workspace\",\"problem\":null,\"shortcut\":\"Control+Alt+F11\",\"shortcutRegistered\":true,\"shortcutProblem\":null,\"generation\":1,\"busy\":false,\"sessionId\":null,\"piWeb\":{\"baseUrl\":\"http://127.0.0.1:47308\",\"reachable\":true,\"problem\":null},\"desktopTask\":{\"authorized\":false,\"level\":null,\"sessionId\":null,\"generation\":null,\"stopped\":false,\"stoppedReason\":null,\"lastObservationId\":null,\"bridgeReady\":true}}"
     },
     {
       "name": "the isolated shell reports this run's workspace and a generation",
       "ok": true,
-      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791197965503\\\\orb-workspace\",\"generation\":1}"
+      "detail": "{\"workspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791200802798\\\\orb-workspace\",\"expectedWorkspace\":\"D:\\\\pi-orb-p1-runs\\\\p1-06-real-open-app-1791200802798\\\\orb-workspace\",\"generation\":1}"
     },
     {
       "name": "the isolated shell created a real pi-web session",
       "ok": true,
-      "detail": "\"01a10bb8-44f4-7725-b650-1eaf13f2ca2e\""
+      "detail": "\"01a10be3-8aab-7100-9a44-1a811e38f397\""
     },
     {
       "name": "the session is served by a model that declares image input",
       "ok": true,
-      "detail": "{\"sessionId\":\"01a10bb8-4ffd-7725-b650-1eb1f04b8e57\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
+      "detail": "{\"sessionId\":\"01a10be3-9430-7100-9a44-1a82b1af5d2d\",\"selected\":{\"provider\":\"TZcode\",\"modelId\":\"deepseek-v4.1-flash\"},\"input\":[\"text\",\"image\"],\"declaredImageCapable\":true}"
     },
     {
       "name": "an interactive desktop is available before target enumeration",
-      "ok": false,
-      "detail": "{\"process\":\"LockApp\",\"title\":\"Windows Ĭ����������\",\"className\":\"Windows.UI.Core.CoreWindow\",\"inputDesktopAccessible\":true}"
+      "ok": true,
+      "detail": "{\"process\":\"ChatGPT\",\"title\":\"ChatGPT\",\"className\":\"Chrome_WidgetWin_1\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the harness can foreground its disposable target by process id",
+      "ok": true,
+      "detail": "{\"pid\":107336,\"handle\":6228830,\"selection\":\"test harness only\"}"
+    },
+    {
+      "name": "an interactive desktop is available to foreground the target",
+      "ok": true,
+      "detail": "{\"process\":\"ChatGPT\",\"title\":\"ChatGPT\",\"className\":\"Chrome_WidgetWin_1\",\"inputDesktopAccessible\":true}"
+    },
+    {
+      "name": "the disposable target is the foreground window before the first frame",
+      "ok": true,
+      "detail": "{\"title\":\"P1-05 input target\",\"ok\":true,\"foregrounded\":true}"
+    },
+    {
+      "name": "full-access is granted to the isolated Orb session",
+      "ok": true,
+      "detail": "{\"authorized\":true,\"level\":\"full-access\",\"sessionId\":\"01a10be3-8aab-7100-9a44-1a811e38f397\"}"
+    },
+    {
+      "name": "the prompt was sent with automatic frontmost-window context",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "the disposable page or application recorded its completion click",
+      "ok": true,
+      "detail": "[{\"at\":1791200843265,\"kind\":\"native-click\",\"pid\":108240}]"
+    },
+    {
+      "name": "the real model called click on its own",
+      "ok": true,
+      "detail": "[{\"toolName\":\"click\",\"toolCallId\":\"call_00_sFFrmRxJhlisfTpHFDZl8906\",\"arguments\":{\"position\":[485,485],\"screen_index\":0},\"file\":\"C:\\\\Users\\\\JUSTLI~1\\\\AppData\\\\Local\\\\Temp\\\\pi-orb-real-open-app-agent-1791200802798\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-open-app-1791200802798-orb-workspace--\\\\2026-10-05T11-47-03-981Z_01a10be3-8aab-7100-9a44-1a811e38f397.jsonl\",\"index\":8,\"at\":1791200842976}]"
+    },
+    {
+      "name": "the automatic frontmost screenshot preceded the GUI action",
+      "ok": true,
+      "detail": "[{\"index\":5,\"imageCount\":1,\"file\":\"<agentDir>\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-open-app-1791200802798-orb-workspace--\\\\2026-10-05T11-47-03-981Z_01a10be3-8aab-7100-9a44-1a811e38f397.jsonl\"}]"
+    },
+    {
+      "name": "the action tool result includes its fresh observation and screenshot",
+      "ok": true,
+      "detail": "[{\"toolName\":\"click\",\"toolCallId\":\"call_00_sFFrmRxJhlisfTpHFDZl8906\",\"text\":\"<frontmost_app>PiOrbProbe1791200802798</frontmost_app>\\n<frontmost_window>Pi Orb native probe</frontmost_window>\",\"imageCount\":1,\"index\":9,\"ok\":true,\"observation\":{\"id\":\"obs-muv6qgms-3\",\"at\":1791200843956,\"title\":\"Pi Orb native probe\"}}]"
+    },
+    {
+      "name": "the real model used the reference entry tool with the isolated target",
+      "ok": true,
+      "detail": "{\"toolName\":\"open_app\",\"toolCallId\":\"call_00_mSPG1cJEcU22VqDpzdjE3812\",\"arguments\":{\"name\":\"PiOrbProbe1791200802798\"},\"file\":\"C:\\\\Users\\\\JUSTLI~1\\\\AppData\\\\Local\\\\Temp\\\\pi-orb-real-open-app-agent-1791200802798\\\\sessions\\\\--D--pi-orb-p1-runs-p1-06-real-open-app-1791200802798-orb-workspace--\\\\2026-10-05T11-47-03-981Z_01a10be3-8aab-7100-9a44-1a811e38f397.jsonl\",\"index\":6,\"at\":1791200838853}"
+    },
+    {
+      "name": "a screenshot of the opened target preceded the model click",
+      "ok": true,
+      "detail": "[{\"toolName\":\"open_app\",\"toolCallId\":\"call_00_mSPG1cJEcU22VqDpzdjE3812\",\"text\":\"Opened PiOrbProbe1791200802798 (launched).\\n<frontmost_app>PiOrbProbe1791200802798</frontmost_app>\\n<frontmost_window>Pi Orb native probe</frontmost_window>\\n<focus_note>Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.</focus_note>\",\"imageCount\":1,\"index\":7,\"ok\":true,\"observation\":{\"id\":\"obs-muv6qdmo-2\",\"at\":1791200840064,\"title\":\"Pi Orb native probe\"}},{\"toolName\":\"click\",\"toolCallId\":\"call_00_sFFrmRxJhlisfTpHFDZl8906\",\"text\":\"<…"
+    },
+    {
+      "name": "the model used only GUI tools to reach the completion oracle",
+      "ok": true,
+      "detail": "[\"open_app\",\"click\"]"
     }
   ],
-  "passed": false,
-  "error": "no interactive desktop: foreground is LockApp (Windows Ĭ����������) and the input desktop is not accessible. The workstation appears to be locked; unlock it and re-run. Nothing was sent to any model.",
-  "shellTail": "\r\n\r\nDevTools listening on ws://127.0.0.1:46713/devtools/browser/9ce478b0-41c7-4b32-b09a-5ed4ffea1af2\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-103852\n[pi-orb] desktop {\"at\":\"2026-10-05T10:59:50.004Z\",\"event\":\"authorize\",\"sessionId\":\"01a10bb8-44f4-7725-b650-1eaf13f2ca2e\",\"generation\":1,\"level\":\"full-access\"}\n",
-  "piWebTail": "▲ Next.js 16.3.6\n- Local:         http://127.0.0.1:46712\n- Network:       http://127.0.0.1:46712\n✓ Ready in 711ms\n✓ Running next.config took 113ms\n[pi-web] session_start dispatched to extensions for session 01a10bb8-44f4-7725-b650-1eaf13f2ca2e\n[pi-web] session_start dispatched to extensions for session 01a10bb8-4ffd-7725-b650-1eb1f04b8e57\n"
+  "passed": true,
+  "targetLog": {
+    "events": [
+      {
+        "kind": "ready",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "native-ready",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      },
+      {
+        "kind": "native-click",
+        "cell": null,
+        "offsetInCell": null,
+        "value": null,
+        "deltaY": null,
+        "overScroller": null,
+        "scrollTop": null
+      }
+    ],
+    "matches": [
+      {
+        "at": 1791200843265,
+        "kind": "native-click",
+        "pid": 108240
+      }
+    ],
+    "cellDowns": [
+      {}
+    ]
+  },
+  "sessionFiles": [
+    "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-open-app-1791200802798-orb-workspace--\\2026-10-05T11-47-03-981Z_01a10be3-8aab-7100-9a44-1a811e38f397.jsonl"
+  ],
+  "modelToolCalls": [
+    {
+      "toolName": "open_app",
+      "toolCallId": "call_00_mSPG1cJEcU22VqDpzdjE3812",
+      "arguments": {
+        "name": "PiOrbProbe1791200802798"
+      },
+      "index": 6,
+      "at": 1791200838853,
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-open-app-1791200802798-orb-workspace--\\2026-10-05T11-47-03-981Z_01a10be3-8aab-7100-9a44-1a811e38f397.jsonl"
+    },
+    {
+      "toolName": "click",
+      "toolCallId": "call_00_sFFrmRxJhlisfTpHFDZl8906",
+      "arguments": {
+        "position": [
+          485,
+          485
+        ],
+        "screen_index": 0
+      },
+      "index": 8,
+      "at": 1791200842976,
+      "file": "<agentDir>\\sessions\\--D--pi-orb-p1-runs-p1-06-real-open-app-1791200802798-orb-workspace--\\2026-10-05T11-47-03-981Z_01a10be3-8aab-7100-9a44-1a811e38f397.jsonl"
+    }
+  ],
+  "modelToolResults": [
+    {
+      "toolName": "open_app",
+      "toolCallId": "call_00_mSPG1cJEcU22VqDpzdjE3812",
+      "text": "Opened PiOrbProbe1791200802798 (launched).\n<frontmost_app>PiOrbProbe1791200802798</frontmost_app>\n<frontmost_window>Pi Orb native probe</frontmost_window>\n<focus_note>Keyboard focus is on another window. hotkey brings this window forward first; click inside it if focus must land on a specific control.</focus_note>",
+      "imageCount": 1,
+      "index": 7,
+      "ok": true,
+      "observation": {
+        "id": "obs-muv6qdmo-2",
+        "at": 1791200840064,
+        "title": "Pi Orb native probe"
+      }
+    },
+    {
+      "toolName": "click",
+      "toolCallId": "call_00_sFFrmRxJhlisfTpHFDZl8906",
+      "text": "<frontmost_app>PiOrbProbe1791200802798</frontmost_app>\n<frontmost_window>Pi Orb native probe</frontmost_window>",
+      "imageCount": 1,
+      "index": 9,
+      "ok": true,
+      "observation": {
+        "id": "obs-muv6qgms-3",
+        "at": 1791200843956,
+        "title": "Pi Orb native probe"
+      }
+    }
+  ],
+  "finishedAt": "2026-10-05T11:47:29.307Z"
 }

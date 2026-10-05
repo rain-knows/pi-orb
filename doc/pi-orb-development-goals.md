@@ -3,6 +3,7 @@
 - 文档版本：0.1；依据截至 2026-09-29 的对话和本机源码核对。
 - 项目暂定名称：**pi-orb**。定位：pi-web 的开源 Electron 桌面伴随项目，不是另一个 agent harness。
 - 本文件同时保留原始开发目标和当前验收状态；实现结论以 `doc/support-matrix.md` 和对应 evidence 为准。
+- 当前状态（2026-10-05）：参考工具集替换清单已完成；真实模型点击、滚动、输入、可见浏览器、open_app，以及后台完成/失败和产品桥停止的有限样本通过。下文截至 2026-09-30 的长段状态是历史快照，不代表当前验收；长期稳定性和完整 v0.1 平台边界仍见支持矩阵。
 - 迁移说明：本文较早的 P2-04 段落仍使用旧 `orb_*` 名称和“只激活、不启动”的历史语义；当前
   工具集与 `open_app` 行为以 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
   和 [`toolset-comparison-2026-10-04.md`](./toolset-comparison-2026-10-04.md) 为准。

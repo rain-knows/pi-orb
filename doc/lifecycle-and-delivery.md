@@ -7,8 +7,9 @@ Electron 打包形态和桌面动作等待语义，不引入 dsh 会话运行时
 
 动作等待的来源为参考 `packages/experimental/tool-computer-use/src/plugin.ts` 的
 `open_app` 执行器（约 1055–1062 行）和 `src/config.ts` 的 `postActionWaitMs` 默认值 600ms。
-pi-orb 在 `ReferenceWindowsDriver.#openApp()` 激活已运行应用后等待同一时长，再验证前台身份并捕获
-新观察；不复用会启动新进程的 backend `openApp`。点击修饰键校验沿用参考
+当前 `ReferenceWindowsDriver.#openApp()` 已按新插件参考 `9cdc503` 直接调用 backend
+`openApp` 激活或启动，等待同一时长后捕获实际前台新图；慢启动不强制校验前台身份。
+旧“只激活、不启动”实现已删除，来源与真实验收见工具集迁移记录。点击修饰键校验沿用参考
 `packages/experimental/tool-computer-use/src/coordinates.ts` 的大小写归一和 token 规则，Windows
 backend 按虚拟键去重别名；pi-orb 仅补充空白修剪，不增加新修饰键。
 
@@ -42,28 +43,28 @@ session Access 生命周期。当前探针 `evidence/p1-07/run-lifecycle-regress
 ## 真实模型闭环状态
 
 真实模型脚本 `evidence/p1-06/run-real-model-c7.mjs` 使用隔离 pi-web、真实模型、真实 Electron、
-参考 Windows backend 和 disposable target。仓库中此前保存的 2026-09-29 运行记录通过了 C7/D6/D8，
-但 2026-09-30 的重新运行必须按本次结果记录：
+参考 Windows backend 和 disposable target。下表为 2026-10-05 当前参考工具合同的有限样本，
+历史失败和锁屏中止记录不覆盖当前结果：
 
 | 场景 | 最新记录 | 事实 |
 |---|---:|---|
-| C7 观察→点击→再观察 | **失败（截图前）** | 唤醒快捷键未触发目标记录，因此截图拒绝，未产生 Orb 工具调用 |
-| D6 观察→滚动 | **环境中止** | 前台为 `LockApp`/不可交互桌面，未向模型发送动作 |
-| D8 点击→观察→输入 | **本轮未完成** | 没有生成新的 session-access JSON；旧记录仅作历史 |
+| C7 观察→点击→再观察 | **20/20** | 首帧先于模型点击，目标自报命中 0,0，动作后新图 |
+| D6 观察→滚动 | **21/21** | 模型实际滚动，wheel 在滚动区域且 scrollTop 改变，动作后新图 |
+| D8 点击→观察→输入 | **22/22** | 精确文本读回，聚焦和输入分别返回新图 |
+| 可见浏览器 | **22/22** | open_in_browser 打开独立本地网页，模型依据截图点击，网页自身完成请求 |
+| open_app 冷启动 | **22/22** | 初始未运行的独立应用启动，模型依据截图点击，应用自身完成事件及新图 |
 
-新合同结果原样保留在 `evidence/p1-06/real-model-c7-session-access.json` 和
-`real-model-d6-scroll-session-access.json`；旧的 `real-model-*-reference-backend.json` 仍作为
-历史记录保留，不被覆盖。C7 本轮在截图前因唤醒快捷键未触发目标记录而失败；D6 在
-`LockApp`/不可交互桌面环境中止，未向模型发送动作；D8 本轮未完成，也没有新的 JSON。
-这些结果不能被一次成功动作或打包成功替代，支持矩阵因此继续把 C7/D6/D8 标为未验证，直到
-同一版本、同一脚本在真实模型上稳定通过。
+新合同结果保留在 `evidence/p1-06/real-model-*-session-access.json`；旧的
+`real-model-*-reference-backend.json` 仅作为历史。以上通过不是长期稳定成功率证明，
+多屏、高权限窗口和其他系统等边界仍以支持矩阵为准。
 
 ## 打包与产物
 
-`node evidence/p2-05/run-p2-05.mjs` 于 2026-09-30 通过：
+`node evidence/p2-05/run-p2-05.mjs` 于 2026-10-05 通过：
 
 - Windows x64 解包产物构建成功；
-- 包内容审计 25/25：运行时文件、许可证和原生模块路径正确，无源码、测试、证据或凭据；
+- 包内容审计 30/30：运行时文件、许可证和原生模块路径正确，无源码、测试、证据或凭据；
+- 独立打包插件的真实 Pi loader 验证 15/15，包括普通会话隔离及 worker 工具边界；
 - 打包启动探测 22/22：preload 桥、无 Node renderer、参考前端 DOM/令牌、停靠滑动和 session Access 合同均通过。
 
 形态沿用参考项目的 electron-builder、每用户 NSIS、`asarUnpack` 原生模块和 `publish: null`；

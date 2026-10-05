@@ -20,7 +20,7 @@
 - [x] 真实模型后台停止闭环：真实模型调用、产品桥 `code_agent_stop`、worker 注册表归零和无完成通知均通过 `10/10`。
 - [x] 真实后台 provider 失败回读：隔离 worker 请求实际触发 provider 503，最终助手错误、持久注册表与 owner 单次失败通知一致，`12/12`。
 - [x] 当前参考工具合同的真实点击 20/20、滚动 21/21、输入 22/22、可见浏览器 22/22；均包含目标自身事件和动作后新图。
-- [ ] `open_app` 冷启动修复后的真实模型闭环；最新运行因锁屏在模型请求前中止。
+- [x] `open_app` 冷启动修复后的真实模型闭环，22/22；独立应用启动、模型依据截图点击、应用自身事件与动作后新图均已验证。
 
 ## 来源与宿主适配
 
@@ -107,5 +107,26 @@ C7 点击 20/20、D6 滚动 21/21、D8 输入 22/22、可见浏览器网页 22/2
 成功后 600ms 返回当时的真实前台图；冷启动尚未前置不误报失败。实际 backend 错误也
 返回能采集的新图。Pi adapter 只保留结果格式、取消与既有授权/新鲜度边界。
 新增丢弃式 WinForms oracle，由本机已有 .NET Framework 编译器在隔离目录构建；其名称
-仅进入测试壳进程 PATH，不改用户 PATH。修复后真机探针因锁屏中止，仍需
-`node evidence/p1-06/run-real-model-c7.mjs open-app` 复验；本阶段不得标记完整完成。
+仅进入测试壳进程 PATH，不改用户 PATH。此前修复后探针因锁屏中止；2026-10-05
+11:46–11:47 UTC 解锁桌面复验通过 22/22，证据为
+`evidence/p1-06/real-model-open-app-session-access.json`。初始应用未运行；模型自主调用
+`open_app` 返回 `launched` 及原生应用截图，随后 `click([485,485])`，应用进程 108240
+记录 `native-click`，点击结果再次返回该应用的新截图。启动与点击观察 ID 不同，时间均在
+各自工具调用后。这个有限样本证明修复后的冷启动闭环，不代表所有应用启动时间或视觉准确率。
+
+## 完成审计（2026-10-05）
+
+上述本阶段完成清单已全部具备对应证据：
+
+| 要求 | 当前证据与验证范围 |
+|---|---|
+| 参考直接工具、参数、提示和结果预算 | `tests/orb-tools.test.ts`、`tests/orb-reference-extension.test.ts`、`tests/computer-use-context.test.ts`；真实 Pi loader `evidence/personal-startup/plugin-load.json` 15/15 |
+| 普通会话隔离、worker 不获得 GUI | loader 的普通/Orb/worker 分支与 `evidence/p1-06/tool-exposure.json` 的 provider 实收 schema；内置宿主工具按用户已加载 inventory 选择 |
+| 自动首帧、动作后截图和真实目标读回 | `real-model-c7-session-access.json` 20/20、`real-model-d6-scroll-session-access.json` 21/21、`real-model-d8-type-session-access.json` 22/22、`real-model-browser-session-access.json` 22/22、`real-model-open-app-session-access.json` 22/22 |
+| 后台入队、继续、归属、停止、双空闲单次通知 | `tests/code-agent-manager.test.ts`；真实模型 complete 8/8、产品桥 stop 10/10、真实 provider failure 12/12（同目录 `real-model-code-agent-*-session.json`） |
+| 删除旧工具链路、不改写 Pi Web 引擎 | 迁移提交 `8991e0890e` 删除旧扩展/BrowserBroker/Playwright 依赖；当前 bridge 和 Pi Web client 使用公开 API；包内容审计验证无旧运行时入口 |
+| 来源、许可、构建与打包运行 | 本记录、比较报告、`THIRD_PARTY_NOTICES.md`；483 项单测、类型/Lint/构建；`evidence/p2-05/stage-result.json`，内容审计 30/30、打包运行 22/22 |
+
+完成的是本次参考工具集替换，不是完整 v0.1 平台验收。Pi 的会话、模型偏好与已安装搜索工具
+由宿主管理；参考的独立后台模型设置没有另建一套配置。多屏、其他系统、高权限窗口、干净
+机器安装及长期稳定成功率仍按支持矩阵保留边界；不得用本阶段有限样本对这些范围作支持声明。

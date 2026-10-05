@@ -110,7 +110,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **个人安装与短命令**：NSIS 安装至中文/空格目录、App Paths/ShellExecute、单实例保留草稿、卸载清理与应用配置保留 | 当前开发机 8/8；完整干净用户环境、交互安装/升级向导与 SmartScreen 仍未验证 | `evidence/personal-startup/installer-smoke.json` |
 | **当前账户 preview.2 → preview.3 升级**：静默升级、真实短命令启动、无控制台、同实例唤回、图标与数据保留 | 本机 11/11；模型/凭据字节不变、工作区和快捷键保留；完整干净用户与交互向导仍未验证 | `evidence/windows-startup-and-workspaces/current-user-upgrade.json` |
 | **工作区入口与默认完全访问界面**：原生菜单入口、同目录无操作、切换前停止旧任务、实际授权/撤权标签同步 | 单测及实际 Electron/Pi Web UI 生命周期 25/25；参考底板图标用于安装器/快捷方式/托盘 | `evidence/windows-startup-and-workspaces/ui-lifecycle.json`、`doc/windows-startup-and-workspaces.md` |
-| **`open_app` 的参考语义**：直接使用 backend 激活/启动；成功后 600ms 返回当时的真实前台截图，慢启动不误报失败；`name` 拒绝路径／参数片段／shell 元字符 | 单测验证实际观察绑定、慢启动、后续 wait、新图、错误和取消；真实冷启动修复后尚未验收 | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`doc/reference-toolset-transition.md` |
+| **`open_app` 的参考语义**：直接使用 backend 激活/启动；成功后 600ms 返回当时的真实前台截图，慢启动不误报失败；`name` 拒绝路径／参数片段／shell 元字符 | 单测验证实际观察绑定、慢启动、后续 wait、新图、错误和取消；修复后真实模型冷启动→依据截图点击→目标事件→新图 22/22（有限样本） | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`evidence/p1-06/real-model-open-app-session-access.json`、`doc/reference-toolset-transition.md` |
 | **当前参考工具合同的真实 C7/D6/D8**：自动首帧、模型自主调用、目标实际落点/滚动/输入和动作后新图 | 有限样本通过：C7 20/20、D6 21/21、D8 22/22；存在更早模型取点失败，不代表任意任务稳定成功 | `evidence/p1-06/real-model-c7-session-access.json`、`real-model-d6-scroll-session-access.json`、`real-model-d8-type-session-access.json` |
 | **可见默认浏览器闭环**：模型 open_in_browser → wait → click，本地页面收到完成请求 | 有限样本通过 22/22；没有使用 DOM/Playwright 网关，不代表任意网站或登录态覆盖 | `evidence/p1-06/real-model-browser-session-access.json` |
 
@@ -147,7 +147,6 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **未签名安装包的 SmartScreen 提示与绕过体验** | v0.1 不做代码签名；提示文案与用户侧行为需真实环境 | 未验证；不得宣称"可直接分发" |
 | **卸载后的用户数据与工作区保留** | 需要一次真实的安装→使用→卸载流程 | 未验证；代码侧写入面已由发布门禁审计（只写 Orb userData 与用户确认的工作区） |
 | **安装后的浮球观感、真实按键、多屏、DPI** | 属 P2-01/P1 人工项，打包不改变其状态 | 未验证 |
-| **`open_app` 修复后的真实桌面效果** | 旧重复适配曾误报冷启动失败，现改为参考 backend；修复后运行因 LockApp/输入桌面不可访问中止，未向模型发送动作 | `evidence/p1-06/real-model-open-app-session-access.json`；解锁后运行 `node evidence/p1-06/run-real-model-c7.mjs open-app` |
 
 ## 4. 已知环境事实（不是缺陷，但影响使用）
 

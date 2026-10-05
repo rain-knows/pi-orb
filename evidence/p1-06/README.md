@@ -2,7 +2,8 @@
 
 2026-10-05 当前参考合同：C7 20/20、D6 21/21、D8 22/22、可见浏览器 22/22；后台
 完成 8/8、产品桥停止 10/10、真实 provider 失败回读 12/12。均为有限样本。
-`open_app` 冷启动旧适配已按参考修正，修复后运行因锁屏中止，仍未验收。
+`open_app` 冷启动旧适配已按参考修正，解锁桌面后的真实模型复验通过 22/22：独立应用
+初始未运行，模型启动后依据截图点击，应用自身记录完成事件，动作后返回新图。
 下方较早 D 组及旧 orb_* 判定保留为历史，当前结论以本段及对应 session-access JSON 为准。
 
 > 运行方式：
@@ -18,7 +19,7 @@
 > - `node evidence/p1-06/run-real-code-agent.mjs failure`（真实 provider 错误回读，要求错误全文一致）
 >
 > 历史结果：旧版 `tool-exposure.json`（7/7）、`loop-verification.json`（迁移前）、`loop-verification-reference-backend.json`（旧授权模型）与 `real-model-*-reference-backend.json`；当前 session Access 闭环由脚本写入 `loop-verification-session-access.json`。真实模型新合同结果独立写入 `real-model-*-session-access.json`，不覆盖历史记录。
-> 状态：下方旧 `orb_*` 表格属于迁移前历史；当前 Orb 工作区以 13 个直接 GUI 工具加 3 个后台工具为准。后台真实模型完成闭环已通过 8/8（`real-model-code-agent-session.json`），停止闭环已通过 10/10（`real-model-code-agent-stop-session.json`）；C7/D6/D8 和后台失败仍按当前支持矩阵标为未验证。旧 Cua 链路只作迁移基线，不代表最终生产后端。
+> 状态：下方旧 `orb_*` 表格属于迁移前历史；当前 Orb 工作区以 13 个直接 GUI 工具加 3 个后台工具为准。真实模型 C7/D6/D8、浏览器、open_app 及后台完成/失败、产品桥停止的有限样本均已通过。当前记录见首段和 §5.1；旧 Cua 链路只作迁移基线，不代表最终生产后端。
 
 ## 1. 交付内容
 
@@ -181,7 +182,7 @@ node evidence/p1-06/run-real-model-c7.mjs
 本次还修正了 harness 的桌面探测声明：`OpenInputDesktop` 的 Win32 返回值必须按句柄读取，
 不能声明为 `bool` 后再与 `IntPtr.Zero` 比较；旧声明会把已解锁桌面误判为不可访问。
 
-### D 组逐项结论（task-4）
+### D 组当前逐项结论（2026-10-05）
 
 下表只给结论，不把未验证当通过。两列分开写，因为“自动化已证明的部分”与“真实模型侧”不是同一件事：
 
@@ -190,21 +191,20 @@ node evidence/p1-06/run-real-model-c7.mjs
 
 | # | 项 | 结果（真实模型侧） | 自动化已证明的部分 + 判据来源 |
 |---|---|---|---|
-| D1 | 模型**实际发起** `click`（使用自动附加截图） | **失败（最新复跑）** | 最新记录的模型工具调用为空；旧通过记录仍在 Git 历史 |
-| D2 | 随后发起 `click`，坐标来自当前截图（分数 0–1000） | **失败（最新复跑）** | 最新运行没有产生点击调用 |
-| D3 | 每次动作后产生**新的观察**（一动作一观察） | **未验证（最新复跑未进入动作）** | 需重新取得同一运行内的 observe→click→observe |
-| D4 | 目标窗口报告**命中预期位置** | **失败（最新复跑）** | 目标日志没有 `cell-mousedown` |
+| D1 | 模型**实际发起** `click`（使用自动附加截图） | **通过（有限样本）** | `real-model-c7-session-access.json`，持久首帧先于模型实际工具调用 |
+| D2 | 随后发起 `click`，坐标来自当前截图（分数 0–1000） | **通过（有限样本）** | 同一 C7 运行模型调用 `click([125,190])` |
+| D3 | 每次动作后产生**新的观察**（一动作一观察） | **通过（有限样本）** | C7/D6/D8 结果含动作后时间戳与新图，D8 聚焦和输入观察 ID 不同 |
+| D4 | 目标窗口报告**命中预期位置** | **通过（有限样本）** | 同一 C7 运行目标自报 `cell-mousedown` 命中 `0,0`，20/20 |
 | D5 | Access 控件显示当前权限档；撤权后不再执行 | **产品探针通过；人工未验证** | 新探针走 `revokeOrbAccess()`，并断言后续动作被拒 `no-task-authorization`：`loop-verification-session-access.json`；`tests/desktop-task.test.ts`。**人工点击** Access 控件的体验未验证 |
-| D6 | 让模型滚动（`scroll`），目标收到 `wheel` 并动作后观察 | **环境中止** | 前台为 `LockApp`/不可交互桌面，未向模型发送动作；结果见 `real-model-d6-scroll-session-access.json` |
+| D6 | 让模型滚动（`scroll`），目标收到 `wheel` 并动作后观察 | **通过（有限样本）** | `real-model-d6-scroll-session-access.json` 21/21，目标 wheel 在滚动区域且 scrollTop 改变 |
 | D7 | 在**普通（非 Orb）**会话里操作桌面 | **通过** | 普通会话工具集为 pi-web 默认，不含 GUI 或后台工具；当前 Orb 会话获得 16 个：`tool-exposure.json`（7/7，判据是 provider **实收** schema，不是 UI 标签） |
-| D8 | 让模型输入非敏感文本（`input_text`）并动作后观察 | **本轮未完成** | 没有生成新的 session-access JSON；旧记录仅作历史 |
+| D8 | 让模型输入非敏感文本（`input_text`）并动作后观察 | **通过（有限样本）** | `real-model-d8-type-session-access.json` 22/22，目标精确收到 P1ORBD8TEST；聚焦和输入均返回新图 |
 
-小结：工具注册、授权、目标日志中的滚动/输入动作和普通会话隔离已通过；最新真实模型 C7/D6/D8
-闭环均未完整通过，不能把一次动作成功写成稳定的模型闭环。旧 Cua JSON 仅用于迁移对照。
+当前真实模型 C7/D6/D8 闭环已在有限样本通过，不能把一次动作成功写成稳定成功率。
+旧 Cua JSON 仅用于迁移对照。
 
-D6 的动作到达判据是 backend 的目标自身日志看到 `wheel` 且 `scrollTop` 改变；旧
-`reference-backend` 记录满足这一部分，但本轮 session-access 运行在 `LockApp`/不可交互桌面中止，
-未向模型发送动作。因此不能把旧驱动成功摘要替代当前真实模型证据。
+D6 的动作到达判据是目标自身日志看到滚动区域内的 `wheel` 且 `scrollTop` 改变。
+此前锁屏复跑中止记录只代表环境前置失败，不替代当前解锁桌面的真实模型证据。
 
 2026-09-29 复核：`node evidence/p1-06/probe-native-wheel.mjs` 已启动并清理 disposable Electron 目标，但
 `activate-window.ps1` 返回前台为“Windows 默认锁屏界面”（`reason=could-not-foreground`）。本次没有产生
@@ -212,12 +212,11 @@ D6 的动作到达判据是 backend 的目标自身日志看到 `wheel` 且 `scr
 
 ## 6. 明确未验证
 
-此前 `not-configured` 的桥接问题已经修复；真实模型 C7/D6/D8 的历史通过记录与最新失败复跑并存，
-在连续复跑稳定前按未验证处理。
+此前 `not-configured` 的桥接问题已经修复；真实模型基本动作、浏览器和 open_app 的当前
+有限样本已通过。长期稳定成功率和以下未覆盖范围仍未验证。
 
 | 项 | 原因 |
 |---|---|
-| **open_app 修复后的真实冷启动闭环** | 新独立 WinForms 探针因锁屏中止，未向模型发送动作；见 `real-model-open-app-session-access.json`。 |
 | **失败即停（batch-stopped）由真实驱动失败触发** | 由单测覆盖（`tests/desktop-broker.test.ts`）；本次整链路中未构造真实驱动失败。 |
 | 普通 vs 高权限窗口、多显示器 | 未对高权限窗口测试（不自动提权）；仅 1 个显示器。 |
 | 同一任务锁在多会话并发下的行为 | 单任务锁由单测覆盖；整链路只覆盖单会话场景。 |
