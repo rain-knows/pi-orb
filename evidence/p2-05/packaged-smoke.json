@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-05T12:10:53.397Z",
+  "capturedAt": "2026-10-09T00:59:47.594Z",
   "executable": "release\\0.1.0-preview.3\\win-unpacked\\pi-orb.exe",
-  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1791202253397",
+  "runRoot": "D:\\pi-orb-p2-runs\\packaged-smoke-1791507587594",
   "checks": [
     {
       "name": "the packaged application stays alive",
@@ -11,7 +11,7 @@
     {
       "name": "the packaged application creates its window",
       "ok": true,
-      "detail": "pi-orb"
+      "detail": ""
     },
     {
       "name": "the packaged preload bridge reaches the renderer",
@@ -41,7 +41,7 @@
     {
       "name": "the ported reference shell is mounted, not just its stylesheet",
       "ok": true,
-      "detail": "{\"panel\":true,\"dockTab\":true,\"composer\":true,\"configured\":false,\"bodyClasses\":\"\"}"
+      "detail": "{\"panel\":true,\"dockTab\":true,\"composer\":true,\"configured\":false,\"bodyClasses\":\"expand-left expand-up\"}"
     },
     {
       "name": "the reference design tokens resolve to the reference values",
@@ -81,7 +81,7 @@
     {
       "name": "an orb dragged beyond every display is clamped back into the work area",
       "ok": true,
-      "detail": "{\"parked\":{\"x\":8988,\"y\":8988},\"recovered\":{\"x\":1673,\"y\":971,\"width\":35,\"height\":89},\"screen\":{\"w\":1707,\"h\":1067}}"
+      "detail": "{\"parked\":{\"x\":8988,\"y\":8988},\"recovered\":{\"x\":1623,\"y\":983,\"width\":97,\"height\":97},\"screen\":{\"w\":1707,\"h\":1067}}"
     },
     {
       "name": "the dock gesture slides the window off the edge instead of snapping it",
@@ -91,7 +91,12 @@
     {
       "name": "unsnapping the docked orb restores the ball and clears the dock state",
       "ok": true,
-      "detail": "{\"expanded\":false,\"horizontal\":\"left\",\"vertical\":\"up\"}"
+      "detail": "{\"expanded\":false,\"horizontal\":\"left\",\"vertical\":\"up\",\"strip\":0}"
+    },
+    {
+      "name": "the packaged bridge exposes OS-cursor drag and background bookmarks with no old position API",
+      "ok": true,
+      "detail": "Pi preload drag signals / bookmarks"
     },
     {
       "name": "the packaged session Access bridge is present and starts unauthorized",
@@ -115,6 +120,6 @@
     }
   ],
   "passed": true,
-  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-110404",
-  "stderrTail": "DevTools listening on ws://127.0.0.1:31992/devtools/browser/a2f6204a-4d08-45d5-9018-10b4bb527237"
+  "stdoutTail": "[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-18492",
+  "stderrTail": "Debugger listening on ws://127.0.0.1:31993/37585f68-5782-4d18-a773-46147e0a9e19\nFor help, see: https://nodejs.org/learn/getting-started/debugging\n\nDevTools listening on ws://127.0.0.1:31992/devtools/browser/ba12b4df-ed88-46cd-9594-772ca131905c\nDebugger attached."
 }

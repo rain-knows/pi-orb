@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-05T12:10:53.239Z",
+  "capturedAt": "2026-10-09T00:59:30.042Z",
   "version": "0.1.0-preview.3",
   "appRoot": "release/0.1.0-preview.3/win-unpacked",
   "entries": {
@@ -41,7 +41,7 @@
   ],
   "sizes": {
     "executableBytes": 246038528,
-    "asarBytes": 8210307,
+    "asarBytes": 8243679,
     "unpackedNativeBytes": 1834010,
     "archiveEntryCount": 50
   },
@@ -79,7 +79,7 @@
     {
       "name": "the archive contains the built renderer assets",
       "ok": true,
-      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-B6NcydUX.css, out/renderer/assets/index-DIsl5EXQ.js, out/renderer/assets/observation-frame-CWh_eSAv.css"
+      "detail": "out/renderer/assets/deepseek-avatar-square-BmOagJoi.gif, out/renderer/assets/index-9cBYpaSQ.css, out/renderer/assets/index-RwkFdl78.js, out/renderer/assets/observation-frame-CWh_eSAv.css"
     },
     {
       "name": "the archive ships no src/ files",
@@ -149,12 +149,12 @@
     {
       "name": "the packaged resources carry THIRD_PARTY_NOTICES.md",
       "ok": true,
-      "detail": "14688 bytes"
+      "detail": "17006 bytes"
     },
     {
       "name": "the packaged resources carry CHANGELOG.md",
       "ok": true,
-      "detail": "63477 bytes"
+      "detail": "64097 bytes"
     },
     {
       "name": "the independent plugin ships outside ASAR at the app version",

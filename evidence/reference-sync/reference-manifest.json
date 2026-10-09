@@ -1,0 +1,470 @@
+{
+  "at": "2026-10-09T01:00:18.273Z",
+  "repository": "https://github.com/mini-yifan/dsh-orb-cordis",
+  "base": "9cdc50302d202f4497569731be488a8afa500da7",
+  "commit": "aa79308e47265b7d4a774edb688de2bbd7dce66e",
+  "clean": true,
+  "commitCount": 32,
+  "changes": [
+    {
+      "path": ".gitignore",
+      "disposition": "not-applicable",
+      "reason": "Local RELEASE.md ignore; absent from Pi tracked files",
+      "sourceSha256": "bf43e1089899cfba09cdb20f026d8a43f628e01660a4022b8e2a13f1441e4d66"
+    },
+    {
+      "path": "README.md",
+      "disposition": "adapted",
+      "reason": "Pi README and sync documentation",
+      "sourceSha256": "94fea9e05b19f4b58d8fb69527650f8f306db2e17576d8a4ffec9a003d0b1eef"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "disposition": "adapted",
+      "reason": "Pi Chinese README and sync documentation",
+      "sourceSha256": "e886d7c8f2e829b74db4a6c15e4aa77119aea6a7c9d62e0f84ad491ac3107862"
+    },
+    {
+      "path": "docs/02-architecture.md",
+      "disposition": "adapted",
+      "reason": "Reference non-destructive boundary retained; sync documentation",
+      "sourceSha256": "940ae3e52520af9790850b6625652630da18b1f1c2f5fa144a7df1a26b93bc32"
+    },
+    {
+      "path": "packages/bundle/cordis.patch.yml",
+      "disposition": "not-applicable",
+      "reason": "dsh npm bundle release/build metadata and Cordis mount; Pi Vite plugin and NSIS remain",
+      "sourceSha256": "dcb2f9804499bfba50dc667c333da0112778769ce0a1273382b26f9aea040422"
+    },
+    {
+      "path": "packages/bundle/package.json",
+      "disposition": "not-applicable",
+      "reason": "dsh npm bundle release/build metadata and Cordis mount; Pi Vite plugin and NSIS remain",
+      "sourceSha256": "5439f56b7cbba6b5ae17dd99cb6f302738de959e9e34f17277e235fb6c9667bf"
+    },
+    {
+      "path": "packages/bundle/scripts/pack.mjs",
+      "disposition": "not-applicable",
+      "reason": "dsh npm bundle release/build metadata and Cordis mount; Pi Vite plugin and NSIS remain",
+      "sourceSha256": "21c03e249708615af61bd52ae63bd08e47a379f159d45a9517a45bbdbcb55560"
+    },
+    {
+      "path": "packages/bundle/tests/install.test.mjs",
+      "disposition": "not-applicable",
+      "reason": "dsh npm bundle release/build metadata and Cordis mount; Pi Vite plugin and NSIS remain",
+      "sourceSha256": "43bc0b3b7f83ad2b9d19cef8c6997e68a9f92c4d8647c3050f54e2496983a09c"
+    },
+    {
+      "path": "packages/client-settings/client.js",
+      "disposition": "adapted",
+      "reason": "Ribbon setting in Pi native menu; dsh update/runtime download UI omitted",
+      "sourceSha256": "705a94bb8d2368acea49f8fe437685241a24a750c8164baade2cb7009260ae15"
+    },
+    {
+      "path": "packages/client-settings/tests/section.test.mjs",
+      "disposition": "adapted",
+      "reason": "Pi preference/menu tests; dsh settings/update fixtures omitted",
+      "sourceSha256": "2e6ec4805e68b08cf84f8a53b1fb0907b26ce5a2605360c734c13bfe69459f00"
+    },
+    {
+      "path": "packages/computer-use/package.json",
+      "disposition": "not-applicable",
+      "reason": "dsh npm bundle release/build metadata and Cordis mount; Pi Vite plugin and NSIS remain",
+      "sourceSha256": "e78a6c0e7cef5b6b0ddf5ae505e07cb68d426f0c07b11c536f6a3da8b352a3f8"
+    },
+    {
+      "path": "packages/computer-use/src/code-agent-completion.ts",
+      "disposition": "adapted",
+      "reason": "Pi aborted final assistant is user stop; pending inactive-owner notices stay parked until owner is active/idle",
+      "sourceSha256": "201022a1bf1973b00ba61df54ea507b5c54d332b88eae729001d99f9023d913d"
+    },
+    {
+      "path": "packages/computer-use/src/code-agent-registry.ts",
+      "disposition": "adapted",
+      "reason": "Pi process bookmarks, stopped/read state and interval timestamps",
+      "sourceSha256": "250d7154e22837daf954e2d203c5e5f266e69276974c737f19cdb614f5ff3dd6"
+    },
+    {
+      "path": "packages/computer-use/src/code-agent.ts",
+      "disposition": "adapted",
+      "reason": "Existing top-level Pi manager records bookmarks and stops sessions; no Cordis realm services",
+      "sourceSha256": "62f26d699429ee19e394c21ecd2dfd74964a8bfcaa1e69c4be5a8eb2cc7fa11d"
+    },
+    {
+      "path": "packages/computer-use/src/gui-lock.ts",
+      "disposition": "ported",
+      "reason": "Direct shared lock",
+      "sourceSha256": "91a2fd120cdfb9cc4fb227b4c4601b4b882090611349a884b9f2778e4376107a"
+    },
+    {
+      "path": "packages/computer-use/src/open.ts",
+      "disposition": "ported",
+      "reason": "Pre-existence forbidden path check",
+      "sourceSha256": "8258ca6f060c267ee2f8d2924fe6d8d3b8b4d6cae863e19c2aaded41732abf2e"
+    },
+    {
+      "path": "packages/computer-use/src/plugin.ts",
+      "disposition": "adapted",
+      "reason": "Shared Electron screen lock surrounds all observe/action requests; current owner/generation gate is stricter than dsh",
+      "sourceSha256": "55507a49ccf0df83c032b9aaa174cb576185f3f4d310bdb50b7a2f8e94009cec"
+    },
+    {
+      "path": "packages/computer-use/tests/code-agent-registry.spec.ts",
+      "disposition": "adapted",
+      "reason": "Pi manager bookmark/stop/continuation tests",
+      "sourceSha256": "4ee3e9a5de0a5ad91290ceba3a142db1f84b8056aeae71d15effa9279631f17a"
+    },
+    {
+      "path": "packages/computer-use/tests/code-agent.spec.ts",
+      "disposition": "adapted",
+      "reason": "Pi manager completion ownership/stop guard tests",
+      "sourceSha256": "c7daae9b837533533c82eb9f7fad15d574fac237d40c389e5db385d96b1adb7a"
+    },
+    {
+      "path": "packages/computer-use/tests/gui-lock.spec.ts",
+      "disposition": "ported",
+      "reason": "All four tests",
+      "sourceSha256": "b0d308e4b2723b3bcfe0f287e567a3db08e1c5734dcf94911dfa7611f931b99c"
+    },
+    {
+      "path": "packages/computer-use/tests/tools.spec.ts",
+      "disposition": "adapted",
+      "reason": "Pi broker global contention and forbidden open path tests",
+      "sourceSha256": "704191aab1dc4b61cc5bd8fae7d8a55cb21ca921ef91fa6eadc0ff4f0d4e0be5"
+    },
+    {
+      "path": "packages/computer-use/tsdown.config.ts",
+      "disposition": "not-applicable",
+      "reason": "dsh npm bundle release/build metadata and Cordis mount; Pi Vite plugin and NSIS remain",
+      "sourceSha256": "202b9368fae96c29bf9178d4131c59b48f70a014fdef4da85b6674f787e109ca"
+    },
+    {
+      "path": "packages/helper/assets/chat.css",
+      "disposition": "ported",
+      "reason": "Fold styles and no flex shrink",
+      "sourceSha256": "140ea5282352046e46b4e2570d041fd5b0e2b52b7e8d53646806de03cb320f15"
+    },
+    {
+      "path": "packages/helper/assets/floating.css",
+      "disposition": "ported",
+      "reason": "Applicable strip CSS",
+      "sourceSha256": "2f2bbaa2e8f04b58cdf21995e5f0075d5da05676c9c1f725260eb067a2e94745"
+    },
+    {
+      "path": "packages/helper/assets/floating.html",
+      "disposition": "adapted",
+      "reason": "Pi HTML adds reference agent-strip",
+      "sourceSha256": "fd9bfac2c4b190871b00481e0e4c8a1c312058e271e4b0f18afe6d3b4afd44dd"
+    },
+    {
+      "path": "packages/helper/assets/shell.js",
+      "disposition": "ported",
+      "reason": "Applicable gesture/bookmark/report sections",
+      "sourceSha256": "9c495414579a8116a78aa21c94ef3c7e7d4f8795363bc325d3c2e3aa6dfe8234"
+    },
+    {
+      "path": "packages/helper/preload.cjs",
+      "disposition": "adapted",
+      "reason": "Pi preload adopts signal-only drag and bookmarks",
+      "sourceSha256": "8374813d7890b4f6cb82685623a5ef6226b180afd84a8be09130db695830d196"
+    },
+    {
+      "path": "packages/helper/src/electron.d.ts",
+      "disposition": "adapted",
+      "reason": "Pi uses installed Electron official types",
+      "sourceSha256": "127a90424439b44698f56e70692238749a0cbf0b9dda0240c5cac536c60ba1f3"
+    },
+    {
+      "path": "packages/helper/src/geometry.ts",
+      "disposition": "ported",
+      "reason": "Direct FloatingPlacement",
+      "sourceSha256": "bb472563f2442cf96e3eb8f2a9d4ce7ac216b2c7479ffcab921b6bc6bb6d195d"
+    },
+    {
+      "path": "packages/helper/src/main.ts",
+      "disposition": "adapted",
+      "reason": "Thin Electron wrapper; no downloaded helper lifecycle",
+      "sourceSha256": "ca880389a533c13903ef9b440e791243272cabfd10096212b1365e629a2f8ab8"
+    },
+    {
+      "path": "packages/helper/src/menu.ts",
+      "disposition": "not-applicable",
+      "reason": "dsh updater menu; Pi has no registry updater",
+      "sourceSha256": "844699b730b2bcedac97fa46f44e05836653a35286a495f621e4b4488073dd47"
+    },
+    {
+      "path": "packages/helper/tests/drag-input.test.ts",
+      "disposition": "adapted",
+      "reason": "Pi renderer tests cover signal-only gestures, threshold and pin lifecycle",
+      "sourceSha256": "3932571472023e3328e53037cc8f5729dfd17f5255537fa5d8563ec3b720b218"
+    },
+    {
+      "path": "packages/helper/tests/geometry.test.ts",
+      "disposition": "ported",
+      "reason": "All 21 tests",
+      "sourceSha256": "612f82fdb6a355d55c5c206957353aebe8a69ff0bd5155308c91d300e432adff"
+    },
+    {
+      "path": "packages/helper/tests/menu.test.ts",
+      "disposition": "not-applicable",
+      "reason": "dsh updater menu tests",
+      "sourceSha256": "8004a18d832d345e370fa2066d6386a07175a37c632198541762c10d61795f96"
+    },
+    {
+      "path": "packages/helper/tests/transcript-model.test.ts",
+      "disposition": "adapted",
+      "reason": "Pi renderer tests cover completion-only folded cards",
+      "sourceSha256": "1b3ef90688d15485acfc46f524a0765d599419b114e30d643ee70c68ae037799"
+    },
+    {
+      "path": "packages/host/src/electron-runtime.ts",
+      "disposition": "not-applicable",
+      "reason": "Electron is already bundled in Pi NSIS",
+      "sourceSha256": "2a67b85dade0e46b563eb314f125cbf7ae0715ac4ff11f0bfb064cd73b28e8bd"
+    },
+    {
+      "path": "packages/host/src/index.ts",
+      "disposition": "not-applicable",
+      "reason": "Cordis bootstrap, dsh updater and downloaded helper lifecycle",
+      "sourceSha256": "57b221db14b6fcbde5225147ff73ba00b3b179f59f2a026b547d7dd67227062d"
+    },
+    {
+      "path": "packages/host/src/orb.ts",
+      "disposition": "adapted",
+      "reason": "Pi manager/main/SSE and renderer implement bookmarks/notices; dsh download/update/jump-ack omitted",
+      "sourceSha256": "7c68bcba6722d6f5a5403d266af2c71eb3a4177e7dd6cc86916fa6a87a67c2ee"
+    },
+    {
+      "path": "packages/host/src/overlay-guard.ts",
+      "disposition": "adapted",
+      "reason": "Pi observation show boundary honors preference and hides immediately",
+      "sourceSha256": "00ded8f265a34995a88cd5014d98060dc8b799a5a2ed8d210dafdab10d10ab1b"
+    },
+    {
+      "path": "packages/host/src/preferences.ts",
+      "disposition": "adapted",
+      "reason": "Observation toggle adapted; dsh updater preferences omitted",
+      "sourceSha256": "b5b1202f08a331429f86f3fdc0edd9130643ab90e70deaa93bda842ddca7b8fb"
+    },
+    {
+      "path": "packages/host/src/routes.ts",
+      "disposition": "adapted",
+      "reason": "Pi menu persists ribbon setting; official ?session= URL replaces dsh jump route",
+      "sourceSha256": "a1749c460b733377abf4cff3538704259dd2fabf81119ecab5943a21d254b0d5"
+    },
+    {
+      "path": "packages/host/src/update.ts",
+      "disposition": "not-applicable",
+      "reason": "pnpm/npm registry installer belongs to dsh bundle; playbook 9.4 excludes this pipeline",
+      "sourceSha256": "1ecf0916c904352c92a6f0561d3294396346ac310f7147ec49e48b36bcfec81d"
+    },
+    {
+      "path": "packages/host/tests/overlay-guard.test.ts",
+      "disposition": "adapted",
+      "reason": "Pi preference show/hide and packaged menu tests",
+      "sourceSha256": "127ea9e5b29f19116fff214ab394553c1e3bca37af5e3c337c9a89ac2ee53d72"
+    },
+    {
+      "path": "packages/host/tests/preferences.test.ts",
+      "disposition": "adapted",
+      "reason": "Pi preference persistence tests; no updater preferences",
+      "sourceSha256": "e11cdfd4c2e7ffeae0b96c838015dde857752d02cccdeeeab10ffb4377b983f6"
+    },
+    {
+      "path": "packages/host/tests/routes.test.ts",
+      "disposition": "adapted",
+      "reason": "Pi packaged IPC/menu and exact bookmark URL validation",
+      "sourceSha256": "e5f13743259dab0420a00f2589aa8c5d96e5125c7243b7da2856ff1ffed66d55"
+    },
+    {
+      "path": "packages/host/tests/runtime.test.ts",
+      "disposition": "not-applicable",
+      "reason": "Downloaded helper retry; Pi runs as the bundled Electron application",
+      "sourceSha256": "f94fa1397e81e9cb027ee13b6316cc85d83c5f107adcca3b78936f8a3f21bc7a"
+    },
+    {
+      "path": "packages/host/tests/update.test.ts",
+      "disposition": "not-applicable",
+      "reason": "dsh plugin registry update pipeline",
+      "sourceSha256": "c4a3667b8b93b83f5e33c70cbbf45104f32f59272e45ff099b821369af0ac317"
+    }
+  ],
+  "copies": [
+    {
+      "source": "packages/helper/src/geometry.ts",
+      "target": "src/main/floating-geometry.ts",
+      "adaptation": "Direct class/algorithms; Pi export names and OS reduced-motion gate",
+      "sourceSha256": "bb472563f2442cf96e3eb8f2a9d4ce7ac216b2c7479ffcab921b6bc6bb6d195d",
+      "targetSha256": "58353cc7b03b8a8ab06a5154572459ff663c5b1b45f5ca9ecf79c56783fb14dd",
+      "provenance": true
+    },
+    {
+      "source": "packages/helper/src/main.ts",
+      "target": "src/main/floating-window-controller.ts",
+      "adaptation": "Electron cursor/display adapter for the directly ported placement class",
+      "sourceSha256": "ca880389a533c13903ef9b440e791243272cabfd10096212b1365e629a2f8ab8",
+      "targetSha256": "25532fadd8feb17278688b461e9e5e629b968b6b223de17e61318a7c76d869a3",
+      "provenance": true
+    },
+    {
+      "source": "packages/host/src/orb.ts",
+      "target": "src/main/index.ts",
+      "adaptation": "Caller titles/cache, Pi public session navigation and observation menu boundaries",
+      "sourceSha256": "7c68bcba6722d6f5a5403d266af2c71eb3a4177e7dd6cc86916fa6a87a67c2ee",
+      "targetSha256": "8b0982222e6d767d9a7b9f3c038b99ef0878273fa5ba73ac04d953635f258ab3",
+      "provenance": true
+    },
+    {
+      "source": "packages/helper/assets/shell.js",
+      "target": "src/renderer/floating.js",
+      "adaptation": "Direct gestures/bookmarks/folded card; Pi IPC and text rendering replace helper transport/markdown",
+      "sourceSha256": "9c495414579a8116a78aa21c94ef3c7e7d4f8795363bc325d3c2e3aa6dfe8234",
+      "targetSha256": "0743f6a18f7ddf472e8517bb50f290113ef1eca2e60ef36381c27d9d6db764d4",
+      "provenance": true
+    },
+    {
+      "source": "packages/helper/assets/floating.css",
+      "target": "src/renderer/floating.css",
+      "adaptation": "Direct strip selectors and anchor corrections; Pi root theme selector",
+      "sourceSha256": "2f2bbaa2e8f04b58cdf21995e5f0075d5da05676c9c1f725260eb067a2e94745",
+      "targetSha256": "bf0c4c58b113d8896b7b646a7fc201c195ae7f71094d263dad20110633b2f496",
+      "provenance": true
+    },
+    {
+      "source": "packages/helper/assets/chat.css",
+      "target": "src/renderer/reference-notice.css",
+      "adaptation": "Direct fold styles, mapped Pi tokens and plain text body",
+      "sourceSha256": "140ea5282352046e46b4e2570d041fd5b0e2b52b7e8d53646806de03cb320f15",
+      "targetSha256": "5795da5478114b51b34c734ed0cb837387ab2f154439ea21dea6a3cc9201c70e",
+      "provenance": true
+    },
+    {
+      "source": "packages/computer-use/src/gui-lock.ts",
+      "target": "src/main/gui-lock.ts",
+      "adaptation": "Direct mutex; Pi Symbol namespace",
+      "sourceSha256": "91a2fd120cdfb9cc4fb227b4c4601b4b882090611349a884b9f2778e4376107a",
+      "targetSha256": "9f97ba3f33dfd5e26fb3c635e5df81eca405a65880f11e5e14a9660532f67841",
+      "provenance": true
+    },
+    {
+      "source": "packages/computer-use/src/code-agent-completion.ts",
+      "target": "src/shared/code-agent.ts",
+      "adaptation": "Direct notice guards/caps; Pi session outcome format",
+      "sourceSha256": "201022a1bf1973b00ba61df54ea507b5c54d332b88eae729001d99f9023d913d",
+      "targetSha256": "8feaba317ed0caf997c21dabfeeaa02c72e36691c1467bb840333924f232a8c8",
+      "provenance": true
+    },
+    {
+      "source": "packages/computer-use/src/code-agent-registry.ts",
+      "target": "src/main/code-agent-manager.ts",
+      "adaptation": "Process bookmarks in existing Pi manager; persisted ownership, SSE instead of Cordis",
+      "sourceSha256": "250d7154e22837daf954e2d203c5e5f266e69276974c737f19cdb614f5ff3dd6",
+      "targetSha256": "09efb06730dd95c119b9e3f170ecf598b59c0440d00707d5af726ba1f5d7b0f4",
+      "provenance": true
+    },
+    {
+      "source": "packages/computer-use/src/open.ts",
+      "target": "src/main/reference-windows/open.ts",
+      "adaptation": "Pre-realpath and post-realpath system-path checks",
+      "sourceSha256": "8258ca6f060c267ee2f8d2924fe6d8d3b8b4d6cae863e19c2aaded41732abf2e",
+      "targetSha256": "3abab2e87ae8a1e6483d6becabf90d538f63391607b4440ab7fd7e0833ff839b",
+      "provenance": true
+    },
+    {
+      "source": "packages/host/src/preferences.ts",
+      "target": "src/main/observation-frame-preference.ts",
+      "adaptation": "Default-on preference; Orb-owned atomic file, strict corrupt-file reporting",
+      "sourceSha256": "b5b1202f08a331429f86f3fdc0edd9130643ab90e70deaa93bda842ddca7b8fb",
+      "targetSha256": "7b5d7523a006d51c65dd2e2388aae1313ba4a7a40cac0303c8eaedd25bd86d20",
+      "provenance": true
+    },
+    {
+      "source": "packages/helper/tests/geometry.test.ts",
+      "target": "tests/upstream-floating-placement.test.ts",
+      "adaptation": "All 21 source tests; vitest and Pi export paths",
+      "sourceSha256": "612f82fdb6a355d55c5c206957353aebe8a69ff0bd5155308c91d300e432adff",
+      "targetSha256": "cee4f78aca95365ab4df55ec8bda5a124b61a6aa5b3740bb56b434c1e835217d",
+      "provenance": true
+    },
+    {
+      "source": "packages/computer-use/tests/gui-lock.spec.ts",
+      "target": "tests/gui-lock.test.ts",
+      "adaptation": "All four source tests; Pi import path",
+      "sourceSha256": "b0d308e4b2723b3bcfe0f287e567a3db08e1c5734dcf94911dfa7611f931b99c",
+      "targetSha256": "b8c96fe8cc398498f6f564e7a420974148b12b2fffe354370d6006f4e12ffa6d",
+      "provenance": true
+    }
+  ],
+  "legacy": {
+    "repository": "https://github.com/rain-knows/deepseek-harness-orb",
+    "base": "72f1d738458a223696685a909e806b683eff5885",
+    "commit": "51f09764d7ff99947be08ebbb2ca2388faab3df4",
+    "commitCount": 1,
+    "changes": [
+      {
+        "path": "apps/desktop/README.md",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "dsh Windows identity/upgrade notes; Pi retains its released per-user identity",
+        "sourceBlob": "6fadc5fc0fb5b5021c4629a1e66d5356b22b20d2"
+      },
+      {
+        "path": "apps/desktop/README.zh.md",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "dsh Windows identity/upgrade notes; Pi retains its released per-user identity",
+        "sourceBlob": "be81af85ff20ce5bd62dd6e79830432fd64d9948"
+      },
+      {
+        "path": "apps/desktop/resources/icon-windows.png",
+        "status": "D",
+        "disposition": "not-applicable",
+        "reason": "Deleted dsh icon; Pi already has its own single product icon",
+        "sourceBlob": "cc8a09e311149d1157743e4e6a5de5d8afd21495"
+      },
+      {
+        "path": "apps/desktop/resources/icon-windows.svg",
+        "status": "D",
+        "disposition": "not-applicable",
+        "reason": "Deleted dsh icon; Pi already has its own single product icon",
+        "sourceBlob": "eb07a50158238ac0a59d0e9eb0937b8b1e2cbe8b"
+      },
+      {
+        "path": "apps/desktop/scripts/electron-builder-config.mjs",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "dsh appId/executable/icon/legacy machine upgrade; Pi identity and per-user NSIS already established",
+        "sourceBlob": "0f37010d0fd89e47935991321d85e494c8530bc3"
+      },
+      {
+        "path": "apps/desktop/scripts/smoke-packaged-runtime.ts",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "LibreOffice long-path junction smoke; no LibreOffice/dsh runtime in Pi artifact",
+        "sourceBlob": "d76d5bf6852c4eebcd75be05d9861d445ca075a3"
+      },
+      {
+        "path": "apps/desktop/src/main.ts",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "dsh About-dialog icon path unified with release icon; Pi already loads its own bundled icon",
+        "sourceBlob": "ef6315caa2f2c13d5cebc86903a72b281c74fcc5"
+      },
+      {
+        "path": "apps/desktop/tests/installer-packaging.spec.ts",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "dsh installer identity tests; Pi P2-05 audits own identity/content",
+        "sourceBlob": "043ab64833ddc81d8d2e6003ddac686f588589e9"
+      },
+      {
+        "path": "apps/desktop/tests/main-startup.spec.ts",
+        "status": "M",
+        "disposition": "not-applicable",
+        "reason": "dsh icon/startup identity tests; Pi P2-05 starts its own packaged artifact",
+        "sourceBlob": "89f1c4b7cc5ca9533de892c4202dd861466f8d0a"
+      }
+    ]
+  },
+  "passed": true
+}

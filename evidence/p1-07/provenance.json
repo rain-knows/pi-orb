@@ -4,7 +4,7 @@
   "checkout": "D:\\pi-orb-ref\\deepseek-harness-orb",
   "commit": "72f1d738458a223696685a909e806b683eff5885",
   "unmodified": 0,
-  "adapted": 12,
+  "adapted": 11,
   "missing": 0,
   "adaptedWithoutProvenanceHeader": 0,
   "files": [
@@ -36,7 +36,7 @@
       "file": "src/main/reference-windows/windows-native.ts",
       "reference": "packages/experimental/tool-computer-use/src/windows-native.ts",
       "status": "adapted",
-      "novelLines": 23,
+      "novelLines": 36,
       "provenanceHeader": true,
       "sample": [
         "* Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,",
@@ -60,7 +60,7 @@
       "file": "src/main/reference-windows/coordinates.ts",
       "reference": "packages/experimental/tool-computer-use/src/coordinates.ts",
       "status": "adapted",
-      "novelLines": 17,
+      "novelLines": 16,
       "provenanceHeader": true,
       "sample": [
         "* Screenshot-fraction mapping for the observation surface.",
@@ -114,18 +114,6 @@
         "* Platform boundary for the native foreground selection monitor.",
         "*",
         "* Source: `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885`,"
-      ]
-    },
-    {
-      "file": "src/main/floating-geometry.ts",
-      "reference": "apps/desktop/src/floating-window.ts",
-      "status": "adapted",
-      "novelLines": 97,
-      "provenanceHeader": true,
-      "sample": [
-        "* Floating orb geometry adapted from",
-        "* deepseek-harness-orb/apps/desktop/src/floating-window.ts at",
-        "* 72f1d738458a223696685a909e806b683eff5885 (MIT — see THIRD_PARTY_NOTICES.md §3.5)."
       ]
     },
     {

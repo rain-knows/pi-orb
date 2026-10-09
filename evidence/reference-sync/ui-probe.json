@@ -1,0 +1,177 @@
+{
+  "at": "2026-10-09T01:00:19.014Z",
+  "runRoot": "D:\\pi-orb-p2-runs\\reference-ui-1791507616146",
+  "kind": "real packaged Electron with deterministic Pi Web wire fixture; no real model or OS pointer input",
+  "checks": [
+    {
+      "name": "packaged renderer exists",
+      "ok": true
+    },
+    {
+      "name": "cross-conversation bookmarks show completed and stopped states",
+      "ok": true,
+      "detail": [
+        {
+          "state": "completed",
+          "title": "已完成 · <1m\n生成使用手册\n来自对话: 使用手册\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n手册已生成。\n点击在主窗口打开",
+          "color": "var(--agent-c1)"
+        },
+        {
+          "state": "stopped",
+          "title": "已停止 · <1m\n整理项目说明\n来自对话: 项目整理\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n已完成部分整理，用户手动停止。\n点击在主窗口打开",
+          "color": "var(--agent-c0)"
+        }
+      ]
+    },
+    {
+      "name": "caller attribution uses separate reference colors",
+      "ok": true,
+      "detail": [
+        {
+          "state": "completed",
+          "title": "已完成 · <1m\n生成使用手册\n来自对话: 使用手册\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n手册已生成。\n点击在主窗口打开",
+          "color": "var(--agent-c1)"
+        },
+        {
+          "state": "stopped",
+          "title": "已停止 · <1m\n整理项目说明\n来自对话: 项目整理\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n已完成部分整理，用户手动停止。\n点击在主窗口打开",
+          "color": "var(--agent-c0)"
+        }
+      ]
+    },
+    {
+      "name": "caller attribution uses Pi Web conversation titles",
+      "ok": true,
+      "detail": [
+        {
+          "state": "completed",
+          "title": "已完成 · <1m\n生成使用手册\n来自对话: 使用手册\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n手册已生成。\n点击在主窗口打开",
+          "color": "var(--agent-c1)"
+        },
+        {
+          "state": "stopped",
+          "title": "已停止 · <1m\n整理项目说明\n来自对话: 项目整理\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n已完成部分整理，用户手动停止。\n点击在主窗口打开",
+          "color": "var(--agent-c0)"
+        }
+      ]
+    },
+    {
+      "name": "bookmarks widen the real packaged window",
+      "ok": true,
+      "detail": {
+        "chips": [
+          {
+            "state": "completed",
+            "title": "已完成 · <1m\n生成使用手册\n来自对话: 使用手册\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n手册已生成。\n点击在主窗口打开",
+            "color": "var(--agent-c1)"
+          },
+          {
+            "state": "stopped",
+            "title": "已停止 · <1m\n整理项目说明\n来自对话: 项目整理\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n已完成部分整理，用户手动停止。\n点击在主窗口打开",
+            "color": "var(--agent-c0)"
+          }
+        ],
+        "cardCount": 1,
+        "folded": true,
+        "cardText": "后台任务报告The user stopped background Code agent session worker-stopped from the main window:The user stopped background Code agent session worker-stopped from the main window:\n整理项目说明\n\nLast output before it stopped:\n已完成部分整理，用户手动停止。",
+        "strip": "208px",
+        "width": 553,
+        "body": "expand-left expand-up has-strip strip-left expanded running",
+        "hasGuard": false
+      }
+    },
+    {
+      "name": "completion creates exactly one folded report",
+      "ok": true,
+      "detail": {
+        "chips": [
+          {
+            "state": "completed",
+            "title": "已完成 · <1m\n生成使用手册\n来自对话: 使用手册\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n手册已生成。\n点击在主窗口打开",
+            "color": "var(--agent-c1)"
+          },
+          {
+            "state": "stopped",
+            "title": "已停止 · <1m\n整理项目说明\n来自对话: 项目整理\n工作目录: D:\\pi-orb-p2-runs\\reference-ui-1791507616146\\workspace\n已完成部分整理，用户手动停止。\n点击在主窗口打开",
+            "color": "var(--agent-c0)"
+          }
+        ],
+        "cardCount": 1,
+        "folded": true,
+        "cardText": "后台任务报告The user stopped background Code agent session worker-stopped from the main window:The user stopped background Code agent session worker-stopped from the main window:\n整理项目说明\n\nLast output before it stopped:\n已完成部分整理，用户手动停止。",
+        "strip": "208px",
+        "width": 553,
+        "body": "expand-left expand-up has-strip strip-left expanded running",
+        "hasGuard": false
+      }
+    },
+    {
+      "name": "report shows partial output while hiding model instructions",
+      "ok": true,
+      "detail": "后台任务报告The user stopped background Code agent session worker-stopped from the main window:The user stopped background Code agent session worker-stopped from the main window:\n整理项目说明\n\nLast output before it stopped:\n已完成部分整理，用户手动停止。"
+    },
+    {
+      "name": "Pi Web owner prompt receives the no-restart guard once",
+      "ok": true,
+      "detail": [
+        {
+          "sessionId": "owner-main",
+          "message": "The user stopped background Code agent session worker-stopped from the main window:\n整理项目说明\n\nLast output before it stopped:\n已完成部分整理，用户手动停止。\n\nDo not restart this task and do not call code_agent for it again unless the user asks."
+        }
+      ]
+    },
+    {
+      "name": "other owner is not woken",
+      "ok": true
+    },
+    {
+      "name": "stop cap stays inside the widened panel",
+      "ok": true,
+      "detail": {
+        "panel": {
+          "left": 220,
+          "right": 540
+        },
+        "stop": {
+          "left": 238,
+          "right": 274,
+          "width": 36
+        }
+      }
+    },
+    {
+      "name": "report expands through its real click handler",
+      "ok": true
+    },
+    {
+      "name": "report folds again without duplicating",
+      "ok": true
+    },
+    {
+      "name": "bookmark click opens the exact public Pi Web session URL once",
+      "ok": true
+    },
+    {
+      "name": "bookmark click keeps the Orb owner active and hides the read finished bookmark",
+      "ok": true
+    },
+    {
+      "name": "unknown bookmarks cannot open arbitrary sessions",
+      "ok": true
+    },
+    {
+      "name": "observation ribbon menu defaults to enabled",
+      "ok": true
+    },
+    {
+      "name": "native ribbon toggle persists into isolated userData",
+      "ok": true
+    },
+    {
+      "name": "reopening the ribbon menu reads the disabled preference",
+      "ok": true
+    }
+  ],
+  "passed": true,
+  "logs": "\r\nDebugger listening on ws://127.0.0.1:31997/278caf87-7e8c-4989-b849-1975148c0091\r\nFor help, see: https://nodejs.org/learn/getting-started/debugging\r\n\r\nDevTools listening on ws://127.0.0.1:31996/devtools/browser/e96adbc7-0a93-44ea-a405-ba8bc204d903\r\nDebugger attached.\r\n[pi-orb] bridge listening on \\\\.\\pipe\\pi-orb-31076\n[pi-orb] desktop {\"at\":\"2026-10-09T01:00:16.847Z\",\"event\":\"authorize\",\"sessionId\":\"owner-main\",\"generation\":1,\"level\":\"full-access\"}\n[pi-orb] session timing {\"event\":\"model-response-interval\",\"durationMs\":270.1661999999999}\nError occurred in handler for 'orb:agent-open': Error: Unknown Code agent bookmark.\n    at file:///D:/workself/pi-orb/release/0.1.0-preview.3/win-unpacked/resources/app.asar/out/main/index.js:5306:86\n    at async Session.<anonymous> (node:electron/js2c/browser_init:1:118174)\nDebugger ending on ws://127.0.0.1:31997/278caf87-7e8c-4989-b849-1975148c0091\r\nFor help, see: https://nodejs.org/learn/getting-started/debugging\r\n"
+}

@@ -245,27 +245,17 @@ try {
     await evaluate(cdp, "document.querySelector('#preview-sheet').hidden=true; document.body.dispatchEvent(new PointerEvent('pointerleave')); true");
     await waitFor(cdp, "document.body.classList.contains('expanded')", (value) => value === false, "panel collapsed");
     await sleep(400);
-    const dock = await evaluate(cdp, "window.orb.moveFloatingBall(-60, 200).then(() => window.orb.clampFloatingBall())");
-    if (dock.docked !== "left") throw new Error(`Dock state failed: ${JSON.stringify(dock)}`);
-    await evaluate(cdp, "window.orb.unsnapFloatingBall().then(() => true)");
-    await evaluate(cdp, `new Promise(resolve => {
-      const ball = document.querySelector('#ball');
-      const rect = ball.getBoundingClientRect();
-      ball.setPointerCapture = () => {};
-      const start = { pointerId: 1, button: 0, buttons: 1, screenX: window.screenX + rect.left + 36, screenY: 200, clientX: rect.left + 36, clientY: rect.top + 36 };
-      ball.dispatchEvent(new PointerEvent('pointerdown', start));
-      ball.dispatchEvent(new PointerEvent('pointermove', { ...start, screenX: -24 }));
-      setTimeout(() => { ball.dispatchEvent(new PointerEvent('pointerup', { ...start, screenX: -24 })); setTimeout(resolve, 700); }, 300);
-    })`);
-    await waitFor(cdp, "document.body.classList.contains('docked-left')", Boolean, "renderer dock state");
-    await capture(cdp, "after-dock.png");
+    // Drag/dock now reads the OS cursor in main; the P2-05 packaged smoke covers that boundary.
+    // This frontend probe verifies that the removed coordinate ingress is unavailable.
+    if (!(await evaluate(cdp, "typeof window.orb.moveFloatingBall === 'undefined' && typeof window.orb.dragEnd === 'function'"))) throw new Error('Unexpected legacy drag API');
+    await capture(cdp, "after-collapsed.png");
     await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
     const reducedMotion = await evaluate(cdp, "getComputedStyle(document.querySelector('#dock-tab')).animationName");
     if (reducedMotion !== "none") throw new Error(`Reduced-motion dock animation still active: ${reducedMotion}`);
     await cdp.send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "no-preference" }] });
     if (!observed.prompt || !observed.answered) throw new Error(`Wire fixture not completed: ${JSON.stringify(observed)}`);
     await probeNativeTarget(cdp);
-    writeFileSync(join(import.meta.dirname, "interaction-probe.json"), `${JSON.stringify({ passed: true, commands: observed.commands, reducedMotion, draftStaysExpanded: true, runningStyle, screenshots: ["after-ready.png", "after-dark.png", "after-input.png", "after-access.png", "after-question.png", "after-tool-running.png", "after-tool-thread.png", "after-history.png", "after-dock.png"], visualFixture: ["after-preview-fixture.png"] }, null, 2)}\n`);
+    writeFileSync(join(import.meta.dirname, "interaction-probe.json"), `${JSON.stringify({ passed: true, commands: observed.commands, reducedMotion, draftStaysExpanded: true, runningStyle, screenshots: ["after-ready.png", "after-dark.png", "after-input.png", "after-access.png", "after-question.png", "after-tool-running.png", "after-tool-thread.png", "after-history.png", "after-collapsed.png"], visualFixture: ["after-preview-fixture.png"] }, null, 2)}\n`);
     console.log("Packaged renderer/Pi wire interaction probe passed");
   } finally { cdp.close(); }
 } finally {

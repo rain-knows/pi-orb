@@ -32,9 +32,9 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | 原生模块 | `koffi/build/koffi/win32_x64/koffi.node` 与 `uiohook-napi/prebuilds/win32-x64/uiohook-napi.node` 已解包；**无其它平台**的 `.node`；无 C++ 源码、vendored 头文件、包文档、import library | 通过 |
 | 随包许可 | `resources/LICENSE`、`resources/THIRD_PARTY_NOTICES.md`、`resources/CHANGELOG.md` | 通过 |
 | 清单一致 | 包内 `package.json` 版本 = 仓库版本；`main` 指向构建入口；Koffi 2.16.3 与精确锁定一致，.node SHA-256 与验证环境一致 | 通过 |
-| 内容泄漏 | 对 asar 内 11 个自建文本文件扫描本机用户路径、`PI_ORB_PI_WEB_PASSWORD`、`sk-` 形态密钥：0 命中 | 通过 |
+| 内容泄漏 | 对 asar 内自建文本文件扫描本机用户路径、`PI_ORB_PI_WEB_PASSWORD`、`sk-` 形态密钥：0 命中；当前文件数见 JSON | 通过 |
 
-体积记录（不是判据，是复核「某个包不再被裁剪」的事实）：`pi-orb.exe` 246 090 752 B、
+此前基线体积记录（本次同步的当前体积见 `package-audit.json` 的 `sizes`）：`pi-orb.exe` 246 090 752 B、
 `app.asar` 8 085 800 B、解包原生二进制合计 1 834 010 B、asar 条目 49。
 未被裁剪时解包目录是 129 个文件（koffi/uiohook 的源码、文档与其它平台二进制），裁剪后 10 个。
 
@@ -42,7 +42,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 新审计对放回 `base.hh` 的产物确实失败。依赖来源、反证和完整重建记录见
 [`plugin-reference-and-pointing.md`](../../doc/plugin-reference-and-pointing.md)。
 
-## 2. 启动探测：`packaged-smoke.json`（22/22 通过）
+## 2. 启动探测：`packaged-smoke.json`（23/23 通过）
 
 以真实 `release/<version>/win-unpacked/pi-orb.exe` 启动，独立 `--user-data-dir` 与
 `PI_ORB_CONFIG`，指向一个未使用的 pi-web 端口，通过 Chrome DevTools Protocol 驱动 renderer。
@@ -63,7 +63,8 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | **观察框按参考几何渲染**（glow `28px`、stroke `8px`、圆角 `16px`、渐变 + drop-shadow、遮罩挖空） | 通过 |
 | **观察框不挡输入、不动画**（`pointer-events: none`、`animation: none`） | 通过（改回 `auto` 即失败） |
 | **观察框窗口无脚本**（独立入口，不带壳的 bridge） | 通过（`scriptCount: 0`） |
-| **停靠滑动真的在动**（拖到边缘后 dock，采样到 9 帧不同位置：从屏外 `x=-52` 滑到 tab `x=0,width=34`） | 通过（强制瞬移的反向对照下 2 帧即失败） |
+| **停靠滑动真的在动**（主进程 OS 光标边界使用隔离夹具，真实拖动 IPC；从屏外 `x=-52` 滑到 tab `x=0,width=34`，多帧位置见 JSON） | 通过（强制瞬移的反向对照下 2 帧即失败） |
+| **系统光标手势和后台书签 bridge**（旧 renderer 坐标移动 API 已删除） | 通过 |
 | **取消停靠恢复球并清除 dock 状态** | 通过 |
  | **session Access bridge 存在且初始未授权**（`setOrbAccess`/`revokeOrbAccess` 可用） | 通过 |
  | **旧选窗和逐任务授权 API 不存在**（`listDesktopWindows`/`setDesktopTarget`/`authorizeDesktopTask` 均未暴露） | 通过 |
@@ -71,7 +72,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 | 没有模块解析错误 | 通过 |
 
 > 滑动那条采样的是 renderer 自己的 `screenX`/`outerWidth`（跟随 OS 窗口），并且**先**把球拖到屏幕
-> 边缘——不停靠时 `clampFloatingBall` 是空操作，瞬移与滑动在那时无从区分。第一次写这条检查时正是
+> 边缘——当前通过 `dragPress`／`dragBegin`／`dragMove`／`dragEnd` 触发真实 IPC。第一次写旧版检查时正是
 > 漏了这个前置条件，于是采到 1 帧、误报失败；记录在此以免重犯。
 >
 > 中间几条读的是**计算后的样式**与**真实 DOM**，而不是「样式表已加载」：这正是区分

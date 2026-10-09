@@ -36,6 +36,7 @@ const userDataDir = join(runRoot, "userData");
 // Dedicated ports unlikely to collide with a real pi-web instance or a second probe.
 const UNUSED_PI_WEB_PORT = 31991;
 const DEBUG_PORT = 31992;
+const MAIN_DEBUG_PORT = 31993;
 
 const result = {
   capturedAt: new Date().toISOString(),
@@ -122,7 +123,7 @@ delete childEnv.ELECTRON_RUN_AS_NODE;
 
 const child = spawn(
   executable,
-  [`--user-data-dir=${userDataDir}`, `--remote-debugging-port=${DEBUG_PORT}`],
+  [`--user-data-dir=${userDataDir}`, `--remote-debugging-port=${DEBUG_PORT}`, `--inspect=${MAIN_DEBUG_PORT}`],
   {
     cwd: runRoot,
     env: {
@@ -136,6 +137,7 @@ const child = spawn(
 
 let stdout = "";
 let stderr = "";
+let mainClient;
 child.stdout.on("data", (chunk) => (stdout += chunk.toString()));
 child.stderr.on("data", (chunk) => (stderr += chunk.toString()));
 
@@ -159,6 +161,13 @@ try {
 
   if (pageTarget) {
     const client = await connect(pageTarget.webSocketDebuggerUrl);
+    const mainTargets = await (await fetch(`http://127.0.0.1:${MAIN_DEBUG_PORT}/json/list`)).json();
+    mainClient = await connect(mainTargets[0].webSocketDebuggerUrl);
+    // Isolated cursor fixture at the Electron boundary. No user pointer is moved and no
+    // test-only positioning API is added to the product; renderer sends the real drag IPC.
+    await evaluate(mainClient, `globalThis.__orbSmokeElectron = process.mainModule.require('electron');
+      globalThis.__orbSmokeCursor = { x: 0, y: 0 };
+      globalThis.__orbSmokeElectron.screen.getCursorScreenPoint = () => globalThis.__orbSmokeCursor;`);
 
     const bridgeType = await evaluate(client, "typeof window.orb");
     check("the packaged preload bridge reaches the renderer", bridgeType === "object", `typeof window.orb = ${bridgeType}`);
@@ -360,7 +369,8 @@ try {
     );
 
     // Off-screen recovery, part one: the packaged app really does re-clamp an orb that was dragged
-    // beyond every display. This drives `clampFloatingBall`, which is the same geometry the wake path
+    // beyond every display. This drives the OS-cursor dragEnd boundary, using an isolated cursor fixture;
+    // the placement class is the same geometry the wake path
     // runs — but note it is NOT the wake path itself.
     //
     // That distinction is deliberate and was learned the hard way: an earlier version of this check
@@ -370,13 +380,18 @@ try {
     // adding a bridge method purely to be testable would be a product surface that exists for tests.
     // The wake path's own behaviour is therefore pinned by `tests/floating-recovery.test.ts` and by
     // the shared `presentOrb` helper, which both wake routes call.
+    await evaluate(client, "window.orb.setFloatingExpanded(false)");
+    const startCursor = JSON.parse(await evaluate(client, "JSON.stringify({x:window.screenX+48,y:window.screenY+48})"));
+    await evaluate(mainClient, `globalThis.__orbSmokeCursor = ${JSON.stringify(startCursor)}`);
+    await evaluate(client, "window.orb.dragPress(); window.orb.dragBegin(); window.orb.getStatus()");
+    await evaluate(mainClient, "globalThis.__orbSmokeCursor = {x:9036,y:9036}");
     const recovery = await evaluate(
       client,
       `(async () => {
-        await window.orb.moveFloatingBall(9000, 9000);
+        window.orb.dragMove(false);
         await new Promise((done) => setTimeout(done, 300));
         const parked = { x: window.screenX, y: window.screenY };
-        await window.orb.clampFloatingBall();
+        await window.orb.dragEnd(false);
         await new Promise((done) => setTimeout(done, 600));
         return JSON.stringify({
           parked,
@@ -404,16 +419,22 @@ try {
     // *slides* off rather than snapping. Docking only happens once the ball is past an edge, so the
     // probe reproduces that pre-condition first; without it the call is a no-op and a snap and a
     // slide are indistinguishable. The window position is read through the renderer's own
-    // `screenX`/`outerWidth`, which track the OS window, so observing motion needs no product API.
+    // `screenX`/`outerWidth`, which track the OS window. The isolated main inspector sets only the
+    // cursor fixture; all window placement is real production code.
+    await evaluate(client, "window.orb.setFloatingExpanded(false)");
+    const slideCursor = JSON.parse(await evaluate(client, "JSON.stringify({x:window.screenX+48,y:window.screenY+48})"));
+    await evaluate(mainClient, `globalThis.__orbSmokeCursor = ${JSON.stringify(slideCursor)}`);
+    await evaluate(client, "window.orb.dragPress(); window.orb.dragBegin(); window.orb.getStatus()");
+    await evaluate(mainClient, "globalThis.__orbSmokeCursor = {x:-4,y:536}");
     const slide = await evaluate(
       client,
       `(async () => {
         // Drag hard against the left edge, as a user dragging the ball there would.
-        await window.orb.moveFloatingBall(-40, 500);
+        window.orb.dragMove(true);
         await new Promise((done) => setTimeout(done, 200));
         const before = { x: window.screenX, width: window.outerWidth };
         const samples = [];
-        const settled = window.orb.clampFloatingBall();
+        const settled = window.orb.dragEnd(true);
         for (let i = 0; i < 30; i += 1) {
           samples.push({ x: window.screenX, width: window.outerWidth });
           await new Promise((done) => setTimeout(done, 16));
@@ -444,6 +465,9 @@ try {
       unsnapValue !== null && unsnapValue.docked === undefined && unsnapValue.expanded === false,
       String(unsnap).slice(0, 200),
     );
+    check("the packaged bridge exposes OS-cursor drag and background bookmarks with no old position API",
+      await evaluate(client, "typeof window.orb.dragPress === 'function' && typeof window.orb.getAgentBookmarks === 'function' && typeof window.orb.moveFloatingBall === 'undefined'"),
+      "Pi preload drag signals / bookmarks");
 
     const access = await evaluate(
       client,
@@ -498,6 +522,7 @@ try {
   result.stdoutTail = stdout.slice(-2000);
   result.stderrTail = stderr.slice(-2000);
 } finally {
+  mainClient?.close();
   child.kill();
   await sleep(1500);
   if (child.exitCode === null) child.kill("SIGKILL");

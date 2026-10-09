@@ -48,7 +48,7 @@ const PORTS = {
   "src/main/windows-selection.ts": "apps/desktop/src/windows-selection.ts",
   "src/main/windows-selection-native.ts": "apps/desktop/src/windows-selection-native.ts",
   "src/main/selection-monitor.ts": "apps/desktop/src/selection-monitor.ts",
-  "src/main/floating-geometry.ts": "apps/desktop/src/floating-window.ts",
+  // Current geometry is ported from the plugin reference, recorded by reference-sync/record-reference.mjs.
   "src/main/floating-overlay-guard.ts": "apps/desktop/src/floating-window.ts",
   "src/main/observation-frame.ts": "apps/desktop/src/observation-frame-window.ts",
 };
