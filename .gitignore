@@ -61,9 +61,7 @@ auth.json
 !.env.example
 
 # Native binaries and package archives of the desktop driver.
-# The locked versions are recorded as hashes in
-# evidence/p0-04/cua-artifact-manifest.json; the blobs themselves are not
-# redistributed from this repository.
+# Native runtime hashes are audited from the actual package; blobs are not committed.
 *.tgz
 *.dll
 *.node
@@ -92,3 +90,6 @@ auth.json
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Daily verification output, including reports and temporary probe data
+/evidence/runs/

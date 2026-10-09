@@ -14,4 +14,4 @@
 
 卸载前通过专用短进程调用 Pi remove，按归属清理 App Paths；保留历史、模型、凭据与工作区。Node/Pi 不可用则提示手动移除插件，不静默删除用户数据。实现：[NSIS hooks](../resources/installer.nsh)、[单实例](../src/main/index.ts)。
 
-来源：旧单体 72f1d738458a223696685a909e806b683eff5885（MIT）的 apps/desktop/scripts/electron-builder-config.mjs、apps/desktop/src/main.ts、welcome-api.ts；复用每用户 NSIS、唤回与必要文件选择。Pi 官方包登记和单实例锁是宿主适配；不搬 dsh Node/host 管道或完整设置页。出处见 [取材入口](reference-playbook.md)。证据：[后端启动](../evidence/personal-startup/backend-startup.json)、[安装数据保护](../evidence/personal-startup/installer-smoke.json)、[升级](../evidence/windows-startup-and-workspaces/current-user-upgrade.json)。
+来源：旧单体 72f1d738458a223696685a909e806b683eff5885（MIT）的 apps/desktop/scripts/electron-builder-config.mjs、apps/desktop/src/main.ts、welcome-api.ts；复用每用户 NSIS、唤回与必要文件选择。Pi 官方包登记和单实例锁是宿主适配；不搬 dsh Node/host 管道或完整设置页。出处见 [取材入口](reference-playbook.md)。证据：[后端启动](../evidence/startup/backend-startup.json)、[安装数据保护](../evidence/startup/installer-smoke.json)、[升级](../evidence/startup/current-user-upgrade.json)。

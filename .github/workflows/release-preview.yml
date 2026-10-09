@@ -85,16 +85,16 @@ jobs:
       # happened, which is what makes the published binary's contents a measured fact rather than an
       # inherited one.
       - name: Build and verify the packaged artifact on this machine
-        run: node evidence/p2-05/run-p2-05.mjs
+        run: node scripts/verify/package.mjs
 
       - name: Assert the fresh audit and probe both passed
         run: |
           node -e "
           const fs = require('node:fs');
           const read = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
-          const audit = read('evidence/p2-05/package-audit.json');
-          const smoke = read('evidence/p2-05/packaged-smoke.json');
-          const stage = read('evidence/p2-05/stage-result.json');
+          const audit = read('evidence/packaging/package-audit.json');
+          const smoke = read('evidence/packaging/packaged-smoke.json');
+          const stage = read('evidence/packaging/stage-result.json');
           console.log('package audit:', audit.checks.filter((c) => c.ok).length + '/' + audit.checks.length);
           console.log('packaged smoke:', smoke.checks.filter((c) => c.ok).length + '/' + smoke.checks.length);
           if (!audit.passed || !smoke.passed || !stage.passed) {
@@ -109,10 +109,10 @@ jobs:
       # The installer command rebuilds win-unpacked. Audit and start that final artifact too;
       # evidence from the earlier directory build alone does not describe this rebuild.
       - name: Audit the installer build's unpacked artifact
-        run: node evidence/p2-05/run-package-audit.mjs
+        run: node scripts/verify/package-audit.mjs
 
       - name: Start the installer build's unpacked artifact
-        run: node evidence/p2-05/run-packaged-smoke.mjs
+        run: node scripts/verify/packaged-smoke.mjs
 
       # A published release must be traceable to the evidence it was built from, so the records that
       # were just produced travel with the artifact instead of staying in a log.
@@ -124,9 +124,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path dist-evidence | Out-Null
           Copy-Item "$dir/pi-orb-$version-win-x64.exe" dist-evidence/
           Copy-Item "$dir/pi-orb-$version-win-x64.exe.blockmap" dist-evidence/ -ErrorAction SilentlyContinue
-          Copy-Item evidence/p2-05/package-audit.json dist-evidence/
-          Copy-Item evidence/p2-05/packaged-smoke.json dist-evidence/
-          Copy-Item evidence/p2-05/stage-result.json dist-evidence/
+          Copy-Item evidence/packaging/package-audit.json dist-evidence/
+          Copy-Item evidence/packaging/packaged-smoke.json dist-evidence/
+          Copy-Item evidence/packaging/stage-result.json dist-evidence/
           Copy-Item evidence/p1-07/release-gate.json dist-evidence/
           Get-ChildItem dist-evidence | Select-Object Name, Length
 
@@ -150,7 +150,7 @@ jobs:
           if ($matrix -notmatch '未验证') { throw 'the support matrix no longer records unverified items' }
           $unverifiedSection = [regex]::Match($matrix, '(?ms)^## 3\. 未验证.*?(?=^## 4\.)').Value.Trim()
           if (-not $unverifiedSection) { throw 'the unverified support matrix section is missing' }
-          $manual = Get-Content doc/manual-acceptance.md -Raw
+          $manual = Get-Content doc/verification.md -Raw
           if ($manual -notmatch 'E 组') { throw 'the installer acceptance steps are missing' }
 
           $notes = @"
@@ -158,7 +158,7 @@ jobs:
 
           This is a **preview build, not a complete v0.1 release.** It is unsigned, so Windows may
           warn about an unknown publisher on first run. The actual SmartScreen experience is unverified in
-          ``doc/manual-acceptance.md`` §9 (E9); do not disable your security settings to silence it.
+          ``doc/verification.md`` §9 (E9); do not disable your security settings to silence it.
 
           ### 本版内容与使用
 

@@ -10,10 +10,10 @@ import {
  * The C7 core: a screenshot fraction must land on the same point of the desktop that the target app
  * reports. This is the step that was wrong before — the model was asked for a screen coordinate it
  * had no way to compute, and the observation dropped the window's screen position entirely
- * (evidence/p1-06/d-group-prerequisites.md §5).
+ * (doc/observation-coordinates.md).
  *
  * The numbers are the real ones from two independent runs against the disposable P1-05 target
- * (evidence/p1-05/input-verification.json, evidence/p1-06/loop-verification.json):
+ * (original fixture runs retained in Git history):
  *
  *   driver-reported window bounds 189,135 735x786   (the space a request lives in)
  *   window DIP bounds             120,90  502x530    (the target's own getBounds)

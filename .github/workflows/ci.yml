@@ -17,10 +17,10 @@
 #
 # Two things are intentionally NOT here:
 #
-#   - The packaged-application probe (`evidence/p2-05/run-packaged-smoke.mjs`) starts a real Electron
+#   - The packaged-application probe (`scripts/verify/packaged-smoke.mjs`) starts a real Electron
 #     window and enumerates real desktop windows, and the P2-05 content audit reads a Windows
 #     artifact. They are Windows-host-specific and belong to the release machine, not to every pull
-#     request; `doc/p2-05-distribution.md` §6 records what remains manual.
+#     request; `doc/packaging.md` §6 records what remains manual.
 #   - The pi-web baseline comparison needs a developer-local pi-web checkout. On a runner there is
 #     none, and the gate reports it as `skipped` — counted separately, never as passed.
 #

@@ -8,4 +8,4 @@ open_in_browser 使用用户默认浏览器，随后通过可见截图操作。o
 
 前台工具声明 model-only，防止 Code mode 把图像上下文吞入脚本。宿主已有文件、搜索与问答工具按实际配置选取；不存在的能力不会自动注册。
 
-来源：当前插件 `packages/computer-use/src/plugin.ts`、`open.ts`、`gui-lock.ts`；Windows 原生 backend 来自旧单体 `packages/experimental/tool-computer-use/`。原生调用直接移植，Pi schema/认证桥为宿主适配。许可见 [来源](reference-playbook.md)。证据：[工具暴露](../evidence/p1-06/tool-exposure.json)、[桌面样本](../evidence/p1-06/real-model-c7-session-access.json)。
+来源：当前插件 `packages/computer-use/src/plugin.ts`、`open.ts`、`gui-lock.ts`；Windows 原生 backend 来自旧单体 `packages/experimental/tool-computer-use/`。原生调用直接移植，Pi schema/认证桥为宿主适配。许可见 [来源](reference-playbook.md)。证据：[工具暴露](../evidence/access/tool-exposure.json)、[桌面样本](../evidence/desktop/real-model-c7-session-access.json)。

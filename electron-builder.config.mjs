@@ -14,7 +14,7 @@
  * `dsh/` payload mappings, the custom NSIS page/`installer.nsh` overrides, the SafeNet
  * code-signing chain, the release-record/upload flow, and the auto-update feed. pi-orb is a
  * standalone shell that talks to the user's existing pi-web; v0.1 ships an unsigned per-user
- * installer and no updater (see `doc/p2-05-distribution.md`).
+ * installer and no updater (see `doc/packaging.md`).
  *
  * Env overrides: `PI_ORB_APP_ID` (AUMID and uninstall registry identity).
  */

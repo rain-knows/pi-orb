@@ -8,6 +8,6 @@ piweb 保留独立打开网页用途；piweb restart 需核对 Next 入口、进
 
 可审查副本见 [CMD](../scripts/windows-launchers/piorb.cmd)、[VBS](../scripts/windows-launchers/piorb-launch-hidden.vbs)、[PowerShell](../scripts/windows-launchers/piweb.ps1)。PowerShell 5.1 文件保留 UTF-8 BOM。日志位置由脚本和 [个人启动代码](../src/main/personal-startup.ts) 决定。
 
-安装路径报错先核对注册视图、EXE 与同步脚本退出码；弹窗不能单独证明安装文件不存在。历史复核不能重写为当前环境结论。记录：[安装](../evidence/winr-launcher/installation.json)、[运行](../evidence/winr-launcher/runtime.json)、[脚本宿主](../evidence/winr-launcher/script-host-check.json)。
+安装路径报错先核对注册视图、EXE 与同步脚本退出码；弹窗不能单独证明安装文件不存在。历史复核不能重写为当前环境结论。记录：[安装](../evidence/startup/installation.json)、[运行](../evidence/startup/runtime.json)、[脚本宿主](../evidence/startup/script-host-check.json)。
 
 来源：旧单体 72f1d738458a223696685a909e806b683eff5885（MIT）的每用户 App Paths 打包形态，以及本项目已有 personal-startup/showOrb/presentOrb；只适配本机短命令，不另建产品设置或发布管道。支持边界见 [支持矩阵](support-matrix.md)。

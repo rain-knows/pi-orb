@@ -10,7 +10,7 @@
 
 旧单体 sparse checkout 只有 apps/desktop/src 与 packages；renderer、scripts、tests 可看同提交完整检出 C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb，或添加 sparse 目录。检出位置不是运行时依赖。
 
-取材先核对 HEAD，再定位原文件。GUI 从 packages/computer-use/src/ 开始，浮窗从 packages/helper/assets/ 和 packages/helper/src/floating-placement.ts 开始，后台从 code-agent*.ts 开始；旧单体原生实现从 packages/experimental/tool-computer-use/ 开始。详细原文件与宿主差异在所属主题，完整当前同步文件处置在 [来源记录](../evidence/reference-sync/reference-manifest.json)。
+取材先核对 HEAD，再定位原文件。GUI 从 packages/computer-use/src/ 开始，浮窗从 packages/helper/assets/ 和 packages/helper/src/floating-placement.ts 开始，后台从 code-agent*.ts 开始；旧单体原生实现从 packages/experimental/tool-computer-use/ 开始。详细原文件与宿主差异在所属主题，完整当前同步文件处置在 [来源记录](../evidence/reference/reference-manifest.json)。
 
 能移植就直接移植，不重写等价实现。不能直接移植时在所属主题记录原仓库、文件、提交、许可证、复用方式和未复用原因，再实现最小 Pi 适配。保留文件来源头与 [第三方声明](../THIRD_PARTY_NOTICES.md)；上述源码均按 MIT 保留版权，不称为本项目原创。
 

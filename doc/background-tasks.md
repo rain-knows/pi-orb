@@ -10,4 +10,4 @@
 
 来源：当前插件 `packages/computer-use/src/code-agent.ts`、`code-agent-registry.ts`、`code-agent-completion.ts`、`packages/helper/assets/shell.js`。Pi Web API 替换 Cordis 服务；不复制 dsh standard preset 引擎。
 
-实现：[manager](../src/main/code-agent-manager.ts)、[Pi 工具](../pi-package/extensions/code-agent.ts)。回归：[归属与通知](../tests/code-agent-manager.test.ts)。证据：[完成](../evidence/p1-06/real-model-code-agent-session.json)、[停止](../evidence/p1-06/real-model-code-agent-stop-session.json)、[失败](../evidence/p1-06/real-model-code-agent-failure-session.json)。
+实现：[manager](../src/main/code-agent-manager.ts)、[Pi 工具](../pi-package/extensions/code-agent.ts)。回归：[归属与通知](../tests/code-agent-manager.test.ts)。证据：[完成](../evidence/background/real-model-code-agent-session.json)、[停止](../evidence/background/real-model-code-agent-stop-session.json)、[失败](../evidence/background/real-model-code-agent-failure-session.json)。

@@ -7,15 +7,10 @@ The rounded plate, gradients and shadow filters are reused; the whale mark is re
 symbol. `resources/icon.png` and `resources/icon.ico` are raster/Windows derivatives of that SVG.
 The upstream MIT license text is retained below. These assets do not represent DeepSeek endorsement.
 
-This file records the third-party components redistributed with a pi-orb Windows x64 release, and
-the license obligations that follow. It is generated and checked against
-[`evidence/p1-07/license-inventory.json`](./evidence/p1-07/license-inventory.json), which is
-reproducible with `node evidence/p1-07/collect-licenses.mjs`.
-
-- Inventory captured for: pi-orb `0.1.0` (unreleased), Windows x64
-- Desktop backend: Windows source imported from `deepseek-harness-orb` commit `72f1d738458a223696685a909e806b683eff5885` (MIT)
-- Windows native FFI: `koffi@2.16.3` (MIT)
-- Keyboard edge detection: `uiohook-napi@1.5.5` (MIT)
+This file retains the notices of reused source and redistributed runtime dependencies. Versions are
+locked in package.json/package-lock.json; the actual installed production graph is checked by
+`node scripts/verify/licenses.mjs`. The [selected inventory](evidence/reference/license-inventory.json)
+is a historical run, not a claim about a changed dependency graph.
 
 ## 1. pi-orb itself
 
@@ -26,7 +21,6 @@ a release.
 
 | Component | Version | License | Ships a license file | Obligation |
 |---|---|---|---|---|
-| `scheduler` | 0.28.0 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `uiohook-napi` | 1.5.5 | MIT | yes (`LICENSE`) | include copyright and permission notice |
 | `koffi` | 2.16.3 | MIT | yes (`LICENSE.txt`) | include copyright and permission notice |
 | `node-gyp-build` | 4.8.4 | MIT | yes (`LICENSE`) | include copyright and permission notice |
@@ -38,71 +32,6 @@ Declared optional packages for other operating systems and architectures (`darwi
 `win32-arm64-msvc`) are **not installed** on this platform and therefore do not ship. They are listed
 under `notInstalledOnThisPlatform` in the inventory rather than being silently omitted.
 
-## 3. Historical Cua evidence
-
-The repository contains historical Cua probe records under `evidence/p0-04` and `evidence/p1-05`.
-Those packages are no longer production dependencies and are not redistributed by current pi-orb.
-The following records are retained only to explain the earlier P1 investigation and the decision to
-replace that path with the imported MIT backend.
-
-## 3.1 Historical MPL-2.0 analysis
-
-MPL-2.0 is file-level weak copyleft. Redistributing these artifacts unmodified requires carrying the
-notice and telling recipients how to obtain the corresponding source. It does not make the rest of
-pi-orb MPL, and it does not require publishing pi-orb's own source.
-
-### 3.1 Which files carry MPL-2.0
-
-| File | Package | Bytes | Basis |
-|---|---|---|---|
-| `cua_driver_node_runtime.node` | `@trycua/cua-driver-win32-x64-msvc` | 633 168 | named explicitly by the upstream `node-runtime-NOTICE.md` as a compatibility build derived from `uniffi-bindgen-react-native` 0.31.0-3 |
-| `uniffi-runtime-napi.win32-x64-msvc.node` | `@ubjs/node-win32-x64-msvc` | 537 088 | the `@ubjs/*` packages declare `license: "MPL-2.0"` and point at `github.com/jhugman/uniffi-bindgen-react-native`, which is the same project the upstream notice names |
-
-The two files are **not** identical (different sizes and SHA-256 hashes); the Cua file is a derived
-build, which is what the upstream notice says it is.
-
-### 3.2 `cua_driver_sdk.dll` is not attributed to MPL-2.0 by the shipped evidence
-
-The upstream `node-runtime-NOTICE.md` names only the `.node` runtime, while the package license field
-is `MIT AND MPL-2.0`. That left open whether the 26.8 MB `cua_driver_sdk.dll` also carries an MPL
-obligation. Inspecting the shipped artifact:
-
-| Check | Result |
-|---|---|
-| ASCII license text (`MIT License`, `Mozilla Public`, `Permission is hereby granted`) | 0 occurrences |
-| UTF-16 license text | 0 occurrences |
-| The single `license` string in the file | a Rust symbol-metadata key name, not a license grant |
-| References to `uniffi-bindgen-react-native`, `uniffi_bindgen`, or `cua_driver_node_runtime` | 0 occurrences |
-| Imported libraries | only operating-system libraries (`kernel32`, `user32`, `gdi32`, `ole32`, `oleacc`, `d3d11`, `bcrypt`, `dwmapi`, `dbghelp`, …) |
-
-A first-grep result of "894 MPL occurrences" was **discarded as a false positive**: matching ASCII on a
-binary produced x86 opcode coincidences, and every match was noise rather than a string. The table
-above uses UTF-16 decoding plus context inspection of the one real hit.
-
-**Conclusion:** nothing in the shipped artifact attributes MPL-2.0 to `cua_driver_sdk.dll`, and no
-shipped file links it to the MPL-licensed runtime. It is therefore treated as part of the MIT-licensed
-Cua driver and is **not** listed as an MPL component. This is an inference from the shipped bytes and
-the declared package license, not a legal opinion: the DLL's source repository was not inspected, and
-no claim is made about upstream source files that are not part of this package. If upstream later
-states that the DLL is MPL-derived, this file must be updated and the DLL added to §3.1.
-
-### 3.3 How to obtain the corresponding source
-
-- Cua driver (MIT, and the derived `.node` runtime): <https://github.com/trycua/cua> at the release
-  tag matching `0.30.1`. The upstream notice states the derived runtime's source is the pinned npm
-  development dependency plus the deterministic transformations in `scripts/build-node-runtime.mjs`.
-- `@ubjs/*` (MPL-2.0): <https://github.com/jhugman/uniffi-bindgen-react-native> at
-  `0.31.0-3`, path `runtimes/napi`.
-- `uiohook-napi` (MIT): <https://github.com/SnosMe/uiohook-napi> at the npm `1.5.5` source tree.
-
-The MPL-2.0 text is at <https://www.mozilla.org/MPL/2.0/>.
-
-### 3.4 The packages that declare MPL-2.0 ship no license text
-
-`@ubjs/core`, `@ubjs/node` and `@ubjs/node-win32-x64-msvc` each declare `license: "MPL-2.0"` in
-`package.json` and each ship **no** `LICENSE`/`COPYING`/`NOTICE` file. Their license text is therefore
-supplied by this notice rather than by the package, which is why the link above is included here
-instead of relying on the dependency tree.
 
 ## 3.5 Design derived from `deepseek-harness-orb` (MIT)
 
@@ -206,7 +135,7 @@ The historical sources below remain attributed to their original commits when un
 - `packages/host/src/{preferences,overlay-guard}.ts` → Pi observation preference and main show/hide gate; setting exposed in the native menu because Pi has no public plugin settings-page writer.
 - `packages/helper/tests/geometry.test.ts`, `packages/computer-use/tests/gui-lock.spec.ts` → `tests/upstream-floating-placement.test.ts`, `tests/gui-lock.test.ts` (all source cases, adapted imports/runner).
 
-Full source/target hashes and all changed-file dispositions are in `evidence/reference-sync/reference-manifest.json`.
+Full source/target hashes and all changed-file dispositions are in `evidence/reference/reference-manifest.json`.
 The dsh updater/runtime downloader/registry installer and its legacy Windows application identity are not included.
 
 Source: [mini-yifan/dsh-orb-cordis](https://github.com/mini-yifan/dsh-orb-cordis), pinned commit

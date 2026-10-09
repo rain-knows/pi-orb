@@ -9,7 +9,7 @@
  *
  * Keeping them in one module matters because a guessed shape fails silently: the
  * UI simply never receives text, with no error anywhere. That exact mistake was
- * made and then caught by the real end-to-end run in evidence/p1-02.
+ * made and then caught by the real end-to-end run in the historical Pi Web integration run.
  */
 
 /** Streaming text arrives nested under `assistantMessageEvent`. */
