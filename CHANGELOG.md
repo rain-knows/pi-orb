@@ -10,6 +10,9 @@ verified is recorded as *unverified* and is not claimed as compatible.
 
 ## [Unreleased]
 
+- 同步 `mini-yifan/dsh-orb-cordis@aa79308` 的全部适用增量：系统光标拖动、Windows 缩放吸边及显示器接缝、输入框固定、后台书签和折叠报告、用户停止后的禁止自动重启、GUI 共享互斥、系统路径前置拒绝与观察框彩带开关。
+- 删除 renderer 屏幕坐标移动接口；复用参考状态模型和测试，Pi 会话/API 边界保留。dsh 运行时下载、自更新、系统级安装身份和 Cordis 挂载改动不适用于 Pi 分发；完整逐文件处置见 `evidence/reference-sync/reference-manifest.json` 和 `doc/reference-sync-2026-10-09.md`。
+
 ## [0.1.0-preview.3] - 2026-10-05
 
 Windows x64 未签名预览版。包含此前未发布的 Pi Web 0.10 / Pi 1.0、个人安装与启动改进，

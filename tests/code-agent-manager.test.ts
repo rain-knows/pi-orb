@@ -24,7 +24,7 @@ function fixture() {
     setSessionName: vi.fn(async () => {}),
     openEventStream: vi.fn(async (id: string, callback: (event: unknown) => void) => { order.push(`subscribe:${id}`); events.set(id, callback); return () => { order.push(`close:${id}`); events.delete(id); }; }),
     queuePrompt: vi.fn(async (id: string) => { order.push(`prompt:${id}`); running.set(id, true); }),
-    lastAssistantOutcome: vi.fn(async (): Promise<{ text: string; error: string | null }> => ({ text: "Produced artifact.txt", error: null })),
+    lastAssistantOutcome: vi.fn(async (): Promise<{ text: string; error: string | null; userStopped?: boolean }> => ({ text: "Produced artifact.txt", error: null })),
     clearQueue: vi.fn(async () => {}),
     abort: vi.fn(async (id: string) => { running.set(id, false); }),
   };
@@ -35,6 +35,43 @@ function fixture() {
 }
 
 describe("reference Code agent sessions through Pi Web", () => {
+  it("tracks cross-conversation bookmarks, elapsed intervals and read state across continuation", async () => {
+    const f = fixture();
+    await f.manager.dispatch("owner", f.workspace, "full-access", { task: "Build a document" });
+    await f.manager.dispatch("other", f.workspace, "full-access", { task: "Build a game" });
+    const initial = await f.manager.bookmarks();
+    expect(initial).toMatchObject([{ callerId: "owner", state: "running", colorIndex: 0 }, { callerId: "other", state: "running", colorIndex: 1 }]);
+    f.running.set("worker-1", false);
+    const finished = await f.manager.bookmarks();
+    expect(finished[0]).toMatchObject({ state: "completed", unread: true, endedAt: expect.any(Number), outcome: "Produced artifact.txt" });
+    expect(finished[0]!.endedAt).toBeGreaterThanOrEqual(finished[0]!.startedAt);
+    expect(f.manager.markRead("worker-1")).toBe(true);
+    expect((await f.manager.bookmarks()).map(item => item.sessionId)).toEqual(["worker-2"]);
+    expect(f.manager.markRead("unknown")).toBe(false);
+    await f.manager.dispatch("owner", f.workspace, "full-access", { task: "Change font", session_id: "worker-1" });
+    expect((await f.manager.bookmarks())[0]).toMatchObject({ task: "Change font", state: "running", unread: false });
+    await f.manager.stop("owner", "worker-1");
+    expect((await f.manager.bookmarks()).map(item => item.sessionId)).toEqual(["worker-2"]);
+    f.manager.dispose();
+  });
+
+  it("honors a stop from Pi Web and preserves the no-restart guard beyond a truncated outcome", async () => {
+    const f = fixture();
+    await f.manager.dispatch("owner", f.workspace, "full-access", { task: "Build a document" });
+    f.client.lastAssistantOutcome.mockResolvedValue({ text: "Last partial output", error: "Background prompt aborted.", userStopped: true });
+    await f.complete("worker-1");
+    expect((await f.manager.bookmarks())[0]!.state).toBe("stopped");
+    f.idle();
+    await f.manager.deliverPending("owner");
+    expect(f.delivered[0]).toContain("The user stopped background Code agent");
+    expect(f.delivered[0]).toContain("Last partial output");
+    expect(f.delivered[0]).toContain("Do not restart this task");
+    expect(f.client.queuePrompt).toHaveBeenCalledTimes(1);
+    const stopped = completionNoticeText({ owner: "o", session_id: "s", task: "t", cwd: "x", status: "idle", pending: true, outcome: "x".repeat(9000), tools: [] }, true);
+    expect(stopped).toContain("Do not restart this task");
+    expect(stopped.indexOf("Do not restart")).toBeGreaterThanOrEqual(COMPLETION_BODY_MAX_CHARS);
+    f.manager.dispose();
+  });
   it("accepts a first-class session without waiting for completion and subscribes before prompting", async () => {
     const f = fixture();
     expect(await f.manager.dispatch("owner", f.workspace, "full-access", { task: "Build a document" })).toEqual({ accepted: true, created: true, session_id: "worker-1" });

@@ -16,10 +16,14 @@ export const IPC = {
   setShortcut: "orb:set-shortcut",
   /** Renderer -> main: change the reference-style floating ball/panel geometry. */
   setFloatingExpanded: "orb:set-floating-expanded",
-  /** Renderer -> main: move the collapsed ball while dragging. */
-  moveFloatingBall: "orb:move-floating-ball",
-  /** Renderer -> main: commit a drag and clamp or dock the ball. */
-  clampFloatingBall: "orb:clamp-floating-ball",
+  /** Renderer -> main: signal gestures; main reads the OS cursor in DIP coordinates. */
+  dragPress: "orb:drag-press",
+  dragBegin: "orb:drag-begin",
+  dragMove: "orb:drag-move",
+  dragEnd: "orb:drag-end",
+  agentBookmarks: "orb:agent-bookmarks",
+  openAgent: "orb:agent-open",
+  floatingState: "orb:floating-state",
   /** Renderer -> main: pull a docked tab back into the display. */
   unsnapFloatingBall: "orb:unsnap-floating-ball",
   /**
@@ -100,6 +104,7 @@ export interface FloatingWindowState {
   readonly horizontal: "left" | "right";
   readonly vertical: "up" | "down";
   readonly docked: "left" | "right" | undefined;
+  readonly strip: number;
 }
 
 /**
@@ -237,6 +242,7 @@ export type OpenSessionHistoryResult =
 export const SESSION_EVENT_CHANNEL_NAME = "orb:session-event";
 
 export type OrbSessionEvent =
+  | { readonly type: "code-agent-notice"; readonly text: string }
   | { readonly type: "access"; readonly status: DesktopTaskStatus }
   | { readonly type: "session"; readonly sessionId: string; readonly generation: number }
   | { readonly type: "turn-start" }

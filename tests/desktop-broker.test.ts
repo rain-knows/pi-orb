@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DesktopBroker } from "../src/main/desktop-broker";
+import { SCREEN_BUSY_MESSAGE, withScreenLock } from "../src/main/gui-lock";
 import type { ActResult, DesktopDriver, ObserveResult } from "../src/main/desktop-task";
 import type { DesktopAction, DesktopObservation } from "@shared/orb-tools";
 
@@ -47,6 +48,24 @@ const click = (observationId: string): DesktopAction => ({ kind: "click", observ
 const openApp = (observationId: string): DesktopAction => ({ kind: "openApp", observationId, name: "Notepad" });
 
 describe("DesktopBroker session access", () => {
+  it("refuses another screen owner immediately and resumes after that owner releases", async () => {
+    const { broker, actions, driver } = createBroker();
+    broker.authorize({ sessionId: "sess", generation: 1, level: "workspace-write" });
+    const gate = Promise.withResolvers<void>();
+    const held = withScreenLock("another-owner", () => gate.promise);
+    try {
+      await expect(broker.observe("sess", 1)).rejects.toThrow(SCREEN_BUSY_MESSAGE);
+      await expect(broker.act(click("obs-1"), "sess", 1)).rejects.toThrow(SCREEN_BUSY_MESSAGE);
+      expect(actions).toHaveLength(0);
+      expect(driver.lastObservation).toBeNull();
+      expect(broker.status().authorized).toBe(true);
+    } finally {
+      gate.resolve();
+      await held;
+    }
+    expect(await broker.observe("sess", 1)).toHaveProperty("observationId");
+  });
+
   it("refuses actions until an access tier is selected", async () => {
     const { broker, actions } = createBroker();
     const result = await broker.act(click("obs-1"), "sess", 1) as Record<string, unknown>;

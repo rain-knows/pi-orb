@@ -228,7 +228,7 @@ export class PiWebClient {
     await this.#sessionCommand(sessionId, { type: "set_session_name", name });
   }
 
-  async lastAssistantOutcome(sessionId: string): Promise<{ text: string; error: string | null }> {
+  async lastAssistantOutcome(sessionId: string): Promise<{ text: string; error: string | null; userStopped: boolean }> {
     // Pi Web's command adapter does not expose the SDK's get_messages command.
     // Read its public history response, with a bounded tail and deferred media.
     const response = await this.#request(`/api/sessions/${encodeURIComponent(sessionId)}?tail=1&tree=summary&deferThinking=1&deferMedia=1`, { method: "GET" });
@@ -239,7 +239,7 @@ export class PiWebClient {
     const error = message?.stopReason === "error" || message?.stopReason === "aborted"
       ? message.errorMessage || `Background prompt ${message.stopReason}.`
       : null;
-    return { text, error };
+    return { text, error, userStopped: message?.stopReason === "aborted" };
   }
 
   async getState(sessionId: string): Promise<AgentState> {

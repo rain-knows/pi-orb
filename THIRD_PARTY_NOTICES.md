@@ -189,6 +189,26 @@ pi-orb 没有批量桥接协议，也没有搬入 dsh 的调度器；Pi 的 `seq
 
 ## 7. dsh-orb-cordis Computer Use adaptation
 
+### 2026-10-09 incremental synchronization
+
+Latest reused source: `mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e`
+(MIT, Copyright (c) 2026 mini-yifan; Computer Use derived from DeepSeek Harness).
+The historical sources below remain attributed to their original commits when unchanged.
+
+- `packages/helper/src/geometry.ts` → `src/main/floating-geometry.ts`: directly ported FloatingPlacement, Pi export names and OS reduced-motion gate.
+- `packages/host/src/orb.ts` → bookmark IPC/title cache in `src/main/index.ts`: Pi public summaries and session URL replace dsh history/jump routes; read finished bookmarks disappear.
+- Strip positioning in `src/renderer/orb-surface.css` adapts the above geometry to Pi's existing compact stop cap.
+- `packages/helper/src/main.ts`, `preload.cjs` → `src/main/floating-window-controller.ts`, Pi main/preload IPC: OS cursor drag signals and strip layout, no dsh helper transport.
+- `packages/helper/assets/shell.js`, `floating.css`, `floating.html`, `chat.css` → Pi floating renderer, HTML/CSS and `reference-notice.css`: gesture, pin, bookmark and folded notice sections; Pi IPC/Chinese text/root theme/text-body adaptation.
+- `packages/computer-use/src/gui-lock.ts` → `src/main/gui-lock.ts`: direct shared mutex with Pi Symbol namespace; applied in DesktopBroker.
+- `packages/computer-use/src/{code-agent,code-agent-completion,code-agent-registry}.ts` → Pi CodeAgentManager/shared contract: bookmarks, stop semantics and capped notices through Pi Web, no Cordis services.
+- `packages/computer-use/src/open.ts` → Pi `reference-windows/open.ts`: forbidden input path before existence and resolved-path check.
+- `packages/host/src/{preferences,overlay-guard}.ts` → Pi observation preference and main show/hide gate; setting exposed in the native menu because Pi has no public plugin settings-page writer.
+- `packages/helper/tests/geometry.test.ts`, `packages/computer-use/tests/gui-lock.spec.ts` → `tests/upstream-floating-placement.test.ts`, `tests/gui-lock.test.ts` (all source cases, adapted imports/runner).
+
+Full source/target hashes and all changed-file dispositions are in `evidence/reference-sync/reference-manifest.json`.
+The dsh updater/runtime downloader/registry installer and its legacy Windows application identity are not included.
+
 Source: [mini-yifan/dsh-orb-cordis](https://github.com/mini-yifan/dsh-orb-cordis), pinned commit
 `9cdc50302d202f4497569731be488a8afa500da7`. The plugin is MIT licensed by mini-yifan;
 its Computer Use sources derive from DeepSeek Harness under the upstream MIT notice.

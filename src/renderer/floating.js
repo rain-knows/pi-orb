@@ -1,3 +1,4 @@
+/** Updated sections ported from mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e, packages/helper/assets/shell.js (MIT). Pi IPC/events replace dsh helper transport. */
 /*
  * Floating renderer port from rain-knows/deepseek-harness-orb, MIT, commit
  * 72f1d738458a223696685a909e806b683eff5885:
@@ -102,7 +103,6 @@ async function main() {
   let expanded = false
   let pinned = false
   let dragging = false
-  let collapsing = false
   let skipClick = false
   let docked
   let dockHoverArmed = true
@@ -110,8 +110,12 @@ async function main() {
   let dockPointerInside = false
   let suppressExpand = false
   let skipDockCommit = false
-  let pointer
-  let lastOrigin
+  let pointerHeld = false
+  let pointerPointerId
+  let pressAt = { x: 0, y: 0 }
+  let agentItems = []
+  let agentClock
+  const agentStrip = el("agent-strip")
   let collapseTimer
   let collapseFrame
   let historyOpen = false
@@ -200,7 +204,97 @@ async function main() {
     syncEmpty()
   }
 
+  function syncThinkPreview(node) {
+    const summary = node.querySelector('.think-summary-text')?.textContent ?? ''
+    node.toggleAttribute('data-preview', !node.hasAttribute('data-expanded') && summary !== '')
+  }
+
+  function createThink(node, options = {}) {
+    const iconMarkup = options.iconMarkup ?? '<path d="M8 1l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="none" stroke="currentColor"/>'
+    node.dataset.variant = 'think'
+    const status = document.createElement('span')
+    status.className = 'visually-hidden'
+    const disclosure = document.createElement('div')
+    disclosure.className = 'think-disclosure'
+    const row = document.createElement('div')
+    row.className = 'think-row'
+    row.setAttribute('role', 'button')
+    row.tabIndex = 0
+    row.setAttribute('aria-expanded', 'false')
+    const leading = document.createElement('span')
+    leading.className = 'think-leading'
+    const idle = document.createElement('span')
+    idle.className = 'think-icon-idle'
+    idle.append(noticeIcon(iconMarkup))
+    const hover = document.createElement('span')
+    hover.className = 'think-chevron-hover'
+    hover.append(noticeIcon('<path d="M4 6l4 4 4-4" fill="none" stroke="currentColor"/>'))
+    const openChevron = document.createElement('span')
+    openChevron.className = 'think-chevron-open'
+    openChevron.append(noticeIcon('<path d="M4 10l4-4 4 4" fill="none" stroke="currentColor"/>'))
+    leading.append(idle, hover, openChevron)
+    const title = document.createElement('span')
+    title.className = 'think-title'
+    title.textContent = options.title ?? '后台任务报告'
+    const separator = document.createElement('span')
+    separator.className = 'think-separator'
+    separator.setAttribute('aria-hidden', 'true')
+    const summary = document.createElement('span')
+    summary.className = 'think-summary'
+    const summaryText = document.createElement('span')
+    summaryText.className = 'think-summary-text'
+    summary.append(summaryText)
+    row.append(leading, title, separator, summary)
+    const body = document.createElement('div')
+    body.className = 'think-body'
+    disclosure.append(row, body)
+    node.append(status, disclosure)
+    // A notice card ships settled: its one-line summary and body are filled here.
+    if (options.summary !== undefined) {
+      summaryText.textContent = options.summary
+      node.dataset.preview = 'true'
+    }
+    if (options.body !== undefined) body.textContent = options.body
+    const toggle = () => {
+      const open = !node.hasAttribute('data-expanded')
+      node.toggleAttribute('data-expanded', open)
+      disclosure.toggleAttribute('data-open', open)
+      row.setAttribute('aria-expanded', String(open))
+      syncThinkPreview(node)
+    }
+    row.addEventListener('click', toggle)
+    row.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return
+      event.preventDefault()
+      toggle()
+    })
+  }
+
+  function noticeIcon(markup) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.setAttribute('viewBox', '0 0 16 16')
+    svg.setAttribute('aria-hidden', 'true')
+    svg.innerHTML = markup
+    return svg
+  }
+  function isCompletionNotice(text) {
+    return text.startsWith('Background Code agent session ') || text.startsWith('The user stopped background Code agent session ')
+  }
+  function addCodeAgentNotice(text) {
+    if (!isCompletionNotice(text)) return
+    const guard = 'Do not restart this task and do not call code_agent for it again unless the user asks.'
+    const shown = text.endsWith(guard) ? text.slice(0, -guard.length).trimEnd() : text
+    const node = document.createElement('article')
+    node.className = 'block'
+    node.dataset.kind = 'notice'
+    createThink(node, { summary: shown.split('\n').find(line => line.trim() !== '') ?? '', body: shown })
+    transcript.append(node)
+    messageCount += 1
+    syncEmpty()
+    transcript.scrollTop = transcript.scrollHeight
+  }
   function addMessage(role, text) {
+    if (role === "user" && isCompletionNotice(text)) { addCodeAgentNotice(text); return }
     const article = document.createElement('article')
     article.className = `orb-message orb-message--${role}`
     const label = document.createElement('strong')
@@ -273,6 +367,11 @@ async function main() {
     document.body.classList.toggle('expand-right', state.horizontal === 'right')
     document.body.classList.toggle('expand-up', state.vertical === 'up')
     document.body.classList.toggle('expand-down', state.vertical === 'down')
+    const strip = typeof state.strip === 'number' && Number.isFinite(state.strip) ? Math.max(0, Math.round(state.strip)) : 0
+    document.body.classList.toggle('has-strip', strip > 0)
+    document.body.classList.toggle('strip-left', strip > 0 && state.horizontal === 'left')
+    document.body.classList.toggle('strip-right', strip > 0 && state.horizontal === 'right')
+    document.body.style.setProperty('--strip-w', strip + 'px')
   }
 
   function clearDockHoverTimer() {
@@ -307,15 +406,78 @@ async function main() {
 
   function applyDockedFrom(result) {
     if (result === undefined || result === null) return
+    if (result.expanded === true) applyDirection(result)
     applyDocked(result.docked)
   }
 
-  async function moveBall(x, y) {
-    applyDockedFrom(await api.moveFloatingBall(x, y))
+  /**
+   * Press on `element`: keep the client point the drag threshold and the dock tab's
+   * pull are measured from (both while the window is still static), and capture the
+   * pointer so the gesture survives the window moving out from under the cursor.
+   */
+  function beginPointer(element, event) {
+    pressAt = { x: event.clientX, y: event.clientY }
+    pointerPointerId = event.pointerId
+    pointerHeld = true
+    element.setPointerCapture(event.pointerId)
   }
 
-  async function clampBall() {
-    applyDockedFrom(await api.clampFloatingBall())
+  function ownsPointer(event) {
+    if (pointerPointerId === undefined) return false
+    return event.pointerId === undefined || event.pointerId === pointerPointerId
+  }
+
+  // A gesture that ends outside the window (or while the compositor holds the
+  // capture) must never leave the panel locked shut.
+  window.addEventListener('blur', () => {
+    if (pointerHeld) void finishGesture()
+  })
+
+  /**
+   * The gesture is over. A drag is committed by the main process, which places the
+   * ball under the OS cursor and decides the dock. A press without a drag is left to
+   * the click handler, so this returns false.
+   */
+  async function finishGesture() {
+    const moved = dragging
+    pointerHeld = false
+    pointerPointerId = undefined
+    dragging = false
+    if (!moved) {
+      // Clear the main-process grab as well: blur/cancel must not leave an old press behind.
+      await api.dragEnd(!(running || Boolean(pendingQuestion)))
+      return false
+    }
+    skipClick = true
+    const skipDock = skipDockCommit
+    skipDockCommit = false
+    if (!skipDock) applyDockedFrom(await api.dragEnd(!(running || Boolean(pendingQuestion))))
+    return true
+  }
+
+  /**
+   * The ball gesture passed the motion threshold. A free panel collapses first: its
+   * DOM now, its window in the main process, before any move signal goes out. A
+   * running or asking agent keeps the panel open and the ball simply follows.
+   */
+  function startBallDrag() {
+    dragging = true
+    if (!(running || Boolean(pendingQuestion))) {
+      pinned = false
+      document.body.classList.remove('pinned')
+      void setExpanded(false, true)
+    }
+    api.dragBegin()
+  }
+
+  function syncExpand() {
+    if (pointerHeld || dragging) return
+    if (docked !== undefined) {
+      if (dockHoverArmed) void unsnapDocked()
+      return
+    }
+    if (suppressExpand) return
+    void setExpanded(true)
   }
 
   async function unsnapDocked() {
@@ -342,6 +504,7 @@ async function main() {
       panel.hidden = false
       expanded = true
       document.body.classList.add('expanded')
+      renderAgentStrip()
       syncBallGif()
       stop.hidden = !running
       return
@@ -349,6 +512,7 @@ async function main() {
     if (!force && (pinned || running || pendingQuestion || hasSelectionChip() || activeSheet || historyOpen || hasDraft() || isEditing())) return
     expanded = false
     document.body.classList.remove('expanded')
+    renderAgentStrip()
     syncBallGif()
     if (docked !== undefined) dockTab.hidden = false
     stop.hidden = true
@@ -364,11 +528,6 @@ async function main() {
     }, ANIMATION_MS)
   }
 
-  function ballGrabOffset(event) {
-    const rect = ball.getBoundingClientRect()
-    return { dx: event.clientX - rect.left, dy: event.clientY - rect.top }
-  }
-
   function hasSelectionChip() { return selectionContext !== null && selectionContext !== undefined }
   function hasDraft() { return promptText(prompt).trim().length > 0 }
   function isEditing() { return document.activeElement === prompt || document.activeElement === questionCustom || document.activeElement === el('shortcut-input') }
@@ -381,6 +540,138 @@ async function main() {
       void setExpanded(false)
     }, COLLAPSE_MS)
   }
+
+  function agentStateText(state) {
+    if (state === 'completed') return '已完成'
+    if (state === 'stopped') return '已停止'
+    if (state === 'ended') return '已结束'
+    return '运行中'
+  }
+
+  function agentDurationText(totalMs) {
+    const minutes = Math.floor(Math.max(0, totalMs) / 60_000)
+    if (minutes < 1) return '<1m'
+    if (minutes < 100) return `${minutes}m`
+    return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, '0')}`
+  }
+
+  function agentElapsedText(item) {
+    const start = typeof item.startedAt === 'number' ? item.startedAt : 0
+    const end = item.state === 'running'
+      ? Date.now()
+      : (typeof item.endedAt === 'number' ? item.endedAt : Date.now())
+    return agentDurationText(end - start)
+  }
+
+  function agentTip(item) {
+    const parts = [`${agentStateText(item.state)} · ${agentElapsedText(item)}`]
+    if (typeof item.task === 'string' && item.task !== '') parts.push(item.task)
+    if (typeof item.callerTitle === 'string' && item.callerTitle !== '') parts.push(`${'来自对话'}: ${item.callerTitle}`)
+    if (typeof item.cwd === 'string' && item.cwd !== '') parts.push(`${'工作目录'}: ${item.cwd}`)
+    if (typeof item.outcome === 'string' && item.outcome !== '') parts.push(item.outcome)
+    parts.push('点击在主窗口打开')
+    return parts.join('\n')
+  }
+
+  function agentChip(item) {
+    const chip = document.createElement('button')
+    chip.type = 'button'
+    chip.className = 'agent-chip'
+    chip.dataset.state = typeof item.state === 'string' ? item.state : 'running'
+    const color = Number(item.colorIndex)
+    chip.style.setProperty('--agent-color', `var(--agent-c${Number.isFinite(color) ? Math.abs(color) % 4 : 0})`)
+    chip.setAttribute('role', 'listitem')
+    const status = document.createElement('span')
+    status.className = 'agent-chip-status'
+    if (item.state === 'completed') {
+      status.innerHTML = `<svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 8l3 3 7-7" fill="none" stroke="currentColor"/></svg>`
+    } else if (item.state === 'stopped') {
+      status.innerHTML = `<svg viewBox="0 0 16 16" width="14" height="14"><rect x="4" y="4" width="8" height="8" fill="currentColor"/></svg>`
+    } else if (item.state === 'ended') {
+      status.innerHTML = `<svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 2L15 14H1Z" fill="none" stroke="currentColor"/></svg>`
+    } else {
+      const spinner = document.createElement('span')
+      spinner.className = 'agent-spinner'
+      status.append(spinner)
+    }
+    const time = document.createElement('span')
+    time.className = 'agent-chip-time'
+    time.dataset.state = chip.dataset.state
+    time.dataset.startedAt = String(item.startedAt ?? '')
+    time.dataset.endedAt = String(item.endedAt ?? '')
+    time.textContent = agentElapsedText(item)
+    const name = document.createElement('span')
+    name.className = 'agent-chip-name'
+    name.textContent = typeof item.task === 'string' ? item.task : ''
+    chip.append(status, time, name)
+    if (item.unread === true) {
+      const dot = document.createElement('span')
+      dot.className = 'agent-chip-unread'
+      chip.append(dot)
+    }
+    chip.title = agentTip(item)
+    chip.setAttribute('aria-label', `${agentStateText(item.state)}: ${name.textContent}`)
+    chip.addEventListener('click', () => {
+      if (typeof item.sessionId === 'string') void api.openAgent(item.sessionId).then(refreshAgents).catch(report)
+    })
+    return chip
+  }
+
+  function renderAgentStrip() {
+    if (agentStrip === null) return
+    agentStrip.replaceChildren()
+    const visible = expanded && agentItems.length > 0
+    agentStrip.hidden = !visible
+    if (!visible) {
+      stopAgentClock()
+      return
+    }
+    for (const item of agentItems) agentStrip.append(agentChip(item))
+    startAgentClock()
+  }
+
+  function startAgentClock() {
+    stopAgentClock()
+    agentClock = window.setInterval(refreshAgentTimes, 1000)
+  }
+
+  function stopAgentClock() {
+    if (agentClock === undefined) return
+    window.clearInterval(agentClock)
+    agentClock = undefined
+  }
+
+  function refreshAgentTimes() {
+    if (agentStrip === null) return
+    for (const time of agentStrip.querySelectorAll('.agent-chip-time')) {
+      const start = Number(time.dataset.startedAt)
+      const endedAt = Number(time.dataset.endedAt)
+      const end = time.dataset.state === 'running' || !Number.isFinite(endedAt) || endedAt <= 0
+        ? Date.now()
+        : endedAt
+      time.textContent = agentDurationText(end - (Number.isFinite(start) ? start : 0))
+    }
+  }
+
+  function sortAgentItems(items) {
+    items.sort((left, right) => {
+      const leftRunning = left.state === 'running'
+      const rightRunning = right.state === 'running'
+      if (leftRunning !== rightRunning) return leftRunning ? -1 : 1
+      if (leftRunning) return (left.startedAt ?? 0) - (right.startedAt ?? 0)
+      return (right.endedAt ?? 0) - (left.endedAt ?? 0)
+    })
+    return items
+  }
+
+  async function refreshAgents() {
+    agentItems = sortAgentItems(await api.getAgentBookmarks())
+    renderAgentStrip()
+  }
+  api.onFloatingState(applyDirection)
+  const agentPoll = window.setInterval(() => { void refreshAgents().catch(report) }, 1000)
+  window.addEventListener('beforeunload', () => { window.clearInterval(agentPoll); stopAgentClock() })
+  void refreshAgents().catch(report)
 
   function setHistoryOpen(next) {
     historyOpen = next
@@ -666,7 +957,9 @@ async function main() {
   }
 
   api.onSessionEvent((event) => {
-    if (event.type === 'access') {
+    if (event.type === 'code-agent-notice') {
+      addCodeAgentNotice(event.text)
+    } else if (event.type === 'access') {
       desktopTask = event.status
       renderPermission()
     } else if (event.type === 'assistant-delta') {
@@ -740,88 +1033,54 @@ async function main() {
   syncEmpty()
   setRunning(running)
 
-  document.body.addEventListener('pointerenter', () => {
+  function isPrimaryButton(event) {
+    return event.button === 0
+  }
+
+  function primaryButtonHeld(event) {
+    return (event.buttons & 1) === 1
+  }
+
+  document.body.addEventListener('pointerenter', (event) => {
     dockPointerInside = true
-    if (dragging || collapsing) return
-    if (docked !== undefined) {
-      if (dockHoverArmed) void unsnapDocked().catch(report)
-      return
-    }
-    if (suppressExpand) return
-    void setExpanded(true).catch(report)
+    // A dropped pointerup (capture stolen, window hidden mid-gesture) would leave the
+    // press flags stuck and the panel permanently unable to expand. Only a reported
+    // "no buttons" counts: an absent field must not end a live drag.
+    if (pointerHeld && typeof event.buttons === 'number' && event.buttons === 0) void finishGesture()
+    syncExpand()
   })
   document.body.addEventListener('pointerleave', () => {
     dockPointerInside = false
     suppressExpand = false
-    if (dragging || collapsing) return
+    if (pointerHeld || dragging) return
     scheduleCollapse()
   })
 
-  function isPrimaryButton(event) { return event.button === 0 }
-  function primaryButtonHeld(event) { return (event.buttons & 1) === 1 }
-
-  ball.addEventListener('pointerdown', event => {
+  ball.addEventListener('pointerdown', (event) => {
     if (!isPrimaryButton(event)) return
     dragging = false
-    collapsing = false
     skipClick = false
-    lastOrigin = undefined
-    pointer = { ...ballGrabOffset(event), startX: event.screenX, startY: event.screenY }
-    ball.setPointerCapture(event.pointerId)
+    beginPointer(ball, event)
+    api.dragPress()
   })
-  ball.addEventListener('pointermove', event => {
-    if (pointer === undefined) return
+  ball.addEventListener('pointermove', (event) => {
+    if (!ownsPointer(event)) return
     if (!primaryButtonHeld(event)) {
-      void finishPointer(event).catch(report)
+      void finishGesture()
       return
     }
-    lastOrigin = { x: event.screenX - pointer.dx, y: event.screenY - pointer.dy }
     if (!dragging) {
-      if (Math.hypot(event.screenX - pointer.startX, event.screenY - pointer.startY) <= 4) return
-      dragging = true
-      if (running) {
-        void moveBall(lastOrigin.x, lastOrigin.y).catch(report)
-        return
-      }
-      collapsing = true
-      pinned = false
-      document.body.classList.remove('pinned')
-      void setExpanded(false, true).then(() => {
-        collapsing = false
-        if (dragging && lastOrigin !== undefined) void moveBall(lastOrigin.x, lastOrigin.y).catch(report)
-      }).catch(report)
-      return
+      if (Math.hypot(event.clientX - pressAt.x, event.clientY - pressAt.y) <= 4) return
+      startBallDrag()
     }
-    if (!collapsing) void moveBall(lastOrigin.x, lastOrigin.y).catch(report)
+    api.dragMove(!(running || Boolean(pendingQuestion)))
   })
-  async function finishPointer(event) {
-    if (dragging) {
-      skipClick = true
-      dragging = false
-      collapsing = false
-      const origin = pointer === undefined
-        ? lastOrigin
-        : { x: event.screenX - pointer.dx, y: event.screenY - pointer.dy }
-      pointer = undefined
-      lastOrigin = undefined
-      const skipDock = skipDockCommit
-      skipDockCommit = false
-      if (!skipDock) {
-        if (origin !== undefined) await moveBall(origin.x, origin.y)
-        await clampBall()
-      }
-      return true
-    }
-    pointer = undefined
-    lastOrigin = undefined
-    return false
-  }
-  ball.addEventListener('pointerup', async event => {
+  ball.addEventListener('pointerup', async (event) => {
     if (!isPrimaryButton(event)) {
-      await finishPointer(event)
+      void finishGesture()
       return
     }
-    const dragged = await finishPointer(event)
+    const dragged = await finishGesture()
     if (dragged || skipClick) {
       skipClick = false
       return
@@ -831,40 +1090,42 @@ async function main() {
     if (pinned) await setExpanded(true)
     else scheduleCollapse()
   })
-  ball.addEventListener('pointercancel', event => { void finishPointer(event).catch(report) })
-  ball.addEventListener('lostpointercapture', event => { void finishPointer(event).catch(report) })
+  ball.addEventListener('pointercancel', () => { void finishGesture() })
+  ball.addEventListener('lostpointercapture', () => { void finishGesture() })
 
-  dockTab.addEventListener('pointerdown', event => {
+  dockTab.addEventListener('pointerdown', (event) => {
     if (!isPrimaryButton(event)) return
     dragging = false
-    collapsing = false
     skipClick = true
-    lastOrigin = undefined
-    pointer = { dx: 0, dy: 0, startX: event.screenX, startY: event.screenY }
-    dockTab.setPointerCapture(event.pointerId)
+    beginPointer(dockTab, event)
   })
-  dockTab.addEventListener('pointermove', event => {
-    if (pointer === undefined || docked === undefined) return
+  dockTab.addEventListener('pointermove', (event) => {
+    if (!ownsPointer(event) || docked === undefined) return
     if (!primaryButtonHeld(event)) {
-      void finishPointer(event).catch(report)
+      void finishGesture()
       return
     }
-    lastOrigin = { x: event.screenX, y: event.screenY }
-    const inward = docked === 'right'
-      ? pointer.startX - event.screenX
-      : event.screenX - pointer.startX
-    if (inward <= DOCK_DRAG_OFF_PX) return
+    const pulled = docked === 'right' ? pressAt.x - event.clientX : event.clientX - pressAt.x
+    if (pulled <= DOCK_DRAG_OFF_PX) return
     dragging = true
-    void unsnapDocked().catch(report)
+    void unsnapDocked()
   })
-  dockTab.addEventListener('pointerup', event => { void finishPointer(event).catch(report) })
-  dockTab.addEventListener('pointercancel', event => { void finishPointer(event).catch(report) })
-  dockTab.addEventListener('lostpointercapture', event => { void finishPointer(event).catch(report) })
+  dockTab.addEventListener('pointerup', () => { void finishGesture() })
+  dockTab.addEventListener('pointercancel', () => { void finishGesture() })
+  dockTab.addEventListener('lostpointercapture', () => { void finishGesture() })
 
   composer.addEventListener('submit', event => {
     event.preventDefault()
     void sendPrompt().catch(report)
   })
+  /** Input clicks only pin; unpinning stays a ball click (or drag). */
+  function pinBall() {
+    if (pinned) return
+    pinned = true
+    document.body.classList.add('pinned')
+  }
+
+  prompt.addEventListener('click', pinBall)
   prompt.addEventListener('input', syncComposerHeight)
   prompt.addEventListener('focusout', () => {
     setTimeout(() => { if (!dockPointerInside) scheduleCollapse() }, 0)
@@ -880,7 +1141,7 @@ async function main() {
     insertPlainText(prompt, event.clipboardData?.getData('text/plain') ?? '')
     syncComposerHeight()
   })
-  composer.addEventListener('click', event => { if (event.target === composer) prompt.focus() })
+  composer.addEventListener('click', event => { if (event.target === composer) { prompt.focus(); pinBall() } })
   stop.addEventListener('click', () => { void api.abort({ generation: snapshot.generation }).catch(report) })
 
   historyButton.addEventListener('click', () => {

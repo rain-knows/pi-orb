@@ -1,5 +1,13 @@
 # pi-orb 参考项目优先手册
 
+> **当前同步基线（2026-10-09）**：插件参考已同步至原作者
+> `mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e`。
+> 本地只读取材位置 `D:\pi-orb-ref\dsh-orb-cordis-20261009`。
+> 窗口几何、系统光标拖动与书签 UI 以 `packages/helper` 为准；当前吸边为接触边缘
+> 加 3 DIP 容差，书签条预留 208 DIP。以下旧单体窗口索引保留历史来源，不再决定
+> 拖动/吸边规则。全部差异与 Pi 宿主适配见 [本轮同步记录](./reference-sync-2026-10-09.md)。
+> 源文件覆盖核对：`node evidence/reference-sync/record-reference.mjs`。
+
 > **工具集迁移状态（2026-10-05）**：本手册早期的 `orb_*`、显式 `observation_id`、独立
 > `orb_batch` 和 Playwright 网关描述已被 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
 > 取代。当前实现以参考项目的 13 个直接 GUI 工具、自动首帧和后台 `code_agent` 为准；下文
@@ -55,9 +63,20 @@
 git -C D:\pi-orb-ref\deepseek-harness-orb rev-parse HEAD
 # 期望：72f1d738458a223696685a909e806b683eff5885
 git -C D:\pi-orb-ref\deepseek-harness-orb status --porcelain   # 期望：无输出
+git -C D:\pi-orb-ref\dsh-orb-cordis-20261009 rev-parse HEAD
+# 期望：aa79308e47265b7d4a774edb688de2bbd7dce66e
+git -C D:\pi-orb-ref\dsh-orb-cordis-20261009 status --porcelain   # 期望：无输出
 ```
 
-### 1.2 新插件参考（2026-10-01）
+### 1.2 插件参考（当前 2026-10-09）
+
+当前源提交 `aa79308e47265b7d4a774edb688de2bbd7dce66e`，仓库
+`mini-yifan/dsh-orb-cordis`，MIT。旧 `rain-knows` 镜像仍停在 `9cdc503`，
+旧检出保持只读。直接移植 `helper/src/geometry.ts` 的 FloatingPlacement、
+`helper/assets/shell.js` 的手势/书签/折叠报告、对应 CSS 和 `computer-use/src/gui-lock.ts`；
+后台 registry/completion、观察框偏好由 Pi Web API / Electron 适配。
+
+下述 2026-10-01 的工具来源表仍适用于未改变的工具/坐标模块；当前窗口取材优先以上新入口。
 
 新增 [`rain-knows/dsh-orb-cordis`](https://github.com/rain-knows/dsh-orb-cordis)，只读检出
 `D:\pi-orb-ref\dsh-orb-cordis`，固定 `9cdc50302d202f4497569731be488a8afa500da7`（MIT，

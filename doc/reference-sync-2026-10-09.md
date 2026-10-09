@@ -3,10 +3,13 @@
 ## 固定来源与范围
 
 插件参考从 `9cdc50302d202f4497569731be488a8afa500da7` 更新到原作者
-`mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e`。
+[`mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e`](https://github.com/mini-yifan/dsh-orb-cordis/commit/aa79308e47265b7d4a774edb688de2bbd7dce66e)。
 rain-knows 镜像仍在旧提交。旧单体参考从 `72f1d738458a223696685a909e806b683eff5885`
 到 `51f09764d7ff99947be08ebbb2ca2388faab3df4` 只有 Windows 发行身份修复。
 旧检出保持原位；新检出只作为开发取材，不是运行时依赖。
+本次逐文件覆盖插件 32 个提交／47 个文件、旧单体 1 个提交／9 个文件；
+没有未分类差异。固定来源、每个文件的处置理由、13 个移植入口的源码及目标 SHA-256
+见 [`reference-manifest.json`](../evidence/reference-sync/reference-manifest.json)。
 
 ## 全部差异处置
 
@@ -30,6 +33,41 @@ rain-knows 镜像仍在旧提交。旧单体参考从 `72f1d738458a223696685a909
 复用许可为 MIT（mini-yifan / DeepSeek），来源头与 THIRD_PARTY_NOTICES.md 同步。
 自动更新与非 Windows 平台支持范围保持现有产品边界。
 
+## 适配细节
+
+- 书签沿用上游进程生命周期、运行任务优先、计时、四色会话归属和未读语义。
+  Pi Web 的公开会话摘要提供来源标题，复用上游 10 秒缓存；已读的结束任务移除，
+  运行任务仍显示。点击调用公开 `?session=<id>` URL，只有显式点击时打开一次，
+  不在轮询中导航。后台管理器继续持久保存所有权和待投递通知。
+- 仅识别 `code_agent` 完成／用户停止前缀为默认折叠的报告卡；普通用户消息、
+  系统前台信息和模型回复保持现有渲染。复用披露组件/CSS，以 `textContent` 显示正文，
+  不为此增加 Markdown 渲染依赖。禁止自动重启的指令传给模型，界面隐藏该指令。
+- 上游通过跨会话自动唤醒补发通知；Pi 只向当前空闲 owner 投递，其他 owner 保留待投递。
+  因此不新增上游的 screen-busy 文字后缀，当前 session/generation 授权边界继续有效。
+- 旧 renderer 坐标移动和 clamp IPC 已删除。直接移植 FloatingPlacement，由主进程读取
+  Electron OS 光标和显示器 DIP；仅添加已有系统减少动画偏好。实际视觉检查发现
+  Pi 的 36px 停止按钮旧定位覆盖了书签定位，已按 strip 宽度修正，保留既有 caret 防重叠规则。
+- 观察框开关默认开启，以原生菜单实现，持久保存到 Orb 自有 userData，关闭立即隐藏；
+  不写 Pi Web 设置、模型、凭据或插件加载配置。
+
 ## 验证
 
-实施中。完成时记录类型、Lint、全量单测、来源覆盖及打包运行结果。
+| 检查 | 本轮结果 | 证据 |
+|---|---|---|
+| 类型／Lint／全量 Vitest | 通过，52 个文件／518 项测试 | `npm run typecheck`、`npm run lint`、`npm test` |
+| 最新插件与单体差异覆盖、移植 SHA-256／许可 | 全部分类，13 个移植入口通过 | `evidence/reference-sync/reference-manifest.json` |
+| 旧单体模块来源审计 | 11 个剩余模块，零缺失／零无来源头 | `evidence/p1-07/provenance.json` |
+| Windows 解包构建 → 内容审计 → 真实 Pi 加载 → 启动 | 四步通过；内容审计 30/30、插件加载 15/15、打包 smoke 23/23 | `evidence/p2-05/stage-result.json`、`evidence/personal-startup/plugin-load.json` |
+| 最新 UI 真实打包窗口探针 | 18/18；书签归属/标题、停止报告、折叠/展开、按钮定位、准确会话 URL、已读移除、开关保存 | `evidence/reference-sync/ui-probe.json` |
+
+直接移植全部 21 条 FloatingPlacement 与 4 条 GUI 锁规格测试；新增 Pi broker 争用、
+禁止路径前置校验、用户停止通知防重启、后台所有权/继续任务、菜单/偏好与 renderer 回归。
+新版截图已人工目视检查，停止按钮位于输入条内，书签与报告没有遮挡。
+
+本轮 UI 探针运行真实打包 Electron，但 Pi Web 使用确定性 HTTP/SSE 夹具，外部导航与
+原生菜单在该独立进程中捕获；证明真实 IPC、布局、指定 URL 与偏好保存，不代表真实
+模型任务或浏览器最终页面验证。既有 Computer Use 参数/原生后端未改变，本轮未重复
+消耗真实模型执行桌面任务。120%/150% 量化和多屏接缝由上游规格模拟覆盖；
+不据此扩大支持矩阵中的实际多屏/DPI、干净机安装、卸载、升级或非 Windows 验证范围。
+
+复现入口见 [`evidence/reference-sync/README.md`](../evidence/reference-sync/README.md)。

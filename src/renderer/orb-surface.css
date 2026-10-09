@@ -48,8 +48,9 @@ body.running #prompt.prompt-empty { caret-color: transparent; }
 body.running #prompt.prompt-empty::after { content: ""; }
 body.running #stop { width: 36px; height: 36px; }
 body.running #stop::after { inset: 11px; border-radius: 3px; }
-body.running.expand-left #stop { left: calc(var(--chrome) + 18px); }
-body.running.expand-right #stop { right: calc(var(--chrome) + 18px); }
+/* Keep Pi's smaller stop cap on the reference panel after the bookmark strip widens the window. */
+body.running.expand-left #stop { left: calc(var(--strip-w) + var(--chrome) + 18px); }
+body.running.expand-right #stop { right: calc(var(--strip-w) + var(--chrome) + 18px); }
 body.running.expand-up #stop { bottom: calc(var(--chrome) + 18px); }
 body.running.expand-down #stop { top: calc(var(--chrome) + 18px); }
 @media (prefers-reduced-motion: reduce) { #panel { transition: none; } }

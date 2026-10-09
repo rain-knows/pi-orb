@@ -3,6 +3,9 @@
 > 工具集已于 2026-10-05 切换到参考项目的 13 个 Computer Use 工具；本页旧版 Playwright
 > 行仅为历史证据，当前没有浏览器 DOM 网关。当前契约见 `reference-toolset-transition.md`。
 
+> 2026-10-09 插件同步至 `aa79308`：518 项测试、内容审计 30/30、打包运行 23/23，
+> 新书签/报告/菜单 UI 夹具 18/18。范围和实际多屏/DPI 验证边界见 `reference-sync-2026-10-09.md`。
+
 本文件是 pi-orb 唯一的版本兼容性声明来源。**没有经过验收的组合一律标记为“未验证”**，不因代码可以编译、依赖可以安装或文档宣称跨平台而视为支持。
 
 - 维护规则见 [`pi-orb-development-goals.md`](./pi-orb-development-goals.md) §7.2（上游更新策略）。
@@ -25,7 +28,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | Pi CLI | `@earendil-works/pi-coding-agent@1.0.1` | 本机全局命令与扩展更新完成；Orb 会话由 Pi Web 的 SDK 驱动 | `evidence/upgrade-0.10/environment.json` |
 | pi-web | P0/P1 隔离验收使用 `@agegr/pi-web@0.9.3`，固定提交 `95a58744532c7fccaa933aa7757a1419ace67ed2` | 固定快照已完成生产构建、条件插件加载与工具暴露验收；本机当前 `@agegr/pi-web@0.10.0` (`62dc24b11aa9f4f7cc7ed9597fa584a94758cfdf`) 含用户未提交改动，未纳入支持基线 | `evidence/p0-02/result.json`、`evidence/p1-06/tool-exposure.json` |
 | 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；桌面闭环和历史真实模型运行记录存在，但 2026-09-30 C7/D6/D8 复跑未完整通过，暂不宣称稳定支持 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
-| 新插件参考 | `dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`（MIT） | 已检出/核对；13 个工具、默认 millifraction 契约和后台 code_agent 作为当前移植基线；不是运行时依赖 | `doc/reference-playbook.md` §1.2、`doc/reference-toolset-transition.md` |
+| 插件参考 | `mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e`（MIT） | 当前增量基线：工具/后台任务与最新窗口、书签、报告和停止语义；不是运行时依赖；多屏真机支持不由几何测试外推 | `doc/reference-playbook.md` §1.2、`doc/reference-sync-2026-10-09.md`、`evidence/reference-sync/` |
 | Windows FFI | `koffi@2.16.3`（MIT，精确锁定） | 替换 2.14.1；原生回调/截图压力探针 1000 枚举 + 50 捕获通过；并非对间歇退出根因的证明 | `evidence/tool-speed/native-callback-stress.json`；`doc/plugin-reference-and-pointing.md` |
 | 快捷键边沿监听 | `uiohook-napi@1.5.5` | Windows Node 环境可加载并完成 `start/stop`；hook 不可用时快捷键失败而不静默降级；真实长按仍需 Electron 人工复测 | `src/main/shortcut-edge-guard.ts`、`tests/shortcut-edge-guard.test.ts` |
 | renderer 构建 | `vite@7.3.6` + `electron-vite@5.0.0`，原生 HTML/CSS/JS renderer | 构建通过；已删除 React 与 Vite React 插件 | 本仓库 `npm run build` |
@@ -101,9 +104,9 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览、锁屏／休眠后清除遗失的按键状态 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘及真实锁屏／休眠体验未验证）。参考项目固定提交 `72f1d738458a223696685a909e806b683eff5885` 无对应全局手势；本项是 Pi 接入所需的独立能力 | `tests/double-alt.test.ts`、`tests/double-alt-recovery.test.ts`、`tests/shortcut-edge-guard.test.ts`、`src/main/double-alt.ts`、`src/main/shortcut-edge-guard.ts`、`src/main/index.ts` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/floating.js`、`evidence/p2-03/README.md` |
 | **P2-04/P2-06 桌面操作扩展**：参考按钮/次数/修饰键、replace/submit、纵向滚动、等待、应用列表、前台信息、热键、长按、同窗口拖拽、动作后回图、显式截图导出、浏览器/文件夹打开及应用激活或启动 | 已接入自动化；真实桌面动作、目标像素、保存对话框、剪贴板和真实模型仍需人工验收 | `doc/desktop-tools-port.md`、`tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows-input.test.ts` |
-| **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 当前 preview.3 本机构建，内容审计 30/30、实际启动 22/22；旧 preview.1 发布与 GitHub runner 动画失败披露保留在发布记录 | `electron-builder.config.mjs`、`evidence/p2-05/`、`doc/release-process.md` §9 |
+| **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 当前同步构建解包目录，内容审计 30/30、实际启动 23/23；既有安装器/发布记录保留，本轮未发版 | `electron-builder.config.mjs`、`evidence/p2-05/`、`doc/release-process.md` §9 |
 | **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留，Koffi 版本和二进制匹配验证环境 | 已验证（30/30，新增头文件残留反证） | `evidence/p2-05/package-audit.json`、`evidence/tool-speed/package-audit-koffi-headers-rejected.json` |
-| **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、session Access bridge 存在且旧选窗 API 不存在 | 已验证（22/22；桌面 native action 闭环另由 session Access 探针证明） | `evidence/p2-05/packaged-smoke.json` |
+| **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、session Access bridge 存在且旧选窗 API 不存在 | 已验证（23/23；桌面 native action 闭环另由 session Access 探针证明） | `evidence/p2-05/packaged-smoke.json` |
 | **参考项目 Windows 后端自带的规格测试已移植**：窗口选择 10 条不变量 + 输入 13 条（键映射、UIPI 拒绝、剪贴板顺序、滚轮档位、PNG 头等） | 已验证（23/23，逐条对应参考 spec） | `tests/reference-windows-foreground.test.ts`、`tests/reference-windows-input.test.ts` |
 | **独立随包 Pi 插件**：无源码目录时加载，完整工具清单保持工作区边界 | 真实 Pi 1.0 加载并检查 15/15；普通会话保持宿主原有活跃工具，Orb 会话获得参考 host roster、13 个 GUI 工具和 3 个后台任务工具；worker 激活已加载的宿主 web 工具，隔离 GUI/前台提示与图片投影；不改写历史。工具 inventory 为受控 fixture，不代表实际搜索服务验证 | `evidence/personal-startup/plugin-load.json` |
 | **个人启动与后端复用**：官方 CLI 注册/移除，隐藏 Pi Web 启动、同 PID 复用、真实 API 会话与模型偏好保留 | 隔离用户设置/随机端口 7/7；preview.3 新增 Win32 无控制台探针；不等同于新用户环境安装 | `evidence/personal-startup/backend-startup.json` |

@@ -14,7 +14,8 @@
 
 | 位置 | 说明 |
 |---|---|
-| `D:\pi-orb-ref\dsh-orb-cordis` | 新插件参考，固定 `9cdc50302d202f4497569731be488a8afa500da7`；Computer Use 与非破坏式插件边界先看此检出，索引见手册 §1.2 |
+| `D:\pi-orb-ref\dsh-orb-cordis-20261009` | 当前插件参考：原作者 `mini-yifan/dsh-orb-cordis`，固定 `aa79308e47265b7d4a774edb688de2bbd7dce66e`；窗口、Computer Use 与后台任务先看此检出，索引见手册 §1.2 |
+| `D:\pi-orb-ref\dsh-orb-cordis` | 旧插件检出，固定 `9cdc50302d202f4497569731be488a8afa500da7`，仅用于历史差异核对 |
 | `D:\pi-orb-ref\deepseek-harness-orb` | **本机优选检出**；注意它是 sparse checkout（只含 `apps/desktop/src` 与 `packages`），打包脚本／测试目录不在其中 |
 | `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb` | 完整工作树检出（同提交）；**需要 `apps/desktop/scripts`、`apps/desktop/tests` 时看这里** |
 | `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-research` | 只读研究检出，同提交 |

@@ -25,6 +25,7 @@ import {
   Menu,
   nativeImage,
   Tray,
+  shell,
   type NativeImage,
 } from "electron";
 import { join } from "node:path";
@@ -57,6 +58,7 @@ import {
   showObservationFrame,
 } from "./observation-frame";
 import { showShellMenu, type ShellMenuRequest } from "./shell-menu";
+import { ObservationFramePreference } from "./observation-frame-preference";
 import {
   IPC,
   type DesktopTaskStatus,
@@ -82,7 +84,7 @@ import { FLOATING_BALL_WINDOW_SIZE } from "./floating-geometry";
 import {
   clampFloatingWindow,
   initialFloatingBounds,
-  moveFloatingBall,
+  pressFloatingBall, beginFloatingDrag, moveFloatingDrag, endFloatingDrag, setFloatingAgentStrip,
   setFloatingExpanded,
   unsnapDockedBall,
 } from "./floating-window-controller";
@@ -155,8 +157,25 @@ let config: OrbConfig;
 let window: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let observationFrame: BrowserWindow | null = null;
+let observationFramePreference: ObservationFramePreference;
 let session: OrbSessionController;
 let codeAgents: CodeAgentManager | null = null;
+/** Caller title cache ported from mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e,
+ * packages/host/src/orb.ts (MIT). Pi's public session summaries replace dsh history records. */
+let callerTitles: { at: number; byId: Map<string, string> } | undefined;
+let callerTitlesTask: Promise<void> | undefined;
+function refreshCallerTitles(): void {
+  if (callerTitles !== undefined && Date.now() - callerTitles.at < 10_000) return;
+  callerTitlesTask ??= client.listSessions().then(rows => {
+    const byId = new Map<string, string>();
+    for (const row of rows) {
+      const title = row.name?.trim() || row.firstMessage.trim().slice(0, 80);
+      if (title) byId.set(row.id, title);
+    }
+    callerTitles = { at: Date.now(), byId };
+  }).catch(error => console.error("[pi-orb] bookmark titles", describeError(error)))
+    .finally(() => { callerTitlesTask = undefined; });
+}
 let wake: WakeController | null = null;
 let lifecycle: OrbWindowLifecycle | null = null;
 let lastWorkspaceProblem: string | null = null;
@@ -738,6 +757,7 @@ function revokeDesktopOperations(reason: string): void {
  * are empty, because a zero-area ribbon would read as a grant over nothing.
  */
 function showObservationFrameForTarget(bounds = referenceDriver?.targetBounds()): void {
+  if (!observationFramePreference.enabled) { hideObservationFrame(observationFrame ?? undefined); return; }
   if (!bounds || bounds.width < 2 || bounds.height < 2) return;
   try {
     observationFrame ??= createObservationFrameWindow();
@@ -829,6 +849,11 @@ function registerIpc(): void {
         onScreenshot: () => current.webContents.send(IPC.shellMenuAction, "screenshot"),
         onShortcut: () => current.webContents.send(IPC.shellMenuAction, "shortcut"),
         onWorkspace: () => current.webContents.send(IPC.shellMenuAction, "workspace"),
+        observationFrameEnabled: observationFramePreference.enabled,
+        onObservationFrame: () => {
+          observationFramePreference.setEnabled(!observationFramePreference.enabled);
+          if (!observationFramePreference.enabled) hideObservationFrame(observationFrame ?? undefined);
+        },
         onCollapse: () => lifecycle?.collapse(),
         onQuit: () => quit(),
         onClearSelectionContext: () => {
@@ -876,25 +901,40 @@ function registerIpc(): void {
 
   ipcMain.handle(IPC.setFloatingExpanded, (_event, expanded: unknown): FloatingWindowState => {
     if (typeof expanded !== "boolean" || !window || window.isDestroyed()) {
-      return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
+      return { expanded: false, horizontal: "right", vertical: "down", docked: undefined, strip: 0 };
     }
     const state = setFloatingExpanded(window, expanded);
     return state;
   });
-  ipcMain.handle(IPC.moveFloatingBall, (_event, x: unknown, y: unknown): FloatingWindowState => {
-    if (typeof x !== "number" || !Number.isFinite(x) || typeof y !== "number" || !Number.isFinite(y) || !window || window.isDestroyed()) {
-      throw new Error("Malformed floating ball position.");
-    }
-    return moveFloatingBall(window, x, y);
+  ipcMain.on(IPC.dragPress, event => { if (window && !window.isDestroyed() && event.sender === window.webContents) pressFloatingBall(window); });
+  ipcMain.on(IPC.dragBegin, event => { if (window && !window.isDestroyed() && event.sender === window.webContents) beginFloatingDrag(window); });
+  ipcMain.on(IPC.dragMove, (event, canDock: unknown) => { if (window && !window.isDestroyed() && event.sender === window.webContents) moveFloatingDrag(window, canDock === true); });
+  ipcMain.handle(IPC.dragEnd, (event, canDock: unknown) => {
+    if (!window || window.isDestroyed() || event.sender !== window.webContents) throw new Error("Orb window unavailable.");
+    return endFloatingDrag(window, canDock === true);
+  });
+  ipcMain.handle(IPC.agentBookmarks, async event => {
+    if (!window || window.isDestroyed() || event.sender !== window.webContents || !codeAgents) return [];
+    const items = await codeAgents.bookmarks();
+    if (items.length > 0) refreshCallerTitles();
+    if (session.sessionId && !session.running) void codeAgents.deliverPending(session.sessionId);
+    if (!window || window.isDestroyed()) return [];
+    const state = setFloatingAgentStrip(window, items.length > 0 ? 208 : 0);
+    window.webContents.send(IPC.floatingState, state);
+    return items.map(item => ({ ...item, callerTitle: callerTitles?.byId.get(item.callerId) ?? "" }));
+  });
+  ipcMain.handle(IPC.openAgent, async (event, id: unknown) => {
+    if (!window || window.isDestroyed() || event.sender !== window.webContents || typeof id !== "string" || !codeAgents) throw new Error("Orb bookmark unavailable.");
+    if (!(await codeAgents.bookmarks()).some(item => item.sessionId === id)) throw new Error("Unknown Code agent bookmark.");
+    const url = new URL(client.baseUrl);
+    url.searchParams.set("session", id);
+    await shell.openExternal(url.toString());
+    codeAgents.markRead(id);
   });
   // Both dock operations now resolve after their slide completes, so the renderer's returned state
   // describes the settled window rather than a position the animation is still passing through.
-  ipcMain.handle(IPC.clampFloatingBall, async (): Promise<FloatingWindowState> => {
-    if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
-    return clampFloatingWindow(window);
-  });
   ipcMain.handle(IPC.unsnapFloatingBall, async (): Promise<FloatingWindowState> => {
-    if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined };
+    if (!window || window.isDestroyed()) return { expanded: false, horizontal: "right", vertical: "down", docked: undefined, strip: 0 };
     return unsnapDockedBall(window);
   });
 
@@ -1416,6 +1456,7 @@ function quit(): void {
 
 void app.whenReady().then(async () => {
   configPath = defaultConfigPath(app.getPath("userData"));
+  observationFramePreference = new ObservationFramePreference(join(app.getPath("userData"), "observation-frame.json"));
   const loaded = loadOrbConfig(configPath);
   config = loaded.config;
   if (loaded.error) {
@@ -1450,7 +1491,7 @@ void app.whenReady().then(async () => {
       // the user hides Orb or revokes GUI Access while the background worker continues.
       if (session.sessionId !== owner || session.running || session.pendingQuestionId || isQuitting) return false;
       if (!generations.tryAcquire(session.generation)) return false;
-      try { await session.prompt(text); return true; }
+      try { await session.prompt(text); emit({ type: "code-agent-notice", text }); return true; }
       catch (error) { generations.release(session.generation); throw error; }
     },
     log: error => console.warn(`[pi-orb] Code agent: ${describeError(error)}`),

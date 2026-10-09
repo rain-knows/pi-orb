@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { runInContext } from "node:vm";
 import { JSDOM } from "jsdom";
 import { afterEach, expect, it, vi } from "vitest";
+import type { CodeAgentBookmark } from "../src/shared/code-agent";
 
 // Adapted from deepseek-harness-orb/apps/desktop/tests/floating-renderer.spec.ts
 // at 72f1d738458a223696685a909e806b683eff5885 (MIT). The original mocks
@@ -21,6 +22,7 @@ function harness(configured = true) {
   Object.defineProperty(win, "matchMedia", { value: () => media });
   Object.defineProperty(win.HTMLElement.prototype, "setPointerCapture", { value: vi.fn() });
   Object.defineProperty(win.HTMLElement.prototype, "releasePointerCapture", { value: vi.fn() });
+  Object.defineProperty(win.MouseEvent.prototype, "pointerId", { value: 1 });
   let status = {
     configured,
     generation: 1,
@@ -48,8 +50,13 @@ function harness(configured = true) {
     onSelectionContext: vi.fn((listener: typeof onSelection) => { onSelection = listener; return () => {}; }),
     onDoubleAltGesture: vi.fn((listener: typeof onDoubleAlt) => { onDoubleAlt = listener; return () => {}; }),
     setFloatingExpanded: vi.fn(async (expanded: boolean) => ({ expanded, horizontal: "left", vertical: "up", docked: undefined })),
-    moveFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined })),
-    clampFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined as "left" | "right" | undefined })),
+    dragPress: vi.fn(),
+    dragBegin: vi.fn(),
+    dragMove: vi.fn(),
+    dragEnd: vi.fn(async (_canDock: boolean) => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined as "left" | "right" | undefined })),
+    getAgentBookmarks: vi.fn(async () => [] as CodeAgentBookmark[]),
+    openAgent: vi.fn(async () => {}),
+    onFloatingState: vi.fn(() => () => {}),
     unsnapFloatingBall: vi.fn(async () => ({ expanded: false, horizontal: "left", vertical: "up", docked: undefined })),
     chooseWorkspace: vi.fn(async () => ({ ok: true, resolved: "C:\\orb" })),
     setWorkspace: vi.fn(async () => { status = { ...status, configured: true, generation: status.generation + 1 }; return status; }),
@@ -93,6 +100,55 @@ it("shows the actual default Full Access grant immediately, and reflects revocat
   h.emit({ type: "access", status: { authorized: false, level: null, stopped: true } });
   expect(h.byId("permission-label").textContent).toBe("访问权限");
   expect(h.byId("access-full").getAttribute("aria-selected")).toBe("false");
+});
+
+it("pins idempotently on input clicks and permits only the ball to unpin", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.byId("prompt").click();
+  h.byId("prompt").click();
+  expect(h.document.body.classList.contains("pinned")).toBe(true);
+  h.byId("ball").dispatchEvent(new h.win.MouseEvent("pointerup", { button: 0 }));
+  await expect.poll(() => h.document.body.classList.contains("pinned")).toBe(false);
+});
+
+it("shows only background completion notices as folded cards and keeps model guards offscreen", async () => {
+  const h = harness();
+  await expect.poll(() => h.api.onSessionEvent.mock.calls.length).toBe(1);
+  h.emit({ type: "code-agent-notice", text: "<frontmost_app>Editor</frontmost_app>" });
+  expect(h.document.querySelector('[data-kind="notice"]')).toBeNull();
+  h.emit({ type: "code-agent-notice", text: "The user stopped background Code agent session worker-1 from the main window:\nTask\n\nLast partial output\n\nDo not restart this task and do not call code_agent for it again unless the user asks." });
+  const card = h.document.querySelector('[data-kind="notice"]')!;
+  const row = card.querySelector('[role="button"]') as HTMLElement;
+  expect(card.hasAttribute("data-expanded")).toBe(false);
+  expect(row.getAttribute("aria-expanded")).toBe("false");
+  expect(card.textContent).toContain("后台任务报告");
+  expect(card.textContent).not.toContain("Do not restart");
+  row.click();
+  expect(card.hasAttribute("data-expanded")).toBe(true);
+  row.dispatchEvent(new h.win.KeyboardEvent("keydown", { key: "Enter" }));
+  expect(card.hasAttribute("data-expanded")).toBe(false);
+  h.emit({ type: "turn-start" });
+  h.emit({ type: "assistant-delta", text: "Worker stopped." });
+  expect(h.document.querySelectorAll('[data-kind="notice"]')).toHaveLength(1);
+});
+
+it("sorts cross-session bookmarks, marks states and opens only the selected background session", async () => {
+  const h = harness();
+  await expect.poll(() => h.byId("composer").hidden).toBe(false);
+  h.api.getAgentBookmarks.mockResolvedValue([
+    { sessionId: "done", callerId: "owner-1", task: "Document", cwd: "C:\\output", state: "completed", startedAt: 1, endedAt: 60000, colorIndex: 0, unread: true },
+    { sessionId: "active", callerId: "owner-2", task: "Game", cwd: "C:\\game", state: "running", startedAt: Date.now(), colorIndex: 1, unread: false },
+  ]);
+  h.document.body.dispatchEvent(new h.win.MouseEvent("pointerenter"));
+  await expect.poll(() => h.document.querySelectorAll(".agent-chip").length, { timeout: 2500 }).toBe(2);
+  const chips = h.document.querySelectorAll(".agent-chip");
+  expect(chips[0]!.getAttribute("data-state")).toBe("running");
+  expect(chips[1]!.querySelector(".agent-chip-unread")).not.toBeNull();
+  (chips[1] as HTMLElement).click();
+  await expect.poll(() => h.api.openAgent.mock.calls.length).toBe(1);
+  expect(h.api.openAgent).toHaveBeenCalledWith("done");
+  expect(h.api.openSessionHistory).not.toHaveBeenCalled();
 });
 
 it("switches workspace from the configured shell and clears previous conversation context", async () => {
@@ -342,11 +398,11 @@ it("moves only after the four-pixel drag threshold and docks through the host st
   await expect.poll(() => h.byId("composer").hidden).toBe(false);
   const ball = h.byId("ball");
   ball.dispatchEvent(new h.win.MouseEvent("pointerdown", { button: 0, screenX: 100, screenY: 100, clientX: 10, clientY: 10 }));
-  ball.dispatchEvent(new h.win.MouseEvent("pointermove", { buttons: 1, screenX: 103, screenY: 100 }));
-  expect(h.api.moveFloatingBall).not.toHaveBeenCalled();
-  ball.dispatchEvent(new h.win.MouseEvent("pointermove", { buttons: 1, screenX: 110, screenY: 100 }));
-  await expect.poll(() => h.api.moveFloatingBall.mock.calls.length).toBeGreaterThan(0);
-  h.api.clampFloatingBall.mockResolvedValueOnce({ expanded: false, horizontal: "left", vertical: "up", docked: "left" });
+  ball.dispatchEvent(new h.win.MouseEvent("pointermove", { buttons: 1, screenX: 103, screenY: 100, clientX: 13, clientY: 10 }));
+  expect(h.api.dragMove).not.toHaveBeenCalled();
+  ball.dispatchEvent(new h.win.MouseEvent("pointermove", { buttons: 1, screenX: 110, screenY: 100, clientX: 20, clientY: 10 }));
+  await expect.poll(() => h.api.dragMove.mock.calls.length).toBeGreaterThan(0);
+  h.api.dragEnd.mockResolvedValueOnce({ expanded: false, horizontal: "left", vertical: "up", docked: "left" });
   ball.dispatchEvent(new h.win.MouseEvent("pointerup", { button: 0, screenX: 110, screenY: 100 }));
   await expect.poll(() => h.document.body.classList.contains("docked-left")).toBe(true);
   expect(h.byId("dock-tab").hidden).toBe(false);

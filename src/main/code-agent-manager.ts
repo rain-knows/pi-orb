@@ -1,11 +1,12 @@
-/** Reference code-agent.ts / code-agent-completion.ts @9cdc503, MIT.
+/** Reference code-agent.ts / code-agent-completion.ts / code-agent-registry.ts
+ * @aa79308e47265b7d4a774edb688de2bbd7dce66e (mini-yifan/dsh-orb-cordis, MIT).
  * First-class background sessions stay in Pi Web. Pi owns execution and history;
  * this adapter owns delegation, SSE completion notices and cancellation.
  */
 import { mkdirSync, readFileSync, writeFileSync, renameSync } from "node:fs";
 import { dirname, isAbsolute, resolve } from "node:path";
 import type { PiWebClient } from "./pi-web-client";
-import { completionNoticeText, queuedTaskText, slugFromTask, uniqueDirectory, type CodeAgentTask } from "../shared/code-agent";
+import { completionNoticeText, queuedTaskText, slugFromTask, uniqueDirectory, type CodeAgentTask, type CodeAgentBookmark } from "../shared/code-agent";
 import type { OrbAccessLevel } from "../shared/ipc";
 
 interface CodeAgentManagerOptions {
@@ -23,6 +24,9 @@ export class CodeAgentManager {
   readonly #delivering = new Set<string>();
   readonly #completing = new Set<string>();
   readonly #dispatching = new Set<string>();
+  readonly #bookmarks = new Map<string, CodeAgentBookmark>();
+  readonly #readBookmarks = new Set<string>();
+  readonly #colors = new Map<string, number>();
   #disposed = false;
 
   constructor(options: CodeAgentManagerOptions) {
@@ -37,6 +41,7 @@ export class CodeAgentManager {
 
   async restore(): Promise<void> {
     for (const task of this.#tasks.values()) if (task.status === "running") {
+      this.#recordBookmark(task);
       try {
         await this.#subscribe(task);
         if (!(await this.#options.client.getState(task.session_id)).running) await this.#complete(task.session_id, this.#epochs.get(task.session_id)!);
@@ -84,6 +89,8 @@ export class CodeAgentManager {
       task.status = "running";
       task.pending = false;
       task.outcome = "";
+      task.userStopped = false;
+      this.#recordBookmark(task);
       this.#save();
       if (!this.#streams.has(task.session_id)) await this.#subscribe(task);
       signal?.throwIfAborted();
@@ -117,6 +124,8 @@ export class CodeAgentManager {
     this.#streams.delete(sessionId);
     task.pending = false;
     task.status = "idle";
+    task.userStopped = true;
+    this.#endBookmark(task, "stopped");
     this.#save();
     await this.#options.client.clearQueue(sessionId);
     await this.#options.client.abort(sessionId);
@@ -128,7 +137,7 @@ export class CodeAgentManager {
     this.#delivering.add(owner);
     try {
       for (const task of this.#tasks.values()) if (task.owner === owner && task.pending) {
-        if (!await this.#options.deliver(owner, completionNoticeText(task))) break;
+        if (!await this.#options.deliver(owner, completionNoticeText(task, task.userStopped))) break;
         task.pending = false;
         this.#save();
       }
@@ -140,6 +149,40 @@ export class CodeAgentManager {
     this.#disposed = true;
     for (const close of this.#streams.values()) close();
     this.#streams.clear();
+  }
+
+  /** Read process-lifetime bookmarks across Orb conversations, without disclosing credentials. */
+  async bookmarks(): Promise<CodeAgentBookmark[]> {
+    for (const task of this.#tasks.values()) {
+      if (task.status !== "running" || this.#dispatching.has(task.owner)) continue;
+      try {
+        if (!(await this.#options.client.getState(task.session_id)).running) await this.#complete(task.session_id, this.#epochs.get(task.session_id) ?? 0);
+      } catch (error) { this.#fail(task, error); }
+    }
+    return [...this.#bookmarks.values()].filter(bookmark => bookmark.state === "running" || bookmark.unread);
+  }
+
+  markRead(sessionId: string): boolean {
+    const bookmark = this.#bookmarks.get(sessionId);
+    if (!bookmark) return false;
+    this.#readBookmarks.add(sessionId);
+    this.#bookmarks.set(sessionId, { ...bookmark, unread: false });
+    return true;
+  }
+
+  #recordBookmark(task: CodeAgentTask): void {
+    if (!this.#colors.has(task.owner)) this.#colors.set(task.owner, this.#colors.size % 4);
+    this.#bookmarks.set(task.session_id, { sessionId: task.session_id, callerId: task.owner,
+      task: task.task, cwd: task.cwd, startedAt: Date.now(), state: "running",
+      colorIndex: this.#colors.get(task.owner)!, unread: false });
+  }
+
+  #endBookmark(task: CodeAgentTask, state: CodeAgentBookmark["state"]): void {
+    const bookmark = this.#bookmarks.get(task.session_id);
+    if (!bookmark) return;
+    const text = task.outcome.trim();
+    const outcome = text.length <= 200 ? text : `${text.slice(0, 199)}…`;
+    this.#bookmarks.set(task.session_id, { ...bookmark, state, endedAt: Date.now(), outcome, unread: !this.#readBookmarks.has(task.session_id) });
   }
 
   #owned(owner: string, sessionId: string): CodeAgentTask {
@@ -169,7 +212,10 @@ export class CodeAgentManager {
       const outcome = await this.#options.client.lastAssistantOutcome(sessionId);
       if (this.#epochs.get(sessionId) !== epoch || task.status !== "running" || this.#disposed) return;
       task.status = outcome.error === null ? "idle" : "error";
-      task.outcome = outcome.error ?? outcome.text;
+      task.userStopped = outcome.userStopped === true;
+      task.outcome = task.userStopped ? outcome.text : outcome.error ?? outcome.text;
+      if (task.userStopped) task.status = "idle";
+      this.#endBookmark(task, task.userStopped ? "stopped" : outcome.error === null ? "completed" : "ended");
       task.pending = true;
       this.#save();
       await this.deliverPending(task.owner);
@@ -182,6 +228,7 @@ export class CodeAgentManager {
     if (this.#disposed || task.status === "error") return;
     task.status = "error";
     task.outcome = error instanceof Error ? error.message : String(error);
+    this.#endBookmark(task, "ended");
     task.pending = true;
     this.#save();
     this.#options.log?.(error);

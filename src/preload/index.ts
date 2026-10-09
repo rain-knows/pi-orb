@@ -12,6 +12,7 @@
  */
 
 import { contextBridge, ipcRenderer } from "electron";
+import type { CodeAgentBookmark } from "../shared/code-agent";
 import {
   IPC,
   type AbortRequest,
@@ -44,8 +45,13 @@ export interface OrbBridge {
   refreshConnection(): Promise<WorkspaceStatus>;
   setShortcut(accelerator: string): Promise<WorkspaceStatus>;
   setFloatingExpanded(expanded: boolean): Promise<FloatingWindowState>;
-  moveFloatingBall(x: number, y: number): Promise<FloatingWindowState>;
-  clampFloatingBall(): Promise<FloatingWindowState>;
+  dragPress(): void;
+  dragBegin(): void;
+  dragMove(canDock: boolean): void;
+  dragEnd(canDock: boolean): Promise<FloatingWindowState>;
+  getAgentBookmarks(): Promise<CodeAgentBookmark[]>;
+  openAgent(sessionId: string): Promise<void>;
+  onFloatingState(listener: (state: FloatingWindowState) => void): () => void;
   unsnapFloatingBall(): Promise<FloatingWindowState>;
   collapseOrb(): Promise<DesktopTaskStatus>;
   /**
@@ -86,8 +92,17 @@ const bridge: OrbBridge = {
   refreshConnection: () => ipcRenderer.invoke(IPC.refreshConnection),
   setShortcut: (accelerator: string) => ipcRenderer.invoke(IPC.setShortcut, accelerator),
   setFloatingExpanded: (expanded: boolean) => ipcRenderer.invoke(IPC.setFloatingExpanded, expanded),
-  moveFloatingBall: (x: number, y: number) => ipcRenderer.invoke(IPC.moveFloatingBall, x, y),
-  clampFloatingBall: () => ipcRenderer.invoke(IPC.clampFloatingBall),
+  dragPress: () => ipcRenderer.send(IPC.dragPress),
+  dragBegin: () => ipcRenderer.send(IPC.dragBegin),
+  dragMove: (canDock: boolean) => ipcRenderer.send(IPC.dragMove, canDock),
+  dragEnd: (canDock: boolean) => ipcRenderer.invoke(IPC.dragEnd, canDock),
+  getAgentBookmarks: () => ipcRenderer.invoke(IPC.agentBookmarks),
+  openAgent: (id: string) => ipcRenderer.invoke(IPC.openAgent, id),
+  onFloatingState: (listener) => {
+    const handler = (_event: unknown, state: FloatingWindowState) => listener(state);
+    ipcRenderer.on(IPC.floatingState, handler);
+    return () => ipcRenderer.removeListener(IPC.floatingState, handler);
+  },
   unsnapFloatingBall: () => ipcRenderer.invoke(IPC.unsnapFloatingBall),
   collapseOrb: () => ipcRenderer.invoke(IPC.collapseOrb),
   openShellMenu: (flags: ShellMenuEditFlags) => ipcRenderer.invoke(IPC.shellMenu, flags),

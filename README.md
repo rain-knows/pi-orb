@@ -17,6 +17,10 @@ P1/P2 的实现与分阶段证据保留；个人用户安装与启动改进见�
 - **桌面工具**：使用参考项目的 `click`、`input_text`、`scroll`、`hotkey`、`long_press`、`drag`、`wait`、`long_wait`、`screenshot`、`open_in_browser`、`open_in_finder`、`list_apps` 和 `open_app`（激活或启动应用）；首帧自动附加，动作后返回新截图。
 - **截图取点**：模型按截图的 0–1000 fraction 坐标定位；过期截图 token 只在 Electron bridge 内部校验，不进入模型参数。
 - **后台任务**：`code_agent`、`code_agent_status` 和 `code_agent_stop` 将持续文件调查或产物生成交给独立 Pi Web session，完成后通知 Orb 前台。
+- **任务书签**：展开侧边显示跨 Orb 对话的后台任务状态、耗时和未读标记；点击在 Pi Web 打开对应 session。完成报告默认折叠，主窗口手动停止的任务不会自动重启。
+- **最新窗口交互**：复用参考项目的系统光标拖动和缩放吸边修复；点击输入框固定面板，点击浮球取消固定；右键「观察框彩带」可切换窗口标记。
+
+参考来源已同步到 `dsh-orb-cordis@aa79308`，全部更新及 Pi 适配边界见[同步记录](./doc/reference-sync-2026-10-09.md)。
 
 新 Orb 会话及明确重新打开隐藏的 Orb 默认 **Full Access（完全访问）**，可以产生真实鼠标与键盘输入。请在开始任务前检查 Access；Stop、隐藏、断连、锁屏及会话/工作区切换会撤销旧授权。聚焦已经可见的 Orb 保留手动权限；正常回复结束保留当前会话的授权；截图消息仍需另行预览确认。授权边界见 [SECURITY.md](./SECURITY.md)。
 

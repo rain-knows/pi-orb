@@ -47,6 +47,8 @@ export interface ShellMenuActions {
   readonly onScreenshot?: () => void;
   readonly onShortcut?: () => void;
   readonly onWorkspace?: () => void;
+  readonly observationFrameEnabled?: boolean;
+  readonly onObservationFrame?: () => void;
 }
 
 /**
@@ -64,6 +66,7 @@ export function shellMenuTemplate(
   if (actions.onModel) utilities.push({ label: "选择模型", click: actions.onModel });
   if (actions.onScreenshot) utilities.push({ label: "截取屏幕", click: actions.onScreenshot });
   if (actions.onShortcut) utilities.push({ label: "修改唤醒快捷键…", click: actions.onShortcut });
+  if (actions.onObservationFrame) utilities.push({ label: "观察框彩带", type: "checkbox", checked: actions.observationFrameEnabled, click: actions.onObservationFrame });
   if (utilities.length > 0) utilities.push({ type: "separator" });
   const shell: MenuItemConstructorOptions[] = [
     ...utilities,

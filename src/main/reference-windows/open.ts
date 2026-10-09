@@ -1,4 +1,4 @@
-/** Adapted from dsh-orb-cordis computer-use/open.ts, commit 9cdc50302d202f4497569731be488a8afa500da7 (MIT, Copyright (c) 2026 mini-yifan). */
+/** Adapted from dsh-orb-cordis computer-use/open.ts, commit aa79308e47265b7d4a774edb688de2bbd7dce66e (MIT, Copyright (c) 2026 mini-yifan). */
 import { realpath } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -21,6 +21,7 @@ export interface FinderOpenTarget { readonly path: string; readonly revealOnly: 
 export async function resolveFinderOpen(path: string | undefined, revealOnly: boolean, home = homedir()): Promise<FinderOpenTarget> {
   const trimmed = path?.trim() ?? "";
   const expanded = trimmed === "" || trimmed === "~" ? join(home, "Desktop") : trimmed.startsWith("~/") ? join(home, trimmed.slice(2)) : trimmed;
+  if (PATH_BLACKLIST.some(prefix => expanded === prefix || expanded.startsWith(`${prefix}/`))) throw new Error(`computer-use: opening a system path is forbidden: ${expanded}`);
   const resolved = await realpath(expanded).catch(error => { throw new Error(`computer-use: path does not exist: ${expanded} (${String(error)})`); });
   if (PATH_BLACKLIST.some(prefix => resolved === prefix || resolved.startsWith(`${prefix}/`))) throw new Error(`computer-use: opening a system path is forbidden: ${resolved}`);
   return { path: resolved, revealOnly };

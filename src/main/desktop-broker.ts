@@ -28,6 +28,7 @@ import {
 } from "@shared/orb-tools";
 import { DesktopTaskController, accessRefusalMessage, type ActResult, type DesktopDriver } from "./desktop-task";
 import type { OrbAccessLevel } from "@shared/ipc";
+import { withScreenLock } from "./gui-lock";
 
 export interface DesktopBrokerOptions {
   readonly driver: DesktopDriver;
@@ -73,11 +74,11 @@ export class DesktopBroker {
   }
 
   observe(sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown> {
-    return this.#exclusive(abort => this.#observe(sessionId, generation, abort), signal);
+    return withScreenLock(sessionId, () => this.#exclusive(abort => this.#observe(sessionId, generation, abort), signal));
   }
 
   act(action: unknown, sessionId: string, generation: number, signal?: AbortSignal): Promise<unknown> {
-    return this.#exclusive(abort => this.#act(action, sessionId, generation, abort), signal);
+    return withScreenLock(sessionId, () => this.#exclusive(abort => this.#act(action, sessionId, generation, abort), signal));
   }
 
   constructor(options: DesktopBrokerOptions) {

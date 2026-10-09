@@ -23,6 +23,18 @@ const labels = (items: readonly { label?: string; type?: string; role?: string }
   items.map((item) => item.role ?? item.label ?? item.type ?? "?");
 
 describe("ported shell context menu", () => {
+  it("shows the persisted observation ribbon state and invokes its toggle", () => {
+    const onObservationFrame = vi.fn();
+    const request = { isEditable: false, canCut: false, canCopy: false, canPaste: false, canSelectAll: false, hasSelectionContext: false };
+    const item = shellMenuTemplate(request, { ...actions, onObservationFrame, observationFrameEnabled: false })
+      .find(entry => entry.label === "观察框彩带");
+    expect(item).toMatchObject({ type: "checkbox", checked: false });
+    item?.click?.({} as never, {} as never, {} as never);
+    expect(onObservationFrame).toHaveBeenCalledTimes(1);
+    expect(shellMenuTemplate(request, { ...actions, onObservationFrame, observationFrameEnabled: true })
+      .find(entry => entry.label === "观察框彩带")?.checked).toBe(true);
+  });
+
   it("offers the edit roles only when the target is editable, as the reference does", () => {
     // Not editable: no cut/copy/paste, and no separators left dangling for them.
     const readonly = shellMenuTemplate(

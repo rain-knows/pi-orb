@@ -36,8 +36,9 @@ describe("reference floating orb geometry", () => {
     expect(ballOriginFromWindow(expanded, expanded)).toEqual({ x: 1800, y: 800 });
   });
 
-  it("only docks after the ball overlaps a left or right display edge", () => {
-    expect(dockSideForBallOrigin({ x: 0, y: 100 }, display)).toBeUndefined();
+  it("docks on edge contact with the upstream three-DIP tolerance", () => {
+    expect(dockSideForBallOrigin({ x: 0, y: 100 }, display)).toBe("left");
+    expect(dockSideForBallOrigin({ x: 4, y: 100 }, display)).toBeUndefined();
     expect(dockSideForBallOrigin({ x: -20, y: 100 }, display)).toBe("left");
     expect(dockSideForBallOrigin({ x: 1870, y: 100 }, display)).toBe("right");
   });

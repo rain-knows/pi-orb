@@ -63,7 +63,7 @@ describe("Pi Web final background outcome", () => {
       ] } });
     }));
     const client = new PiWebClient({ baseUrl: "http://127.0.0.1:30141" });
-    await expect(client.lastAssistantOutcome("worker")).resolves.toEqual({ text: "final", error: expectedError });
+    await expect(client.lastAssistantOutcome("worker")).resolves.toEqual({ text: "final", error: expectedError, userStopped: stopReason === "aborted" });
   });
 });
 
