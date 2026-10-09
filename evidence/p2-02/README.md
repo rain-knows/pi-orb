@@ -4,7 +4,7 @@
 
 - `deepseek-harness-orb` 固定提交 `72f1d738458a223696685a909e806b683eff5885` 的 computer-use
   工具禁止把截图热键作为模型输入动作；参考项目没有用户侧双 Alt 截图手势。
-- pi-orb 按 `doc/pi-orb-development-goals.md` 的 P2-02 目标复用已有 `uiohook-napi` hook，读取
+- pi-orb 按 `doc/product-contract.md` 的 P2-02 目标复用已有 `uiohook-napi` hook，读取
   `Alt=56` 与 `AltRight=3640`；检测后只唤醒 Orb 并打开既有截图预览，不自动发送图像。
 - 组合状态由 `src/main/double-alt.ts` 持有；应用退出移除左右 Alt 监听器。常规可配置全局快捷键
   仍由 Electron `globalShortcut` 管理，不被替换。

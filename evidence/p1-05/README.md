@@ -194,7 +194,7 @@ node evidence/p1-05/run-p1-05.mjs
 2. 重跑脚本：`scrollVerification.deliveredAndObserved` 与 `stripActuallyScrolled` 为 `true` 时，本次滚动物理到达目标**且目标元素真的滚动**。
 3. 观察：前台投递是否在动作后**恢复原前台窗口**。
 4. 记录前台投递时鼠标是否发生位移（`SendInput` 会移动真实指针）。
-5. 截图点↔输入点的**联合**验证见 [`doc/manual-acceptance.md`](../../doc/manual-acceptance.md) C7。
+5. 截图点↔输入点的**联合**验证见 [`doc/verification.md`](../../doc/verification.md) C7。
 
 > 若为 `false`，先看 `notepadReachabilityProbe` 与网格的可达性字段，再看驱动是否真的换成了前台。注意：驱动**失败时也会报成功**，因此只能读目标事件。
 

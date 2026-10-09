@@ -1,7 +1,7 @@
 /**
  * Screenshot context rules (P1-04), kept free of Electron so they are testable.
  *
- * Contract (doc/pi-orb-development-goals.md §5 P1-04, §6.1, §6.3):
+ * Contract (doc/product-contract.md §5 P1-04, §6.1, §6.3):
  *  - a capture happens only after an explicit user action, and only the confirmed
  *    image is sent; cancelling uploads nothing,
  *  - the image the user previewed is byte-identical to the image that is sent,

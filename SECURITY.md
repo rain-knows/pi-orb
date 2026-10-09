@@ -47,7 +47,7 @@ Being explicit is part of the product, not a disclaimer:
 
 - **The Orb workspace is not a filesystem sandbox.** A cwd match marks where the Orb's own context
   lives; it does not restrict what the model's tools may read or write. Section 1.1 of
-  [`doc/pi-orb-development-goals.md`](doc/pi-orb-development-goals.md) states this as a non-goal so
+  [`doc/product-contract.md`](doc/product-contract.md) states this as a non-goal so
   nobody mistakes the workspace for isolation.
 - **An authorized desktop task is a real grant of input authority.** While a task is approved, the
   model can move the mouse, type and press keys in the window you recorded. Approve a task only for a

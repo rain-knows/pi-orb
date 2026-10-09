@@ -1,7 +1,7 @@
 /**
  * Minimal pi-web client adapter.
  *
- * Scope (see doc/pi-orb-development-goals.md §4.1 "pi-web 客户端适配"):
+ * Scope (see doc/product-contract.md §4.1 "pi-web 客户端适配"):
  *  - only the documented HTTP/SSE surface is used,
  *  - credentials never leave the Electron main process,
  *  - no internal pi-web module, registry or React state is touched.

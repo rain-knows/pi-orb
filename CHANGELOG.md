@@ -11,7 +11,7 @@ verified is recorded as *unverified* and is not claimed as compatible.
 ## [Unreleased]
 
 - 同步 `mini-yifan/dsh-orb-cordis@aa79308` 的全部适用增量：系统光标拖动、Windows 缩放吸边及显示器接缝、输入框固定、后台书签和折叠报告、用户停止后的禁止自动重启、GUI 共享互斥、系统路径前置拒绝与观察框彩带开关。
-- 删除 renderer 屏幕坐标移动接口；复用参考状态模型和测试，Pi 会话/API 边界保留。dsh 运行时下载、自更新、系统级安装身份和 Cordis 挂载改动不适用于 Pi 分发；完整逐文件处置见 `evidence/reference-sync/reference-manifest.json` 和 `doc/reference-sync-2026-10-09.md`。
+- 删除 renderer 屏幕坐标移动接口；复用参考状态模型和测试，Pi 会话/API 边界保留。dsh 运行时下载、自更新、系统级安装身份和 Cordis 挂载改动不适用于 Pi 分发；完整逐文件处置见 `evidence/reference-sync/reference-manifest.json` 和 `doc/reference-playbook.md`。
 
 ## [0.1.0-preview.3] - 2026-10-05
 
@@ -53,7 +53,7 @@ Windows x64 未签名预览版。包含此前未发布的 Pi Web 0.10 / Pi 1.0�
   本机迁入原生 MCP 并移除旧 adapter。全局配置改动为本机升级，不作为 Orb 通用策略依赖。
 - 482 单测、29 项 provider 提示词审计、5 个原生 MCP 连接、真实模型搜索、21 项生命周期、
   7 个真实桌面任务、打包审计 27/27 与启动 22/22 通过；Pi Web 全量测试限制及详细来源见
-  [升级记录](./doc/pi-web-0.10-compatibility.md)。这是该次升级的历史记录，当前验证见工具集迁移记录和支持矩阵。
+  [升级记录](./doc/workspaces-sessions.md)。这是该次升级的历史记录，当前验证见工具集迁移记录和支持矩阵。
 
 ## [0.1.0-preview.1] - 2026-10-01
 
@@ -246,7 +246,7 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
     `html[data-ds-dark-theme]`, which the host can drive from an explicit choice rather than a guess.
 
   What is deliberately still not ported is now listed with reasons in
-  `doc/p2-01-reference-reuse.md`: the reference's `#question*` question cards, `#tcc-*` macOS
+  `doc/floating-interaction.md`: the reference's `#question*` question cards, `#tcc-*` macOS
   permission gate, `#ball-gif` avatar, update/welcome frames and selection toolbar have no pi-orb
   counterpart (the project does not invent product concepts the reference does not have), the
   transcript is pi-orb's own React tree rather than the reference's iframe, the native observation
@@ -412,7 +412,7 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
 - `tests/documented-counts.test.ts`: the same protection for evidence counts that
   `playbook-constants.test.ts` gives constants. Documents quote probe results as `25/25` and `15/15`,
   and those numbers rot — the P2-05 line still said `10/10` several rounds after the packaged probe
-  reached 15/15, and `manual-acceptance.md` carried the same stale pair. Every count is now read from
+  reached 15/15, and `verification.md` carried the same stale pair. Every count is now read from
   the recorded JSON and compared against what the documents state next to the matching phrase.
 
   The first version of this check was wrong in a way worth recording: it searched for the *recorded*
@@ -522,7 +522,7 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   Tested in `tests/reference-windows-open-app.test.ts` (including "not running fails and `launch` is
   never reached") and `tests/orb-tools.test.ts`; the tool set is now eight, re-verified against what
   the provider actually receives (`evidence/p1-06/tool-exposure.json`, 7/7). The real desktop effect
-  stays manual: `doc/manual-acceptance.md` §10 (F1–F6).
+  stays manual: `doc/verification.md` §10 (F1–F6).
 
 - **Windows distribution (P2-05).** pi-orb can now be built into something you can hand to someone:
   `npm run package:win` produces a per-user NSIS installer and `npm run package:win:dir` an unpacked
@@ -532,7 +532,7 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   `**/*.{node,dll,exe}` unpack glob, and no update feed — while its dsh-monorepo release pipeline
   (bundled runtime, custom NSIS pages, signing chain, upload flow) is deliberately not copied.
   Three deviations from electron-builder's defaults are recorded with their reasons in
-  `doc/p2-05-distribution.md` §4: `npmRebuild: false` (the shipped binaries must be the prebuilt ones
+  `doc/packaging.md` §4: `npmRebuild: false` (the shipped binaries must be the prebuilt ones
   every native evidence run used, not a fresh from-source build), a `files` exclusion list (smart
   unpack otherwise ships koffi's C++ sources, its vendored headers and documentation, uiohook-napi's
   vendored C sources and every other platform's `.node` — 129 unpacked files become 10), and
@@ -548,7 +548,7 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   and `orb:list-desktop-windows` returns real windows — which is the only external observation that
   `koffi` loaded from `app.asar.unpacked`. Falsified by deleting that unpacked binary: the desktop
   checks fail, and pass again once it is restored.
-- `doc/p2-05-distribution.md` and `doc/manual-acceptance.md` §9 (E1–E9): what is automated, and the
+- `doc/packaging.md` and `doc/verification.md` §9 (E1–E9): what is automated, and the
   clean-machine install / uninstall / upgrade / SmartScreen steps that cannot be. The installer is
   unsigned, so the unknown-publisher prompt is a recorded state, not a defect.
 - The release gate grows to 47 checks: it now also holds the packaging configuration to its
@@ -603,7 +603,7 @@ Also fixed earlier in this cycle: the Pi extension sent run generation `0` while
   isolated so it never reads or writes the user's running orb — its own `--user-data-dir` and
   `PI_ORB_CONFIG`, and an agent dir whose `models.json` is a hard link and `auth.json` a symlink, so the
   real provider configuration is used with no second copy of any credential.
-- `doc/manual-acceptance.md`: the single, step-by-step list of what genuinely cannot be automated
+- `doc/verification.md`: the single, step-by-step list of what genuinely cannot be automated
   (real key presses, a second monitor, an elevated window, mid-press cancellation, and a real model
   choosing to call the tools), with prerequisites, the five permitted result labels and where each
   result has to be written back.

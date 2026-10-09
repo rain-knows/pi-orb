@@ -87,14 +87,14 @@ node evidence/p2-05/run-packaged-smoke.mjs
 
 | 项 | 原因 |
 |---|---|
-| 干净目标机安装／卸载／升级 | 本机已装过，且安装写 HKCU 与用户目录；开发机上的结果不可复现。步骤见 `doc/manual-acceptance.md` §9 |
+| 干净目标机安装／卸载／升级 | 本机已装过，且安装写 HKCU 与用户目录；开发机上的结果不可复现。步骤见 `doc/verification.md` §9 |
 | 未签名安装包的 SmartScreen 提示 | 需要真实用户交互与网络判信 |
 | 卸载不删除用户工作区与 pi-web | 需要一次真实的安装→使用→卸载流程 |
 | 安装后的浮球观感、真实按键唤醒、多显示器、DPI | 属于 P2-01/P1 的人工项，打包不改变其状态 |
 | macOS / Linux 产物 | 未构建、未验证；Windows 结果不外推 |
 
 结论：**Windows x64 产物可构建、内容可审计、打包后可启动并完成一次真实桌面枚举；干净机安装、
-卸载、升级与 SmartScreen 体验未验证**。见 [`../../doc/p2-05-distribution.md`](../../doc/p2-05-distribution.md)
+卸载、升级与 SmartScreen 体验未验证**。见 [`../../doc/packaging.md`](../../doc/packaging.md)
 
 ## 4. 环境事实（复现时的坑）
 

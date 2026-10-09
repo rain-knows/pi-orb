@@ -5,7 +5,7 @@
  *  - the Electron main process, which owns the file (writes it), and
  *  - the Pi extension, which only reads it to decide whether it runs in Orb mode.
  *
- * Design rules (see doc/pi-orb-development-goals.md §4.2):
+ * Design rules (see doc/product-contract.md §4.2):
  *  - The workspace match is an *exact* normalized-directory match. Subdirectories
  *    never match, and a prefix-similar sibling directory never matches.
  *  - This module contains no filesystem access on purpose: it stays pure so both

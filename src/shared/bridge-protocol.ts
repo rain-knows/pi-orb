@@ -2,7 +2,7 @@
  * The bridge between the Pi extension (inside the pi-web Node service) and the Orb
  * desktop broker (inside the Electron main process).
  *
- * Why a separate channel is needed (doc/pi-orb-development-goals.md §4.4, measured in
+ * Why a separate channel is needed (doc/product-contract.md §4.4, measured in
  * evidence/p0-03): the Pi extension runs in pi-web's Node process, so a renderer IPC
  * channel cannot reach it, and a renderer cannot be trusted with desktop authority
  * anyway. The seam is a Windows named pipe: no TCP listener, so no web page and no LAN

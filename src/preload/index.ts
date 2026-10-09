@@ -8,7 +8,7 @@
  *  - pi-web credentials or the authenticated client itself.
  *
  * The renderer runs with `contextIsolation: true`, `sandbox: true` and
- * `nodeIntegration: false` (doc/tech-stack.md §3.1).
+ * `nodeIntegration: false` (doc/process-boundaries.md §3.1).
  */
 
 import { contextBridge, ipcRenderer } from "electron";

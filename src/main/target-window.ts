@@ -1,7 +1,7 @@
 /**
  * Records the window the user was looking at, before the orb takes focus.
  *
- * Why this exists (doc/pi-orb-development-goals.md §6.2): the target must be
+ * Why this exists (doc/product-contract.md §6.2): the target must be
  * recorded *before* waking, otherwise the orb becomes the foreground window and
  * captures itself.
  *

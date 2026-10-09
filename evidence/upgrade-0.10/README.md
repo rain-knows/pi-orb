@@ -1,6 +1,6 @@
 # Pi Web 0.10 / Pi 1.0 验证
 
-详细改动与边界见 [阶段记录](../../doc/pi-web-0.10-compatibility.md)。
+详细改动与边界见 [阶段记录](../../doc/workspaces-sessions.md)。
 
 | 文件 | 证据 |
 |---|---|

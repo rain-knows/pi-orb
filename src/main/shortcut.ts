@@ -4,7 +4,7 @@
  * Electron's `globalShortcut.register` returns `false` when another application
  * already owns the accelerator; it does not throw. A silent failure would leave
  * the orb unreachable, so every attempt returns a structured result the shell can
- * surface (see doc/pi-orb-development-goals.md P1-03: "注册失败可诊断").
+ * surface (see doc/product-contract.md P1-03: "注册失败可诊断").
  */
 
 import { validateAccelerator } from "../shared/accelerator";

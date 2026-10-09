@@ -14,7 +14,7 @@
 
 | 位置 | 说明 |
 |---|---|
-| `D:\pi-orb-ref\dsh-orb-cordis-20261009` | 当前插件参考：原作者 `mini-yifan/dsh-orb-cordis`，固定 `aa79308e47265b7d4a774edb688de2bbd7dce66e`；窗口、Computer Use 与后台任务先看此检出，索引见手册 §1.2 |
+| `D:\pi-orb-ref\dsh-orb-cordis-20261009` | 当前插件参考：原作者 `mini-yifan/dsh-orb-cordis`，固定 `aa79308e47265b7d4a774edb688de2bbd7dce66e`；窗口、Computer Use 与后台任务先看此检出，入口见取材手册 |
 | `D:\pi-orb-ref\dsh-orb-cordis` | 旧插件检出，固定 `9cdc50302d202f4497569731be488a8afa500da7`，仅用于历史差异核对 |
 | `D:\pi-orb-ref\deepseek-harness-orb` | **本机优选检出**；注意它是 sparse checkout（只含 `apps/desktop/src` 与 `packages`），打包脚本／测试目录不在其中 |
 | `C:\Users\JUSTLIKEZYP\AppData\Local\Temp\deepseek-harness-orb-pi-orb` | 完整工作树检出（同提交）；**需要 `apps/desktop/scripts`、`apps/desktop/tests` 时看这里** |
@@ -34,7 +34,7 @@
 - 不能直接移植时，先记录参考项目对应文件、提交和差异，再写最小适配层。
 - pi-web、Pi SDK、Electron 的接入只负责替换参考项目的会话和运行时边界，不改变参考项目的用户体验和交互语义。
 - 不自行增加设置、导航、权限步骤、视觉装饰或产品概念；只有参考项目没有而 Pi 接入必需的内容才允许增加。
-- 每次 UI 或架构改动都要在阶段文档中注明参考项目来源文件、源提交、复用方式和未复用原因。
+- 每次 UI 或架构改动都要在所属主题中注明参考项目来源文件、源提交、复用方式和未复用原因。
 - 参考项目代码须保留其许可证和版权声明；不得把复用内容描述为 pi-orb 原创。
 - 参考项目本地检出更新后，先核对源提交和差异，再更新本仓库；不得把临时检出路径写成运行时依赖。
 
@@ -42,8 +42,7 @@
 
 - 先完成能端到端运行的最小复用，再按阶段扩展。
 - 删除已经废弃的路径，不保留兼容层、静默回退或重复实现。
-- 阶段性工作必须有文档、测试或人工证据，并单独提交，保持开发可控。
-- 打包与分发的形态按 [`doc/reference-playbook.md`](./doc/reference-playbook.md) §9.4 执行：
-  只复用参考项目的打包形态，不搬它的 dsh 单体仓库发布管道；改动打包配置后必须跑
-  `node evidence/p2-05/run-p2-05.mjs`（构建 → 产物内容审计 → 启动打包产物），
-  且不得用“安装包构建成功”代替“包内是什么”与“它能不能跑”这两类证据。
+- 独立工作单独提交，按 [验证策略](doc/verification.md) 选择必要检查；文档改动只检查引用和 diff。
+- 打包与分发见 [打包](doc/packaging.md)：只复用参考打包形态，不搬 dsh 单体发布管道。
+  打包改动必须验证最终安装器构建的内容、Pi 插件加载和实际启动；不得用构建成功替代内容与运行证据。
+  执行入口以 package.json 和 [验证策略](doc/verification.md) 为准。
