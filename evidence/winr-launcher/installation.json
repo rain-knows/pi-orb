@@ -1,0 +1,28 @@
+{
+  "At": "2026-10-09T09:20:07.0801605+08:00",
+  "Backup": "C:\\Users\\JUSTLIKEZYP\\AppData\\Local\\PiWeb\\launcher-backups\\20261009-091049",
+  "MainPid": 23792,
+  "BackendPid": 36048,
+  "ShortCommand": "piorb",
+  "InstalledAppHash": "49290AB0F7F7752D3A5E4E30325065C7A9DF792644B4982CBEAAC0CF58C5E739",
+  "VerifiedBuildHash": "49290AB0F7F7752D3A5E4E30325065C7A9DF792644B4982CBEAAC0CF58C5E739",
+  "ProtectedFiles": [
+    {
+      "File": "models.json",
+      "Unchanged": true
+    },
+    {
+      "File": "auth.json",
+      "Unchanged": true
+    },
+    {
+      "File": "settings.json",
+      "Unchanged": true
+    },
+    {
+      "File": "orb-config.json",
+      "Unchanged": true
+    }
+  ],
+  "AppPaths": "C:/Users/JUSTLIKEZYP/AppData/Local/Programs/pi-orb/pi-orb.exe"
+}

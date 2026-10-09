@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-04T14:13:26.533Z",
-  "root": "D:\\pi-orb-personal-runs\\backend 中文 1791123206237",
-  "baseUrl": "http://127.0.0.1:49678",
+  "capturedAt": "2026-10-09T01:15:14.331Z",
+  "root": "D:\\pi-orb-personal-runs\\backend 中文 1791508514072",
+  "baseUrl": "http://127.0.0.1:61237",
   "checks": [
     {
       "name": "official Pi CLI registers the bundled plugin in isolated agent settings",
@@ -19,7 +19,7 @@
       "name": "running Pi Web production server owns no Windows console",
       "ok": true,
       "detail": {
-        "backendPid": 92460,
+        "backendPid": 35440,
         "attachedConsole": false
       }
     },
@@ -27,8 +27,8 @@
       "name": "second startup reuses the same backend and registration",
       "ok": true,
       "detail": {
-        "backendPid": 92460,
-        "reusedPid": 92460
+        "backendPid": 35440,
+        "reusedPid": 35440
       }
     },
     {

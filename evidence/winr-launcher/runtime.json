@@ -1,0 +1,79 @@
+{
+  "at": "2026-10-09T01:21:56.033Z",
+  "mainPid": 23792,
+  "sessionId": "01a11e32-6515-7046-9de7-c3cf25696db3",
+  "workspace": "D:\\workself\\daily",
+  "bridge": {
+    "ok": true,
+    "status": {
+      "authorized": true,
+      "level": "full-access",
+      "sessionId": "01a11e32-6515-7046-9de7-c3cf25696db3",
+      "generation": 1,
+      "stopped": false,
+      "stoppedReason": null,
+      "lastObservationId": null,
+      "bridgeReady": true
+    }
+  },
+  "background": {
+    "ok": true,
+    "result": {
+      "count": 0,
+      "tasks": []
+    }
+  },
+  "piWeb": {
+    "http": 200,
+    "success": true,
+    "activeTools": [
+      "read",
+      "bash",
+      "powershell",
+      "edit",
+      "write",
+      "ask_user_question",
+      "web_search",
+      "source_check",
+      "fetch_content",
+      "get_search_content",
+      "code_agent",
+      "code_agent_status",
+      "code_agent_stop",
+      "click",
+      "input_text",
+      "scroll",
+      "hotkey",
+      "long_press",
+      "drag",
+      "wait",
+      "long_wait",
+      "screenshot",
+      "open_in_browser",
+      "open_in_finder",
+      "list_apps",
+      "open_app"
+    ],
+    "expectedOrbTools": [
+      "click",
+      "input_text",
+      "scroll",
+      "hotkey",
+      "long_press",
+      "drag",
+      "wait",
+      "long_wait",
+      "screenshot",
+      "open_in_browser",
+      "open_in_finder",
+      "list_apps",
+      "open_app",
+      "code_agent",
+      "code_agent_status",
+      "code_agent_stop"
+    ],
+    "missing": [],
+    "oldOrbTools": []
+  },
+  "passed": true
+}

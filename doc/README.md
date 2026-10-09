@@ -6,6 +6,7 @@
 
 | 文档 | 用途 | 状态 |
 |---|---|---|
+| [`winr-piorb.md`](./winr-piorb.md) | 本机 `piorb` 全功能启动、新版安装资源与 `piweb` 启动链更新 | 2026-10-09 实施与真实运行验证 |
 | [`windows-startup-and-workspaces.md`](./windows-startup-and-workspaces.md) | 黑窗口、参考图标、工作区切换、默认 Full Access 同步 | preview.3 实施记录 |
 | [`personal-user-installation.md`](./personal-user-installation.md) | Win+R 入口、随包独立插件、个人启动准备与后端复用 | 2026-10-04 实施与验证记录 |
 | [`pi-web-0.10-compatibility.md`](./pi-web-0.10-compatibility.md) | Pi 1.0 提示词段责任、全局插件/MCP 组织、Orb 完成事件适配和验证限制 | 2026-10-03 本机/源码升级记录 |
