@@ -1,49 +1,16 @@
 # pi-orb 开发目标与优先级
 
-- 文档版本：0.1；依据截至 2026-09-29 的对话和本机源码核对。
-- 项目暂定名称：**pi-orb**。定位：pi-web 的开源 Electron 桌面伴随项目，不是另一个 agent harness。
-- 本文件同时保留原始开发目标和当前验收状态；实现结论以 `doc/support-matrix.md` 和对应 evidence 为准。
-- 当前状态（2026-10-05）：参考工具集替换清单已完成；真实模型点击、滚动、输入、可见浏览器、open_app，以及后台完成/失败和产品桥停止的有限样本通过。下文截至 2026-09-30 的长段状态是历史快照，不代表当前验收；长期稳定性和完整 v0.1 平台边界仍见支持矩阵。
-- 迁移说明：本文较早的 P2-04 段落仍使用旧 `orb_*` 名称和“只激活、不启动”的历史语义；当前
-  工具集与 `open_app` 行为以 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
-  和 [`toolset-comparison-2026-10-04.md`](./toolset-comparison-2026-10-04.md) 为准。
-- 第一原则：**非破坏性优先于功能数量、界面一致性和开发捷径。**
-- 前置研究：DeepSeek Orb → pi Computer Use 可行性调研（原文档不在当前仓库，暂不提供失效的仓内链接）。本文件采纳后续对话的新方向：Electron 悬浮窗是产品核心；不再把它排除在产品 MVP 之外。旧报告中“无浮球工具插件”的 MVP 只作为能力研究，不作为本项目最终范围。
+本页定义产品范围和交付要求。来源索引见 [参考手册](./reference-playbook.md)，当前支持结论只见 [支持矩阵](./support-matrix.md)。
 
-## 1. 产品目标与决策状态
+## 1. 产品目标
 
-### 1.1 已确定的方向
+基于 pi-web 的非破坏式功能扩展：Pi 插件、Electron 浮球和小型适配模块提供参考项目的桌面体验。直接复用参考窗口结构、交互、视觉和 Windows 后端，Pi/pi-web 只替换宿主边界。
 
-1. 独立开源项目，以现有 **pi-web + Pi SDK** 为基础，通过组合和插件扩展开发，不复制模型调用循环、模型管理、插件市场和会话引擎。
-2. 普通 pi-web 和 Electron 悬浮窗共用一套 Pi 版本、模型／凭据配置、插件安装与会话存储；悬浮窗使用自己的独立会话，不和普通页面抢同一个正在运行的对话。
-3. 悬浮窗启用前必须选择一个**专用 cwd**。以 cwd 匹配作为 Orb 运行模式标记，模式包含专用工具暴露列表和提示词，优先由 Pi 扩展实现。
-4. 不建设按所有 cwd 划分的通用权限系统，也不要求不同 cwd 的强工具隔离。普通项目保持原有工具和提示；专用目录负责文件组织和模式识别，**不是文件访问沙箱**。
-5. 使用 Electron，视觉和交互借鉴 DeepSeek Orb：小窗／浮球、可唤醒、可收起、方便附带屏幕上下文。
-6. 需要快捷键唤醒；研究左右 Alt 同时按的截图交互。用户尚未定义它是当前窗口截图还是进入选区，也没有确认 Codex 的内部实现。
-7. 优先不修改 pi-web，方便跟进其更新；不以长期维护整仓 fork 为开发方式。
-
-### 1.2 推荐方案，不当作用户已确认的细节
-
-| 决策 | 推荐起点 | 确定时机 |
-|---|---|---|
-| 首发平台 | Windows x64，结合当前工作环境；macOS 后续独立验收 | P0-01；不承诺全平台同步交付 |
-| 首版入口 | `/orb` 命令＋悬浮窗自有按钮，不修改 pi-web 原工具菜单 | P0-02 |
-| cwd 范围 | 规范化后精确匹配专用目录，不自动包含子目录；首版单一专用目录 | P0-01 / P1-01 |
-| 屏幕分享默认交互 | 用户触发截图→预览→确认发送，唤醒本身不自动上传 | P1-04 |
-| 唤醒快捷键 | 可配置的普通组合键，默认值实施时检查冲突；双 Alt 另做专项 | P1-03 / P2-02 |
-| 桌面驱动 | Windows 首发直接复用参考项目固定提交的 native backend；Cua 仅保留为历史只读探针，不进入生产 action path | P0-04 / P0-05 / P1-05 |
-| 后端启动 | 首版优先连接已经运行的本机 pi-web，明确唯一生命周期所有者 | P0-03 |
-| 窗口收起 | 收起不等于退出；首版建议收起前停止桌面操作并撤销授权，聊天可继续 | P1-02；需用户确认 |
-| 独立工作区设置 | Electron 提供目录选择，Orb 自有配置保存；扩展读取同一配置识别模式 | P1-01；不让插件在运行中伪造 ctx.cwd |
-
-### 1.3 明确非目标
-
-- 不为本项目改写 Pi／pi-web 内核，不用 monkey patch、DOM 注入、安装后替换 node_modules、覆盖原页面 CSS 来伪造扩展接口。
-- 不复制 dsh/Cordis Host、私有 Session Controller 和 DeepSeek Orb 的整个后端。
-- 不以提示词、cwd 或隐藏工具宣称 OS 安全隔离；不强行增加多租户／多工作区权限框架。
-- 不照搬后台代理自动批准用户问题／危险操作的策略。
-- 不在 MVP 实现语音、全桌面常驻录制、多机器控制、通用调度中心。2026-10-04 用户已明确要求参考 code_agent 双轨与完整工具集替换，当前要求见 `reference-toolset-transition.md`。
-- 不声称已知道 Codex 双 Alt 如何实现；只借鉴用户想要的交互，不推测或依赖其未公开内部协议。
+- 普通 Pi Web 会话保留原行为；Orb 能力只在专用工作区和当前会话授权下启用。
+- 工具、自动首帧、动作后截图及后台工作以 [参考工具集](./reference-toolset-transition.md) 为准。
+- 不复制会话引擎、模型循环、凭据管理或插件加载机制，不改写 pi-web 私有实现。
+- 不新增参考没有且 Pi 接入不需要的设置、导航或产品概念，不保留废弃实现和兼容回退。
+- 渐进交付，每阶段先完成能端到端运行的最小复用，再增加功能。
 
 ## 2. 非破坏性合同（最高优先级）
 
@@ -64,185 +31,41 @@
 
 **退出条件**：若无法通过 N1–N8，不得以“插件代码没改上游”宣称非破坏性成功。记录实际冲突，请用户决定最小上游扩展点或调整范围；本目标不授权直接修改 pi-web。
 
-## 3. 参考项目、基线与证据
+## 3. 参考与来源
 
-### 3.1 两个参考项目
+当前参考提交、文件位置和可复用清单只在参考手册维护。每个移植文件保留来源和许可证；每阶段记录对应文件、源提交、复用方式与未复用原因。第三方义务见 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)。
 
-| 项目 | 地址及已核对基线 | 主要借鉴 | 不直接搬运 |
-|---|---|---|---|
-| **pi-web** | https://github.com/agegr/pi-web ；本次抓取的远端 `main` 历史中未找到文档原记录的 `95a58744532c7fccaa933aa7757a1419ace67ed2`，按 SHA 抓取返回 `not our ref`；本机 package `@agegr/pi-web@0.9.3`，依赖 Pi SDK `0.87.1` | 会话创建、API/SSE、历史读取、图片消息、扩展 UI 响应与资源加载 | 不复制整个服务端，不长期维护改名 fork，不假设 HTTP API 是永不变的公开 SDK |
-| **DeepSeek Orb** | https://github.com/rain-knows/deepseek-harness-orb ；Git `72f1d738458a223696685a909e806b683eff5885`；根 README 称基于 dsh 0.1.7，实验包声明 `0.1.7-rc.1` | 直接复用浮球交互、观察窗口裁剪、坐标投影、动作后回图、overlay 排除，以及 `tool-computer-use` 的 Windows `koffi/GDI/SendInput/clipboard` backend 和测试模式 | 只保留 pi-orb 必需的 pi-web 会话、授权和 bridge 边界；不搬 Cordis 装配、dsh 附件引用格式、后台自动审批。Cua MCP/native driver 目录只用于对照实验，不作为第二套生产后端 |
+## 4. 架构责任
 
-两个仓库根 LICENSE 都是 MIT。pi-web 为 `Copyright (c) 2026 agegr`，DeepSeek 仓库为 `Copyright (c) 2026 DeepSeek`。借用实质性代码时保留版权及许可文本，逐文件记录来源提交／修改；检查原生依赖、二进制和素材各自许可。MIT 不授予第三方商标背书，不把 pi-orb 描述为上游官方产品。DeepSeek Orb 的 `THIRD_PARTY_NOTICES.md` 是审阅入口，不代替新依赖的许可证检查。
+| 模块 | 职责 |
+|---|---|
+| Pi / pi-web | 会话、模型、凭据、插件、HTTP/SSE 和后台 worker |
+| pi-package | 条件工具注册、前台角色、图片/文本上下文预算和公开事件适配 |
+| Electron main | 窗口、授权/代次、认证桥、原生驱动、后台任务 registry 与共享后端连接 |
+| preload | 沙箱 renderer 的受限 IPC |
+| renderer | 参考浮球交互与 Pi 数据展示，不管理密码和原生权限 |
+| shared | 工具 schema、坐标、配置和桥接协议的共享契约 |
 
-上文旧 `pi-web` 提交及其证据链接属于历史调研基线；后续开发应以用户维护的 fork 实际提交重新核验。
+### 4.4 本机桥与所有权
 
-本机 pi-web 检查时存在六个已有改动文件：`app/endfield.css`、`components/AppShell.tsx`、`components/ChatInput.tsx`、`components/MessageView.tsx`、`components/SessionSidebar.tsx`、`docs/local-endfield-verification.md`。本次只读；固定菜单等关键事实另用 Git HEAD 对照，不能把工作树当成干净上游发行版。
+cwd 匹配是工具装配条件，不能代替桌面授权。grant 绑定 Orb session/generation，内部观察对象绑定窗口和截图；跨进程调用经认证 named pipe。多个客户端可浏览同一历史，输入操作由当前授权入口串行持有，不能另建运行时同时写会话。
 
-### 3.2 pi-web 接入事实
+## 5. 开发顺序
 
-以下链接指向固定提交；行号仅作本次基线定位，后续升级按符号核对。
+1. 在参考手册定位原实现，核对固定提交和现有依赖能力。
+2. 先直接移植适用源码，再用最小模块替换 Pi/Electron 边界。
+3. 用协议测试、产物探针和真实目标读回覆盖对应能力。
+4. 新增事实写入负责它的文档；阶段来源、失败和原始结果写入 evidence，独立提交。
 
-- [W1：lib/rpc-manager.ts](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/lib/rpc-manager.ts)：`startRpcSession`（约 1950 行）创建 `SessionManager`，经 `createAgentSessionServices` 与 `createAgentSessionFromServices` 构造会话；共享注册表按 sessionId 管理实例。`withExtensionTools`（约 201 行）将非空内置工具选择与全部已注册扩展工具合并；创建后约 2131 行应用，`setActiveToolSelection` 和 `reload` 也使用它。**仅 session_start 设一次工具集不能证明持续有效。**
-- [W2：lib/session-tool-selection.ts](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/lib/session-tool-selection.ts)：`validateSessionToolSelection` 只允许内置工具名，不能传 `orb_click` 冒充既有预设。
-- [W3：components/ChatInput.tsx](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/components/ChatInput.tsx) 的 `TOOL_PRESETS`（约 99 行）和 [lib/tool-presets.ts](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/lib/tool-presets.ts) 固定列出 configured/chat-only/read-only/default/full。**没有已确认的 registerToolPreset 接口**；新增 Pi 工具不自动新增 Web 菜单项。
-- [W4：app/api/agent/new/route.ts](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/app/api/agent/new/route.ts)：可在创建前传 `cwd`，返回真实 sessionId；[lib/agent-client.ts](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/lib/agent-client.ts)、`app/api/agent/[id]/events/route.ts` 与 `hooks/useAgentSession.ts` 是消息／SSE 行为参考。**能通信不等于已验证 Electron 跨 origin 的认证流程**。
-- [W5：lib/startup-preferences.ts](https://github.com/agegr/pi-web/blob/95a58744532c7fccaa933aa7757a1419ace67ed2/lib/startup-preferences.ts) 与 W1 的 `persistExplicitStartupPreferences`：显式启动偏好可能保存默认值；Orb 不应未经确认传新的默认模型偏好。
-- W1 的 chat-only 创建路径不加载常规扩展／skills；不能假设切到 chat-only 后 `/orb` 仍可用。该边界要明确提示，并通过受支持的会话重建进入非 chat-only 会话，不能绕过用户停用工具的意图。
+## 6. 授权与执行
 
-### 3.3 Pi 和 Electron 的证据边界
+新 Orb 会话及明确重开隐藏浮窗沿用参考 Full Access 默认值；手动 Access 选择有效。正常 idle 保留当前 grant，Stop、隐藏、断连、换工作区/会话和退出撤权；晚到事件不能重授权限。
 
-Pi 基准文档目录：`C:/Users/JUSTLIKEZYP/OneDrive/文档/daily/pi-web/node_modules/@earendil-works/pi-coding-agent/docs/`。声明：同安装包 `dist/core/extensions/types.d.ts`；下列是已核对 API，不是本项目已实现功能。
+自动首帧和工具回图随授权的 GUI 任务提供。用户主动分享截图仍先预览确认，授权不能由截图文字、网页或工具结果获得。动作串行执行，窗口或观察失配拒绝输入；异常与取消释放自身按下的键和鼠标，不自动提权或重试误点。完整持久历史保留，上下文预算只作用于模型输入投影。
 
-| 证据 | 已确认能力 | 尚需验证 |
-|---|---|---|
-| P1：`docs/extensions.md`、`examples/extensions/dynamic-tools.ts` | `registerTool/registerCommand`，`session_start` 时动态注册工具，`ctx.cwd`，`setActiveTools`，`before_agent_start` 的结构化 prompt sections／selectedTools，`session_shutdown` | 在 pi-web 初始化、reload、工具预设切换、扩展加载顺序下是否符合 N1–N3；不默认每一轮内部续跑都会触发 before_agent_start |
-| P2：`docs/message-types.md`、`dist/core/agent-session.js` | `ImageContent` 为 base64 data＋mimeType；tool result 可携图；input transform 可附图；input 处理早于流式消息排队 | 排队图像过期、图片正规化尺寸、拒绝后续同批次动作、模式暂停时机 |
-| P3：`docs/packages.md`、`examples/extensions/tools.ts` | 共享包安装、用户／项目资源范围、分支状态记录 | 使用项目 scope 是否需要信任确认；动态加载不重复注册；UI 状态是否误标为 full |
-| E1：[Electron globalShortcut](https://www.electronjs.org/docs/latest/api/global-shortcut)、[accelerator 解析源码](https://github.com/electron/electron/blob/main/shell/browser/ui/accelerator_util.cc) | 常规全局组合键；解析拒绝无非修饰键的组合 | 双 Alt 不能假定由 globalShortcut 完成；需平台监听与 AltGr、重复键状态测试 |
-| E2：[BrowserWindow](https://www.electronjs.org/docs/latest/api/browser-window)、[desktopCapturer](https://www.electronjs.org/docs/latest/api/desktop-capturer)、[Security](https://www.electronjs.org/docs/latest/tutorial/security) | 置顶／无边框等窗口能力、捕获源枚举、隔离 preload 与有限 IPC | Electron 尚未选定版本；捕获质量／尺寸、DPI、overlay 排除、OS 权限须锁定版本实测 |
+工作区不是文件系统沙箱，宿主 shell/扩展仍有用户原权限。导出、剪贴板和应用启动使用当前工具合同；关闭 Orb 不删除用户工作区或 Pi 历史。错误日志不包含密钥、敏感输入或截图 base64。
 
-DeepSeek Orb 代码索引：
-- [D1：浮窗实现](https://github.com/rain-knows/deepseek-harness-orb/blob/72f1d738458a223696685a909e806b683eff5885/apps/desktop/src/floating-window.ts) 与同目录 `observation-frame-window.ts`。
-- [D2：GUI 工具闭环](https://github.com/rain-knows/deepseek-harness-orb/blob/72f1d738458a223696685a909e806b683eff5885/packages/experimental/tool-computer-use/src/plugin.ts)、同目录 `observe.ts`、`coordinates.ts`、`coordinate-mode.ts`、`overlay-guard.ts`。
-- [D3：Windows 后端](https://github.com/rain-knows/deepseek-harness-orb/blob/72f1d738458a223696685a909e806b683eff5885/packages/experimental/tool-computer-use/src/windows.ts) 及 `windows-native.ts`：koffi/GDI/SendInput；[macOS 后端](https://github.com/rain-knows/deepseek-harness-orb/blob/72f1d738458a223696685a909e806b683eff5885/packages/experimental/tool-computer-use/src/macos.ts)：JXA/CGEvent、screencapture／SCK。部分取消路径缺少可靠按键／鼠标释放，移植必须补测。
-- [D4：Cua MCP 原型](https://github.com/rain-knows/deepseek-harness-orb/blob/72f1d738458a223696685a909e806b683eff5885/packages/experimental/computer-use-cua-driver-mcp/src/index.ts) 和 [native 原型](https://github.com/rain-knows/deepseek-harness-orb/blob/72f1d738458a223696685a909e806b683eff5885/packages/experimental/computer-use-cua-driver-native/src/index.ts)：是独立实验路线，**不是浮球实际使用的自有后端**。
-
-### 3.4 复用优先级与删除规则
-
-这不是“参考风格”清单，而是实现决策：
-
-1. **先搬已经验证的实现，再写适配。** Windows 桌面能力以参考项目 `packages/experimental/tool-computer-use/src/windows.ts`、`windows-native.ts`、`windows-foreground.ts`、`coordinates.ts` 和对应测试为源代码基线。pi-orb 只把它们接到自己的 `DesktopTaskController`、Pi 工具协议和 named-pipe bridge。
-2. **Cua 只做探针，不做长期 fallback。** P0/P1 的 Cua 探针保留为证据脚本；当参考 backend 覆盖桌面观察、点击、输入和滚动后，删除运行时 Cua action path、foreground escalation 和“失败后换另一后端”的兼容逻辑。Orb 的 Electron 截图预览仍是独立的用户确认边界。
-3. **同一能力只保留一个实现。** `SendInput`、窗口激活、剪贴板、坐标换算和滚轮投递不得同时存在 PowerShell、Cua、native 三套生产路径。替换完成后删除旧文件、旧选项和旧测试，不以 feature flag 或静默回退保留。
-4. **集成边界不能复制上游内部系统。** pi-web/Pi session、Orb session/generation Access grant、当前前台 observation 和 bridge 是本项目边界；模型循环、桌面策略和平台输入实现来自上游并保持其语义。
-5. **验收以目标事实为准。** 上游函数返回成功只能证明调用完成；截图像素、目标事件日志和文本读回才是 pi-orb 的通过证据。D6 若目标没有 `wheel` 和 `scrollTop` 变化，必须保留失败并继续替换/修复唯一生产 backend。
-
-## 4. 目标架构与责任划分
-
-### 4.1 分层而不再造平台
-
-| 层 | 责任 | 不负责 |
-|---|---|---|
-| pi-web 原服务 | Pi 会话与消息循环、模型与凭据、已有插件资源和历史；正常浏览器客户端继续工作 | 不默认成为远程桌面控制服务器，不因 Orb 改变所有会话提示 |
-| pi-orb Electron 壳 | 窗口／托盘／唤醒、专用目录设置、截图预览、原生授权、桌面能力生命周期 | 不另起一套 Pi 会话引擎，不给 renderer Node 或任意 shell 权限 |
-| Orb Pi 扩展 | 识别专用 cwd、模式命令、工具注册／选择、追加提示词、动作结果图片、每次执行校验 | 不修改实际会话 cwd、不修改用户 global defaultTools、不把提示词当授权 |
-| pi-web 客户端适配 | 小范围封装会话创建、图片发送、SSE、状态和停止；重用协议行为 | 不访问 pi-web 内部 globalThis 注册表，不 hook 私有方法 |
-| 单一桌面后端 | 窗口观察、截图、输入与释放；可能由 Electron 主进程管理的独立 native helper／Cua 子进程执行 | 不自行选择模型、不拥有聊天循环、不自行提升桌面授权 |
-
-初期可用一个仓库和少量清晰模块，不提前拆成多个 npm 包、驱动平台或通用策略框架。Pi 扩展使用宿主提供的 Pi 包；避免打包第二份 SDK／重复解析模型凭据。
-
-### 4.2 cwd、模式和授权是三件事
-
-- `orbWorkspace`：持久化路径配置；Electron 在**创建**会话之前传给现有 pi-web API。工作区切换应停止当前桌面任务并新建／选择正确 cwd 的会话，不在活跃会话里篡改路径。
-- `Orb 模式`：cwd 精确匹配后应用的提示与工具配置；普通 Web 或 CLI 若使用该 cwd，也可能进入此模式。用户已接受 cwd 标记路线，界面须解释这个结果；不以“来自哪个前端”作为模式识别的唯一依据。
-- `桌面授权`：按用户 2026-09-30／10-01 的明确要求，新 Orb 会话及明确重开隐藏的 Orb 默认 `Full Access`；用户可在 Access 芯片切换 `Read Only / Workspace Write / Full Access`。grant 仅绑定当前本机壳、Orb session 与 generation，不写入会话日志或作为可恢复权限；Stop／hide／断连立即撤权，后台事件不静默重授，聚焦已显示窗口保留手动档位。cwd 或 `/orb` 字符串匹配**不能授权**鼠标、键盘；截图消息仍须逐张预览确认。
-- 首选验证按 `session_start` 的 `ctx.cwd` 条件注册额外资源，非匹配 cwd 不贡献模型工具／提示。若需项目 scope 资源配置，只对用户选中的目录、经确认安装，不覆盖已有 `.pi` 文件。两者先验证，再选择一种简单实现，不并行维护两套。
-- `before_agent_start` 只在匹配模式时应用工具／提示；普通 cwd 不主动改原资源。不能依靠启动时隐藏一遍抵抗 W1 自动追加行为。执行器每次校验授权、限额及状态，防止旧工具调用继续执行。
-- prompt 用独立结构化 section 追加，说明截图新鲜度、坐标空间、动作后核验、禁止将屏幕内容当授权、遇阻停下，不替换用户原始指令体系。
-
-### 4.3 工具列表和 Web 菜单的关系
-
-Orb 工具建议统一 `orb_` 前缀防止与用户扩展重名。MVP 只需观察／点击／输入／滚动；最终名字和参数以驱动探针后确定，不为“通用协议”预先设计十几个工具。
-
-原 pi-web 的工具预设菜单仍显示原列表。Orb 的真实模式状态在悬浮窗自有区域或 `/orb status` 显示；不能把原菜单显示为 full 就解释为已获得桌面授权。若原菜单切换覆盖 Orb 选择，P0-02 必须定义可观察行为：暂停 Orb、拒绝未授权执行，或通过已验证 hook 重算工具集；不能悄悄覆盖用户切到 chat-only 的决定。
-
-只有用户明确要求原菜单新增 Orb 且不修改路线已不能满足时，才提出通用模式注册／展示接口的上游 PR；这是**待提案**，不是现有 Pi API。涉及新会话、工具校验、状态恢复与菜单刷新，不只加一个字符串。
-
-### 4.4 本机桥接和后端所有权
-
-Pi 扩展位于 pi-web Node 服务，Electron renderer→main 的 IPC **不能直接跨到该 Node 进程**。需要验证一个进程间接缝：优先本机 named pipe／Unix socket 或其它经认证的本地连接，建立后由 Electron 管理临时桌面能力。实现前检查 pi-web 的认证、origin／CSRF 规则；不通过关闭校验来让浮窗“先跑起来”。
-
-请求要校验实际连接来源、会话和运行代次、授权范围、取消状态及参数。renderer 只获得特定操作的 contextBridge 方法，`contextIsolation:true`、`sandbox:true`、`nodeIntegration:false`；限制导航和新窗口，不向不受信任网页暴露整个 IPC。凭据留在 Pi 服务；截图不经第三方中转。命名管道和本机认证降低误用，不承诺防御已获得相同 OS 用户权限的恶意代码。
-
-连接已有服务时只断开自己；由壳启动服务时，壳才有权按明确规则关闭其子进程。有活跃网页会话时不得自动更新／重启共享后端。首版不支持远程 pi-web 控制本机桌面，普通 LAN 客户端不能靠提交同 cwd 获取原生授权。
-
-## 5. 开发优先级、依赖与交付门槛
-
-优先级：P0 = 任何产品实现前必须消除的架构风险；P1 = MVP 核心；P2 = 基于 MVP 的体验和平台扩展。以下是未来任务，不表示已经做完。
-
-主顺序：`P0-01 → P0-02/P0-03/P0-04 → P0-05 → P1-01 → P1-02 → P1-03 → P1-04 → P1-05 → P1-06 → P1-07 → P2`。P0-04 只读探针不得被当作输入能力验收。P0-02／P0-03 失败时，不用源码补丁偷越门槛。
-
-### P0：证明可以非破坏性接入
-
-| ID／目的 | 前置 | 交付物和接入点 | 可观察验收 | 风险／不做事项 |
-|---|---|---|---|---|
-| P0-01 固化合同与基线 | 无 | N1–N8 对照表、支持版本、写入清单；W1–W5／P1–P3；确认首发平台 | 在干净测试配置记录普通会话工具、命令、提示、模型设置；已有用户源码 diff 可区分；选定测试样本 | 不直接在日常配置上做破坏性实验，不为“自动更新”预设兼容全部版本 |
-| P0-02 插件可行性验证 | P0-01 | 最小测试扩展和自动测试（未来产物）：专用 cwd 条件注册、before_agent_start 选择／section；W1/W2/P1 | 非 Orb cwd 前后行为一致；Orb cwd 正确配置；创建、set_tools、chat-only、reload、恢复、fork、两个 cwd 同时运行皆符合规则；上游无 diff；删除扩展可恢复原行为 | 若全局加载使工具／提示泄漏，评估现有项目 scope 或条件注册；仍失败则停止提出最小接入建议，不猴子补丁；不增加 cwd 强权限隔离 |
-| P0-03 客户端与原生桥验证 | P0-01 | 现有 API/SSE 认证和生命周期试验记录；本机桥接最小协议及模拟请求；W4/E2 | Electron 客户端可经合法认证创建独立会话、发消息、重连／停止；任意网页／旧代次／无授权请求不能执行模拟原生操作；退出壳不杀已有服务 | 不以 wildcard CORS、公开控制 API、暴露 Node 给 renderer 绕过认证；不需要先实现完整聊天 UI |
-| P0-04 驱动候选只读探针 | P0-01，实际截图前明确许可 | 锁定 Cua 候选版本／许可证、工具目录、权限状态、截图样本元数据及耗时；同时固定参考项目 native backend 的 source/test 基线 | 工具发现、目标窗口身份、图片解码／尺寸、坐标约定、只读取消、关机清理有记录；可说明 Cua 与 native 的差异 | 不发送鼠标键盘，不把“截图正常”当点击准确；Cua 只作为证据探针，不升级为第二条生产后端 |
-| P0-05 选择最小接入方案 | P0-02、P0-03、P0-04 | 一页决策：直接复用参考项目 native backend，接入 Orb 授权/bridge；记录未通过项和最小适配边界 | 原生 backend 的 source/test 移植计划和依赖许可成立后进入 P1；必须改上游时列符号、原因、默认行为及测试，请用户决定 | 不接受 Cua/native 双轨；不自动接受长期 fork；未决定双 Alt 不阻塞普通快捷键路线 |
-
-### P1：最小可用 pi-orb
-
-#### 里程碑 M1：独立小窗能正常聊天，不含自动输入
-
-| ID／目的 | 前置 | 交付物和接入点 | 可观察验收 | 风险／不做事项 |
-|---|---|---|---|---|
-| P1-01 工作区和独立会话 | P0-05 | Orb 设置、目录选择／验证、创建与恢复独立会话；W4、SessionManager 语义 | 未选 cwd 不能启用；取消选择无写入；Windows 大小写、符号链接／junction、无权限／不存在目录正确处理；切工作区保留旧文件与历史且不串会话 | 默认精确匹配目录；新目录经确认创建；拒绝用前缀字符串误判子路径；不复制用户工作区 |
-| P1-02 Electron 最小浮窗 | P1-01 | 壳主进程／受限 preload／简洁 renderer，基本拖动、置顶、展开／收起、退出；E2/D1 | 可发文本、显示流式结果和错误、显式停止；历史可从原 pi-web 浏览；多个客户端浏览不双重发任务；主界面仍可正常使用 | 独立 renderer 经 API/SSE 复用后端；不 iframe/DOM 注入完整页面来改布局，不复制 pi-web 内部 React 状态树 |
-| P1-03 常规唤醒快捷键 | P1-02 | 可配置快捷键、冲突提示、注销清理、托盘备用入口；E1；`uiohook-napi` key-up edge guard | 未聚焦时唤醒／收起正常；重复按不新建重复会话；注册失败可诊断；退出解除注册；唤醒不自动截图或上传 | Pi registerShortcut 是宿主快捷键扩展，不代替 Electron OS 全局快捷键；普通组合键的长按去重由 Electron 注册 + key-up hook 共同完成；不以双 Alt 阻塞 M1 |
-
-M1 完成定义：在批准的平台和依赖组合上，小窗能用共享 Pi 后端完成独立对话，专用 cwd 生效，普通 Web 对比回归通过；尚无桌面点击能力也可内部演示。
-
-#### 里程碑 M2：屏幕上下文预览与发送
-
-| ID／目的 | 前置 | 交付物和接入点 | 可观察验收 | 风险／不做事项 |
-|---|---|---|---|---|
-| P1-04 明确授权的截图上下文 | M1、P0-04 | 当前前台窗口截图＋应用／标题元数据、预览、删除、确认发送；P2/E2/D2 | 在 Orb 获取焦点前记录用户当前窗口，不能截成 Orb 自己；预览对应发送图；取消无上传；text-only 模型拒绝图像任务；确认后图片进入正确会话 | 标题／路径也可能敏感；不默认读取剪贴板／选中文字／浏览器 URL；没有当前窗口能力时明确报告，不静默改截整屏 |
-
-M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图不夹带 Orb 遮罩；图片大小上限明确且测试通过。每次截图先预览；自动执行中逐步回图的授权另属于 M3，不要求每帧弹窗重复确认。
-
-#### 里程碑 M3：一动作一观察的 Computer Use
-
-| ID／目的 | 前置 | 交付物和接入点 | 可观察验收 | 风险／不做事项 |
-|---|---|---|---|---|
-| P1-05 人工授权真机驱动验收 | M2 | 以参考项目 Windows native backend 为唯一生产候选，在可丢弃测试应用中验证点击／非敏感输入／滚动；Cua 只保留历史探针 | 截图点→输入点一致，验证 DPI、焦点变化、普通 vs elevated 窗口、取消在按下后发生的释放行为；记录 native backend source commit 与逐项结果 | 测试失败不自动提权，不盲目重试；直接修复或替换 native backend，不退回 Cua 作为兼容路径 |
-| P1-06 Orb 模式与工具闭环 | P1-05、P0-02 | `/orb`／小窗自有状态、专用 section、观察／点击／输入／滚动工具；P1/P2/D2 | 空闲时进入任务→新图→一次动作→新图→Pi 后续推理；忙碌时拒绝新增 GUI 任务；图像尺寸转换及窗口身份绑定正确；失败后阻止同批后续动作；退出模式不遗留 prompt/tool delta | 0–1000 为建议 model 坐标，按后端实际坐标转换且只选一种；不发工具名混入 W2 的内置列表；不另写模型循环 |
-| P1-07 最低安全、回归和发布门禁 | M1/M2/M3（机制随对应阶段实现，不在末尾才补） | 任务限额、紧急停止、断连撤权、生命周期测试、许可证／包发布说明、兼容矩阵 | 当前已交付能力对应的 §6／§7 必测项通过（未启用的 P2 能力不阻塞 v0.1）；N1–N8 对照有证据；公开包无密钥／个人截图；卸载不破坏 pi-web／工作区；源码实现通过项目实际 lint/typecheck/test | 不以模型说“完成”当成功；不得发布默认全桌面无限权限；不能拿 mock 通过代替原生取消释放测试 |
-
-**v0.1 最小完整版本 = M1 + M2 + M3 + P1-07。** M1/M2 可分别交付可用预览，不用未成熟的完整自动化阻塞已经可用的聊天／看图功能；未通过桌面操作门禁时，只禁用输入能力并明确标注，不伪称完整版本完成。
-
-### P2：在稳定闭环上增加体验
-
-| ID／目的 | 前置 | 交付物和接入点 | 可观察验收 | 风险／不做事项 |
-|---|---|---|---|---|
-| P2-01 Orb 风格体验 | M1；输入共存需 M3 | 贴边吸附、悬停展开、钉住、观察边框、主题；D1/overlay guard | 多屏／DPI／工作区切换保持可找回；overlay 不挡操作、不进入截图；关闭与收起语义清楚 | 不复制第三方品牌资产；不让视觉层拥有系统输入权限 |
-| P2-02 双 Alt 快捷手势 | P1-03 | 复用 `uiohook-napi` 物理左右 Alt keycode；双 Alt 触发后唤醒 Orb 并进入已有截图预览；D1/E1 | 区分左右 Alt；同步按、先后按、长按、重复、AltGr、焦点变化、锁屏／休眠恢复无卡键；不吞其他正常快捷键；同一按压只触发一次；退出卸载 hook | `deepseek-harness-orb` 没有双 Alt 产品手势，本项按本项目目标做最小适配，不宣称复刻 Codex 或参考项目内部行为；不全量记录按键；不自动上传截图 |
-| P2-03 选区与附加上下文 | M2、用户确认范围 | 已接入参考 history 会话入口（公开 session summary/detail）和参考项目同类 Windows UI Automation `TextPattern` 选区读取；选区结果以 composer chip 附加 | 历史按钮可列出当前 Orb workspace 会话并恢复 user/assistant transcript；选区文本只在用户发送时附加，并显示来源标签；真实 UIA、多屏/DPI、Esc/工具栏和其它平台仍需验收 | 不用模拟 Ctrl+C 静默覆盖用户剪贴板；应用标题不等于完整路径／URL；不 OCR 出文件路径再当可信 cwd |
-| P2-04 追加桌面操作 | M3 | 已按参考项目接入热键、长按、同窗口拖拽、每个动作返回新图像与 observation、用户显式截图导出；`open_app` 按参考语义激活或启动应用 | Read Only 允许观察/应用列表/等待，Workspace Write 增加输入，Full Access 再允许 `open_app`；各动作复用 session grant、generation 和动作后 observation；截图导出保存到 Desktop 并复制剪贴板；真实模型动作、跨应用切换及像素命中仍需 disposable target 验收 | 不开放任意启动参数或路径；不支持跨屏拖拽；应用名经过校验，只允许显示名或 executable base name |
-| P2-05 额外平台与分发 | P1-07、确认平台 | Windows x64 已落地：electron-builder 每用户 NSIS 安装包与解包产物，形态复用参考配置（`apps/desktop/scripts/electron-builder-config.mjs`）；产物内容审计 30/30 与打包产物启动探测 23/23 通过。macOS 签名／TCC 归属与 Linux 目标未做 | 干净目标机安装、权限拒绝／撤销、升级、卸载可复现；声明支持矩阵 | 不用 Windows 通过推断 macOS/Linux 可用；不照搬 Electron 身份到 Node helper；未签名产物必须在文档与人工项中如实标注为未验证 |
-| P2-06 原工具菜单上游集成 | P0-02 结论＋用户明确要求 | 通用可扩展模式接口的提案／可选 PR；W2/W3 | 关闭接口时普通行为不变；模式注册、工具校验、恢复／显示一致；合并与版本支持有记录 | 不是首版前提；上游不接受时不静默维护私有整仓 fork |
-| P2-07 后台任务衔接（可选） | v0.1、用户确认需求 | 复用已有 Pi 子代理／独立会话机制，结果通知回 Orb | 父子任务归属、独立停止、完成只通知一次、不得自动替用户批准问题 | 不将前期 DeepSeek 双轨当本项目刚性范围，不再造任务调度系统 |
-
-## 6. 原生权限、状态和故障规则
-
-### 6.1 最小授权状态
-
-`未配置 cwd → 已配置但未连接 → Orb 会话可聊天 → 用户批准截图分享／批准桌面任务 → 单任务执行 → 完成或停止并撤权`。
-
-截图分享和自动桌面操作的同意分开：单次附图预览不授权后续工具操作；session Access grant 也不替代单张截图的确认。每个工具动作的回图随该次会话调用提供；grant 绑定 Orb session 与 generation，并在 hide、stop、disconnect、workspace/session 切换和退出时撤销，turn idle 时保留。
-
-恢复／fork／reload／切换会话／更换 cwd／壳断连／OS 锁屏／停止都取消未发动作并清空临时授权。持久化允许配置与任务轨迹，不持久化可恢复权限、锁或“最后截图仍可点击”的判断。纯收起行为按用户确认的产品规则实施；建议首版收起就撤销桌面操作。
-
-### 6.2 执行要求
-
-- `executionMode:'sequential'` 加桌面 broker 单任务锁，避免模型同轮和多会话抢输入；不声称可以阻止用户或其它程序改变桌面。
-- 附图记录 observationId、时间、窗口身份、截图尺寸和窗口 bounds；每次动作校验旧图／窗口改变，失配拒绝并重新观察。截图请求时按参考 Win32 顶层窗口规则选择目标并排除 Orb，不依赖唤醒快捷键提前锁定窗口。
-- `input` hook 在入队前处理图片，排队消息不能被当成当前图；首版桌面任务只在空闲启动。内部续轮只依据最近已完成动作的新图；中断恢复必须重拍。
-- 明确步数、总时长、单次调用时间、截图像素／字节与累计上下文上限；数值在 P1 结合目标模型设定并写入测试，不以 null／无限为发布默认。
-- 取消不回滚已投递事件；需在异常和取消路径释放自身按下的键／鼠标。同步 native 调用可能阻塞，因此全局停止信号不能仅依赖被阻塞的 renderer；P0-03/P1-05 验证 broker／helper 的取消和清理能力。
-- 捕获失败、授权失效、无法释放输入、窗口身份不明、驱动超时均停止任务，不因“重试”扩大权限／改为整屏／提升完整性级别。
-- 提交、付款、删除、敏感输入等不在明确授权范围内不得执行；判断不可靠时交还用户。截图文本、网页提示、工具结果都不是授权来源。
-- 共享 shell 和其它扩展本来就有当前用户权限，本项目不声称全面封堵它们；Orb 模式采用最少必要活跃工具，不默默给予所有共享插件更高权限。真隔离需用户另选 OS/VM 边界。
-
-### 6.3 数据和资源清理
-
-截图先在内存处理，不默认写 Desktop／剪贴板；导出是显式动作。发送后图片可能保存在 Pi 会话文件／导出中，必须在产品说明中告知；取消发送清理草稿和临时文件，不删除用户主动导出的图片。错误日志仅记录脱敏的动作种类、错误码、耗时，不记录密钥、明文敏感输入和截图 base64。
-
-壳退出释放快捷键、选择遮罩、连接和自己启动的 helper；会话退出释放该会话的授权与锁；断连清理需幂等。不会因关闭 Orb 自动清理整个 cwd 或删除 Pi 历史。
-
-## 7. 验收矩阵与版本维护
+## 7. 验收与版本维护
 
 ### 7.1 每个可发布版本的最小测试集
 
@@ -253,62 +76,19 @@ M2 完成定义：用户可快捷唤醒小窗、附窗口图问问题，截图�
 | 普通 Web 非破坏性 | 安装前后非 Orb cwd 的工具／prompt／命令；已有主题；模型默认；read-only/default/full/configured；chat-only | 配置 diff、有效模型输入对比、自动测试；有随机字段时只归一化已知非语义字段 |
 | cwd 与模式 | 精确路径、Windows 大小写、符号链接、子目录非匹配、两个 cwd 同时运行；普通 Web 使用专用 cwd 也匹配 | 路径单测与会话集成测试；确认无跨会话全局状态泄漏 |
 | 生命周期 | 创建／空闲回收／reload／resume／fork／换目录／关窗／断连／重连；一个 session 的浏览和操作 | 授权失效与资源计数、无双写／重复请求的事件轨迹 |
-| 工具选择 | W1 自动追加、工具预设切换、before_agent_start 和其它扩展组合、终止同批后续动作 | 模型实际看到的工具 schema 和 prompt，而非只看 UI 标签 |
+| 工具选择 | 条件注册工具、工具预设切换、before_agent_start 和其它扩展组合、终止同批后续动作 | 模型实际看到的工具 schema 和 prompt，而非只看 UI 标签 |
 | 图像 | text-only 模型、resize、DPI、多屏、窗口被遮挡、Orb 排除、取消预览、超大图 | 人工批准的无敏感样本、尺寸／坐标对应记录和测试结果 |
 | 原生输入 | 普通／高权限窗口、焦点被抢、按下后取消、helper 崩溃、超时、键／鼠标释放、剪贴板 | 平台真机报告；mock 不代替此项 |
 | 快捷键 | 冲突、重复唤醒、退出注销；双 Alt/AltGr 单独测试 | 锁定 OS／键盘布局／Electron／监听库版本的用例记录 |
 | 进程与认证 | 本机连接鉴别、伪造 sessionId／旧代次、跨 origin、LAN 请求、退出不杀共享服务 | 正向和负向测试；任何拒绝均没有原生输入副作用 |
 | 打包／卸载 | 安装依赖、许可、临时文件、工作区保留、无凭据打包 | 文件清单、安装／卸载实测与第三方 notice |
 
-### 7.2 上游更新策略
+### 7.2 上游更新
 
-1. 记录支持组合：pi-orb 版本、pi-web 版本／提交、Pi SDK 版本、Electron 版本、驱动版本和 OS。没有测试的组合称“未验证”，不自动宣称兼容。
-2. 上游更新进入独立测试环境，先对 W1–W5/P1–P3 的接入合同跑 CI；再运行本机桥和关键截图／输入 smoke。不得直接更新正在处理用户任务的共享服务。
-3. 适配只集中在小模块，使用明确边界；变动超过这个边界，先讨论上游通用扩展点。无需在 Orb 里保留被废弃的旧 API 路径。
-4. 发布通过验证的新支持组合和变更说明。升级失败保留用户数据、停止启用不兼容桌面能力；用户可选择重新安装已验证发行版。**这是发布版本选择，不是在代码中建设永久兼容层或迁移兜底。**
-5. 安装／卸载操作必须由用户授权；不私自调用 pi-web 更新、不替换用户当前安装、不在 node_modules 打补丁。
+上游更新先进入隔离环境，验证公开接入、非破坏性合同、原生输入和实际打包产物，再更新支持矩阵及 CHANGELOG。不在 node_modules 打补丁，不擅自更新正在服务用户任务的共享后端；不兼容时报告并停用受影响能力，不建立旧 API 回退路径。
 
-目标是“上游变更时维护面小、可检测、可控升级”，不是“任何 pi-web 更新都必然零适配”。
+证据映射见 [合同对照](../evidence/p1-07/CONTRACT-MATRIX.md)，人工步骤见 [验收清单](./manual-acceptance.md)。
 
-## 8. 实施前待决清单与阻塞处理
+## 8. 阻塞规则
 
-| 待决项 | 推荐默认 | 不能在未经确认时做什么 |
-|---|---|---|
-| 首发平台与最低 OS | Windows x64 优先 | 不把 macOS/Linux 写成已支持 |
-| 双 Alt 的动作 | 进入截图预览；当前窗口或选区由用户决定 | 不自动上传，不假定是 Codex 同款内部实现 |
-| 附加上下文 | 初期只附图＋应用／窗口标题 | 不自动读取选中文字、剪贴板、URL、文件路径 |
-| 后端管理 | 连接已有本机服务优先 | 不重启／终止用户原服务，不悄悄启动第二套 Pi engine |
-| 窗口收起与操作中任务 | 首版收起停桌面动作；独立聊天可继续 | 不把看不见的后台输入当默认体验 |
-| 原工具菜单的 Orb 项 | 后置上游接口提案 | 不擅自改 ChatInput 或 tool-presets |
-| 更强文件隔离 | 不在当前范围；明确风险即可 | 不把专用文件夹宣传为沙箱，不擅加 VM 强制要求 |
-
-阻塞规则：源码与假设冲突先记录具体符号、实际行为、复现和替代方案；必须改上游、换产品方向、扩大原生权限或定义未决定的交互时停下询问。文档可以记录待决项，不能以“后续再验证”为由越过 P0／输入发布门槛。
-
-## 9. 需求覆盖与本次文档核验
-
-| 对话要求 | 文档覆盖 |
-|---|---|
-| 独立开源 pi-orb、易维护 | §1、§2、§4、§7.2 |
-| 非破坏性第一、方便更新 pi-web | N1–N8、P0、P1-07、§7.2 |
-| 共享 Pi/插件而悬浮窗有专用模式 | §4.1–4.3、P0-02、P1-06 |
-| 专用 cwd 设置，不要求 cwd 强隔离 | §1、§4.2、P1-01、§6.2 |
-| 原工具菜单追加 Orb 的现实限制 | W2/W3、§4.3、P2-06 |
-| Electron/Orb 风格和快捷唤醒 | P1-02/P1-03、P2-01 |
-| 双 Alt 截图及相关信息 | E1、P1-04、P2-02/P2-03、§8 |
-| Computer Use 技术方向与实现顺序 | D2–D4、P0-04、M2/M3、§6 |
-| 两参考项目、MIT、第三方许可 | §3.1、P1-07 |
-| 细优先级、依赖、验收 | §5、§7.1 |
-
-截至 2026-09-30，本目标已进入实现与真机证据阶段：Electron 壳、Pi 扩展、认证桥、session Access broker 和参考项目 Windows native backend 已接入；产品侧 C7 坐标闭环、生命周期与打包证据已通过，但真实模型 C7/D6/D8 的最新复跑未完整通过，失败 JSON 原样保留并按支持矩阵标为未验证。P2-01 已完成参考浮球 renderer 形态、72px/344x444 窗口几何、拖动 IPC、贴边停靠、收起还原、hover/pin、系统主题和真实新会话；多显示器、DPI、锁屏恢复、观察框原生 overlay 及人工拖动体验仍未验证。P2-02 已复用现有 `uiohook-napi` 左右 Alt keycode，双 Alt 只唤醒并打开原有截图预览，纯状态测试通过；真实键盘、AltGr、锁屏恢复和人工体验仍未验证。P2-03 已复用 pi-web 公开 session summary/detail API 实现当前 Orb workspace 的 history 列表和 transcript 恢复；选区真实 UIA、多屏/DPI 和原生工具栏仍未验收。P2-04 已从固定参考提交接入 Windows 热键、长按、同窗口拖拽、session Access 后的动作后 image block 和显式截图导出；`orb_open_app` 经用户决定后开放，但**收窄为只激活已在运行的应用、绝不启动进程**（运行前置检查 → 激活 → 前台确属该应用，三步全过才重绑定，否则保留原目标），并已有单测与工具暴露证据；真实桌面动作、目标像素、保存对话框、剪贴板与 open-app 真机效果待验收（`manual-acceptance.md` §9／§10）。P2-05 已按参考项目的打包形态（electron-builder + JS 配置模块、每用户 NSIS、`asarUnpack` 原生模块、无更新源）产出 Windows x64 安装包与解包产物，产物内容审计 30/30、打包产物启动探测 23/23（验证 session Access preload 合同与参考壳层）；dsh 单体仓库的发布管道（随包 Node 运行时、自定义 NSIS 页面、签名链、上传与自动更新）明确未搬，理由见 [`p2-05-distribution.md`](./p2-05-distribution.md)。干净机安装／卸载／升级与 SmartScreen 属人工项（[`manual-acceptance.md`](./manual-acceptance.md) §9），当前保持未验证。历史 Cua 只作为迁移基线保留，不再进入生产 action path。当前实现状态和版本声明以 [`support-matrix.md`](./support-matrix.md)、[`manual-acceptance.md`](./manual-acceptance.md)、[`lifecycle-and-delivery.md`](./lifecycle-and-delivery.md) 及 `evidence/` 为准。
-
-文档完成标准：全文回读；核对引用路径和固定提交；需求覆盖无遗漏；调用 Advisor 复核，有实质意见时落实修订。开发完成标准由各阶段验收决定，二者不得混淆。当前仍未完成的发布门槛是多显示器、高权限窗口、Chromium 内容输入、安装包在干净机上的安装／卸载／升级（P2-05 E 组）和部分人工交互体验。取消信号已接入 broker、driver 与 native backend，并由自动化竞态测试和真实 disposable target 日志验证。
-
-> 迁移校正：上方 2026-09-30 历史长段仍使用旧 `orb_*` 命名和旧 `open_app` 限制；当前状态以本表 P2-04、`reference-toolset-transition.md` 和 `support-matrix.md` 为准。当前 `open_app` 可激活或启动应用。
-
-### 本次核验记录
-
-- 已全文回读并按上表逐项对照对话需求；19 项开发任务编号唯一，均列目的、前置、交付物／接入点、验收和风险／不做事项。
-- 已用两个参考仓库的 Git 对象检查 13 个固定提交源码链接，缺失 0；核对 Pi 安装包的 7 个文档／声明／示例路径，全部存在。Electron 文档为前轮官方文档检索依据，尚未选定实际实现版本。
-- 已修正主依赖链遗漏的 P0-05，并注明 P2 未启用能力的测试不阻塞 v0.1；基本授权、取消与非破坏性回归仍是每一对应能力的发布条件。
-- 保存后已调用 Advisor 最终复核，但此次没有返回文本意见，**不将其记为通过或独立背书**；启动阶段 Advisor 提醒的插件工具泄漏、排队首帧、后端所有权、原生桥接和授权失效风险已纳入目标。
-- 核验末尾 pi-web 仍列出原有六个修改文件；本项目未对其执行编辑或覆盖式安装。DeepSeek Orb 固定提交的 backend 已被移植到本仓库并通过当前生产路径验证；产品级验证仍按 P0/P1/P2 执行。
+源码与假设冲突先记录具体符号、实际行为和复现；必须改上游、改变产品方向或扩大权限时先交由用户决定。未验证范围由支持矩阵保留，不以构建成功替代真机、安装或长期稳定性结论。

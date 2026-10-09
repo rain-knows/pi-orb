@@ -29,7 +29,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | pi-web | P0/P1 隔离验收使用 `@agegr/pi-web@0.9.3`，固定提交 `95a58744532c7fccaa933aa7757a1419ace67ed2` | 固定快照已完成生产构建、条件插件加载与工具暴露验收；本机当前 `@agegr/pi-web@0.10.0` (`62dc24b11aa9f4f7cc7ed9597fa584a94758cfdf`) 含用户未提交改动，未纳入支持基线 | `evidence/p0-02/result.json`、`evidence/p1-06/tool-exposure.json` |
 | 桌面驱动 | `deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 Windows native backend，仓内 `src/main/reference-windows/` | 已接入唯一生产 action path；桌面闭环和历史真实模型运行记录存在，但 2026-09-30 C7/D6/D8 复跑未完整通过，暂不宣称稳定支持 | `tests/reference-windows.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/` |
 | 插件参考 | `mini-yifan/dsh-orb-cordis@aa79308e47265b7d4a774edb688de2bbd7dce66e`（MIT） | 当前增量基线：工具/后台任务与最新窗口、书签、报告和停止语义；不是运行时依赖；多屏真机支持不由几何测试外推 | `doc/reference-playbook.md` §1.2、`doc/reference-sync-2026-10-09.md`、`evidence/reference-sync/` |
-| Windows FFI | `koffi@2.16.3`（MIT，精确锁定） | 替换 2.14.1；原生回调/截图压力探针 1000 枚举 + 50 捕获通过；并非对间歇退出根因的证明 | `evidence/tool-speed/native-callback-stress.json`；`doc/plugin-reference-and-pointing.md` |
+| Windows FFI | `koffi@2.16.3`（MIT，精确锁定） | 替换 2.14.1；原生回调/截图压力探针 1000 枚举 + 50 捕获通过；并非对间歇退出根因的证明 | `evidence/tool-speed/native-callback-stress.json`；`evidence/tool-speed/README.md` |
 | 快捷键边沿监听 | `uiohook-napi@1.5.5` | Windows Node 环境可加载并完成 `start/stop`；hook 不可用时快捷键失败而不静默降级；真实长按仍需 Electron 人工复测 | `src/main/shortcut-edge-guard.ts`、`tests/shortcut-edge-guard.test.ts` |
 | renderer 构建 | `vite@7.3.6` + `electron-vite@5.0.0`，原生 HTML/CSS/JS renderer | 构建通过；已删除 React 与 Vite React 插件 | 本仓库 `npm run build` |
 | TypeScript | `5.9.3`（`strict`） | 类型检查通过 | 本仓库 `npm run typecheck` |
@@ -75,12 +75,12 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **历史 Cua 0.30.1 安装物**：版本、许可构成与两个裸二进制 SHA-256 均与 P0-04 清单一致 | 历史探针已验证，不属于当前生产能力 | `evidence/p1-05/input-verification.json` |
 | **历史 Cua 运行时工具目录**：57 个工具；窗口 id 为 bigint；窗口有前序 zIndex | 历史探针已验证，不属于当前生产能力 | `evidence/p1-05/cua-runtime-probe.json` |
 | **历史 Cua 坐标空间差异**：`getScreenSize` 报 1707x1067 而物理为 2560x1600；窗口 bounds 为物理像素，动作为屏幕 DIP | 历史探针已实测，不属于当前生产能力 | `evidence/p1-05/input-verification.json` |
-| **点击坐标换算的正确性**（两种记录矛盾，以产品整链路实测为准） | **产品整链路实测已裁决**：当前实现「分数 × 驱动上报窗口尺寸」命中 `1,2`（`loop-verification-session-access.json`）；曾据一次直调探针改成「屏幕 DIP − 物理原点」，**同链路实测落 `0,1`**，故不采用。P1-05 记录的那条规则与本次链路实测相矛盾，其**逐次落点归属存疑**（与本次探针同类问题） | `evidence/p1-06/loop-verification-session-access.json`；`doc/cua-driver-integration.md` §1 记录了两侧数字与残留疑问 |
+| **点击坐标换算的正确性**（两种记录矛盾，以产品整链路实测为准） | **产品整链路实测已裁决**：当前实现「分数 × 驱动上报窗口尺寸」命中 `1,2`（`loop-verification-session-access.json`）；曾据一次直调探针改成「屏幕 DIP − 物理原点」，**同链路实测落 `0,1`**，故不采用。P1-05 记录的那条规则与本次链路实测相矛盾，其**逐次落点归属存疑**（与本次探针同类问题） | `evidence/p1-06/loop-verification-session-access.json`；`evidence/p1-05/README.md` §1 记录了两侧数字与残留疑问 |
 | **模型坐标契约：最新附加截图的 0–1000 millifraction** | 已验证：截图分数 → HID 分数 → 原生位置；会话/代次/观察绑定和动作后新截图均有自动化覆盖 | `tests/coordinate-mapping.test.ts`、`tests/orb-tools.test.ts`、`tests/reference-windows-driver.test.ts`、`evidence/p1-06/loop-verification-session-access.json` |
 | **截图取点→输入落点在**同一次运行**内一致（C7 产品侧闭环）** | 已验证（自动化闭环：取的是截图分数，落点由目标自身日志判定） | `evidence/p1-06/loop-verification-session-access.json`（当前运行全项通过）——取分数 `(611.6,360.4)` → 目标 JSONL 命中 `1,2` |
 | **历史 Cua 后台点击**：4/4 瞄准格子命中，且不抢前台 | 历史验证；当前参考 Win32 backend 使用可见 GUI／SendInput，不声明任意后台窗口点击支持 | `evidence/p1-05/input-verification.json` |
 | **历史 Cua 后台输入文本**：向原生应用投递并读回 | 历史验证；不属于当前参考 Windows backend 的后台投递能力 | 同上 |
-| **通用桌面体验改进**：按请求选窗、默认完全访问、中文状态行、草稿保持、运行输入光标隐藏、工具期间不隐藏面板 | 单测及打包交互已验证；实际 bridge／broker／Win32 点击自报目标 `0,0` 通过，未宣称模型自主跨应用或任意后台 GUI 投递 | `doc/orb-experience-improvements.md`；`evidence/frontend-port/interaction-probe.json`、`native-target-probe.json` |
+| **通用桌面体验改进**：按请求选窗、默认完全访问、中文状态行、草稿保持、运行输入光标隐藏、工具期间不隐藏面板 | 单测及打包交互已验证；实际 bridge／broker／Win32 点击自报目标 `0,0` 通过，未宣称模型自主跨应用或任意后台 GUI 投递 | `evidence/frontend-port/visual-review.md`；`evidence/frontend-port/interaction-probe.json`、`native-target-probe.json` |
 | **前台点击投递**：目标记录到真实 `mouse-down`，驱动报 `delivery_mode:foreground` | 已验证 | 同上 |
 | **历史 Cua 前台滚动的物理到达与生效**：曾在一次运行中由目标日志证实；2026-09-28 最新复跑驱动虽报成功但目标为 0 个 `wheel` | **历史 Cua 路径不稳定，不属于当前生产能力**；当前参考 backend 的 D6 以真实模型目标日志单独判定 | `evidence/p1-05/input-verification.json`（历史探针）；`evidence/p1-06/real-model-d6-scroll-reference-backend.json` |
 | **历史 Cua 后台→前台升级**：typed `scroll` 无法表达 `delivery_mode`，旧适配器曾按 `background_unavailable` 升级 | 历史探针已验证；适配器已删除，不属于当前生产能力 | `evidence/p1-05/input-verification.json` |
@@ -98,12 +98,12 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **`cua_driver_sdk.dll` 的 MPL 归属核实**：交付物中无任何证据把 MPL 归于该 DLL（无许可文本、不引用 uniffi runtime、仅导入系统库） | 已核实并记录 | `THIRD_PARTY_NOTICES.md` §3 |
 | `@ubjs/*` 三个包（MPL-2.0，随发行） | 已识别并计入 NOTICE | 同上 §2–§3 |
 | **发布门禁**：质量门禁、非破坏性、凭据/像素、忽略规则、许可、版本一致性、证据完整性、打包配置与产物审计记录、CI 与发布流程、renderer 参考一致性 | 已验证（且多次反向对照可证伪） | `evidence/p1-07/release-gate.json`（66/66） |
-| **session Access 生命周期**：新会话与明确重开默认完全访问；turn idle 保留 grant 并隐藏观察框；Stop、隐藏、断连撤权；workspace/session 切换替换为新会话 grant | 当前探针 21/21 通过；原生与 DOM 工具结束后的模型思考期间仍显示光效；首次启动失败保留 | `evidence/p1-07/session-access-regression.json`；`doc/session-continuity.md` |
-| **浏览器窗口工具**：通过 `open_in_browser` 打开默认浏览器或 http(s) 地址，再使用参考项目 GUI 工具观察和操作可见窗口 | 当前代码和打包审计已移除 DOM/Playwright 网关；真实模型浏览器闭环仍待人工验收 | `pi-package/extensions/orb.ts`；`doc/toolset-comparison-2026-10-04.md` |
+| **session Access 生命周期**：新会话与明确重开默认完全访问；turn idle 保留 grant 并隐藏观察框；Stop、隐藏、断连撤权；workspace/session 切换替换为新会话 grant | 当前探针 21/21 通过；原生与 DOM 工具结束后的模型思考期间仍显示光效；首次启动失败保留 | `evidence/p1-07/session-access-regression.json`；`doc/personal-user-installation.md` |
+| **浏览器窗口工具**：通过 `open_in_browser` 打开默认浏览器或 http(s) 地址，再使用参考项目 GUI 工具观察和操作可见窗口 | 当前代码和打包审计已移除 DOM/Playwright 网关；真实模型浏览器闭环仍待人工验收 | `pi-package/extensions/orb.ts`；`doc/reference-toolset-transition.md` |
 | **P2-01 参考浮球体验**：72px 球、344x444 展开 bounds、方向选择、左右停靠 tab 与**停靠滑动动画**、拖动 IPC、收起还原、hover/pin、系统主题、参考 GIF 状态动效、History/Access/New、连续 prompt、问题卡片、**观察框**、**布局变化后仍可找回** | 已接入；JSDOM、打包探测和 renderer parity 自动化通过；跨应用真实模型流程、多屏/DPI 与逐状态人工视觉验收仍未验证 | `tests/floating-geometry.test.ts`、`tests/floating-dock-animation.test.ts`、`tests/floating-recovery.test.ts`、`tests/renderer-reference-parity.test.ts`、`tests/observation-frame.test.ts`、`tests/floating-renderer.test.ts`、`tests/orb-session.test.ts`、`src/main/floating-window-controller.ts`、`src/main/observation-frame.ts`、`src/main/index.ts`、`src/renderer/index.html`、`src/renderer/floating.js`、`src/renderer/floating.css`、`evidence/frontend-port/visual-review.md` |
 | **P2-02 双 Alt 手势检测**：左右物理 Alt、时序窗口、单次触发、组合键拒绝、退出卸载、进入截图预览、锁屏／休眠后清除遗失的按键状态 | 已接入（纯状态单测、类型、lint 和构建通过；实际键盘及真实锁屏／休眠体验未验证）。参考项目固定提交 `72f1d738458a223696685a909e806b683eff5885` 无对应全局手势；本项是 Pi 接入所需的独立能力 | `tests/double-alt.test.ts`、`tests/double-alt-recovery.test.ts`、`tests/shortcut-edge-guard.test.ts`、`src/main/double-alt.ts`、`src/main/shortcut-edge-guard.ts`、`src/main/index.ts` |
 | **P2-03 history 与选区上下文**：当前 workspace 摘要、历史 session 绑定、文本 transcript 恢复、Windows UI Automation 选中文字 chip | 已接入（公开 API adapter、workspace 过滤、选区纯逻辑测试和 bridge 接入通过；真实 UI Automation 与人工窗口体验未验证） | `tests/pi-web-history.test.ts`、`tests/orb-session.test.ts`、`tests/windows-selection.test.ts`、`src/main/windows-selection-native.ts`、`src/main/index.ts`、`src/renderer/floating.js`、`evidence/p2-03/README.md` |
-| **P2-04/P2-06 桌面操作扩展**：参考按钮/次数/修饰键、replace/submit、纵向滚动、等待、应用列表、前台信息、热键、长按、同窗口拖拽、动作后回图、显式截图导出、浏览器/文件夹打开及应用激活或启动 | 已接入自动化；真实桌面动作、目标像素、保存对话框、剪贴板和真实模型仍需人工验收 | `doc/desktop-tools-port.md`、`tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows-input.test.ts` |
+| **P2-04/P2-06 桌面操作扩展**：参考按钮/次数/修饰键、replace/submit、纵向滚动、等待、应用列表、前台信息、热键、长按、同窗口拖拽、动作后回图、显式截图导出、浏览器/文件夹打开及应用激活或启动 | 已接入自动化；真实桌面动作、目标像素、保存对话框、剪贴板和真实模型仍需人工验收 | `doc/reference-toolset-transition.md`、`tests/orb-tools.test.ts`、`tests/desktop-broker.test.ts`、`tests/reference-windows-driver.test.ts`、`tests/reference-windows-input.test.ts` |
 | **P2-05 Windows x64 打包产物**：NSIS 每用户安装包与解包目录可构建 | 当前同步构建解包目录，内容审计 30/30、实际启动 23/23；既有安装器/发布记录保留，本轮未发版 | `electron-builder.config.mjs`、`evidence/p2-05/`、`doc/release-process.md` §9 |
 | **P2-05 产物内容审计**：产品文件在 asar 的运行时路径上、许可证随包、无仓库源码／测试／证据／凭据／密钥／其它平台二进制／构建残留，Koffi 版本和二进制匹配验证环境 | 已验证（30/30，新增头文件残留反证） | `evidence/p2-05/package-audit.json`、`evidence/tool-speed/package-audit-koffi-headers-rejected.json` |
 | **P2-05 打包产物可运行**：真实启动 `pi-orb.exe`，preload 桥可用、renderer 无 Node 权限、构建后 renderer 与素材从 asar 加载、参考壳层已挂载且令牌解析为参考值、**停靠滑动观测到真实位移**、session Access bridge 存在且旧选窗 API 不存在 | 已验证（23/23；桌面 native action 闭环另由 session Access 探针证明） | `evidence/p2-05/packaged-smoke.json` |
@@ -112,7 +112,7 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | **个人启动与后端复用**：官方 CLI 注册/移除，隐藏 Pi Web 启动、同 PID 复用、真实 API 会话与模型偏好保留 | 隔离用户设置/随机端口 7/7；preview.3 新增 Win32 无控制台探针；不等同于新用户环境安装 | `evidence/personal-startup/backend-startup.json` |
 | **个人安装与短命令**：NSIS 安装至中文/空格目录、App Paths/ShellExecute、单实例保留草稿、卸载清理与应用配置保留 | 当前开发机 8/8；完整干净用户环境、交互安装/升级向导与 SmartScreen 仍未验证 | `evidence/personal-startup/installer-smoke.json` |
 | **当前账户 preview.2 → preview.3 升级**：静默升级、真实短命令启动、无控制台、同实例唤回、图标与数据保留 | 本机 11/11；模型/凭据字节不变、工作区和快捷键保留；完整干净用户与交互向导仍未验证 | `evidence/windows-startup-and-workspaces/current-user-upgrade.json` |
-| **工作区入口与默认完全访问界面**：原生菜单入口、同目录无操作、切换前停止旧任务、实际授权/撤权标签同步 | 单测及实际 Electron/Pi Web UI 生命周期 25/25；参考底板图标用于安装器/快捷方式/托盘 | `evidence/windows-startup-and-workspaces/ui-lifecycle.json`、`doc/windows-startup-and-workspaces.md` |
+| **工作区入口与默认完全访问界面**：原生菜单入口、同目录无操作、切换前停止旧任务、实际授权/撤权标签同步 | 单测及实际 Electron/Pi Web UI 生命周期 25/25；参考底板图标用于安装器/快捷方式/托盘 | `evidence/windows-startup-and-workspaces/ui-lifecycle.json`、`doc/personal-user-installation.md` |
 | **`open_app` 的参考语义**：直接使用 backend 激活/启动；成功后 600ms 返回当时的真实前台截图，慢启动不误报失败；`name` 拒绝路径／参数片段／shell 元字符 | 单测验证实际观察绑定、慢启动、后续 wait、新图、错误和取消；修复后真实模型冷启动→依据截图点击→目标事件→新图 22/22（有限样本） | `tests/reference-windows-open-app.test.ts`、`tests/orb-tools.test.ts`、`evidence/p1-06/real-model-open-app-session-access.json`、`doc/reference-toolset-transition.md` |
 | **当前参考工具合同的真实 C7/D6/D8**：自动首帧、模型自主调用、目标实际落点/滚动/输入和动作后新图 | 有限样本通过：C7 20/20、D6 21/21、D8 22/22；存在更早模型取点失败，不代表任意任务稳定成功 | `evidence/p1-06/real-model-c7-session-access.json`、`real-model-d6-scroll-session-access.json`、`real-model-d8-type-session-access.json` |
 | **可见默认浏览器闭环**：模型 open_in_browser → wait → click，本地页面收到完成请求 | 有限样本通过 22/22；没有使用 DOM/Playwright 网关，不代表任意网站或登录态覆盖 | `evidence/p1-06/real-model-browser-session-access.json` |
@@ -163,6 +163,6 @@ P1/P2 实现与证据已经落地；当前仅发布预览版，§3 的未验证�
 | npm 11 默认拦截依赖安装脚本 | `electron` 与 `esbuild` 需显式 `npm approve-scripts`；`electron` 二进制经 `ELECTRON_MIRROR` 下载 |
 | 工作站锁屏时无法前置任何窗口 | 反射式唤醒路径无法把目标窗口记为“用户正在看的窗口”，截图授权链在第一步断掉；此时产品报「recorded window was replaced」对用户是**误导**（真正原因是没有可前置的窗口）。真实模型类验收必须在解锁的交互式桌面下进行。见 `evidence/p1-06/README.md` §5.1 |
 
-工具速度此前阶段见 [实施记录](./tool-speed-optimization.md)，最新插件像素适配与小控件结果见
-[后续阶段](./plugin-reference-and-pointing.md)：生产等待保留 600ms；小控件有限样本通过，
+工具速度此前阶段见 [历史证据](../evidence/tool-speed/README.md)，最新插件像素适配与小控件结果见
+[同目录后续实验](../evidence/tool-speed/README.md)：生产等待保留 600ms；小控件有限样本通过，
 失败与原生退出记录保留，不宣称普遍成功率、提速比例或原生退出根因已经解决。

@@ -47,7 +47,7 @@ App Paths 支持 Win+R/ShellExecute；PowerShell 直接输入 `pi-orb` 不属于
 
 完整实现与验证见[个人用户安装与启动](./doc/personal-user-installation.md)。历史 [preview.1 Release](https://github.com/rain-knows/pi-orb/releases/tag/v0.1.0-preview.1) 不包含以上改进。
 
-浏览器任务使用 `open_in_browser` 打开用户默认浏览器，再通过可见窗口截图工具完成操作；这与参考项目的 Computer Use 语义一致。DOM/Playwright 网关和浏览器扩展认证已移除，历史说明见[工具集对比报告](./doc/toolset-comparison-2026-10-04.md)。
+浏览器任务使用 `open_in_browser` 打开用户默认浏览器，再通过可见窗口截图工具完成操作；这与参考项目的 Computer Use 语义一致。DOM/Playwright 网关和浏览器扩展认证已移除，当前契约见[参考工具集](./doc/reference-toolset-transition.md)。
 
 ### 从源码运行
 
@@ -78,16 +78,7 @@ npm run dev
 
 桌面取点采用新插件参考的截图相对 0–1000 millifraction → HID 换算。模型请求只保留最新一张 Orb 工具截图，完整持久历史不变；生产动作后等待仍为 600ms。Koffi 精确锁定 `2.16.3`，包内只保留 Windows x64 运行时所需文件。
 
-| 验证 | 已记录结果 | 边界 |
-|---|---|---|
-| 质量与发布门禁 | 483 个单元测试，P2-05 产物审计 30/30、打包 smoke 22/22 | 类型、lint、构建、插件加载、产物内容和 renderer 启动 |
-| 后台任务 | 真实模型完成 8/8、产品桥停止 10/10、真实 provider 失败回读 12/12 | Pi Web 独立 worker；错误全文与单次通知一致，不代替 GUI 实测 |
-| 真实模型 GUI 闭环 | 点击 20/20、滚动 21/21、输入 22/22、可见浏览器 22/22、应用冷启动 22/22 | 当前参考工具合同的有限样本；有目标自身读回和动作后新图，未宣称任意任务稳定成功 |
-| 工具往返（迁移前历史） | 旧实现三动作批量中位 11.03s，单步中位 18.99s | 仅用于解释本次迁移动机；不代表当前工具协议或性能承诺 |
-| 原生依赖 | 实际 Electron 中 1000 次枚举 + 50 次截图通过 | 有限压力样本，未确认历史间歇退出的精确根因 |
-| Windows 打包 | 包内容审计 30/30，实际打包产物启动 22/22 | 不等同于干净机器安装、卸载或升级验收 |
-
-完整来源与原始记录见[像素取点实施记录](./doc/plugin-reference-and-pointing.md)、[浮窗体验记录](./doc/orb-experience-improvements.md)和[支持矩阵](./doc/support-matrix.md)。
+验证结果和边界统一见[支持矩阵](./doc/support-matrix.md)，原始结果和复现脚本见[证据索引](./evidence/README.md)。源码来源见[参考手册](./doc/reference-playbook.md)。单元测试、真实模型有限样本、包内容审计和实际打包启动各证明不同范围。
 
 以下仍未验证：多显示器与 DPI 变化、高权限窗口、不同 Chromium 页面输入的稳定性、广泛跨应用流程、真实键盘/锁屏/休眠恢复，以及干净机器安装、卸载、升级和 SmartScreen 体验。历史失败和原生退出记录保留。preview.3 采用 GitHub **prerelease**，不宣称完整 v0.1 已完成。
 

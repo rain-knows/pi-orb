@@ -40,7 +40,7 @@ node evidence/p2-05/run-packaged-smoke.mjs
 
 2026-10-01 更新 Koffi 后发现新增 `lib/native` 头文件目录，按参考的最小运行文件策略排除；
 新审计对放回 `base.hh` 的产物确实失败。依赖来源、反证和完整重建记录见
-[`plugin-reference-and-pointing.md`](../../doc/plugin-reference-and-pointing.md)。
+[历史取点与包裁剪证据](../tool-speed/README.md)。
 
 ## 2. 启动探测：`packaged-smoke.json`（23/23 通过）
 

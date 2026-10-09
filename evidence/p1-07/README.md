@@ -52,7 +52,7 @@
 
 ## 2. 目标点名的 MPL 核实（`cua_driver_sdk.dll`）
 
-结论已写入 [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) §3。要点与依据：
+结论已写入 [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md) §3。要点与依据：
 
 | 检查 | 结果 |
 |---|---|
@@ -211,7 +211,7 @@ P1-06 的桥要求请求携带**当时的运行代次**，而扩展里的 `sessi
 | 正向截图路径 | 需真实前台窗口 |
 | macOS / Linux / 多显示器 / 高权限窗口 | 未验证 |
 
-这些项在 [`doc/support-matrix.md`](../doc/support-matrix.md) 中逐条标注，并有对应 README 中的人工验证步骤。**发布门禁会检查这些未验证记录仍然存在**，因此一次发布无法悄悄把它们删掉来"变绿"。
+这些项在 [`doc/support-matrix.md`](../../doc/support-matrix.md) 中逐条标注，并有对应 README 中的人工验证步骤。**发布门禁会检查这些未验证记录仍然存在**，因此一次发布无法悄悄把它们删掉来"变绿"。
 
 ## 7. 版本与文档维护
 
@@ -220,7 +220,7 @@ P1-06 的桥要求请求携带**当时的运行代次**，而扩展里的 `sessi
 | `package.json` 版本 | `0.1.0`（`Unreleased`） |
 | `CHANGELOG.md` | Keep a Changelog 格式；版本策略与支持矩阵互相引用 |
 | `doc/support-matrix.md` | 唯一的兼容性声明来源；已验证/未验证/环境事实分列 |
-| `doc/cua-driver-integration.md` | 驱动接入事实（坐标空间、投递模式、会话、许可义务） |
+| `evidence/p1-05/README.md` | 历史 Cua 驱动探针与输入证据；当前驱动合同见参考手册 |
 | `evidence/README.md` | 各阶段证据索引与复现命令 |
 | `README.md` | 状态、结构、命令、非破坏性保证与已知例外 |
 | `.gitignore` | 依赖/构建/临时/本地目标状态/凭据/二进制/截图；**不**整体忽略 `.pi/` |

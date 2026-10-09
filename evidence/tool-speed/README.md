@@ -1,9 +1,8 @@
 # 工具调用提速证据
 
-参考源和结论见 [阶段记录](../../doc/tool-speed-optimization.md)。本目录没有凭据或截图数据；原始图片只在隔离 Pi 会话中，模型报告只提取文字、大小和调用参数。
+本目录保存 2026-09-30 至 2026-10-01 的历史提速实验，显式 observe/batch 与 pixel 模式已经删除；这些结果不作为当前工具契约或性能承诺。本目录没有凭据或截图数据；原始图片只在隔离 Pi 会话中，模型报告只提取文字、大小和调用参数。
 
-当前像素契约和一图预算的实现、环境及未解决的原生退出见
-[插件阶段记录](../../doc/plugin-reference-and-pointing.md)。下表中的历史记录不会因新实现而覆盖。
+当前工具契约见 [参考工具集](../../doc/reference-toolset-transition.md)，坐标与来源见 [参考手册](../../doc/reference-playbook.md) §6.3。历史原生退出尚未确认根因，失败与中断记录保留；下表的结果不会因新实现而覆盖。
 
 | 文件 | 含义 |
 |---|---|
@@ -57,3 +56,19 @@ node evidence/tool-speed/summarize-pixel-results.mjs
 
 需要另建干净源码环境时，`prepare-pi-web.mjs` 仅导出固定 `95a5874` 到 `.tmp/plugin-pointing/pi-web`，
 安装依赖并构建；Node 堆上限 4GiB。该构建尚未完成验收，不冒充本轮真实模型所用环境。
+
+## 历史来源与适配
+
+旧单体来源：`deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885` 的 `plugin.ts`、`windows.ts`、`policy.ts`；顺序调用、取消与 600ms 等待经 Pi/Electron 桥适配。后续 pixel 实验来源：`dsh-orb-cordis@9cdc50302d202f4497569731be488a8afa500da7`，MIT。源码与许可散列保存在 `plugin-reference.json`。
+
+### 已删除的 pixel 实验
+
+| 来源（新插件同一固定提交） | 复用方式 | 必要适配 / 不复用原因 |
+|---|---|---|
+| `packages/computer-use/src/coordinates.ts:166-215` | 直接复用 pixel 校验及 pixel → HID 公式 | 模型侧统一像素；原生 HID 继续现有 millifraction；不保留模型双模式/设置或 dsh 日志迁移 |
+| `packages/computer-use/src/raster.ts` | 直接移植头部解析 | 从 Pi 已归一化的 PNG/JPEG 读尺寸，不能用 Win32 窗口大小假冒 attachment 大小 |
+| `coordinate-mode.ts` 的 `rememberObservation` / `firstFrameNotice`、`observe.ts:132-143`、`policy.ts` | 复用 attachment 尺寸绑定和像素提示语义 | 用公开 Pi context 钩子替代 Cordis projection；缓存须绑定 session、generation 和 observation_id，尺寸缺失或旧编号拒绝 |
+| `policy.ts` 的顺序批量与最后图像语义 | 复用最后截图做下一步判断 | 本次请求只保留最新 Orb 图片；用户附件、其他工具、持久历史不变，不重复解码/压缩 |
+
+
+这些适配仅描述当时实验，当前生产使用 millifraction。Koffi 版本、包裁剪与许可的当前依据为 `package.json`、`electron-builder.config.mjs` 和 `THIRD_PARTY_NOTICES.md`。

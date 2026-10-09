@@ -70,7 +70,7 @@ Windows x64 未签名预览版。包含此前未发布的 Pi Web 0.10 / Pi 1.0�
 - context 预算由三图缩为最新一图，保留完整持久历史。紧凑与 28×24 DIP 夹具各 7/7 任务通过；
   批量三控件中位耗时分别 12.38s/11.68s，单步约 18.42s；有限样本不外推到任意应用。
 - 保留启动失败与原生退出证据；复跑旧分数版本遇到 `0x80000003`，当前未确认退出根因。
-  来源、实验环境和验证边界见 `doc/plugin-reference-and-pointing.md`。
+  来源、实验环境和验证边界见 `evidence/tool-speed/README.md`。
 - Koffi 精确更新至 `2.16.3`，采用官方 Node/Windows 回调崩溃修复，现有 native 适配接口不变；
   实际 Electron 1000 次枚举 + 50 次捕获压力探针通过。不把有限无崩溃样本当成精确根因证明。
 - 更新依赖后微小控件真实模型再跑 7/7，批量中位 11.03s、单步 18.99s；累计三个完整轮次 21/21。
@@ -82,7 +82,7 @@ Windows x64 未签名预览版。包含此前未发布的 Pi Web 0.10 / Pi 1.0�
 - 请求关联计时、串行批量工具、协议 v2、取消与按动作数/声明等待计算的超时。
 - context 仅保留最近三张 Orb 工具截图；用户附件和持久历史保持不变。
 - 1500 次等待对照不满足缩短条件，保留 600ms。真实模型大控件对照中响应次数从 5 降至 3；小控件误点记录保留，不宣称普遍提速。
-- 453 测试、权限生命周期、原生 Stop/窗口变化及打包审计/启动通过。来源、原始数据和限制见 `doc/tool-speed-optimization.md`。
+- 453 测试、权限生命周期、原生 Stop/窗口变化及打包审计/启动通过。来源、原始数据和限制见 `evidence/tool-speed/README.md`。
 
 ### Fixed
 
@@ -91,13 +91,13 @@ Windows x64 未签名预览版。包含此前未发布的 Pi Web 0.10 / Pi 1.0�
   点击穿透，工具调用期间不再隐藏整个面板。输入焦点、草稿和问题阻止自动收起；工具过程
   使用紧凑中文状态行；运行中空输入框隐藏光标，停止按钮改为方形图标。新 Orb 会话默认
   完全访问，停止、隐藏及断连仍撤权；文件和后台任务使用 Pi 原有工具。参考提交、差异和
-  验证边界见 [`doc/orb-experience-improvements.md`](./doc/orb-experience-improvements.md)。
+  验证边界见 [`evidence/frontend-port/visual-review.md`](./evidence/frontend-port/visual-review.md)。
 
 - **Aligned `orb_open_app` with the reference action timing.** The Windows driver now waits the
   reference `POST_ACTION_WAIT_MS` settle period after activation and before foreground inspection
   and recapture, so a slow window switch cannot be reported as a fresh observation of the old target.
   Stage 6 lifecycle, packaging and the latest real-model rerun results are recorded in
-  [`doc/lifecycle-and-delivery.md`](./doc/lifecycle-and-delivery.md); the failed C7/D6/D8 rerun JSON is
+  [`evidence/p1-07/CONTRACT-MATRIX.md`](./evidence/p1-07/CONTRACT-MATRIX.md); the failed C7/D6/D8 rerun JSON is
   retained and the support matrix leaves those model-side contracts unverified.
 
 - **An orb left on a disconnected monitor could not be brought back.** P2-01's criterion is that the

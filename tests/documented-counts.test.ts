@@ -48,15 +48,14 @@ const audit = tally("evidence/p2-05/package-audit.json");
 const probe = tally("evidence/p2-05/packaged-smoke.json");
 const gate = gateTally();
 
+// Current claims only; frozen stage provenance keeps the results from its own run.
 const documents: readonly { path: string; label: string }[] = [
   { path: "README.md", label: "README" },
   { path: "doc/support-matrix.md", label: "support matrix" },
   { path: "doc/manual-acceptance.md", label: "manual acceptance" },
   { path: "doc/pi-orb-development-goals.md", label: "development goals" },
-  { path: "doc/pi-orb-reuse-assessment.md", label: "reuse assessment" },
   { path: "evidence/README.md", label: "evidence index" },
   { path: "evidence/p2-05/README.md", label: "p2-05 evidence" },
-  { path: "doc/p2-01-reference-reuse.md", label: "p2-01 record" },
 ];
 
 /** Which claim each document is expected to carry, and the recorded value for it. */

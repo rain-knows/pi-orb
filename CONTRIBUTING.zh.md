@@ -62,7 +62,7 @@ npm run build
 | 任意改动 | `node evidence/p1-07/run-release-gate.mjs` | `evidence/p1-07/release-gate.json` |
 | 桌面后端、坐标、工具 | `node evidence/p1-06/run-p1-06-tools.mjs` | `evidence/p1-06/tool-exposure.json` |
 | 打包、图标、依赖 | `node evidence/p2-05/run-p2-05.mjs` | `evidence/p2-05/*.json` |
-| 只能由人判断的项 | [`doc/manual-acceptance.md`](doc/manual-acceptance.md) | 该文件对应表格 |
+| 只能由人判断的项 | [`doc/manual-acceptance.md`](doc/manual-acceptance.md) | 对应 evidence 结果；支持结论只更新支持矩阵 |
 
 发布门禁会替你执行下列规则：
 

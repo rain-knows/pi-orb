@@ -1,5 +1,7 @@
 # Floating renderer port: fixed reference baseline
 
+> 阶段来源记录：保留实施时的事实与结果，不随当前版本同步。当前行为见参考手册与工具契约，支持结论只见支持矩阵。
+
 > 本页旧 `orb_*` 工具和“只激活已运行应用”段落属于迁移前历史；当前工具集、自动首帧和
 > `open_app` 启动语义以 [`reference-toolset-transition.md`](./reference-toolset-transition.md)
 > 与 [`reference-playbook.md`](./reference-playbook.md) 为准。
@@ -141,4 +143,4 @@ turn idle preserves it.
 Targeted verification covers session/generation refusal, missing Access, stale
 observations after regrant, all three tiers, multi-prompt queue progression, and
 the actual renderer DOM. Full-suite, lint, build, package probe and live-model
-outcomes are recorded in `doc/reference-experience-gap.md` after this run.
+outcomes are recorded in `evidence/frontend-port/visual-review.md` and the corresponding probe JSON. This file preserves the original port provenance; current behavior belongs to the reference playbook and tool contract.

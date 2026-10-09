@@ -96,7 +96,7 @@ Copyright (c) 2026 mini-yifan；上游 DeepSeek 归属见该仓 `THIRD-PARTY-NOT
 旧单体仓库已 fetch：远端 HEAD `51f09764d7ff99947be08ebbb2ca2388faab3df4`，相对 `72f1d738`
 仅一次 Windows 安装身份更新（图标、安装提权/升级、相关测试与说明），Computer Use 没有差异。
 pi-orb 没有它的已发布系统级安装需要升级，本轮不搬这些打包改动，也不改变已验收的旧后端提交。
-实施与证据入口：[`plugin-reference-and-pointing.md`](./plugin-reference-and-pointing.md)。
+历史取点实验与来源见 [`../evidence/tool-speed/README.md`](../evidence/tool-speed/README.md)；当前工具合同见 [`reference-toolset-transition.md`](./reference-toolset-transition.md)。
 
 ## 2. 取材优先级
 
@@ -351,7 +351,7 @@ D:\workself\pi-orb\
 - pi-orb 现状：驱动把 `coordinateSpace.windowRect` 固定为 `{x:0, y:0, width, height}`
   （`src/main/reference-windows-driver.ts:221-225`），后端的 `mapNormalizedToGlobal` 再加回
   `screen.bounds` 原点，因此整链等价于“窗口相对分数”。**这个等价关系是当前实现的正确性依据，
-  改动任一侧都会产生混合单位缺陷**（`doc/cua-driver-integration.md` 与 `evidence/p1-06/` 记录过同类缺陷）。
+  改动任一侧都会产生混合单位缺陷**（`evidence/p1-05/` 与 `evidence/p1-06/` 记录过同类缺陷）。
 - screenshot attachment 缺失、session/generation 不符或越界坐标须在扩展边界拒绝；freshness
   token 只存在于 Pi/Electron 适配层，不能进入模型 schema。主进程继续执行自身的新鲜度、授权和区域变化检查。
 
@@ -462,7 +462,7 @@ D:\workself\pi-orb\
 **不可让步的三条**（pi-orb 的宿主授权边界）：
 
 1. 每个 GUI 工具按参考规则使用自动附加的前台截图；动作只允许使用最新截图，动作后由宿主重新采集。模型可以在同一步发出多个已可见且互不依赖的顺序调用，不能把依赖前一步创建的菜单、页面或对话框的动作放在同一步。
-2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话及明确重开隐藏的 Orb 默认完全访问，Stop／hide／断连立即撤权，不由后台事件静默重授。截图消息必须另经用户预览确认。cwd 匹配、`/orb` 字符串都不构成授权；2026-10-01 的重开默认值是用户明确要求的 shell 授权行为，详见 `doc/session-continuity.md`。
+2. 桌面工具必须有当前 Orb session 的 Access grant；新 Orb 会话及明确重开隐藏的 Orb 默认完全访问，Stop／hide／断连立即撤权，不由后台事件静默重授。截图消息必须另经用户预览确认。cwd 匹配、`/orb` 字符串都不构成授权；2026-10-01 的重开默认值是用户明确要求的 shell 授权行为，详见 §8 与 `personal-user-installation.md`。
 3. 断连、换 workspace/session、收起、Stop、退出都必须撤权并释放按键／鼠标／监听器；turn idle 与普通回复完成不撤权。
 
 ## 9. E/F 面：工程、验证与文档约定
@@ -709,4 +709,4 @@ src/orb-permission.ts 与 src/project-manager.ts。复用图标底板/阴影及�
 Full Access 保持参考默认值，授权变更实时送到 renderer，撤权规则保留。
 Pi Web CLI 的二次 spawn 没有 windowsHide；Orb 从已验证 Pi Web 包解析其 Next.js 正式
 生产入口直接隐藏启动，保留 cwd、hostname、日志与共享服务复用，不改上游或 monkey patch。
-实施和证据见 `windows-startup-and-workspaces.md`。
+当前使用见 `personal-user-installation.md`；阶段来源和证据见 `evidence/windows-startup-and-workspaces/README.md`。

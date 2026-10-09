@@ -75,7 +75,7 @@ carry the evidence for what it changes, in the same commit:
 | Anything at all | `node evidence/p1-07/run-release-gate.mjs` | `evidence/p1-07/release-gate.json` |
 | Desktop backend, coordinates, tools | `node evidence/p1-06/run-p1-06-tools.mjs` | `evidence/p1-06/tool-exposure.json` |
 | Packaging, icon, dependencies | `node evidence/p2-05/run-p2-05.mjs` | `evidence/p2-05/*.json` |
-| Anything a human must judge | [`doc/manual-acceptance.md`](doc/manual-acceptance.md) | the matching table there |
+| Anything a human must judge | [`doc/manual-acceptance.md`](doc/manual-acceptance.md) | the corresponding evidence record; support conclusions only in the support matrix |
 
 Rules that the release gate enforces on your behalf:
 

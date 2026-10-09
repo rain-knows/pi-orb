@@ -137,7 +137,7 @@ broker 对策略拒绝返回 `{ ok:false, refused:true, reason }`，而桥服务
 
 ## 5. 输入投递能力的边界（沿用 P1-05 实测）
 
-`doc/cua-driver-integration.md` 记录的约束在本阶段同样成立并已被代码采纳：
+以下约束来自 P1-05 历史 Cua 探针，原始结果见 `../p1-05/README.md`；不作为当前参考 Windows backend 的使用说明：
 
 | 组合 | 结果 |
 |---|---|

@@ -1,26 +1,26 @@
 {
-  "capturedAt": "2026-10-05T12:06:52.857Z",
+  "capturedAt": "2026-10-09T01:27:00.725Z",
   "projectVersion": "0.1.0-preview.3",
   "checks": [
     {
       "name": "typecheck passes",
       "ok": true,
-      "detail": "13085 ms"
+      "detail": "12203 ms"
     },
     {
       "name": "lint passes",
       "ok": true,
-      "detail": "9822 ms"
+      "detail": "7363 ms"
     },
     {
       "name": "unit tests pass",
       "ok": true,
-      "detail": "14684 ms"
+      "detail": "14603 ms"
     },
     {
       "name": "production build succeeds",
       "ok": true,
-      "detail": "4897 ms"
+      "detail": "5061 ms"
     },
     {
       "name": "pi-web HEAD and its six pre-existing user changes are untouched",
@@ -45,7 +45,7 @@
     {
       "name": "the release ignore rules exclude dependencies and build output",
       "ok": true,
-      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".playwright-mcp/\",\".tmp/\",\"evidence/browser-connection/dom-result.png\",\"evidence/browser-connection/live-official-profile.png\",\"node_modules/\",\"out/\",\"release/\"]}"
+      "detail": "{\"missing\":[],\"ignored\":[\".pi/.goals-pool-snapshot.json\",\".pi/goals/\",\".playwright-mcp/\",\".tmp/\",\"evidence/browser-connection/dom-result.png\",\"evidence/browser-connection/live-official-profile.png\",\"evidence/reference-sync/bookmarks-expanded.png\",\"evidence/reference-sync/bookmarks-folded.png\",\"node_modules/\",\"out/\",\"release/\"]}"
     },
     {
       "name": "no build output or dependency directory is staged for release",
@@ -175,7 +175,7 @@
     {
       "name": "every ported file records its reference commit and licence",
       "ok": true,
-      "detail": "adapted=12 unmodified=0 withoutHeader=0"
+      "detail": "adapted=11 unmodified=0 withoutHeader=0"
     },
     {
       "name": "the agent instructions record the local reference checkout and the playbook entry point",
@@ -295,7 +295,7 @@
     {
       "name": "the recorded packaged-application probe passed and verifies the session Access preload contract",
       "ok": true,
-      "detail": "{\"passed\":true,\"checks\":22}"
+      "detail": "{\"passed\":true,\"checks\":23}"
     },
     {
       "name": "the installer steps that cannot be automated are recorded as manual",
@@ -319,8 +319,8 @@
     },
     {
       "name": "product writes only happen in the modules that own the Orb data directory and the chosen workspace",
-      "ok": true,
-      "detail": "{\"writeFiles\":[\"src/main/bridge-server.ts\",\"src/main/code-agent-manager.ts\",\"src/main/config-store.ts\",\"src/main/index.ts\",\"src/main/personal-startup.ts\",\"src/main/workspace.ts\"],\"registryBinding\":true,\"unexpected\":[]}"
+      "ok": false,
+      "detail": "{\"writeFiles\":[\"src/main/bridge-server.ts\",\"src/main/code-agent-manager.ts\",\"src/main/config-store.ts\",\"src/main/index.ts\",\"src/main/observation-frame-preference.ts\",\"src/main/personal-startup.ts\",\"src/main/workspace.ts\"],\"registryBinding\":true,\"unexpected\":[\"src/main/observation-frame-preference.ts\"]}"
     },
     {
       "name": "no product write targets pi-web or a node_modules path",
@@ -333,23 +333,24 @@
       "detail": "workspace creation must be gated on a confirmation flag"
     }
   ],
-  "passed": true,
+  "passed": false,
   "writeSurface": {
-    "writeCallCount": 15,
+    "writeCallCount": 18,
     "files": [
       "src/main/bridge-server.ts",
       "src/main/code-agent-manager.ts",
       "src/main/config-store.ts",
       "src/main/index.ts",
+      "src/main/observation-frame-preference.ts",
       "src/main/personal-startup.ts",
       "src/main/workspace.ts"
     ],
     "note": "the Orb data directory is Electron userData; the workspace is created only after an explicit user confirmation, so uninstalling leaves the workspace, pi-web and pi-web's node_modules untouched"
   },
   "summary": {
-    "passed": 66,
+    "passed": 65,
     "skipped": 0,
-    "failed": 0,
+    "failed": 1,
     "version": "0.1.0-preview.3",
     "note": "this gate checks what can be automated; the manual steps for the unverified capability are recorded in the corresponding evidence README files. `skipped` counts checks that could not run in this environment and are explicitly NOT counted as passed"
   }

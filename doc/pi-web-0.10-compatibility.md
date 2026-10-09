@@ -1,5 +1,7 @@
 # Pi Web 0.10 / Pi 1.0 升级记录（2026-10-03）
 
+> 阶段来源记录：保留实施时的事实与结果，不随当前版本同步。当前行为见参考手册与工具契约，支持结论只见支持矩阵。
+
 本轮重点是 **Pi 插件装配和提示词组织**，其次是 Orb 对新版事件合同的适配。
 当前版本声明统一见 [支持矩阵](./support-matrix.md)，结构化结果见
 [升级证据](../evidence/upgrade-0.10/README.md)。这是本机与源码升级，未发布新安装器。
@@ -90,7 +92,7 @@ Pi Web 已复用现有异步原子写入函数，短暂锁定重试时保留旧�
 开发前核对两处本地参考提交与 [取材手册](./reference-playbook.md)：旧单体 `72f1d738458a223696685a909e806b683eff5885`、
 新插件 `9cdc50302d202f4497569731be488a8afa500da7`。
 桌面行为沿用参考项目的 `packages/experimental/tool-computer-use/` Windows 实现和新插件的像素/图片合同，
-详见已有 [像素适配记录](./plugin-reference-and-pointing.md)。本轮没有改动这些参考源和界面/权限语义。
+该阶段像素实验与来源见 [历史提速证据](../evidence/tool-speed/README.md)；当前坐标合同只见 [参考手册](./reference-playbook.md) §6.3。本轮没有改动这些参考源和界面/权限语义。
 参考项目的 dsh 会话驱动不能直接作为 Pi 运行时，因此只调整 `src/main/orb-session.ts` 与 Pi 插件接入边界。
 
 - Pi 1.0 的 `agent_end` 不是逻辑完成：重试、压缩、follow-up 仍可能继续。
