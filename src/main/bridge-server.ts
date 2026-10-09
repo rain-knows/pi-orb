@@ -1,7 +1,7 @@
 /**
  * The Electron side of the bridge: a Windows named pipe that serves the Pi extension.
  *
- * Verified properties this depends on (evidence/p0-03):
+ * Verified properties this depends on (doc/process-boundaries.md):
  *  - a named pipe has no TCP listener, so no web page and no LAN client can reach it;
  *  - every request carries the per-run token, the session id and the run generation;
  *  - a request from an older generation is refused.

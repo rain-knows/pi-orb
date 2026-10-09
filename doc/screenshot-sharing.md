@@ -6,6 +6,6 @@
 
 像素默认留在内存；保存或复制仅由明确用户操作触发。renderer 不获得任意路径读写或原生 API。预览授权与桌面工具授权分别管理。
 
-来源：旧单体 `apps/desktop/src/desktop-screenshot.ts`、`floating-window.ts` 与 renderer 截图流程；Pi 使用 preload/会话代次替换 dsh 事件协议。双 Alt 适配不声称为原参考代码移植，来源注释见 [double-alt](../src/main/double-alt.ts)。
+来源：旧单体 `apps/desktop/src/floating-window.ts` 的捕获排除与 `apps/desktop/renderer/floating.js` 的图片交互；Pi 的 desktopCapturer、预览确认和会话代次属于宿主适配，不宣称为参考截图模块的直接移植。双 Alt 适配不声称为原参考代码移植，来源注释见 [double-alt](../src/main/double-alt.ts)。
 
 实现：[capture](../src/main/desktop-capture.ts)、[flow](../src/main/screenshot-flow.ts)、[export](../src/main/screenshot-export.ts)。回归：[截图流程](../tests/screenshot-flow.test.ts)、[导出](../tests/screenshot-export.test.ts)、[手势](../tests/double-alt.test.ts)。支持见 [支持范围](support-matrix.md)。

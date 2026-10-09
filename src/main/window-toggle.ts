@@ -54,7 +54,7 @@ export interface WakeControllerOptions {
    *
    * Suppress closely spaced callbacks from global accelerator repeat and simultaneous
    * shortcut/tray triggers. This time window cannot distinguish a long hold from a
-   * later deliberate press; see the A4 manual result in evidence/p1-03/README.md.
+   * later deliberate press; see the A4 manual result in doc/verification.md.
    */
   readonly cooldownMs?: number;
   readonly now?: () => number;

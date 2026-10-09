@@ -22,5 +22,5 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "pi-package/**/*.ts", "tests/**/*.ts", "*.ts"],
-  "exclude": ["node_modules", "out", "dist"]
+  "exclude": ["node_modules", "out", "dist", "tests/integration"]
 }

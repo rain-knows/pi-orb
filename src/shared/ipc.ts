@@ -2,7 +2,7 @@
  * IPC contract shared by the Electron main process, the preload bridge and the
  * renderer.
  *
- * Rules (see doc/product-contract.md §4.4 and doc/process-boundaries.md §3.1):
+ * Rules (see doc/product-contract.md and doc/process-boundaries.md):
  *  - The renderer never receives credentials, a generic IPC handle, or Node APIs.
  *  - Every request carries the running generation, so a message produced for an
  *    earlier run cannot act on the current one.

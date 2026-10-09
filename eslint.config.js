@@ -10,6 +10,7 @@ export default tseslint.config(
       "release/**",
       "coverage/**",
       "evidence/**",
+      "tests/integration/**",
       ".tmp/**",
     ],
   },

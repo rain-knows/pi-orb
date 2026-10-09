@@ -17,7 +17,7 @@ import { createRunDirectory } from '../../scripts/verify/run-directory.mjs';
 //   - the Orb shell gets its own --user-data-dir and its own PI_ORB_CONFIG, so it never reads or
 //     writes the running user's %APPDATA%\pi-orb handshake;
 //   - pi-web gets its own agent dir. Its models.json is a HARD LINK and auth.json a SYMLINK to the
-//     real ones: the real configuration is used with no second copy of any credential;
+//     real ones: SDK writes cannot alter the user configuration; cleanup removes these copies;
 //   - the session dir is that isolated agent dir, so no session is written under the user's profile.
 //
 // It spends a small, bounded number of real model turns (one per prompt) and never retries silently:
@@ -32,12 +32,10 @@ import { randomUUID } from "node:crypto";
 import {
   existsSync,
   appendFileSync,
-  linkSync,
   mkdirSync,
   readFileSync,
   readdirSync,
   rmSync,
-  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
@@ -119,11 +117,7 @@ const piWebWorktree = process.env.PI_ORB_EVIDENCE_PI_WEB;
 if (!piWebWorktree) throw new Error('Set PI_ORB_EVIDENCE_PI_WEB to an installed, production-built Pi Web package.');
 
 const WORKSPACE = join(runRoot, "orb-workspace");
-/**
- * The isolated agent dir must sit on the SAME volume as the real one: the real `models.json` is shared
- * by hard link, and a hard link cannot cross volumes. TEMP is on C: alongside the real agent dir, so
- * the link succeeds and no credential is copied. Everything else stays under the run directory.
- */
+// Private per-user temporary directory. The disposable copies are deleted during cleanup.
 const agentDir = join(tmpdir(), `pi-orb-${caseConfig.slug}-agent-${Date.now()}`);
 const shellDataDir = join(runRoot, "shell-data");
 const configPath = join(runRoot, "orb-config.json");
@@ -171,8 +165,8 @@ const report = {
     shellUserDataDir: shellDataDir,
     orbConfig: configPath,
     agentDir,
-    modelsJson: "hard link to the real file (no copy)",
-    authJson: "symlink to the real file (no copy)",
+    modelsJson: "isolated temporary copy; never linked to user configuration",
+    authJson: "isolated temporary copy; never linked to user credentials",
     realAgentDir: REAL_AGENT_DIR,
   },
   model: MODEL,
@@ -372,8 +366,8 @@ function shutdown(code) {
       /* ignore */
     }
   }
-  // Remove the staged agent dir. It holds only a hard link and a symlink into the real configuration,
-  // never a copy, but it is still removed so nothing credential-adjacent is left lying around.
+  // Remove the private temporary agent dir, including copied credentials,
+  // so no credential copy is deliberately retained after the probe.
   try {
     rmSync(agentDir, { recursive: true, force: true });
   } catch {
@@ -383,17 +377,17 @@ function shutdown(code) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. Isolated agent dir: real model configuration, no second credential copy.
+// 1. Isolated agent dir: temporary model configuration and credentials, with no write-through.
 // ---------------------------------------------------------------------------
 function stageAgentDir() {
   const modelsSource = join(REAL_AGENT_DIR, "models.json");
   const authSource = join(REAL_AGENT_DIR, "auth.json");
   if (!existsSync(modelsSource)) throw new Error(`no real models.json at ${modelsSource}`);
 
-  // Hard link: the same inode, so the real provider configuration is used and nothing is duplicated.
-  linkSync(modelsSource, join(agentDir, "models.json"));
-  // Symlink: the real credential store, shared rather than copied.
-  if (existsSync(authSource)) symlinkSync(authSource, join(agentDir, "auth.json"));
+  // Disposable copy: a provider/SDK save must not write back to user settings.
+  writeFileSync(join(agentDir, "models.json"), readFileSync(modelsSource), { mode: 0o600 });
+  // Disposable credential copy; never committed, included in the report or kept on normal exit.
+  if (existsSync(authSource)) writeFileSync(join(agentDir, "auth.json"), readFileSync(authSource), { mode: 0o600 });
 
   // Our own settings: the real provider/model, and the extension loaded exactly as a user install would.
   writeFileSync(
@@ -416,8 +410,8 @@ function stageAgentDir() {
 
   report.steps.agentDir = {
     settings: "written (real provider/model, extension declared)",
-    modelsJsonLinked: existsSync(join(agentDir, "models.json")),
-    authJsonLinked: existsSync(join(agentDir, "auth.json")),
+    modelsJsonCopied: existsSync(join(agentDir, "models.json")),
+    authJsonCopied: existsSync(join(agentDir, "auth.json")),
   };
 }
 

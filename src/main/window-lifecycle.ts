@@ -2,7 +2,7 @@
  * The orb window's lifecycle rules.
  *
  * Hiding the orb is not cosmetic. The agreed first-version rule
- * (doc/product-contract.md §6.1, "收起就撤销桌面操作") is that a hidden orb must not keep
+ * (doc/product-contract.md, "收起就撤销桌面操作") is that a hidden orb must not keep
  * the ability to move the user's mouse or keyboard, and must not hold an image waiting to be sent.
  * The chat session is deliberately unaffected, so a running conversation continues.
  *

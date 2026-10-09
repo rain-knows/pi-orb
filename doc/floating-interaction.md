@@ -8,6 +8,6 @@
 
 可编辑右键菜单使用 Electron 编辑角色；已打开时拒绝叠加菜单。Pi 无自有 dsh 主窗，因此壳菜单使用隐藏 Orb，仍走统一撤权。模型设置沿用 Pi，不搬 dsh 设置/更新面板。
 
-来源：旧单体 `apps/desktop/renderer/floating.{html,css,js}`、`apps/desktop/src/floating-window.ts`；当前插件 `packages/helper/assets/{floating.css,floating.html,shell.js}` 与 `packages/helper/src/floating-placement.ts`。Pi 会话模块替换宿主协议；产品图片与版权见 [第三方声明](../THIRD_PARTY_NOTICES.md)。
+来源：旧单体 `apps/desktop/renderer/floating.{html,css,js}`、`apps/desktop/src/floating-window.ts`；当前插件 `packages/helper/assets/{floating.css,floating.html,shell.js}` 与 `packages/helper/src/geometry.ts`。Pi 会话模块替换宿主协议；产品图片与版权见 [第三方声明](../THIRD_PARTY_NOTICES.md)。
 
 回归：[几何](../tests/floating-geometry.test.ts)、[停靠](../tests/floating-dock-animation.test.ts)、[renderer](../tests/floating-renderer.test.ts)、[DOM/CSP](../tests/renderer-reference-parity.test.ts)。当前界面记录见 [UI probe](../evidence/ui/ui-probe.json)。

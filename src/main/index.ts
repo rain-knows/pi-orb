@@ -1,11 +1,11 @@
 /**
  * Electron main process for pi-orb.
  *
- * Responsibilities (doc/product-contract.md §4.1):
+ * Responsibilities (doc/product-contract.md):
  *  - own the window, tray and global wake shortcut,
  *  - own the Orb configuration file,
  *  - proxy every pi-web API/SSE call, because a sandboxed renderer with an
- *    opaque origin cannot call pi-web directly (measured 403, evidence/p0-03),
+ *    opaque origin cannot call pi-web directly (measured 403, doc/process-boundaries.md),
  *  - never hand credentials or Node APIs to the renderer.
  *
  * This process does not implement any part of the Pi agent loop and never
@@ -591,7 +591,7 @@ async function refreshPiWebState(): Promise<void> {
 /**
  * Handle a lost or unusable pi-web connection.
  *
- * The contract (doc/product-contract.md §6.1, P1-07) is that a disconnect revokes desktop
+ * The contract (doc/product-contract.md, P1-07) is that a disconnect revokes desktop
  * authority: the task was approved for a session in a run that no longer exists, so keeping the
  * grant would let a later connection continue acting on an approval nobody can see. The session
  * binding is dropped too, so the next session is a new one rather than a reused id.

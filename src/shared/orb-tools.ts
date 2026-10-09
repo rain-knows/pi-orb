@@ -49,7 +49,7 @@ export const ORB_TOOL_NAMES: readonly string[] = Object.values(ORB_TOOLS);
  * screen coordinate. Ported from the reference implementation
  * (deepseek-harness-orb, MIT): the model cannot know where a window sits on the desktop, and
  * asking it for a screen coordinate is what produced the documented wrong-cell failure
- * (evidence/p1-06/d-group-prerequisites.md §5). A fraction of the image it can actually see is
+ * (doc/observation-coordinates.md). A fraction of the image it can actually see is
  * answerable without any desktop geometry, and the host maps it back deterministically.
  */
 export const COORDINATE_SPACE = 1000;

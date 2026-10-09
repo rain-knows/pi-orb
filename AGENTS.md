@@ -45,4 +45,4 @@
 - 独立工作单独提交，按 [验证策略](doc/verification.md) 选择必要检查；文档改动只检查引用和 diff。
 - 打包与分发见 [打包](doc/packaging.md)：只复用参考打包形态，不搬 dsh 单体发布管道。
   打包改动必须验证最终安装器构建的内容、Pi 插件加载和实际启动；不得用构建成功替代内容与运行证据。
-  执行入口以 package.json 和 [验证策略](doc/verification.md) 为准。
+  执行 npm run verify:package；其他改动按 [验证策略](doc/verification.md) 选择检查。

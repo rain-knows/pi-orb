@@ -10,12 +10,10 @@ import { spawn, execFileSync } from "node:child_process";
 import { connect } from "node:net";
 import {
   existsSync,
-  linkSync,
   mkdirSync,
   readdirSync,
   readFileSync,
   rmSync,
-  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
@@ -70,8 +68,8 @@ const report = {
     workspace,
     shellDataDir,
     agentDir,
-    modelsJson: "hard link to the real file (no copy)",
-    authJson: "symlink to the real file (no copy)",
+    modelsJson: "isolated temporary copy; never linked to user configuration",
+    authJson: "isolated temporary copy; never linked to user credentials",
   },
   checks: [],
   steps: {},
@@ -148,8 +146,8 @@ function stageAgentDir() {
   const modelsSource = join(realAgentDir, "models.json");
   const authSource = join(realAgentDir, "auth.json");
   if (!existsSync(modelsSource)) throw new Error(`No real models.json at ${modelsSource}`);
-  linkSync(modelsSource, join(agentDir, "models.json"));
-  if (existsSync(authSource)) symlinkSync(authSource, join(agentDir, "auth.json"));
+  writeFileSync(join(agentDir, "models.json"), readFileSync(modelsSource), { mode: 0o600 });
+  if (existsSync(authSource)) writeFileSync(join(agentDir, "auth.json"), readFileSync(authSource), { mode: 0o600 });
   if (mode === "failure") {
     // Use Pi's public hooks only in this disposable worker. The real provider must reject the
     // altered model ID; no errors or lifecycle events are faked, and no credentials are logged.

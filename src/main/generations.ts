@@ -5,7 +5,7 @@
  * one configuration). Every request from a client carries the generation it was
  * produced under, and requests from an older generation are refused.
  *
- * Why this exists (see evidence/p0-05/DECISION.md §2 and §5):
+ * Why this exists (see doc/workspaces-sessions.md):
  * `lib/session-revision.ts`'s `snapshotRevision` in pi-web is a *client cache
  * validity token*, not an authorization or generation check. Nothing in pi-web
  * can bind a request to a run instance, so the execution layer must do it.

@@ -1,93 +1,46 @@
-# Continuous integration for pi-orb.
-#
-# Reference reuse: the shape of this workflow comes from `deepseek-harness-orb` commit
-# `72f1d738458a223696685a909e806b683eff5885`, `.github/workflows/ci.yml` — a `pull_request` trigger,
-# `contents: read` permissions, a concurrency group that cancels a superseded run, a checkout with
-# `persist-credentials: false`, and a pinned Node major. Its enterprise machinery (self-hosted /
-# Blacksmith runner failover, telemetry kill switches, monorepo gate fan-out, weighted-approval and
-# issue-lifecycle workflows) is deliberately not copied: it serves an organisation-scale monorepo,
-# not a single Windows desktop app.
-#
-# What runs here is the set of gates this repository actually has, in increasing cost order, so a
-# broken commit fails fast and cheaply:
-#
-#   1. typecheck, lint, unit tests and the production build;
-#   2. the release gate, which also re-runs (1) and adds the non-destructive, credential, license,
-#      version-agreement, packaging and evidence-completeness checks.
-#
-# Two things are intentionally NOT here:
-#
-#   - The packaged-application probe (`scripts/verify/packaged-smoke.mjs`) starts a real Electron
-#     window and enumerates real desktop windows, and the P2-05 content audit reads a Windows
-#     artifact. They are Windows-host-specific and belong to the release machine, not to every pull
-#     request; `doc/packaging.md` §6 records what remains manual.
-#   - The pi-web baseline comparison needs a developer-local pi-web checkout. On a runner there is
-#     none, and the gate reports it as `skipped` — counted separately, never as passed.
-#
-# Windows is the only supported platform (see `doc/support-matrix.md`), so the jobs run on Windows;
-# a green Linux run would prove nothing about the shipped product.
-
+# Reference workflow shape: deepseek-harness-orb@72f1d738458a223696685a909e806b683eff5885.
+# Pi uses one Windows job; no enterprise runner fallback or monorepo fan-out.
 name: CI
-
 on:
   pull_request:
+    paths:
+      - 'src/**'
+      - 'pi-package/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'resources/**'
+      - 'package*.json'
+      - '*.config.*'
+      - 'tsconfig.json'
+      - '.github/workflows/**'
   push:
     branches: [main]
-
-# A superseded run is cancelled so a fresh head does not queue behind a stale one.
+    paths:
+      - 'src/**'
+      - 'pi-package/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'resources/**'
+      - 'package*.json'
+      - '*.config.*'
+      - 'tsconfig.json'
+      - '.github/workflows/**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 permissions:
   contents: read
-
 jobs:
   quality:
-    name: quality gates and release gate
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          # The gate reads the working tree only; no git credentials are needed afterwards.
           persist-credentials: false
-
-      - name: Use Node 24
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
-
-      # `npm ci` runs the `allowScripts` entries in package.json, which is how Electron's binary is
-      # fetched. Without that binary `npm run build` and the packaged probes cannot work at all.
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Unit tests
-        run: npm test
-
-      # The release gate is the executable definition of "releasable" for this repository. It runs
-      # the quality gates again (harmless) and adds the checks that must never be skipped by hand:
-      # no credential or key material, no unapproved binary, license inventory without AGPL/GPL-3/
-      # SSPL, version agreement across package.json/CHANGELOG/support matrix, the packaging
-      # configuration's load-bearing properties, and the presence of the unverified-capability
-      # records. Its JSON output names anything it could not check.
-      - name: Release gate
-        run: node evidence/p1-07/run-release-gate.mjs
-
-      - name: Upload the release-gate record
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-gate
-          path: evidence/p1-07/release-gate.json
-          if-no-files-found: warn
-          retention-days: 14
+      - run: npm ci
+      - run: npm run check

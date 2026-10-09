@@ -24,8 +24,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "package:win": "npm run build && electron-builder --config electron-builder.config.mjs --win --x64 --publish never",
-    "package:win:dir": "npm run build && electron-builder --config electron-builder.config.mjs --win --x64 --publish never --dir",
-    "verify:p0-baseline": "node evidence/p0-01/verify-baseline.mjs"
+    "check": "npm run typecheck && npm run lint && npm test",
+    "verify:package": "node scripts/verify/package.mjs"
   },
   "dependencies": {
     "koffi": "2.16.3",

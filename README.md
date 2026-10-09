@@ -23,6 +23,9 @@ npm run dev
 
 ## 开发入口
 
+完整质量检查：npm run check。最终安装器构建与验证：npm run verify:package。仅文档或精选记录只检查引用和 diff。
+
+
 [文档主题导航](doc/README.md) · [验证策略](doc/verification.md) · [打包](doc/packaging.md) · [发布](doc/release-process.md) · [精选证据](evidence/README.md)
 
 贡献前阅读 [参考取材入口](doc/reference-playbook.md)、[开发约束](AGENTS.md) 与 [贡献指南](CONTRIBUTING.zh.md)。旧阶段资料从 Git 历史追溯。项目采用 [MIT](LICENSE)，复用代码与依赖声明见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md)。

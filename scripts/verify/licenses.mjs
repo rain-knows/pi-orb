@@ -11,7 +11,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { join, resolve } from "node:path";
 
 const repo = resolve(import.meta.dirname, '../..');
-const reportDir = createRunDirectory('packaging');
+const reportDir = createRunDirectory('reference');
 const nodeModules = join(repo, "node_modules");
 
 /** Names that must never appear in a release notice as a redistributed component. */
@@ -27,14 +27,15 @@ const FORBIDDEN_LICENSES = [/AGPL/i, /GPL-3/i, /SSPL/i];
 function collectProductionGraph() {
   const root = JSON.parse(readFileSync(join(repo, "package.json"), "utf8"));
   const seen = new Map();
-  const queue = Object.keys(root.dependencies ?? {});
+  const required = new Set(Object.keys(root.dependencies ?? {}));
+  const queue = [...required];
 
   while (queue.length > 0) {
     const name = queue.shift();
     if (!name || seen.has(name)) continue;
     const packageJsonPath = join(nodeModules, name, "package.json");
     if (!existsSync(packageJsonPath)) {
-      seen.set(name, { name, missing: true });
+      seen.set(name, { name, missing: true, required: required.has(name) });
       continue;
     }
     const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
@@ -48,12 +49,12 @@ function collectProductionGraph() {
           ? pkg.repository
           : (pkg.repository?.url ?? null),
     });
-    for (const dependency of Object.keys(pkg.dependencies ?? {})) queue.push(dependency);
+    for (const dependency of Object.keys(pkg.dependencies ?? {})) { required.add(dependency); queue.push(dependency); }
     // Optional platform packages are what ship the native driver; they matter here.
     for (const dependency of Object.keys(pkg.optionalDependencies ?? {})) queue.push(dependency);
   }
 
-  return [...seen.values()];
+  return [...seen.values()].map(entry => ({ ...entry, required: required.has(entry.name) }));
 }
 
 function normalizeLicense(value) {
@@ -104,11 +105,14 @@ const report = {
   notInstalledNote:
     "these are declared optional platform packages for other operating systems and architectures; none of them is present on disk, so none ships in a Windows x64 release",
   forbiddenLicenseHits: forbiddenHits,
+  missingRequired: graph.filter(entry => entry.missing && entry.required).map(entry => entry.name),
   packagesWithNoLicenseField: installed.filter((entry) => !entry.license).map((entry) => entry.name),
   packagesWithNoLicenseFile: installed
     .filter((entry) => entry.license && !entry.licenseFile)
     .map((entry) => ({ name: entry.name, license: entry.license })),
 };
+
+report.passed = forbiddenHits.length === 0 && report.missingRequired.length === 0 && report.packagesWithNoLicenseField.length === 0 && report.packagesWithNoLicenseFile.length === 0;
 
 mkdirSync(reportDir, { recursive: true });
 writeFileSync(join(reportDir, "license-inventory.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
@@ -118,6 +122,9 @@ console.log(
     {
       productionDependencyCount: report.productionDependencyCount,
       forbiddenLicenseHits: forbiddenHits.map((entry) => `${entry.name}@${entry.version}: ${entry.license}`),
+      passed: report.passed,
+      missingRequired: report.missingRequired,
+      noLicenseFile: report.packagesWithNoLicenseFile,
       noLicenseField: report.packagesWithNoLicenseField,
     },
     null,
@@ -125,4 +132,4 @@ console.log(
   ),
 );
 
-process.exit(forbiddenHits.length === 0 ? 0 : 1);
+process.exitCode = report.passed ? 0 : 1;

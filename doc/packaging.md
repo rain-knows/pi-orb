@@ -6,6 +6,8 @@
 
 使用锁定依赖的预编译 N-API 二进制，关闭 npmRebuild；审计版本、实际包内容和二进制散列，拒绝源代码、测试、精选 evidence、凭据、非目标平台与 Koffi 头文件。插件单独构建，随 resources 分发，不复制 SDK 依赖。
 
-来源：旧单体 `apps/desktop/electron-builder.config.yml` 与 `apps/desktop/scripts/` 的 Electron 打包形态。未复用 dsh 单体企业发布管道、Cordis npm bundle 和自动 updater，因为 Pi 使用独立插件与每用户安装器。许可见 [第三方声明](../THIRD_PARTY_NOTICES.md)。
+来源：旧单体 `apps/desktop/scripts/electron-builder-config.mjs` 与 `apps/desktop/scripts/` 的 Electron 打包形态。未复用 dsh 单体企业发布管道、Cordis npm bundle 和自动 updater，因为 Pi 使用独立插件与每用户安装器。许可见 [第三方声明](../THIRD_PARTY_NOTICES.md)。
 
 必须验证同一次最终安装器构建的包内容、真实 Pi loader 和打包启动；成功构建不代替运行证据。执行策略见 [验证策略](verification.md)，发布流程见 [发布](release-process.md)。
+
+执行 npm run verify:package；子步骤可独立调用 scripts/verify/package-audit.mjs、plugin-load.mjs、packaged-smoke.mjs，均不重建。运行报告放入独立 evidence/runs/ 目录，保留最终安装器身份。

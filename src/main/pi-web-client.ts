@@ -1,12 +1,12 @@
 /**
  * Minimal pi-web client adapter.
  *
- * Scope (see doc/product-contract.md §4.1 "pi-web 客户端适配"):
+ * Scope (see doc/product-contract.md):
  *  - only the documented HTTP/SSE surface is used,
  *  - credentials never leave the Electron main process,
  *  - no internal pi-web module, registry or React state is touched.
  *
- * Verified behaviour this adapter depends on (evidence/p0-03):
+ * Verified behaviour this adapter depends on (doc/process-boundaries.md):
  *  - `POST /api/agent/new` accepts a `cwd` and returns the real session id,
  *  - `POST /api/agent/{id}` accepts prompt/abort/get_state,
  *  - SSE must be subscribed *before* the prompt, otherwise the turn is missed,
@@ -100,7 +100,7 @@ export class PiWebClient {
    * endpoint (`POST /api/web-auth`).
    *
    * The resulting session cookie stays in the main process and is never handed
-   * to the renderer (see evidence/p0-05/DECISION.md §2). When pi-web runs
+   * to the renderer (see doc/process-boundaries.md). When pi-web runs
    * without a password the endpoint answers 404 and there is nothing to do.
    */
   async authenticate(): Promise<void> {

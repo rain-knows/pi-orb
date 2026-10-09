@@ -204,7 +204,13 @@ for (const entry of textEntries) {
   const text = extractFile(asarPath, entry.split("/").join("\\")).toString("utf8");
   for (const pattern of [/([A-Za-z]:\\Users\\[^"'\\\s]+)/u, /PI_ORB_PI_WEB_PASSWORD\s*[:=]\s*\S/u, /\bsk-[A-Za-z0-9]{16,}/u]) {
     const match = pattern.exec(text);
-    if (match) leaks.push(`${entry}: ${match[0].slice(0, 40)}`);
+    if (match) leaks.push(`${entry}: credential or local user path`);
+  }
+}
+for (const entry of walk(pluginRoot)) {
+  if (/\.(cjs|js|json)$/u.test(entry)) {
+    const content = readFileSync(join(pluginRoot, entry), 'utf8');
+    if (/-----BEGIN [A-Z ]*PRIVATE KEY-----|\bsk-(?:ant-)?[A-Za-z0-9-]{20,}|\bgh[pousr]_[A-Za-z0-9]{30,}/u.test(content)) leaks.push('pi-plugin/' + entry + ': credential');
   }
 }
 check("no built file embeds a local user path or a credential", leaks.length === 0, leaks.slice(0, 5).join(", ") || `scanned ${textEntries.length} files`);

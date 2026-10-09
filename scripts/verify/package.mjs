@@ -1,98 +1,64 @@
+import { execFileSync } from 'node:child_process';
+import { appendFileSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createRunDirectory } from './run-directory.mjs';
-// P2-05 distribution stage runner.
-//
-// One command for the whole automated part of P2-05: build the unpacked Windows app, audit what is
-// inside it, then start that exact artifact and prove it runs. The individual probes are separate
-// files so they can be re-run on their own; this only sequences them and reports the combined
-// result, because "the installer built" on its own says nothing about either question.
-//
-// What remains manual is recorded in `doc/verification.md` §E: installing on a clean machine,
-// the SmartScreen prompt for an unsigned installer, uninstall data retention, and an upgrade over
-// an installed copy.
-//
-// Run: node scripts/verify/package.mjs
 
-import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+const digest = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 
-const repo = resolve(import.meta.dirname, '../..');
-const reportDir = createRunDirectory('packaging');
-const evidenceDir = reportDir;
-
-const stage = {
-  capturedAt: new Date().toISOString(),
-  steps: [],
-  passed: false,
-};
-
-function step(name, command, args, options = {}) {
-  const started = Date.now();
-  try {
-    const output = execFileSync(command, args, {
-      cwd: repo,
-      env: { ...process.env, PI_ORB_VERIFY_OUTPUT: reportDir, NODE_ENV: "development" },
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-      shell: process.platform === "win32",
-      maxBuffer: 64 * 1024 * 1024,
-    });
-    stage.steps.push({ name, ok: true, ms: Date.now() - started, output: output.trim().split(/\r?\n/u).slice(-4).join(" | ") });
-    return true;
-  } catch (error) {
-    const output = `${error.stdout ?? ""}${error.stderr ?? ""}`;
-    stage.steps.push({
-      name,
-      ok: false,
-      ms: Date.now() - started,
-      output: (output || error.message).trim().split(/\r?\n/u).slice(-6).join(" | "),
-    });
-    if (options.stopOnFailure !== false) throw error;
-    return false;
+// Importing this module does not build or write anything. Tests call this runner directly.
+export function verifyPackage({ repo = resolve(import.meta.dirname, '../..'), outputDir = createRunDirectory('packaging'), run = execFileSync } = {}) {
+  const { version } = JSON.parse(readFileSync(join(repo, 'package.json'), 'utf8'));
+  const installer = join(repo, 'release', version, `pi-orb-${version}-win-x64.exe`);
+  const asar = join(repo, 'release', version, 'win-unpacked/resources/app.asar');
+  const stage = { capturedAt: new Date().toISOString(), version, outputDir, steps: [], reports: {}, passed: false };
+  const commands = [
+    ['credentials', 'node', ['scripts/verify/credentials.mjs'], 'credentials.json'],
+    ['licenses', 'node', ['scripts/verify/licenses.mjs'], 'license-inventory.json'],
+    ['final installer build', 'npm', ['run', 'package:win'], null],
+    ['package audit', 'node', ['scripts/verify/package-audit.mjs'], 'package-audit.json'],
+    ['Pi plugin loading', 'node', ['scripts/verify/plugin-load.mjs'], 'plugin-load.json'],
+    ['packaged application launch', 'node', ['scripts/verify/packaged-smoke.mjs'], 'packaged-smoke.json'],
+  ];
+  for (const [name, command, args, reportName] of commands) {
+    const started = Date.now();
+    try {
+      run(command, args, {
+        cwd: repo, env: { ...process.env, NODE_ENV: 'development', PI_ORB_VERIFY_OUTPUT: outputDir },
+        encoding: 'utf8', stdio: 'inherit', shell: process.platform === 'win32',
+      });
+      if (reportName) {
+        const report = JSON.parse(readFileSync(join(outputDir, reportName), 'utf8'));
+        if (report.passed !== true || Date.parse(report.capturedAt) < Date.parse(stage.capturedAt) || !Number.isFinite(Date.parse(report.capturedAt))) {
+          throw new Error(`${reportName} failed or does not belong to this run`);
+        }
+        stage.reports[reportName] = report;
+      } else {
+        stage.installer = { path: installer, bytes: statSync(installer).size, sha256: digest(installer) };
+        stage.asar = { path: asar, sha256: digest(asar) };
+      }
+      stage.steps.push({ name, ok: true, ms: Date.now() - started });
+    } catch (error) {
+      stage.steps.push({ name, ok: false, ms: Date.now() - started, error: error.message });
+      break;
+    }
   }
+  if (stage.steps.length === commands.length && stage.steps.every(step => step.ok)) {
+    try {
+      if (digest(installer) !== stage.installer.sha256 || digest(asar) !== stage.asar.sha256) throw new Error('Final artifact changed during verification');
+      stage.passed = true;
+    } catch (error) {
+      stage.steps.push({ name: 'final artifact identity', ok: false, error: error.message });
+    }
+  }
+  writeFileSync(join(outputDir, 'stage-result.json'), JSON.stringify(stage, null, 2) + '\n');
+  return stage;
 }
 
-// `npm run package:win` runs the project build first, so a broken type or a broken renderer
-// fails here rather than producing a stale package. The probes are launched through `node` on PATH
-// because this shell runs commands as a shell string, which would split an absolute
-// `C:\Program Files\...` interpreter path at the space.
-try {
-  step("build and package the unpacked Windows app", "npm", ["run", "package:win:dir"]);
-  step("audit the packaged artifact", "node", ["scripts/verify/package-audit.mjs"]);
-  step("load the independent packaged plugin with Pi", "node", ["scripts/verify/plugin-load.mjs"]);
-  step("start the packaged application and drive its renderer", "node", ["scripts/verify/packaged-smoke.mjs"]);
-} catch {
-  // The failed step already records the command output. Persist this run's failure below rather
-  // than leaving an older successful stage-result.json behind when an intermediate gate fails.
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  const result = verifyPackage();
+  console.log(JSON.stringify({ passed: result.passed, outputDir: result.outputDir, steps: result.steps, installer: result.installer }, null, 2));
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `reports=${result.outputDir}\n`);
+  process.exitCode = result.passed ? 0 : 1;
 }
-
-const auditPath = join(evidenceDir, "package-audit.json");
-const smokePath = join(evidenceDir, "packaged-smoke.json");
-stage.artifactAudit = existsSync(auditPath) ? JSON.parse(readFileSync(auditPath, "utf8")) : null;
-stage.packagedSmoke = existsSync(smokePath) ? JSON.parse(readFileSync(smokePath, "utf8")) : null;
-stage.installer = existsSync(join(repo, "release"))
-  ? "release/<version>/pi-orb-<version>-win-x64.exe (built by `npm run package:win`)"
-  : null;
-
-stage.passed = stage.steps.every((entry) => entry.ok) && stage.artifactAudit?.passed === true && stage.packagedSmoke?.passed === true;
-writeFileSync(join(evidenceDir, "stage-result.json"), `${JSON.stringify(stage, null, 2)}\n`, "utf8");
-
-console.log(
-  JSON.stringify(
-    {
-      passed: stage.passed,
-      steps: stage.steps.map(({ name, ok, ms }) => ({ name, ok, ms })),
-      artifactAudit: stage.artifactAudit ? { passed: stage.artifactAudit.passed, checks: stage.artifactAudit.checks.length } : null,
-      packagedSmoke: stage.packagedSmoke ? { passed: stage.packagedSmoke.passed, checks: stage.packagedSmoke.checks.length } : null,
-      failed: [
-        ...stage.steps.filter((entry) => !entry.ok).map((entry) => entry.name),
-        ...(stage.packagedSmoke?.checks.filter((entry) => !entry.ok).map((entry) => entry.name) ?? []),
-        ...(stage.artifactAudit?.checks.filter((entry) => !entry.ok).map((entry) => entry.name) ?? []),
-      ],
-    },
-    null,
-    2,
-  ),
-);
-
-process.exit(stage.passed ? 0 : 1);

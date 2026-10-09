@@ -18,3 +18,5 @@
 日常结果放在被忽略的 evidence/runs/，不覆盖精选证据。精选报告保留原内容、运行身份和来源散列；源码变化后旧报告不能证明当前来源或产物通过。旧阶段资料由 Git 历史追溯。入口和范围见 [evidence](../evidence/README.md)。
 
 普通 CI 只执行一次类型、Lint、完整单测，纯文档与精选记录变化不触发。命令以 [package scripts](../package.json) 为准。
+
+日常完整检查用 npm run check。发布先运行一次 npm run lint 和 npm test，再运行 npm run verify:package；后者由 package:win 执行一次类型检查与构建，直接生成安装器，随后审计、加载插件并启动该构建。报告带最终安装器与 ASAR 散列，失败写入同次 stage-result 并退出非零。

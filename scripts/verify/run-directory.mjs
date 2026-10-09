@@ -1,5 +1,5 @@
 import { mkdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
 // A package runner passes its own directory to children. Standalone probes get a new run each time.

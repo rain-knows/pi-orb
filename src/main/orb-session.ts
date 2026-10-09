@@ -4,9 +4,9 @@
  * Owns exactly one Orb chat session at a time, bound to the current run
  * generation. It reuses pi-web's existing session creation, prompt, abort and SSE
  * endpoints instead of implementing any part of the agent loop
- * (doc/product-contract.md §4.1).
+ * (doc/product-contract.md).
  *
- * Verified pi-web behaviour this relies on (evidence/p0-03):
+ * Verified pi-web behaviour this relies on (doc/process-boundaries.md):
  *  - SSE must be subscribed *before* the prompt or the first turn is missed,
  *  - `reload`/reconnect keeps the same session id, so browsing history from the
  *    normal pi-web UI stays possible,
