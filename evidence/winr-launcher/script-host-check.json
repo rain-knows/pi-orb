@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-09T01:27:27+00:00",
+  "reportedMessage": "The current-user pi-orb installation was not found.",
+  "errorBranch": "WScript.Shell.RegRead returned an error",
+  "reportedFailureReproduced": false,
+  "installationFileExists": true,
+  "appPathsRegistryViewsPresent": [32, 64],
+  "cscriptExitCode": 0,
+  "wscript": { "pid": 26116, "exitedWithinTimeout": true, "exitCode": 0 },
+  "cmdExitCode": 0,
+  "pendingLauncherScriptHosts": 0,
+  "shellExecute": { "command": "piorb", "mainPid": 23792, "sameMainPid": true },
+  "runtimePassed": true,
+  "activeOrbTools": 16,
+  "limitation": "The original registry read error code was not captured; its underlying cause remains unconfirmed."
+}

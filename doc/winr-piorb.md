@@ -48,3 +48,12 @@ node evidence/winr-launcher/verify-running.mjs
 
 `piweb` 启动/错误日志在 `%LOCALAPPDATA%\PiWeb\`，Orb 自启动后台日志在
 `%APPDATA%\pi-orb\pi-web-startup.log`。观察框已保存的开关偏好保持原值。
+
+## 安装路径报错复核
+
+用户截图中的 `The current-user pi-orb installation was not found.` 来自 VBS 的
+注册表读取失败分支；该提示本身不能证明安装文件不存在。复核时，两种注册表视图的
+安装项和对应 EXE 均存在，原脚本已无法复现报错，因此未擅自归因或重装。
+此前仅异步调用脚本不足以发现错误弹窗。本次补充同步 `cscript`、等待 `wscript`
+退出码及 CMD 路径残留脚本进程检查，全部通过；ShellExecute 重复启动维持主 PID，
+真实运行时仍有 16 个 Orb 工具。证据见 `evidence/winr-launcher/script-host-check.json`。
